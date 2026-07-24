@@ -363,7 +363,7 @@ footer{text-align:center;font-size:12px;color:var(--grigio);padding:0 20px 30px;
 
 <script>
 // ⚠️ IMPOSTA QUI IL NUMERO WHATSAPP DELLO STUDIO (formato internazionale, senza + e senza spazi)
-const NUMERO_WA = "393000000000";
+const NUMERO_WA = "393895068729";
 
 const $ = id => document.getElementById(id);
 const val = id => ($(id) ? $(id).value.trim() : "");
@@ -550,7 +550,7 @@ function etichetta(nome, valore){
   if (el && el.nextElementSibling) return el.nextElementSibling.textContent.trim();
   return String(valore).replace(/_/g, ' ');
 }
-function etichette(nome, valori){
+function etichetta(nome, valori){
   if (!Array.isArray(valori)) return null;
   return valori.map(v => etichetta(nome, v)).filter(Boolean);
 }
