@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>La tua scheda alimentare · Dott. Taglialatela</title>
+<style>
+:root{
+  --verde:#1f7a5a; --verde-chiaro:#e8f3ee; --testo:#1b2420; --grigio:#6b7770;
+  --bordo:#d8e0dc; --sfondo:#f7f9f8; --rosso:#c0392b;
+  --g-verde:#2e9e6b; --g-giallo:#e0a800; --g-rosso:#c0392b;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--sfondo);color:var(--testo);
+  font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+header{background:#fff;border-bottom:1px solid var(--bordo);padding:22px 20px 18px;text-align:center}
+header h1{margin:0;font-size:17px}
+header p{margin:5px 0 0;color:var(--grigio);font-size:13px}
+.intro{background:var(--verde-chiaro);margin:16px;border-radius:12px;padding:16px;font-size:14px;line-height:1.6}
+.progress{position:sticky;top:0;z-index:10;height:4px;background:var(--bordo)}
+.progress i{display:block;height:100%;width:0;background:var(--verde);transition:width .3s}
+main{max-width:600px;margin:0 auto;padding:2px 16px 130px}
+fieldset{background:#fff;border:1px solid var(--bordo);border-radius:12px;margin:0 0 16px;padding:18px 16px}
+legend{font-weight:600;font-size:15px;padding:0 8px;color:var(--verde)}
+label{display:block;font-size:14px;font-weight:500;margin:16px 0 6px}
+label:first-of-type{margin-top:4px}
+.hint{font-size:13px;color:var(--grigio);font-weight:400;margin:-2px 0 8px;line-height:1.45}
+input[type=text],input[type=number],input[type=time],select,textarea{
+  width:100%;padding:12px;border:1px solid var(--bordo);border-radius:9px;
+  font-size:16px;background:#fff;color:var(--testo);font-family:inherit}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--verde);outline-offset:1px;border-color:var(--verde)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.chip{position:relative;display:inline-flex;cursor:pointer}
+.chip input{position:absolute;opacity:0;width:100%;height:100%;left:0;top:0;margin:0;cursor:pointer}
+.chip span{display:block;padding:9px 14px;border:1px solid var(--bordo);border-radius:20px;font-size:14px;background:#fff;transition:.15s}
+.chip input:checked+span{background:var(--verde);border-color:var(--verde);color:#fff;font-weight:500}
+.chip input:focus-visible+span{outline:2px solid var(--verde);outline-offset:2px}
+.hidden{display:none}
+.sub{border-left:3px solid var(--verde-chiaro);padding-left:12px;margin-top:10px}
+
+/* griglia alimenti */
+.legenda{display:flex;gap:14px;font-size:12.5px;color:var(--grigio);margin:8px 0 12px;flex-wrap:wrap}
+.legenda b{font-weight:600;color:var(--testo)}
+.gruppo{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--grigio);
+  margin:18px 0 6px;font-weight:600}
+.cibo{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bordo)}
+.cibo .nome{flex:1;font-size:14.5px;line-height:1.35}
+.cibo .scelte{display:flex;gap:6px;flex:none}
+.liv{position:relative;width:38px;height:38px}
+.liv input{position:absolute;opacity:0;width:100%;height:100%;left:0;top:0;margin:0;cursor:pointer}
+.liv span{display:flex;align-items:center;justify-content:center;width:38px;height:38px;
+  border-radius:50%;border:1.5px solid var(--bordo);background:#fff;font-size:17px;transition:.15s}
+.liv.v input:checked+span{background:var(--g-verde);border-color:var(--g-verde)}
+.liv.g input:checked+span{background:var(--g-giallo);border-color:var(--g-giallo)}
+.liv.r input:checked+span{background:var(--g-rosso);border-color:var(--g-rosso)}
+.liv input:checked+span{color:#fff}
+.liv input:focus-visible+span{outline:2px solid var(--verde);outline-offset:2px}
+
+/* griglia pasti */
+table.pasti{width:100%;border-collapse:collapse;margin-top:8px}
+table.pasti th{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--grigio);
+  font-weight:600;padding:6px 4px;text-align:left}
+table.pasti td{padding:5px 4px;border-bottom:1px solid var(--bordo)}
+table.pasti td:first-child{font-size:14px;width:26%}
+table.pasti select{padding:9px 6px;font-size:14px}
+
+.err{color:var(--rosso);font-size:13px;margin-top:5px;display:none}
+.err.on{display:block}
+.barra{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--bordo);
+  padding:12px 16px calc(12px + env(safe-area-inset-bottom));z-index:20}
+.barra .inner{max-width:600px;margin:0 auto}
+button{width:100%;padding:15px;border:0;border-radius:11px;background:var(--verde);color:#fff;
+  font-size:16px;font-weight:600;font-family:inherit;cursor:pointer}
+button.sec{background:#fff;color:var(--verde);border:1.5px solid var(--verde);margin-top:9px}
+#esito{display:none} #esito.on{display:block}
+.out{background:#fff;border:1px solid var(--bordo);border-radius:10px;padding:12px;
+  font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;
+  max-height:230px;overflow:auto;margin-top:8px}
+.ok{background:var(--verde-chiaro);border-radius:10px;padding:14px;margin-bottom:14px;font-size:14px}
+footer{text-align:center;font-size:12px;color:var(--grigio);padding:0 20px 30px;line-height:1.6}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="progress"><i id="bar"></i></div>
+
+<header>
+  <h1>Dott. Giuseppe Taglialatela</h1>
+  <p>La tua scheda alimentare · circa 5 minuti</p>
+</header>
+
+<div class="intro">
+  Da queste risposte esce il <strong>tuo</strong> piano. Servono a costruirlo attorno a come vivi
+  e a cosa ti piace davvero — non a farti un esame. Non ci sono risposte sbagliate.
+</div>
+
+<main>
+<form id="form" novalidate>
+
+<!-- ══════ SEZIONE 5 ══════ -->
+<fieldset>
+<legend>Cosa devi evitare</legend>
+
+<label>Allergie alimentari accertate</label>
+<div class="hint">Solo quelle diagnosticate, non i cibi che ti danno fastidio.</div>
+<div class="chips">
+  <label class="chip"><input type="checkbox" name="all" value="nessuna" id="all_nessuna"><span>Nessuna</span></label>
+  <label class="chip"><input type="checkbox" name="all" value="glutine"><span>Glutine</span></label>
+  <label class="chip"><input type="checkbox" name="all" value="latte"><span>Proteine del latte</span></label>
+  <label class="chip"><input type="checkbox" name="all" value="uova"><span>Uova</span></label>
+  <label class="chip"><input type="checkbox" name="all" value="arachidi"><span>Arachidi</span></label>
+  <label class="chip"><input type="checkbox" name="all" value="frutta_guscio"><span>Frutta a guscio</span></label>
+  <label class="chip"><input type="checkbox" name="all" value="pesce"><span>Pesce</span></label>
+  <label class="chip"><input type="checkbox" name="all" value="crostacei"><span>Crostacei</span></label>
+  <label class="chip"><input type="checkbox" name="all" value="molluschi"><span>Molluschi</span></label>
+  <label class="chip"><input type="checkbox" name="all" value="soia"><span>Soia</span></label>
+  <label class="chip"><input type="checkbox" name="all" value="sesamo"><span>Sesamo</span></label>
+  <label class="chip"><input type="checkbox" name="all" value="senape"><span>Senape</span></label>
+  <label class="chip"><input type="checkbox" name="all" value="sedano"><span>Sedano</span></label>
+  <label class="chip"><input type="checkbox" name="all" value="lupini"><span>Lupini</span></label>
+  <label class="chip"><input type="checkbox" name="all" value="solfiti"><span>Solfiti</span></label>
+</div>
+<div class="sub hidden" id="sub_all">
+  <label>Sono state confermate da test allergologici?</label>
+  <div class="chips">
+    <label class="chip"><input type="radio" name="all_test" value="si"><span>Sì</span></label>
+    <label class="chip"><input type="radio" name="all_test" value="no"><span>No, è un sospetto</span></label>
+  </div>
+</div>
+
+<label>Intolleranze</label>
+<div class="chips">
+  <label class="chip"><input type="checkbox" name="intoll" value="nessuna" id="int_nessuna"><span>Nessuna</span></label>
+  <label class="chip"><input type="checkbox" name="intoll" value="lattosio" id="int_lattosio"><span>Lattosio</span></label>
+  <label class="chip"><input type="checkbox" name="intoll" value="celiachia"><span>Celiachia diagnosticata</span></label>
+  <label class="chip"><input type="checkbox" name="intoll" value="glutine_nc"><span>Il glutine mi dà fastidio, ma non sono celiaco</span></label>
+  <label class="chip"><input type="checkbox" name="intoll" value="istamina"><span>Istamina</span></label>
+  <label class="chip"><input type="checkbox" name="intoll" value="fruttosio"><span>Fruttosio</span></label>
+</div>
+<div class="sub hidden" id="sub_lattosio">
+  <label>Quanto lattosio riesci a tollerare?</label>
+  <div class="hint">Molti tollerano bene i formaggi stagionati e lo yogurt: saperlo mi permette di non toglierteli inutilmente.</div>
+  <div class="chips">
+    <label class="chip"><input type="radio" name="latt_grado" value="nulla"><span>Nulla, nemmeno tracce</span></label>
+    <label class="chip"><input type="radio" name="latt_grado" value="parziale"><span>Stagionati e yogurt sì</span></label>
+    <label class="chip"><input type="radio" name="latt_grado" value="piccole_quantita"><span>Piccole quantità di tutto</span></label>
+  </div>
+</div>
+
+<label>Come mangi</label>
+<div class="chips">
+  <label class="chip"><input type="radio" name="regime" value="onnivoro"><span>Di tutto</span></label>
+  <label class="chip"><input type="radio" name="regime" value="pesco_vegetariano"><span>Niente carne, ma pesce sì</span></label>
+  <label class="chip"><input type="radio" name="regime" value="vegetariano"><span>Vegetariano</span></label>
+  <label class="chip"><input type="radio" name="regime" value="vegano"><span>Vegano</span></label>
+</div>
+
+<label>Restrizioni religiose o culturali</label>
+<div class="chips">
+  <label class="chip"><input type="checkbox" name="rel" value="nessuna"><span>Nessuna</span></label>
+  <label class="chip"><input type="checkbox" name="rel" value="halal"><span>Halal</span></label>
+  <label class="chip"><input type="checkbox" name="rel" value="kosher"><span>Kosher</span></label>
+  <label class="chip"><input type="checkbox" name="rel" value="digiuni"><span>Periodi di digiuno</span></label>
+</div>
+</fieldset>
+
+<!-- ══════ GRIGLIA ALIMENTI ══════ -->
+<fieldset>
+<legend>Cosa ti piace</legend>
+<div class="hint">Per ogni alimento tocca il cerchio che ti rappresenta. È la parte che conta di più:
+da qui dipende se il piano sarà mangiabile o no.</div>
+<div class="legenda">
+  <span><b style="color:var(--g-verde)">●</b> lo mangio volentieri</span>
+  <span><b style="color:var(--g-giallo)">●</b> lo mangio se serve</span>
+  <span><b style="color:var(--g-rosso)">●</b> non lo mangio</span>
+</div>
+<div id="griglia"></div>
+
+<label for="cibi_altro">Altri alimenti che non mangi o che non hai trovato in elenco</label>
+<input type="text" id="cibi_altro">
+
+<label>Ci sono consistenze che proprio non sopporti?</label>
+<div class="chips">
+  <label class="chip"><input type="checkbox" name="cons" value="nessuna"><span>No</span></label>
+  <label class="chip"><input type="checkbox" name="cons" value="molliccio"><span>Molliccio</span></label>
+  <label class="chip"><input type="checkbox" name="cons" value="viscido"><span>Viscido</span></label>
+  <label class="chip"><input type="checkbox" name="cons" value="croccante"><span>Troppo duro</span></label>
+</div>
+
+<label>Come va la masticazione?</label>
+<div class="chips">
+  <label class="chip"><input type="radio" name="mastic" value="ok"><span>Nessun problema</span></label>
+  <label class="chip"><input type="radio" name="mastic" value="protesi"><span>Ho una protesi</span></label>
+  <label class="chip"><input type="radio" name="mastic" value="difficolta"><span>Faccio fatica</span></label>
+</div>
+
+<label for="irrinunciabile">C'è un alimento a cui non sei disposto a rinunciare?</label>
+<div class="hint">Rispondi sinceramente: costruisco il piano attorno a quello, invece che contro.</div>
+<input type="text" id="irrinunciabile" placeholder="es. il caffè con il cornetto la domenica">
+
+<label for="eliminabile">C'è qualcosa che elimineresti subito, senza fatica?</label>
+<input type="text" id="eliminabile" placeholder="es. le bibite gassate">
+</fieldset>
+
+<!-- ══════ SEZIONE 6 ══════ -->
+<fieldset>
+<legend>Come vivi le giornate</legend>
+
+<label>Dove mangi, di solito</label>
+<div class="hint">Indica dove consumi ogni pasto nei giorni feriali e nel fine settimana.</div>
+<table class="pasti">
+  <tr><th></th><th>Feriale</th><th>Weekend</th></tr>
+  <tr><td>Colazione</td><td id="c_f"></td><td id="c_w"></td></tr>
+  <tr><td>Spuntino</td><td id="s_f"></td><td id="s_w"></td></tr>
+  <tr><td>Pranzo</td><td id="p_f"></td><td id="p_w"></td></tr>
+  <tr><td>Cena</td><td id="n_f"></td><td id="n_w"></td></tr>
+</table>
+
+<label>A che ora mangi, nei giorni feriali</label>
+<table class="pasti">
+  <tr><td>Colazione</td><td colspan="2"><input type="time" id="ora_col"></td></tr>
+  <tr><td>Pranzo</td><td colspan="2"><input type="time" id="ora_pra"></td></tr>
+  <tr><td>Cena</td><td colspan="2"><input type="time" id="ora_cen"></td></tr>
+</table>
+
+<label>Chi cucina, a casa tua?</label>
+<div class="chips">
+  <label class="chip"><input type="radio" name="chi_cucina" value="io"><span>Io</span></label>
+  <label class="chip"><input type="radio" name="chi_cucina" value="altri"><span>Qualcun altro</span></label>
+  <label class="chip"><input type="radio" name="chi_cucina" value="dipende"><span>Dipende</span></label>
+  <label class="chip"><input type="radio" name="chi_cucina" value="nessuno"><span>Nessuno, compro pronto</span></label>
+</div>
+
+<label>Si cucina solo per te o anche per altri?</label>
+<div class="chips">
+  <label class="chip"><input type="radio" name="cucina_per" value="solo_me" id="solo_me"><span>Solo per me</span></label>
+  <label class="chip"><input type="radio" name="cucina_per" value="anche_altri" id="anche_altri"><span>Anche per altri</span></label>
+</div>
+<div class="sub hidden" id="sub_altri">
+  <label for="persone">Quante persone a tavola, te compreso</label>
+  <input type="number" id="persone" inputmode="numeric" min="2" max="12">
+  <label>Riusciresti a prepararti un piatto diverso dal loro?</label>
+  <div class="hint">Se la risposta è no, costruisco un piano che funziona sulla stessa base per tutti.</div>
+  <div class="chips">
+    <label class="chip"><input type="radio" name="piatto_sep" value="si"><span>Sì</span></label>
+    <label class="chip"><input type="radio" name="piatto_sep" value="a_volte"><span>Qualche volta</span></label>
+    <label class="chip"><input type="radio" name="piatto_sep" value="no"><span>No</span></label>
+  </div>
+</div>
+
+<label>Quanto tempo hai per cucinare, in settimana</label>
+<div class="chips">
+  <label class="chip"><input type="radio" name="tempo_f" value="meno_15"><span>Meno di 15 min</span></label>
+  <label class="chip"><input type="radio" name="tempo_f" value="15-30"><span>15-30 min</span></label>
+  <label class="chip"><input type="radio" name="tempo_f" value="oltre_30"><span>Più di 30 min</span></label>
+</div>
+
+<label>E nel weekend</label>
+<div class="chips">
+  <label class="chip"><input type="radio" name="tempo_w" value="meno_15"><span>Meno di 15 min</span></label>
+  <label class="chip"><input type="radio" name="tempo_w" value="15-30"><span>15-30 min</span></label>
+  <label class="chip"><input type="radio" name="tempo_w" value="oltre_30"><span>Più di 30 min</span></label>
+</div>
+
+<label>Quanto te la cavi ai fornelli, da 1 a 5</label>
+<div class="chips">
+  <label class="chip"><input type="radio" name="abilita" value="1"><span>1</span></label>
+  <label class="chip"><input type="radio" name="abilita" value="2"><span>2</span></label>
+  <label class="chip"><input type="radio" name="abilita" value="3"><span>3</span></label>
+  <label class="chip"><input type="radio" name="abilita" value="4"><span>4</span></label>
+  <label class="chip"><input type="radio" name="abilita" value="5"><span>5</span></label>
+</div>
+
+<label>Come sono i tuoi orari di lavoro</label>
+<div class="chips">
+  <label class="chip"><input type="radio" name="lavoro" value="fisso"><span>Fissi</span></label>
+  <label class="chip"><input type="radio" name="lavoro" value="turni"><span>A turni</span></label>
+  <label class="chip"><input type="radio" name="lavoro" value="notturno"><span>Anche di notte</span></label>
+  <label class="chip"><input type="radio" name="lavoro" value="variabile"><span>Variabili</span></label>
+  <label class="chip"><input type="radio" name="lavoro" value="non_lavoro"><span>Non lavoro</span></label>
+</div>
+
+<label>Quanto puoi spendere per la spesa</label>
+<div class="hint">Serve solo a scegliere ingredienti sostenibili per te. Nessuna cifra.</div>
+<div class="chips">
+  <label class="chip"><input type="radio" name="spesa" value="contenuta"><span>Devo stare attento</span></label>
+  <label class="chip"><input type="radio" name="spesa" value="media"><span>Nella media</span></label>
+  <label class="chip"><input type="radio" name="spesa" value="libera"><span>Non è un problema</span></label>
+</div>
+</fieldset>
+
+<!-- ══════ SEZIONE 7 ══════ -->
+<fieldset>
+<legend>Come è andata finora</legend>
+
+<label>Hai già seguito diete in passato?</label>
+<div class="chips">
+  <label class="chip"><input type="radio" name="diete" value="mai" id="diete_mai"><span>Mai</span></label>
+  <label class="chip"><input type="radio" name="diete" value="una_due"><span>Una o due</span></label>
+  <label class="chip"><input type="radio" name="diete" value="molte"><span>Molte</span></label>
+</div>
+
+<div class="sub hidden" id="sub_diete">
+  <label>Com'è andata?</label>
+  <div class="chips">
+    <label class="chip"><input type="radio" name="esito" value="nessun_calo"><span>Non ho perso peso</span></label>
+    <label class="chip"><input type="radio" name="esito" value="calo_poi_recupero"><span>Ho perso e poi ripreso</span></label>
+    <label class="chip"><input type="radio" name="esito" value="calo_mantenuto"><span>Ho perso e mantenuto</span></label>
+  </div>
+  <label>Perché l'hai interrotta?</label>
+  <div class="hint">È la domanda più utile di tutta la scheda: mi dice cosa evitare stavolta.</div>
+  <div class="chips">
+    <label class="chip"><input type="radio" name="motivo" value="troppo_restrittiva"><span>Troppo restrittiva</span></label>
+    <label class="chip"><input type="radio" name="motivo" value="troppo_complicata"><span>Troppo complicata da preparare</span></label>
+    <label class="chip"><input type="radio" name="motivo" value="ripetitiva"><span>Sempre le stesse cose</span></label>
+    <label class="chip"><input type="radio" name="motivo" value="costo"><span>Costava troppo</span></label>
+    <label class="chip"><input type="radio" name="motivo" value="periodo_difficile"><span>Un periodo difficile</span></label>
+    <label class="chip"><input type="radio" name="motivo" value="risultati_lenti"><span>Risultati troppo lenti</span></label>
+    <label class="chip"><input type="radio" name="motivo" value="obiettivo_raggiunto"><span>Avevo raggiunto l'obiettivo</span></label>
+  </div>
+</div>
+
+<label>Cosa vuoi ottenere, soprattutto</label>
+<div class="chips">
+  <label class="chip"><input type="radio" name="obiettivo" value="peso"><span>Perdere peso</span></label>
+  <label class="chip"><input type="radio" name="obiettivo" value="esami"><span>Migliorare gli esami</span></label>
+  <label class="chip"><input type="radio" name="obiettivo" value="energia"><span>Avere più energia</span></label>
+  <label class="chip"><input type="radio" name="obiettivo" value="evento"><span>Un appuntamento preciso</span></label>
+  <label class="chip"><input type="radio" name="obiettivo" value="salute"><span>Stare meglio in generale</span></label>
+</div>
+
+<label for="entro">Entro quando vorresti riuscirci</label>
+<input type="text" id="entro" placeholder="es. entro la primavera">
+
+<label>Chi ha deciso di iniziare questo percorso?</label>
+<div class="chips">
+  <label class="chip"><input type="radio" name="chi_deciso" value="io"><span>Io</span></label>
+  <label class="chip"><input type="radio" name="chi_deciso" value="medico"><span>Me l'ha detto il medico</span></label>
+  <label class="chip"><input type="radio" name="chi_deciso" value="familiare"><span>Un familiare insiste</span></label>
+</div>
+
+<label for="fiducia">Quanto ti senti fiducioso di riuscirci, da 1 a 10</label>
+<input type="number" id="fiducia" inputmode="numeric" min="1" max="10">
+
+<label>Cosa temi di più</label>
+<div class="chips">
+  <label class="chip"><input type="radio" name="timore" value="fame"><span>La fame</span></label>
+  <label class="chip"><input type="radio" name="timore" value="rinunce"><span>Rinunciare a ciò che mi piace</span></label>
+  <label class="chip"><input type="radio" name="timore" value="tempo"><span>Non avere tempo</span></label>
+  <label class="chip"><input type="radio" name="timore" value="fallire"><span>Fallire di nuovo</span></label>
+</div>
+
+<label>In casa ti sostengono?</label>
+<div class="chips">
+  <label class="chip"><input type="radio" name="supporto" value="si"><span>Sì</span></label>
+  <label class="chip"><input type="radio" name="supporto" value="in_parte"><span>In parte</span></label>
+  <label class="chip"><input type="radio" name="supporto" value="no"><span>No</span></label>
+</div>
+
+<label for="note">Vuoi aggiungere qualcosa?</label>
+<textarea id="note" rows="3"></textarea>
+
+<label for="nome_b">Il tuo nome e cognome *</label>
+<div class="hint">Serve solo ad abbinare questa scheda alla tua cartella.</div>
+<input type="text" id="nome_b" autocomplete="name">
+<div class="err" id="e_nome_b">Campo obbligatorio</div>
+</fieldset>
+
+</form>
+
+<div id="esito">
+  <div class="ok"><strong>Ci siamo.</strong> Tocca il pulsante verde: si apre WhatsApp con tutto
+  già scritto, devi solo premere invio.</div>
+  <div class="out" id="out_testo"></div>
+  <details style="margin-top:12px">
+    <summary style="font-size:13px;color:#6b7770;cursor:pointer">Dati in formato archivio (per il nutrizionista)</summary>
+    <div class="out" id="out_json"></div>
+    <button class="sec" type="button" onclick="copia('out_json',this)">Copia dati archivio</button>
+  </details>
+</div>
+
+</main>
+
+<div class="barra"><div class="inner">
+  <button type="button" id="btn_genera">Invia la scheda</button>
+  <div id="btn_invio" style="display:none">
+    <button type="button" id="btn_wa">Apri WhatsApp e invia</button>
+    <button class="sec" type="button" onclick="copia('out_testo',this)">Copia il testo</button>
+  </div>
+</div></div>
+
+<footer>Dott. Giuseppe Taglialatela · Farmacista · Consulente in Nutrizione · Napoli</footer>
+
+<script>
+// ⚠️ IMPOSTA QUI IL NUMERO WHATSAPP DELLO STUDIO (formato internazionale, senza + e senza spazi)
+const NUMERO_WA = "393000000000";
+
+const $ = id => document.getElementById(id);
+const val = id => ($(id) ? $(id).value.trim() : "");
+const radio = n => { const e = document.querySelector(`input[name="${n}"]:checked`); return e ? e.value : null; };
+const checks = n => [...document.querySelectorAll(`input[name="${n}"]:checked`)].map(e => e.value);
+
+/* ---------- griglia alimenti ---------- */
+const ALIMENTI = [
+  ['Pesce e frutti di mare', [
+    ['pesce_azzurro','Pesce azzurro — alici, sgombro, sardine'],
+    ['pesce_bianco','Pesce bianco — merluzzo, orata, spigola'],
+    ['tonno_salmone_scatola','Tonno o salmone in scatola'],
+    ['frutti_di_mare_molluschi','Frutti di mare e molluschi']]],
+  ['Altre proteine', [
+    ['uova','Uova'],
+    ['carne_bianca','Carne bianca — pollo, tacchino'],
+    ['carne_rossa_magra','Carne rossa magra'],
+    ['legumi','Legumi — ceci, fagioli, lenticchie, piselli']]],
+  ['Latticini', [
+    ['latte','Latte'],
+    ['yogurt_bianco','Yogurt bianco naturale'],
+    ['yogurt_greco','Yogurt greco'],
+    ['formaggi_freschi','Formaggi freschi — ricotta, fiocchi, primo sale'],
+    ['formaggi_stagionati','Formaggi stagionati']]],
+  ['Cereali e amidi', [
+    ['pane_pasta_integrali','Pane e pasta integrali'],
+    ['cereali_in_chicco','Cereali in chicco — orzo, farro'],
+    ['patate','Patate']]],
+  ['Verdure, frutta, grassi', [
+    ['verdure_amare','Verdure amare — friarielli, cicoria, scarola, broccoli'],
+    ['verdura_cruda_insalate','Verdura cruda e insalate'],
+    ['frutta_fresca','Frutta fresca'],
+    ['frutta_secca_guscio','Frutta secca a guscio — noci, mandorle'],
+    ['aglio_cipolla','Aglio e cipolla']]]
+];
+(function costruisciGriglia(){
+  const c = $('griglia');
+  ALIMENTI.forEach(([gruppo, voci]) => {
+    const h = document.createElement('div'); h.className = 'gruppo'; h.textContent = gruppo; c.appendChild(h);
+    voci.forEach(([k, etichetta]) => {
+      const r = document.createElement('div'); r.className = 'cibo';
+      r.innerHTML =
+        `<div class="nome">${etichetta}</div>
+         <div class="scelte">
+           <label class="liv v"><input type="radio" name="cibo_${k}" value="verde" aria-label="${etichetta}: volentieri"><span>●</span></label>
+           <label class="liv g"><input type="radio" name="cibo_${k}" value="giallo" aria-label="${etichetta}: se serve"><span>●</span></label>
+           <label class="liv r"><input type="radio" name="cibo_${k}" value="rosso" aria-label="${etichetta}: non lo mangio"><span>●</span></label>
+         </div>`;
+      c.appendChild(r);
+    });
+  });
+})();
+
+/* ---------- griglia dove mangia ---------- */
+const LUOGHI = [['casa','A casa'],['porta_da_casa','Lo porto da casa'],['mensa','Mensa'],
+                ['bar','Bar'],['ristorante','Fuori, al ristorante'],['salta','Lo salto']];
+[['c','colazione'],['s','spuntino'],['p','pranzo'],['n','cena']].forEach(([sigla]) => {
+  ['f','w'].forEach(g => {
+    const sel = document.createElement('select');
+    sel.id = `dove_${sigla}_${g}`;
+    sel.innerHTML = `<option value="">—</option>` + LUOGHI.map(([v,e]) => `<option value="${v}">${e}</option>`).join('');
+    $(`${sigla}_${g}`).appendChild(sel);
+  });
+});
+
+/* ---------- campi a comparsa ---------- */
+const mostra = (el, on) => $(el).classList.toggle('hidden', !on);
+document.querySelectorAll('input[name=all]').forEach(c => c.addEventListener('change', () => {
+  mostra('sub_all', checks('all').filter(v => v !== 'nessuna').length > 0);
+}));
+$('int_lattosio').addEventListener('change', e => mostra('sub_lattosio', e.target.checked));
+document.querySelectorAll('input[name=cucina_per]').forEach(r =>
+  r.addEventListener('change', e => mostra('sub_altri', e.target.value === 'anche_altri')));
+document.querySelectorAll('input[name=diete]').forEach(r =>
+  r.addEventListener('change', e => mostra('sub_diete', e.target.value !== 'mai')));
+
+function esclusiva(idNessuno, gruppo){
+  const n = $(idNessuno); if (!n) return;
+  n.addEventListener('change', () => {
+    if (n.checked) document.querySelectorAll(`input[name="${gruppo}"]`).forEach(c => { if (c !== n) c.checked = false; });
+    if (gruppo === 'all') mostra('sub_all', false);
+    if (gruppo === 'intoll') mostra('sub_lattosio', false);
+  });
+  document.querySelectorAll(`input[name="${gruppo}"]`).forEach(c => {
+    if (c !== n) c.addEventListener('change', () => { if (c.checked) n.checked = false; });
+  });
+}
+esclusiva('all_nessuna', 'all');
+esclusiva('int_nessuna', 'intoll');
+
+/* ---------- barra ---------- */
+function aggiornaBarra(){
+  const tot = document.querySelectorAll('#form input, #form select, #form textarea').length;
+  let fatti = 0;
+  document.querySelectorAll('#form input, #form select, #form textarea').forEach(e => {
+    if (e.type === 'checkbox' || e.type === 'radio') { if (e.checked) fatti++; }
+    else if (e.value.trim()) fatti++;
+  });
+  $('bar').style.width = Math.min(100, Math.round(fatti / tot * 300)) + '%';
+}
+document.addEventListener('input', aggiornaBarra);
+document.addEventListener('change', aggiornaBarra);
+
+/* ---------- raccolta ---------- */
+function codicePaziente(nome){
+  const p = nome.trim().split(/\s+/);
+  const cap = s => s ? s[0].toUpperCase() + s.slice(1).toLowerCase() : '';
+  if (p.length < 2) return cap(p[0] || 'Paziente');
+  return cap(p[p.length - 1]) + cap(p[0]);
+}
+const num = v => v === '' ? null : Number(v);
+
+function raccogli(){
+  const griglia = {};
+  ALIMENTI.forEach(([, voci]) => voci.forEach(([k]) => { griglia[k] = radio('cibo_' + k); }));
+
+  const dove = { feriale: {}, weekend: {} };
+  [['c','colazione'],['s','spuntino'],['p','pranzo'],['n','cena']].forEach(([s, nome]) => {
+    dove.feriale[nome] = val(`dove_${s}_f`) || null;
+    dove.weekend[nome] = val(`dove_${s}_w`) || null;
+  });
+  const fuori = ['bar','ristorante','mensa'];
+  const fuoriSett = Object.values(dove.feriale).filter(v => fuori.includes(v)).length * 5
+                  + Object.values(dove.weekend).filter(v => fuori.includes(v)).length * 2;
+
+  const vincoli = [];
+  if (radio('piatto_sep') === 'no')
+    vincoli.push("Non può fare piatto separato: il piano deve funzionare sulla stessa base della tavola comune.");
+  if (Object.values(dove.feriale).includes('porta_da_casa'))
+    vincoli.push("Porta almeno un pasto da casa nel feriale: servono opzioni trasportabili.");
+  if (radio('tempo_f') === 'meno_15')
+    vincoli.push("Meno di 15 minuti per cucinare nel feriale: ricette rapide o preparazioni anticipate.");
+  if (radio('lavoro') === 'turni' || radio('lavoro') === 'notturno')
+    vincoli.push("Turnista: il piano va costruito per fasce, non per orari fissi.");
+  if (radio('spesa') === 'contenuta')
+    vincoli.push("Budget contenuto: privilegiare legumi, uova, conserve ittiche, verdure di stagione.");
+  if (griglia.legumi === 'rosso')
+    vincoli.push("Rifiuta i legumi: rivedere fibra, proteine vegetali e sazietà.");
+  if (griglia.aglio_cipolla === 'rosso')
+    vincoli.push("Rifiuta aglio e cipolla: serve una strategia alternativa di aromatizzazione se il piano è iposodico.");
+  if (radio('motivo') === 'ripetitiva')
+    vincoli.push("Ha abbandonato per ripetitività: massima rotazione e liste di scambio.");
+  if (radio('motivo') === 'troppo_complicata')
+    vincoli.push("Ha abbandonato per complessità: preparazioni semplici, poche grammature.");
+  if (num(val('fiducia')) !== null && num(val('fiducia')) <= 4)
+    vincoli.push("Fiducia bassa: obiettivi intermedi ravvicinati e verifiche più frequenti.");
+  if (radio('chi_deciso') !== 'io' && radio('chi_deciso') !== null)
+    vincoli.push("Motivazione non autonoma: rinforzo e contatti più ravvicinati nelle prime settimane.");
+
+  const nome = val('nome_b');
+  return {
+    _meta: { schema: "FascicoloPaziente_StudioTaglialatela", versione_schema: "1.0",
+             origine: "Form B - scheda alimentare e stile di vita",
+             compilato_il: new Date().toISOString().slice(0,10) },
+    codice_paziente: codicePaziente(nome), nome_completo: nome,
+    sez5_vincoli_alimentari: {
+      allergie_accertate: checks('all'), allergie_confermate_da_test: radio('all_test'),
+      intolleranze: checks('intoll'), grado_tolleranza_lattosio: radio('latt_grado'),
+      regime: radio('regime'), restrizioni_religiose_culturali: checks('rel'),
+      griglia_alimenti: griglia,
+      alimenti_esclusi_testo_libero: val('cibi_altro'),
+      avversioni_consistenza: checks('cons'), masticazione: radio('mastic'),
+      alimento_irrinunciabile: val('irrinunciabile'),
+      alimento_eliminabile_subito: val('eliminabile')
+    },
+    sez6_contesto_vita: {
+      dove_mangia: dove, orari_pasti: { colazione: val('ora_col'), pranzo: val('ora_pra'), cena: val('ora_cen') },
+      cucina: { chi_cucina: radio('chi_cucina'), cucina_per: radio('cucina_per'),
+                persone_a_tavola: num(val('persone')), puo_fare_piatto_separato: radio('piatto_sep'),
+                tempo_disponibile_feriale: radio('tempo_f'), tempo_disponibile_weekend: radio('tempo_w'),
+                abilita_cucina_1_5: num(radio('abilita')) },
+      orario_lavoro: radio('lavoro'), fascia_spesa: radio('spesa'),
+      _derivato_pasti_fuori_casa_settimana: fuoriSett
+    },
+    sez7_storia_obiettivi: {
+      diete_precedenti: radio('diete'), esito_precedente: radio('esito'),
+      motivo_interruzione: radio('motivo'),
+      obiettivo_principale: radio('obiettivo'), obiettivo_entro: val('entro'),
+      chi_ha_deciso: radio('chi_deciso'), fiducia_1_10: num(val('fiducia')),
+      timore_principale: radio('timore'), supporto_in_casa: radio('supporto'),
+      note_paziente: val('note')
+    },
+    _derivato_vincoli_operativi: vincoli
+  };
+}
+
+
+/* ---------- etichette leggibili ---------- */
+function etichetta(nome, valore){
+  if (valore === null || valore === undefined || valore === '') return null;
+  const el = document.querySelector(`input[name="${nome}"][value="${valore}"]`);
+  if (el && el.nextElementSibling) return el.nextElementSibling.textContent.trim();
+  return String(valore).replace(/_/g, ' ');
+}
+function etichette(nome, valori){
+  if (!Array.isArray(valori)) return null;
+  return valori.map(v => etichetta(nome, v)).filter(Boolean);
+}
+function dataIt(iso){
+  if (!iso) return null;
+  const p = iso.split('-');
+  if (p.length === 3) return `${p[2]}/${p[1]}/${p[0]}`;
+  if (p.length === 2) return `${p[1]}/${p[0]}`;
+  return iso;
+}
+
+/* ---------- testo per WhatsApp ---------- */
+const ETICHETTE = {}; ALIMENTI.forEach(([, v]) => v.forEach(([k, e]) => ETICHETTE[k] = e.split(' — ')[0]));
+function testo(d){
+  const L = [], g = d.sez5_vincoli_alimentari, c = d.sez6_contesto_vita, s = d.sez7_storia_obiettivi;
+  const riga = (e, v) => { if (v !== null && v !== undefined && v !== '' && !(Array.isArray(v) && !v.length)) L.push(`${e}: ${Array.isArray(v) ? v.join(', ') : v}`); };
+
+  L.push('*SCHEDA ALIMENTARE E STILE DI VITA*');
+  riga('Nome', d.nome_completo); L.push('');
+  L.push('*Da evitare*');
+  riga('Allergie', etichette('all', g.allergie_accertate)); riga('Confermate da test', etichetta('all_test', g.allergie_confermate_da_test));
+  riga('Intolleranze', etichette('intoll', g.intolleranze)); riga('Tolleranza lattosio', etichetta('latt_grado', g.grado_tolleranza_lattosio));
+  riga('Regime', etichetta('regime', g.regime)); riga('Restrizioni', etichette('rel', g.restrizioni_religiose_culturali));
+  L.push('');
+  L.push('*Alimenti non graditi*');
+  const rossi = Object.entries(g.griglia_alimenti).filter(([, v]) => v === 'rosso').map(([k]) => ETICHETTE[k]);
+  const gialli = Object.entries(g.griglia_alimenti).filter(([, v]) => v === 'giallo').map(([k]) => ETICHETTE[k]);
+  L.push(rossi.length ? 'Non li mangia: ' + rossi.join(', ') : 'Non rifiuta nulla');
+  if (gialli.length) L.push('Solo se serve: ' + gialli.join(', '));
+  riga('Altro', g.alimenti_esclusi_testo_libero);
+  riga('Consistenze evitate', etichette('cons', g.avversioni_consistenza.filter(v => v !== 'nessuna')));
+  riga('Masticazione', etichetta('mastic', g.masticazione));
+  riga('Non rinuncia a', g.alimento_irrinunciabile);
+  riga('Eliminerebbe subito', g.alimento_eliminabile_subito);
+  L.push('');
+  L.push('*Giornate*');
+  const dm = c.dove_mangia;
+  const LUOGO = Object.fromEntries(LUOGHI);
+  ['colazione','spuntino','pranzo','cena'].forEach(p => {
+    if (dm.feriale[p] || dm.weekend[p])
+      L.push(`${p[0].toUpperCase()+p.slice(1)}: feriale ${LUOGO[dm.feriale[p]] || '—'} / weekend ${LUOGO[dm.weekend[p]] || '—'}`);
+  });
+  riga('Orari feriali', [c.orari_pasti.colazione, c.orari_pasti.pranzo, c.orari_pasti.cena].filter(Boolean).join(' · '));
+  riga('Chi cucina', etichetta('chi_cucina', c.cucina.chi_cucina)); riga('Cucina per', etichetta('cucina_per', c.cucina.cucina_per));
+  riga('Persone a tavola', c.cucina.persone_a_tavola);
+  riga('Piatto separato possibile', etichetta('piatto_sep', c.cucina.puo_fare_piatto_separato));
+  riga('Tempo per cucinare, feriale', etichetta('tempo_f', c.cucina.tempo_disponibile_feriale));
+  riga('Tempo per cucinare, weekend', etichetta('tempo_w', c.cucina.tempo_disponibile_weekend));
+  riga('Abilità in cucina', c.cucina.abilita_cucina_1_5 ? c.cucina.abilita_cucina_1_5 + '/5' : null);
+  riga('Orari di lavoro', etichetta('lavoro', c.orario_lavoro)); riga('Spesa', etichetta('spesa', c.fascia_spesa));
+  L.push('');
+  L.push('*Storia e obiettivi*');
+  riga('Diete precedenti', etichetta('diete', s.diete_precedenti)); riga('Esito', etichetta('esito', s.esito_precedente));
+  riga('Motivo interruzione', etichetta('motivo', s.motivo_interruzione));
+  riga('Obiettivo', etichetta('obiettivo', s.obiettivo_principale)); riga('Entro', s.obiettivo_entro);
+  riga('Ha deciso di iniziare', etichetta('chi_deciso', s.chi_ha_deciso)); riga('Fiducia', s.fiducia_1_10 ? s.fiducia_1_10 + '/10' : null);
+  riga('Teme soprattutto', etichetta('timore', s.timore_principale)); riga('Supporto in casa', etichetta('supporto', s.supporto_in_casa));
+  riga('Note', s.note_paziente);
+  if (d._derivato_vincoli_operativi.length) {
+    L.push(''); L.push('*Da tenere presente nel piano*');
+    d._derivato_vincoli_operativi.forEach(v => L.push('• ' + v));
+  }
+  return L.join('\n');
+}
+
+/* ---------- azioni ---------- */
+$('btn_genera').addEventListener('click', () => {
+  const ok = !!val('nome_b');
+  $('e_nome_b').classList.toggle('on', !ok);
+  if (!ok) { $('e_nome_b').scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
+  const d = raccogli();
+  $('out_testo').textContent = testo(d);
+  $('out_json').textContent = JSON.stringify(d, null, 2);
+  $('esito').classList.add('on');
+  $('btn_genera').style.display = 'none';
+  $('btn_invio').style.display = 'block';
+  $('bar').style.width = '100%';
+  $('esito').scrollIntoView({ behavior: 'smooth' });
+});
+
+$('btn_wa').addEventListener('click', () => {
+  const t = $('out_testo').textContent;
+  const url = `https://wa.me/${NUMERO_WA}?text=${encodeURIComponent(t)}`;
+  if (url.length > 7500) { copia('out_testo', $('btn_wa')); window.open(`https://wa.me/${NUMERO_WA}`, '_blank'); }
+  else window.open(url, '_blank');
+});
+
+function copia(id, btn){
+  const t = $(id).textContent;
+  const fatto = () => { const o = btn.textContent; btn.textContent = 'Copiato ✓'; setTimeout(() => btn.textContent = o, 1800); };
+  if (navigator.clipboard) navigator.clipboard.writeText(t).then(fatto);
+  else { const ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); fatto(); }
+}
+</script>
+</body>
+</html>
