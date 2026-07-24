@@ -394,7 +394,7 @@ da qui dipende se il piano sarà mangiabile o no.</div>
 
 <script>
 // ⚠️ IMPOSTA QUI IL NUMERO WHATSAPP DELLO STUDIO (formato internazionale, senza + e senza spazi)
-const NUMERO_WA = "393000000000";
+const NUMERO_WA = "393895068729";
 
 const $ = id => document.getElementById(id);
 const val = id => ($(id) ? $(id).value.trim() : "");
@@ -628,7 +628,7 @@ function testo(d){
   L.push('*Giornate*');
   const dm = c.dove_mangia;
   const LUOGO = Object.fromEntries(LUOGHI);
-  ['colazione','spuntino','pranzo','cena'].forEach(p => {
+  ['colazione','spuntino','pranzo"','cena'].forEach(p => {
     if (dm.feriale[p] || dm.weekend[p])
       L.push(`${p[0].toUpperCase()+p.slice(1)}: feriale ${LUOGO[dm.feriale[p]] || '—'} / weekend ${LUOGO[dm.weekend[p]] || '—'}`);
   });
