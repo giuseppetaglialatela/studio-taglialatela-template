@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Scheda di primo accesso · Dott. Taglialatela</title>
+<style>
+:root{
+  --verde:#1f7a5a; --verde-chiaro:#e8f3ee; --testo:#1b2420; --grigio:#6b7770;
+  --bordo:#d8e0dc; --sfondo:#f7f9f8; --giallo:#f0c419; --rosso:#c0392b;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--sfondo);color:var(--testo);
+  font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+header{background:#fff;border-bottom:1px solid var(--bordo);padding:22px 20px 18px;text-align:center}
+header h1{margin:0;font-size:17px;letter-spacing:.02em}
+header p{margin:5px 0 0;color:var(--grigio);font-size:13px}
+.progress{position:sticky;top:0;z-index:10;height:4px;background:var(--bordo)}
+.progress i{display:block;height:100%;width:0;background:var(--verde);transition:width .3s}
+main{max-width:600px;margin:0 auto;padding:18px 16px 120px}
+fieldset{background:#fff;border:1px solid var(--bordo);border-radius:12px;
+  margin:0 0 16px;padding:18px 16px}
+legend{font-weight:600;font-size:15px;padding:0 8px;color:var(--verde)}
+label{display:block;font-size:14px;font-weight:500;margin:16px 0 6px}
+label:first-of-type{margin-top:4px}
+.hint{font-size:13px;color:var(--grigio);font-weight:400;margin:-2px 0 8px;line-height:1.45}
+input[type=text],input[type=tel],input[type=email],input[type=date],
+input[type=number],select,textarea{
+  width:100%;padding:12px;border:1px solid var(--bordo);border-radius:9px;
+  font-size:16px;background:#fff;color:var(--testo);font-family:inherit}
+textarea{min-height:60px;resize:vertical}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--verde);outline-offset:1px;border-color:var(--verde)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.chip{position:relative;display:inline-flex;cursor:pointer}
+.chip input{position:absolute;opacity:0;width:100%;height:100%;left:0;top:0;margin:0;cursor:pointer}
+.chip span{display:block;padding:9px 14px;border:1px solid var(--bordo);border-radius:20px;
+  font-size:14px;background:#fff;transition:.15s}
+.chip input:checked+span{background:var(--verde);border-color:var(--verde);color:#fff;font-weight:500}
+.chip input:focus-visible+span{outline:2px solid var(--verde);outline-offset:2px}
+.hidden{display:none}
+.sub{border-left:3px solid var(--verde-chiaro);padding-left:12px;margin-top:10px}
+.farmaco-row{background:var(--verde-chiaro);border-radius:9px;padding:12px;margin-top:10px}
+.farmaco-row .r{display:flex;gap:8px}
+.farmaco-row .r>*{flex:1}
+table.griglia{width:100%;border-collapse:collapse;font-size:14px}
+table.griglia td{padding:6px 2px;border-bottom:1px solid var(--bordo)}
+table.griglia td:first-child{text-align:left}
+.err{color:var(--rosso);font-size:13px;margin-top:5px;display:none}
+.err.on{display:block}
+.consenso{background:#fff;border:1px solid var(--bordo);border-radius:12px;padding:16px;
+  font-size:13px;color:var(--grigio);line-height:1.5}
+.consenso label{display:flex;gap:10px;align-items:flex-start;color:var(--testo);font-size:14px;margin-top:12px}
+.consenso input{width:20px;height:20px;flex:none;margin-top:1px}
+.barra{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--bordo);
+  padding:12px 16px calc(12px + env(safe-area-inset-bottom));z-index:20}
+.barra .inner{max-width:600px;margin:0 auto}
+button{width:100%;padding:15px;border:0;border-radius:11px;background:var(--verde);color:#fff;
+  font-size:16px;font-weight:600;font-family:inherit;cursor:pointer}
+button.sec{background:#fff;color:var(--verde);border:1.5px solid var(--verde);margin-top:9px}
+button:disabled{opacity:.45;cursor:not-allowed}
+#esito{display:none}
+#esito.on{display:block}
+.out{background:#fff;border:1px solid var(--bordo);border-radius:10px;padding:12px;
+  font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;
+  max-height:230px;overflow:auto;margin-top:8px}
+.ok{background:var(--verde-chiaro);border-radius:10px;padding:14px;margin-bottom:14px;font-size:14px}
+footer{text-align:center;font-size:12px;color:var(--grigio);padding:0 20px 30px;line-height:1.6}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="progress"><i id="bar"></i></div>
+
+<header>
+  <h1>Dott. Giuseppe Taglialatela</h1>
+  <p>Scheda di primo accesso · circa 6 minuti</p>
+</header>
+
+<main>
+<form id="form" novalidate>
+
+<!-- ══════ SEZIONE 1 ══════ -->
+<fieldset>
+<legend>Chi sei</legend>
+
+<label for="nome">Nome e cognome *</label>
+<input type="text" id="nome" autocomplete="name">
+<div class="err" id="e_nome">Campo obbligatorio</div>
+
+<label for="nascita">Data di nascita *</label>
+<input type="date" id="nascita">
+<div class="err" id="e_nascita">Campo obbligatorio</div>
+
+<label>Sesso *</label>
+<div class="hint">Serve per le soglie di riferimento della circonferenza vita.</div>
+<div class="chips">
+  <label class="chip"><input type="radio" name="sesso" value="F"><span>F</span></label>
+  <label class="chip"><input type="radio" name="sesso" value="M"><span>M</span></label>
+</div>
+<div class="err" id="e_sesso">Campo obbligatorio</div>
+
+<label for="tel">Telefono</label>
+<input type="tel" id="tel" autocomplete="tel">
+
+<label for="email">Email</label>
+<div class="hint">Solo per ricevere il piano in PDF, se preferisci non riceverlo su WhatsApp.</div>
+<input type="email" id="email" autocomplete="email">
+</fieldset>
+
+<!-- ══════ SEZIONE 2 ══════ -->
+<fieldset>
+<legend>Misure</legend>
+
+<label for="altezza">Altezza in cm *</label>
+<input type="number" id="altezza" inputmode="numeric" min="120" max="220">
+<div class="err" id="e_altezza">Campo obbligatorio</div>
+
+<label for="peso">Peso attuale in kg *</label>
+<input type="number" id="peso" inputmode="decimal" step="0.1" min="30" max="300">
+<div class="err" id="e_peso">Campo obbligatorio</div>
+
+<label for="vita">Circonferenza vita in cm</label>
+<div class="hint">
+  Come misurarla: in piedi, metro a contatto con la pelle ma non stretto, a fine espirazione,
+  a metà tra l'ultima costola e l'osso del bacino — di solito poco sopra l'ombelico.
+  Se non hai un metro da sarta, lasciala vuota: la prendiamo insieme.
+</div>
+<input type="number" id="vita" inputmode="decimal" step="0.5" min="40" max="200">
+<div class="err" id="e_vita"></div>
+
+<label for="peso_obiettivo">Hai un peso che vorresti raggiungere?</label>
+<input type="number" id="peso_obiettivo" inputmode="decimal" step="0.1" min="30" max="300">
+</fieldset>
+
+<!-- ══════ SEZIONE 3 ══════ -->
+<fieldset>
+<legend>Salute</legend>
+
+<label>Condizioni presenti</label>
+<div class="hint">Seleziona tutto quello che ti riguarda.</div>
+<div class="chips" id="patologie">
+  <label class="chip"><input type="checkbox" name="pat" value="nessuna" id="pat_nessuna"><span>Nessuna</span></label>
+  <label class="chip"><input type="checkbox" name="pat" value="ipertensione"><span>Ipertensione</span></label>
+  <label class="chip"><input type="checkbox" name="pat" value="colesterolo_alto"><span>Colesterolo alto</span></label>
+  <label class="chip"><input type="checkbox" name="pat" value="trigliceridi_alti"><span>Trigliceridi alti</span></label>
+  <label class="chip"><input type="checkbox" name="pat" value="diabete_t2" id="pat_diabete"><span>Diabete tipo 2</span></label>
+  <label class="chip"><input type="checkbox" name="pat" value="prediabete"><span>Prediabete</span></label>
+  <label class="chip"><input type="checkbox" name="pat" value="sindrome_metabolica"><span>Sindrome metabolica</span></label>
+  <label class="chip"><input type="checkbox" name="pat" value="fegato_grasso"><span>Fegato grasso</span></label>
+  <label class="chip"><input type="checkbox" name="pat" value="insufficienza_venosa" id="pat_venosa"><span>Insufficienza venosa / gambe gonfie</span></label>
+  <label class="chip"><input type="checkbox" name="pat" value="ipotiroidismo"><span>Ipotiroidismo</span></label>
+  <label class="chip"><input type="checkbox" name="pat" value="ipertiroidismo"><span>Ipertiroidismo</span></label>
+  <label class="chip"><input type="checkbox" name="pat" value="reflusso_gastrite"><span>Reflusso o gastrite</span></label>
+  <label class="chip"><input type="checkbox" name="pat" value="colon_irritabile"><span>Colon irritabile</span></label>
+  <label class="chip"><input type="checkbox" name="pat" value="celiachia"><span>Celiachia</span></label>
+  <label class="chip"><input type="checkbox" name="pat" value="insufficienza_renale"><span>Problemi ai reni</span></label>
+  <label class="chip"><input type="checkbox" name="pat" value="calcolosi_renale"><span>Calcoli renali</span></label>
+  <label class="chip"><input type="checkbox" name="pat" value="gotta_iperuricemia"><span>Gotta o acido urico alto</span></label>
+  <label class="chip"><input type="checkbox" name="pat" value="osteoporosi"><span>Osteoporosi o osteopenia</span></label>
+  <label class="chip"><input type="checkbox" name="pat" value="ovaio_policistico"><span>Ovaio policistico</span></label>
+  <label class="chip"><input type="checkbox" name="pat" value="apnee_notturne"><span>Apnee notturne</span></label>
+  <label class="chip"><input type="checkbox" name="pat" value="chirurgia_bariatrica"><span>Ho fatto chirurgia bariatrica</span></label>
+  <label class="chip"><input type="checkbox" name="pat" value="gravidanza_allattamento"><span>Gravidanza o allattamento</span></label>
+</div>
+
+<div class="sub hidden" id="sub_venosa">
+  <label>Riguardo alle gambe</label>
+  <div class="chips">
+    <label class="chip"><input type="checkbox" id="edema"><span>Gonfiore a fine giornata</span></label>
+    <label class="chip"><input type="checkbox" id="calze"><span>Uso calze elastiche</span></label>
+  </div>
+</div>
+
+<div class="sub hidden" id="sub_diabete">
+  <label for="hba1c">Ultima emoglobina glicata (HbA1c), se la conosci</label>
+  <input type="text" id="hba1c" placeholder="es. 6,4 %">
+</div>
+
+<label for="pat_altro">Altre condizioni di salute</label>
+<input type="text" id="pat_altro">
+
+<label>Hai esami del sangue degli ultimi 6 mesi?</label>
+<div class="chips">
+  <label class="chip"><input type="radio" name="esami" value="si" id="esami_si"><span>Sì</span></label>
+  <label class="chip"><input type="radio" name="esami" value="no"><span>No</span></label>
+</div>
+<div class="sub hidden" id="sub_esami">
+  <label for="esami_data">Di che mese sono?</label>
+  <input type="month" id="esami_data">
+  <div class="hint">Non serve trascrivere i valori: mandami una foto del referto su WhatsApp.</div>
+</div>
+
+<label>Come va l'intestino?</label>
+<div class="chips">
+  <label class="chip"><input type="radio" name="alvo" value="regolare"><span>Regolare</span></label>
+  <label class="chip"><input type="radio" name="alvo" value="stitico"><span>Tendo alla stitichezza</span></label>
+  <label class="chip"><input type="radio" name="alvo" value="diarroico"><span>Tendo alla diarrea</span></label>
+  <label class="chip"><input type="radio" name="alvo" value="alternante"><span>Alterno</span></label>
+</div>
+
+<label>Disturbi digestivi ricorrenti</label>
+<div class="chips">
+  <label class="chip"><input type="checkbox" name="gi" value="gonfiore"><span>Gonfiore</span></label>
+  <label class="chip"><input type="checkbox" name="gi" value="reflusso"><span>Reflusso</span></label>
+  <label class="chip"><input type="checkbox" name="gi" value="nausea"><span>Nausea</span></label>
+  <label class="chip"><input type="checkbox" name="gi" value="dolore"><span>Dolore addominale</span></label>
+  <label class="chip"><input type="checkbox" name="gi" value="nessuno"><span>Nessuno</span></label>
+</div>
+
+<label for="sonno">Quante ore dormi di solito?</label>
+<input type="number" id="sonno" inputmode="numeric" min="2" max="14">
+
+<label>Come ti senti durante la giornata?</label>
+<div class="chips">
+  <label class="chip"><input type="radio" name="energia" value="bene"><span>Energia stabile</span></label>
+  <label class="chip"><input type="radio" name="energia" value="calo_pomeriggio"><span>Calo nel pomeriggio</span></label>
+  <label class="chip"><input type="radio" name="energia" value="sempre_stanco"><span>Stanchezza costante</span></label>
+</div>
+
+<label for="acqua">Bicchieri d'acqua al giorno</label>
+<input type="number" id="acqua" inputmode="numeric" min="0" max="30">
+
+<label>Alcol a settimana</label>
+<div class="hint">Un'unità = un bicchiere di vino, una birra piccola o un amaro.</div>
+<div class="chips">
+  <label class="chip"><input type="radio" name="alcol" value="0"><span>Non bevo</span></label>
+  <label class="chip"><input type="radio" name="alcol" value="1-3"><span>1-3</span></label>
+  <label class="chip"><input type="radio" name="alcol" value="4-7"><span>4-7</span></label>
+  <label class="chip"><input type="radio" name="alcol" value="oltre_7"><span>Più di 7</span></label>
+</div>
+
+<label>Fumo</label>
+<div class="chips">
+  <label class="chip"><input type="radio" name="fumo" value="no"><span>No</span></label>
+  <label class="chip"><input type="radio" name="fumo" value="si"><span>Sì</span></label>
+  <label class="chip"><input type="radio" name="fumo" value="ex"><span>Ho smesso</span></label>
+</div>
+
+<label for="caffe">Caffè al giorno</label>
+<input type="number" id="caffe" inputmode="numeric" min="0" max="20">
+
+<label>Ti capita di avere fame nervosa, soprattutto la sera?</label>
+<div class="chips">
+  <label class="chip"><input type="radio" name="fame" value="mai"><span>Mai</span></label>
+  <label class="chip"><input type="radio" name="fame" value="a_volte"><span>A volte</span></label>
+  <label class="chip"><input type="radio" name="fame" value="spesso"><span>Spesso</span></label>
+</div>
+
+<label>Ti capita di mangiare sentendo di non riuscire a fermarti?</label>
+<div class="chips">
+  <label class="chip"><input type="radio" name="controllo" value="mai"><span>Mai</span></label>
+  <label class="chip"><input type="radio" name="controllo" value="a_volte"><span>A volte</span></label>
+  <label class="chip"><input type="radio" name="controllo" value="spesso"><span>Spesso</span></label>
+</div>
+</fieldset>
+
+<!-- ══════ SEZIONE 4 ══════ -->
+<fieldset>
+<legend>Farmaci e integratori</legend>
+
+<label>Cosa prendi abitualmente</label>
+<div class="hint">Seleziona le categorie: poi ti chiedo nome, dose e orario di ciascuno.</div>
+<div class="chips" id="cat_farmaci">
+  <label class="chip"><input type="checkbox" name="cat" value="nessuno" id="far_nessuno"><span>Nessun farmaco</span></label>
+  <label class="chip"><input type="checkbox" name="cat" value="Pressione"><span>Pressione</span></label>
+  <label class="chip"><input type="checkbox" name="cat" value="Diuretico"><span>Diuretico</span></label>
+  <label class="chip"><input type="checkbox" name="cat" value="Colesterolo"><span>Colesterolo</span></label>
+  <label class="chip"><input type="checkbox" name="cat" value="Trigliceridi"><span>Trigliceridi</span></label>
+  <label class="chip"><input type="checkbox" name="cat" value="Diabete"><span>Diabete</span></label>
+  <label class="chip"><input type="checkbox" name="cat" value="Tiroide"><span>Tiroide</span></label>
+  <label class="chip"><input type="checkbox" name="cat" value="Stomaco"><span>Stomaco o reflusso</span></label>
+  <label class="chip"><input type="checkbox" name="cat" value="Anticoagulante"><span>Anticoagulante o antiaggregante</span></label>
+  <label class="chip"><input type="checkbox" name="cat" value="Cortisone"><span>Cortisone</span></label>
+  <label class="chip"><input type="checkbox" name="cat" value="Circolazione"><span>Circolazione venosa</span></label>
+  <label class="chip"><input type="checkbox" name="cat" value="Altro"><span>Altro</span></label>
+</div>
+
+<div id="dettagli_farmaci"></div>
+<div class="err" id="e_farmaci"></div>
+
+<label>Fai una terapia iniettiva per il peso o il diabete?</label>
+<div class="hint">Ozempic, Mounjaro, Wegovy, Trulicity, Saxenda e simili.</div>
+<div class="chips">
+  <label class="chip"><input type="radio" name="glp1" value="si" id="glp1_si"><span>Sì</span></label>
+  <label class="chip"><input type="radio" name="glp1" value="no"><span>No</span></label>
+</div>
+<div class="sub hidden" id="sub_glp1">
+  <label for="glp1_nome">Quale</label>
+  <input type="text" id="glp1_nome" placeholder="es. Mounjaro">
+  <label for="glp1_dose">Dose attuale</label>
+  <input type="text" id="glp1_dose" placeholder="es. 5 mg a settimana">
+  <label for="glp1_inizio">Da quando la fai</label>
+  <input type="month" id="glp1_inizio">
+  <label>Come la tolleri?</label>
+  <div class="chips">
+    <label class="chip"><input type="radio" name="glp1_toll" value="bene"><span>Bene</span></label>
+    <label class="chip"><input type="radio" name="glp1_toll" value="nausea"><span>Un po' di nausea</span></label>
+    <label class="chip"><input type="radio" name="glp1_toll" value="stipsi"><span>Stitichezza</span></label>
+    <label class="chip"><input type="radio" name="glp1_toll" value="male"><span>Faccio fatica</span></label>
+  </div>
+</div>
+
+<label>Integratori</label>
+<div class="chips">
+  <label class="chip"><input type="checkbox" name="int" value="nessuno"><span>Nessuno</span></label>
+  <label class="chip"><input type="checkbox" name="int" value="vitamina_d"><span>Vitamina D</span></label>
+  <label class="chip"><input type="checkbox" name="int" value="b12"><span>B12</span></label>
+  <label class="chip"><input type="checkbox" name="int" value="ferro"><span>Ferro</span></label>
+  <label class="chip"><input type="checkbox" name="int" value="magnesio"><span>Magnesio</span></label>
+  <label class="chip"><input type="checkbox" name="int" value="omega3"><span>Omega 3</span></label>
+  <label class="chip"><input type="checkbox" name="int" value="probiotici"><span>Probiotici</span></label>
+  <label class="chip"><input type="checkbox" name="int" value="diosmina"><span>Diosmina o flavonoidi</span></label>
+  <label class="chip"><input type="checkbox" name="int" value="multivitaminico"><span>Multivitaminico</span></label>
+</div>
+<label for="int_altro">Altri integratori o prodotti erboristici</label>
+<input type="text" id="int_altro">
+
+<label>Riesci a prendere le terapie con regolarità?</label>
+<div class="chips">
+  <label class="chip"><input type="radio" name="aderenza" value="regolare"><span>Sì, sempre</span></label>
+  <label class="chip"><input type="radio" name="aderenza" value="salto_qualcosa"><span>Ogni tanto salto</span></label>
+  <label class="chip"><input type="radio" name="aderenza" value="sospeso"><span>Ho sospeso qualcosa</span></label>
+</div>
+</fieldset>
+
+<div class="consenso">
+  I dati di questa scheda sono trattati esclusivamente dal Dott. Giuseppe Taglialatela per la
+  consulenza nutrizionale, secondo il Regolamento UE 2016/679. Non vengono inviati ad alcun
+  server: restano su questo dispositivo finché non sei tu a mandarli. Puoi chiederne modifica
+  o cancellazione in qualsiasi momento.
+  <label>
+    <input type="checkbox" id="consenso">
+    <span>Acconsento al trattamento dei miei dati personali e sanitari. *</span>
+  </label>
+  <div class="err" id="e_consenso">Necessario per proseguire</div>
+</div>
+
+</form>
+
+<div id="esito">
+  <div class="ok"><strong>Scheda pronta.</strong> Tocca il pulsante verde: si apre WhatsApp con il
+  messaggio già scritto, devi solo premere invio.</div>
+  <div class="out" id="out_testo"></div>
+  <details style="margin-top:12px">
+    <summary style="font-size:13px;color:#6b7770;cursor:pointer">Dati in formato archivio (per il nutrizionista)</summary>
+    <div class="out" id="out_json"></div>
+    <button class="sec" type="button" onclick="copia('out_json',this)">Copia dati archivio</button>
+  </details>
+</div>
+
+</main>
+
+<div class="barra"><div class="inner">
+  <button type="button" id="btn_genera">Prepara la scheda</button>
+  <div id="btn_invio" style="display:none">
+    <button type="button" id="btn_wa">Apri WhatsApp e invia</button>
+    <button class="sec" type="button" onclick="copia('out_testo',this)">Copia il testo</button>
+  </div>
+</div></div>
+
+<footer>Dott. Giuseppe Taglialatela · Farmacista · Consulente in Nutrizione · Napoli</footer>
+
+<script>
+// ⚠️ IMPOSTA QUI IL NUMERO WHATSAPP DELLO STUDIO (formato internazionale, senza + e senza spazi)
+const NUMERO_WA = "393895068729";
+
+const $ = id => document.getElementById(id);
+const val = id => ($(id) ? $(id).value.trim() : "");
+const radio = n => { const e = document.querySelector(`input[name="${n}"]:checked`); return e ? e.value : null; };
+const checks = n => [...document.querySelectorAll(`input[name="${n}"]:checked`)].map(e => e.value);
+
+/* ---------- campi a comparsa ---------- */
+function mostra(el, on){ $(el).classList.toggle('hidden', !on); }
+document.querySelector('#pat_venosa').addEventListener('change', e => mostra('sub_venosa', e.target.checked));
+document.querySelector('#pat_diabete').addEventListener('change', e => mostra('sub_diabete', e.target.checked));
+document.querySelector('#esami_si').addEventListener('change', () => mostra('sub_esami', true));
+document.querySelectorAll('input[name=esami]').forEach(r =>
+  r.addEventListener('change', e => mostra('sub_esami', e.target.value === 'si')));
+document.querySelectorAll('input[name=glp1]').forEach(r =>
+  r.addEventListener('change', e => mostra('sub_glp1', e.target.value === 'si')));
+
+/* "Nessuna / Nessun farmaco" azzera le altre voci del gruppo */
+function esclusiva(idNessuno, nomeGruppo){
+  const n = $(idNessuno);
+  n.addEventListener('change', () => {
+    if (n.checked) document.querySelectorAll(`input[name="${nomeGruppo}"]`).forEach(c => { if (c !== n) c.checked = false; });
+    if (nomeGruppo === 'cat') costruisciFarmaci();
+    if (nomeGruppo === 'pat') { mostra('sub_venosa', false); mostra('sub_diabete', false); }
+  });
+  document.querySelectorAll(`input[name="${nomeGruppo}"]`).forEach(c => {
+    if (c !== n) c.addEventListener('change', () => { if (c.checked) n.checked = false; });
+  });
+}
+esclusiva('pat_nessuna', 'pat');
+esclusiva('far_nessuno', 'cat');
+
+/* ---------- righe farmaco generate dalle categorie ---------- */
+const ORARI = ['mattino a digiuno','a colazione','a pranzo','a cena','la sera','più volte al giorno'];
+function costruisciFarmaci(){
+  const cont = $('dettagli_farmaci');
+  const scelte = checks('cat').filter(v => v !== 'nessuno');
+  const precedenti = {};
+  cont.querySelectorAll('.farmaco-row').forEach(r => {
+    precedenti[r.dataset.cat] = { n: r.querySelector('.f-nome').value, d: r.querySelector('.f-dose').value, o: r.querySelector('.f-orario').value };
+  });
+  cont.innerHTML = '';
+  scelte.forEach(cat => {
+    const p = precedenti[cat] || { n:'', d:'', o:'' };
+    const div = document.createElement('div');
+    div.className = 'farmaco-row';
+    div.dataset.cat = cat;
+    div.innerHTML =
+      `<label style="margin-top:0">${cat}</label>
+       <input type="text" class="f-nome" placeholder="Nome del farmaco" value="${p.n.replace(/"/g,'&quot;')}">
+       <div class="r" style="margin-top:8px">
+         <input type="text" class="f-dose" placeholder="Dose (es. 10 mg)" value="${p.d.replace(/"/g,'&quot;')}">
+         <select class="f-orario">
+           <option value="">Quando lo prendi</option>
+           ${ORARI.map(o => `<option${p.o===o?' selected':''}>${o}</option>`).join('')}
+         </select>
+       </div>`;
+    cont.appendChild(div);
+  });
+}
+document.querySelectorAll('input[name=cat]').forEach(c => c.addEventListener('change', costruisciFarmaci));
+
+/* ---------- barra di avanzamento ---------- */
+const campiTot = () => document.querySelectorAll('#form input, #form select').length;
+function aggiornaBarra(){
+  const tot = campiTot();
+  let fatti = 0;
+  document.querySelectorAll('#form input, #form select').forEach(e => {
+    if (e.type === 'checkbox' || e.type === 'radio') { if (e.checked) fatti++; }
+    else if (e.value.trim()) fatti++;
+  });
+  $('bar').style.width = Math.min(100, Math.round(fatti / tot * 260)) + '%';
+}
+document.addEventListener('input', aggiornaBarra);
+document.addEventListener('change', aggiornaBarra);
+
+/* ---------- validazione ---------- */
+function obbligatori(){
+  let ok = true;
+  const controlla = (idErr, buono, testo) => {
+    const e = $(idErr);
+    if (testo) e.textContent = testo;
+    e.classList.toggle('on', !buono);
+    if (!buono) ok = false;
+  };
+  controlla('e_nome', !!val('nome'), 'Campo obbligatorio');
+  controlla('e_nascita', !!val('nascita'), 'Campo obbligatorio');
+  controlla('e_sesso', !!radio('sesso'), 'Campo obbligatorio');
+
+  // --- plausibilita' delle misure ---
+  const h = Number(val('altezza')), p = Number(val('peso')), v = Number(val('vita'));
+  if (!val('altezza')) controlla('e_altezza', false, 'Campo obbligatorio');
+  else controlla('e_altezza', h >= 130 && h <= 220,
+        'Controlla l\'altezza: deve essere in centimetri (es. 175), non in metri.');
+  if (!val('peso')) controlla('e_peso', false, 'Campo obbligatorio');
+  else controlla('e_peso', p >= 35 && p <= 300, 'Controlla il peso: valore fuori dai limiti previsti.');
+  if (val('vita')) controlla('e_vita', v >= 50 && v <= 200,
+        'Controlla la circonferenza vita: valore fuori dai limiti previsti.');
+  else $('e_vita').classList.remove('on');
+
+  // --- coerenza altezza/peso ---
+  if (h >= 130 && h <= 220 && p >= 35 && p <= 300) {
+    const bmi = p / Math.pow(h / 100, 2);
+    if (bmi < 12 || bmi > 75)
+      controlla('e_peso', false, 'Altezza e peso insieme danno un valore anomalo: ricontrollali.');
+  }
+
+  // --- farmaci: se c'e' il nome servono dose e orario ---
+  const righe = [...document.querySelectorAll('.farmaco-row')];
+  const incompleti = righe.filter(r => r.querySelector('.f-nome').value.trim() &&
+    (!r.querySelector('.f-dose').value.trim() || !r.querySelector('.f-orario').value));
+  controlla('e_farmaci', incompleti.length === 0,
+    'Per ogni farmaco indica anche la dose e quando lo prendi: servono a costruire il piano.');
+
+  controlla('e_consenso', $('consenso').checked, 'Necessario per proseguire');
+  return ok;
+}
+
+/* ---------- raccolta dati ---------- */
+function codicePaziente(nome){
+  const p = nome.trim().split(/\s+/);
+  const cap = s => s ? s[0].toUpperCase() + s.slice(1).toLowerCase() : '';
+  if (p.length < 2) return cap(p[0] || 'Paziente');
+  return cap(p[p.length - 1]) + cap(p[0]);
+}
+function eta(d){ if(!d) return null; const n=new Date(d),o=new Date();
+  let a=o.getFullYear()-n.getFullYear(); const m=o.getMonth()-n.getMonth();
+  if(m<0||(m===0&&o.getDate()<n.getDate())) a--; return a; }
+const num = v => v === '' ? null : Number(v);
+
+function raccogli(){
+  const nome = val('nome');
+  const farmaci = [...document.querySelectorAll('.farmaco-row')].map(r => ({
+    nome: r.querySelector('.f-nome').value.trim(),
+    dose: r.querySelector('.f-dose').value.trim(),
+    orario: r.querySelector('.f-orario').value
+  })).filter(f => f.nome);
+
+  return {
+    _meta: { schema: "FascicoloPaziente_StudioTaglialatela", versione_schema: "1.0",
+             origine: "Form A - scheda di primo accesso", compilato_il: new Date().toISOString().slice(0,10) },
+    sez1_identita: {
+      codice_paziente: codicePaziente(nome), nome_completo: nome,
+      data_nascita: val('nascita'), eta_anni: eta(val('nascita')), sesso: radio('sesso'),
+      telefono: val('tel'), email: val('email'),
+      consenso_gdpr: $('consenso').checked, data_consenso: new Date().toISOString().slice(0,10)
+    },
+    sez2_antropometria: {
+      altezza_cm: num(val('altezza')), peso_iniziale_kg: num(val('peso')),
+      circ_vita_iniziale_cm: num(val('vita')),
+      peso_obiettivo_desiderato_kg: num(val('peso_obiettivo')),
+      peso_obiettivo_concordato_kg: null
+    },
+    sez3_quadro_clinico: {
+      patologie: checks('pat'), patologie_altro: val('pat_altro'),
+      insufficienza_venosa_dettaglio: $('pat_venosa').checked
+        ? { edema_declive: $('edema').checked, calze_elastiche: $('calze').checked } : null,
+      hba1c_riferita: val('hba1c') || null,
+      esami_ematici: { disponibili_ultimi_6_mesi: radio('esami') === 'si',
+                       data_referto: val('esami_data') || null, referto_ricevuto: false, valori: {} },
+      sintomi_funzioni: { alvo: radio('alvo'), sintomi_gi: checks('gi'),
+                          ore_sonno: num(val('sonno')), energia_giornata: radio('energia'),
+                          bicchieri_acqua_die: num(val('acqua')) },
+      stili_di_vita: { alcol_unita_settimana: radio('alcol'), fumo: radio('fumo'),
+                       caffe_tazzine_die: num(val('caffe')),
+                       fame_nervosa_serale: radio('fame'), perdita_controllo_cibo: radio('controllo') }
+    },
+    sez4_terapia: {
+      farmaci: farmaci,
+      glp1_gip: radio('glp1') === 'si'
+        ? { in_terapia: true, principio_attivo: val('glp1_nome'), dose_attuale: val('glp1_dose'),
+            data_inizio: val('glp1_inizio'), titolazioni: [], tollerabilita: radio('glp1_toll') }
+        : { in_terapia: false },
+      integratori: checks('int'), integratori_altro: val('int_altro'),
+      aderenza_terapia: radio('aderenza')
+    }
+  };
+}
+
+
+/* ---------- etichette leggibili ---------- */
+function etichetta(nome, valore){
+  if (valore === null || valore === undefined || valore === '') return null;
+  const el = document.querySelector(`input[name="${nome}"][value="${valore}"]`);
+  if (el && el.nextElementSibling) return el.nextElementSibling.textContent.trim();
+  return String(valore).replace(/_/g, ' ');
+}
+function etichette(nome, valori){
+  if (!Array.isArray(valori)) return null;
+  return valori.map(v => etichetta(nome, v)).filter(Boolean);
+}
+function dataIt(iso){
+  if (!iso) return null;
+  const p = iso.split('-');
+  if (p.length === 3) return `${p[2]}/${p[1]}/${p[0]}`;
+  if (p.length === 2) return `${p[1]}/${p[0]}`;
+  return iso;
+}
+
+/* ---------- testo leggibile per WhatsApp ---------- */
+function testo(d){
+  const L = [];
+  const riga = (e, v) => { if (v !== null && v !== undefined && v !== '' && !(Array.isArray(v) && !v.length)) L.push(`${e}: ${Array.isArray(v) ? v.join(', ') : v}`); };
+  const i = d.sez1_identita, a = d.sez2_antropometria, c = d.sez3_quadro_clinico, t = d.sez4_terapia;
+
+  L.push('*SCHEDA DI PRIMO ACCESSO*'); L.push('');
+  L.push('*Dati*');
+  riga('Nome', i.nome_completo); riga('Nato/a il', dataIt(i.data_nascita));
+  riga('Età', i.eta_anni); riga('Sesso', i.sesso === 'F' ? 'Femmina' : 'Maschio');
+  riga('Telefono', i.telefono); riga('Email', i.email);
+  L.push('');
+  L.push('*Misure*');
+  riga('Altezza', a.altezza_cm ? a.altezza_cm + ' cm' : null);
+  riga('Peso', a.peso_iniziale_kg ? a.peso_iniziale_kg + ' kg' : null);
+  if (a.altezza_cm && a.peso_iniziale_kg)
+    riga('BMI', (a.peso_iniziale_kg / Math.pow(a.altezza_cm / 100, 2)).toFixed(1));
+  riga('Circonferenza vita', a.circ_vita_iniziale_cm ? a.circ_vita_iniziale_cm + ' cm' : null);
+  riga('Peso desiderato', a.peso_obiettivo_desiderato_kg ? a.peso_obiettivo_desiderato_kg + ' kg' : null);
+  L.push('');
+  L.push('*Salute*');
+  riga('Condizioni', etichette('pat', c.patologie)); riga('Altro', c.patologie_altro);
+  if (c.insufficienza_venosa_dettaglio) {
+    const v = c.insufficienza_venosa_dettaglio;
+    riga('Gambe', [v.edema_declive ? 'gonfiore serale' : null, v.calze_elastiche ? 'calze elastiche' : null].filter(Boolean));
+  }
+  riga('HbA1c riferita', c.hba1c_riferita);
+  riga('Esami ultimi 6 mesi', c.esami_ematici.disponibili_ultimi_6_mesi ? ('sì — ' + (dataIt(c.esami_ematici.data_referto) || 'data non indicata')) : 'no');
+  riga('Intestino', etichetta('alvo', c.sintomi_funzioni.alvo)); riga('Disturbi digestivi', etichette('gi', c.sintomi_funzioni.sintomi_gi));
+  riga('Sonno', c.sintomi_funzioni.ore_sonno ? c.sintomi_funzioni.ore_sonno + ' ore' : null);
+  riga('Energia', etichetta('energia', c.sintomi_funzioni.energia_giornata));
+  riga('Acqua', c.sintomi_funzioni.bicchieri_acqua_die ? c.sintomi_funzioni.bicchieri_acqua_die + ' bicchieri' : null);
+  riga('Alcol/sett.', etichetta('alcol', c.stili_di_vita.alcol_unita_settimana)); riga('Fumo', etichetta('fumo', c.stili_di_vita.fumo));
+  riga('Caffè', c.stili_di_vita.caffe_tazzine_die);
+  riga('Fame nervosa serale', etichetta('fame', c.stili_di_vita.fame_nervosa_serale));
+  riga('Perdita di controllo sul cibo', etichetta('controllo', c.stili_di_vita.perdita_controllo_cibo));
+  L.push('');
+  L.push('*Farmaci*');
+  if (t.farmaci.length) t.farmaci.forEach(f => L.push(`• ${f.nome}${f.dose ? ' ' + f.dose : ''}${f.orario ? ' — ' + f.orario : ''}`));
+  else L.push('nessuno');
+  if (t.glp1_gip.in_terapia) L.push(`• ${t.glp1_gip.principio_attivo} ${t.glp1_gip.dose_attuale} — da ${dataIt(t.glp1_gip.data_inizio)} — tollerabilità: ${etichetta('glp1_toll', t.glp1_gip.tollerabilita) || 'n.d.'}`);
+  riga('Integratori', etichette('int', t.integratori)); riga('Altri integratori', t.integratori_altro);
+  if (t.farmaci.length || t.glp1_gip.in_terapia) riga('Regolarità terapia', etichetta('aderenza', t.aderenza_terapia));
+  return L.join('\n');
+}
+
+/* ---------- azioni ---------- */
+let datiPronti = null;
+$('btn_genera').addEventListener('click', () => {
+  if (!obbligatori()) {
+    const primo = document.querySelector('.err.on');
+    if (primo) primo.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+  datiPronti = raccogli();
+  $('out_testo').textContent = testo(datiPronti);
+  $('out_json').textContent = JSON.stringify(datiPronti, null, 2);
+  $('esito').classList.add('on');
+  $('btn_genera').style.display = 'none';
+  $('btn_invio').style.display = 'block';
+  $('bar').style.width = '100%';
+  $('esito').scrollIntoView({ behavior: 'smooth' });
+});
+
+$('btn_wa').addEventListener('click', () => {
+  const t = $('out_testo').textContent;
+  const url = `https://wa.me/${NUMERO_WA}?text=${encodeURIComponent(t)}`;
+  if (url.length > 7500) { copia('out_testo', $('btn_wa')); window.open(`https://wa.me/${NUMERO_WA}`, '_blank'); }
+  else window.open(url, '_blank');
+});
+
+function copia(id, btn){
+  const t = $(id).textContent;
+  const fatto = () => { const o = btn.textContent; btn.textContent = 'Copiato ✓'; setTimeout(() => btn.textContent = o, 1800); };
+  if (navigator.clipboard) navigator.clipboard.writeText(t).then(fatto);
+  else { const ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); fatto(); }
+}
+</script>
+</body>
+</html>
