@@ -40,3 +40,6 @@ food_id,nome,categoria,fonte,codice_fonte,data_verifica,kcal_100g,proteine_g,car
 8697,Tacchino petto senza pelle,carne,BDA-IEO,8697,2026-07-26,107,24,0,1.2,0,6,0.8,0.3,17,2,1.1,32,0
 8520,Bovino magro vitellone senza grasso visibile,carne,BDA-IEO,8520,2026-07-26,108,21.58,0,2.38,0,4.4,1.56,0.5,27.6,2,3.76,17.4,0
 592,Olive nere,condimenti,BDA-IEO,592,2026-07-26,240,1.6,0.8,25.1,2.4,62,1.6,0,0,0,0.5,0,20
+8053,Yogurt greco,latticini,BDA-IEO,8053,2026-07-26,115,6.4,2,9.1,0,150,0.3,0.05,6,0.2,0.5,12,0
+1515,Tonno in scatola al naturale sgocciolato,pesce,BDA-IEO,1515,2026-07-26,103,25.1,0,0.3,0,8,1,2,4,4,0.7,27,0
+122800,Sardine fresche,pesce,CREA,122800,2026-07-26,225,20.3,1.5,15.4,0,0,0,0,0,0,3.9,70,0
