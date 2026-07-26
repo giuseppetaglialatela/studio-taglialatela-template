@@ -1,6 +1,0 @@
-food_id,nome,categoria,fonte,codice_fonte,data_verifica,kcal_100g,proteine_g,carboidrati_g,grassi_g,fibra_g,calcio_mg,ferro_mg,vitamina_d_ug,folati_ug,vitamina_b12_ug,zinco_mg,magnesio_mg,vitamina_c_mg
-TEST_A,ALIMENTO TEST A (fittizio),test,FITTIZIO,-,2026-07-26,200,20,20,4,2,100,2,1,20,0.5,1,20,10
-TEST_B,ALIMENTO TEST B (fittizio),test,FITTIZIO,-,2026-07-26,300,10,50,5,5,50,1,0,10,0,0.5,10,5
-TEST_C,ALIMENTO TEST C (fittizio),test,FITTIZIO,-,2026-07-26,50,2,10,0,3,20,0.5,0,30,0,0.2,15,30
-TEST_D,ALIMENTO TEST D (fittizio),test,FITTIZIO,-,2026-07-26,400,25,0,30,0,10,1.5,3,5,2,3,25,0
-TEST_E,ALIMENTO TEST E (fittizio),test,FITTIZIO,-,2026-07-26,150,5,30,2,4,30,1,0,15,0,0.5,20,15
