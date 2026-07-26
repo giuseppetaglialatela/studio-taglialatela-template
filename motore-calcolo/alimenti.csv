@@ -1,0 +1,5 @@
+food_id,nome,categoria,fonte,codice_fonte,data_verifica,kcal_100g,proteine_g,carboidrati_g,grassi_g,fibra_g,calcio_mg,ferro_mg,vitamina_d_ug,folati_ug,vitamina_b12_ug,zinco_mg,magnesio_mg,vitamina_c_mg
+106500,Pollo petto crudo,carne,CREA+BDA-IEO,106500,2026-07-26,100,23.3,0,0.8,0,4,0.4,0.2,14,0.05,0.7,32,0
+000800,Pasta di semola cruda,cereali,CREA+BDA-IEO,000800,2026-07-26,341,13.5,72.7,1.2,1.7,22,1.4,0,19,0,1.15,51,0
+004210,Fagioli cannellini in scatola scolati,legumi,CREA+BDA-IEO(proxy)+USDA,004210,2026-07-26,86,6.0,12.5,0.6,4.8,39,2,0,8,0,0.68,29.3,0
+008540,Mandorle dolci secche,frutta secca,CREA+BDA-IEO,008540,2026-07-26,628,22.0,4.6,55.3,12.7,240,3,0,48,0,2.5,264,0
