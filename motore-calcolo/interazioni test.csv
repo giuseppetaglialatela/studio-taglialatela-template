@@ -1,0 +1,5 @@
+principio_attivo,tipo_target,target,meccanismo,separazione_ore,gravita
+levotiroxina,nutriente,calcio_mg,Il calcio riduce l'assorbimento della levotiroxina (chelazione),4,alta
+levotiroxina,nutriente,ferro_mg,Il ferro riduce l'assorbimento della levotiroxina (chelazione),4,alta
+levotiroxina,food_id,TEST_B,Alimento test contenente caffeina - riduce assorbimento,1,media
+ferro_solfato,nutriente,calcio_mg,Il calcio compete con l'assorbimento del ferro,2,media
