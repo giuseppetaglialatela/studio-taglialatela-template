@@ -97,3 +97,20 @@ food_id,nome,categoria,fonte,codice_fonte,data_verifica,kcal_100g,proteine_g,car
 101520,Vitello filetto crudo,carne,CREA,101520,2026-07-26,107,20.7,0,2.7,0,14,2.3,0,0,0,2.8,25,0
 115800,Trippa di bovini,carne,CREA,115800,2026-07-26,108,15.8,0,5,0,8,4,0,0,0,0,0,3
 127120,Cozza mitilo,pesce,CREA,127120,2026-07-26,84,11.7,3.4,2.7,0,88,5.8,0,0,0,2.2,44,0
+005000,Aglio,verdura,CREA+BDA-IEO(proxy folati),005000,2026-07-26,53,8.4,1.0,0.8,4.3,15,1.2,0,3,0,0.59,17,9
+005160,Cavolfiore,verdura,CREA,005160,2026-07-26,30,3.2,2.7,0.2,2.4,44,0.8,0,71,0,0.7,28,59
+005300,Cipolla,verdura,CREA+BDA-IEO(proxy zinco),005300,2026-07-26,28,1.0,5.7,0.1,1.0,25,0.4,0,20,0,0.3,0,5
+008030,Limone,frutta,CREA+BDA-IEO(proxy zinco/magnesio/folati),008030,2026-07-26,16,0.6,2.5,0,1.9,14,0.1,0,11,0,0.1,12,50
+210010,Miele,altro,CREA+BDA-IEO(proxy zinco/folati),210010,2026-07-26,304,0.6,80.3,0,0,5,0.5,0,2,0,0.8,3,1
+100154_2,Pane comune,cereali,BDA-IEO,100154_2,2026-07-26,269,8.4,59.8,0.4,3.8,15,1.0,0,29,0,0.37,15,0
+000100,Riso bianco crudo,cereali,CREA+BDA-IEO(proxy zinco/magnesio/folati),000100,2026-07-26,332,6.7,80.4,0.4,1.0,24,0.8,0,13,0,1.3,20,0
+004125,Fagioli borlotti secchi cotti bolliti,legumi,CREA,004125,2026-07-26,106,6.9,16.4,0.4,6.9,46,2.3,0,32,0,1.2,0,0
+004425,Fave secche cotte bollite,legumi,CREA+BDA-IEO(proxy minerali),004425+203_1,2026-07-26,146,11.0,22.4,1.3,3.0,90,5.0,0,145,0,4.6,0,0
+005120,Carciofi,verdura,CREA+BDA-IEO(proxy zinco/folati),005120,2026-07-26,22,2.7,2.5,0.2,5.5,86,1.0,0,68,0,0.8,0,12
+005650,Porri,verdura,CREA+BDA-IEO(proxy zinco/folati),005650,2026-07-26,29,2.1,5.2,0.1,2.9,54,0.8,0,74,0,0.2,0,9
+005060,Barbabietole rosse crude,verdura,CREA+BDA-IEO(proxy zinco/folati),005060,2026-07-26,19,1.1,4.0,0,2.6,20,0.4,0,101,0,0.4,0,7
+008000,Arance,frutta,CREA+BDA-IEO(proxy zinco/magnesio/folati),008000,2026-07-26,34,0.7,7.8,0.2,1.6,49,0.2,0,31,0,0.2,10,50
+008060,Mandarini,frutta,CREA+BDA-IEO(proxy zinco/magnesio/folati),008060,2026-07-26,72,0.9,17.6,0.3,1.7,32,0.3,0,18,0,0.1,10,42
+008820,Olive verdi,altro,CREA+BDA-IEO(proxy zinco/folati),008820,2026-07-26,142,0.8,1.0,15.0,3.0,64,1.6,0,0.5,0,0.4,0,0
+150010,Yogurt di latte intero,latticini,CREA,150010,2026-07-26,66,3.8,4.3,3.9,0,125,0.1,0.04,18,0.2,0.41,12,1
+166810,Ricotta di pecora,latticini,CREA,166810,2026-07-26,157,9.5,4.2,11.5,0,166,0.3,0.18,12,0.3,0.2,15,0
