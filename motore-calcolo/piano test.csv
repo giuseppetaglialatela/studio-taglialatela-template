@@ -1,8 +1,0 @@
-giorno,pasto,food_id,grammi
-1,colazione,TEST_A,100
-1,colazione,TEST_C,50
-1,pranzo,TEST_B,150
-1,pranzo,TEST_E,100
-1,spuntino,TEST_C,100
-1,cena,TEST_D,100
-1,cena,TEST_E,150
