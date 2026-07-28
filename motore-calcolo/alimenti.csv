@@ -24,7 +24,7 @@ food_id,nome,categoria,fonte,codice_fonte,data_verifica,kcal_100g,proteine_g,car
 1325,Tonno,pesce,BDA-IEO,1325,2026-07-26,159,21.5,0.1,8.1,0,38,1.3,16.3,20,5,0.5,26,0
 1321,Sgombro,pesce,BDA-IEO,1321,2026-07-26,170,17,0.5,11.1,0,38,1.2,2.9,1,7,2,21,0
 8734,Orata d'allevamento filetti,pesce,BDA-IEO,8734,2026-07-26,159,19.7,1.2,8.4,0,30,0.6,0,5,2,0.5,24,0
-1309,Gambero,pesce,BDA-IEO,1309,2026-07-26,71,13.6,2.9,0.6,0,110,1.8,0,14,3,1.9,39,2
+1309,Gambero,pesce,BDA-IEO+USDA,1309,2026-07-28,71,13.6,2.9,0.6,0,110,1.8,0.1,14,3,1.9,39,2
 349,Zucchine,verdura,BDA-IEO+USDA,349,2026-07-28,14,1.3,1.4,0.1,1.3,21,0.5,0,52,0,0.2,15.3,11
 336,Peperoni dolci,verdura,BDA-IEO+USDA(proxy),336,2026-07-28,26,0.9,4.2,0.3,1.9,17,0.7,0,24,0,0.2,12.0,151
 334,Melanzane,verdura,BDA-IEO+USDA,334,2026-07-28,20,1.1,2.6,0.1,2.6,14,0.3,0,18,0,0.2,13.5,11
@@ -73,13 +73,13 @@ food_id,nome,categoria,fonte,codice_fonte,data_verifica,kcal_100g,proteine_g,car
 309,Broccolo a testa,verdura,BDA-IEO+USDA,309,2026-07-28,33,3,3.1,0.4,3.1,28,0.8,0,132,0,0.6,21.0,54
 500021,Mirtillo nero,frutta,BDA-IEO,500021,2026-07-26,31,0.9,5.1,0.2,3.1,41,0.7,0,6,0,0.2,5,15
 1510,Salmone in salamoia (in scatola),pesce,BDA-IEO,1510,2026-07-26,192,21.1,1,11.5,0,66,0.8,17,14,4,0.8,25,0
-123200,Branzino spigola,pesce,CREA,123200,2026-07-26,82,16.5,0.6,1.5,0,20,4.1,0,0,0,2.1,29,0
+123200,Branzino spigola,pesce,CREA+USDA,123200,2026-07-28,82,16.5,0.6,1.5,0,20,4.1,5.6,0,0,2.1,29,0
 7290,Pesche fresche con buccia,frutta,CREA+USDA,007290,2026-07-28,28,0.7,5.8,0,1.9,0,0,0,7,0,0,8.0,0
 7260,Pere fresche senza buccia,frutta,CREA,007260,2026-07-26,43,0.3,8.8,0.1,3.8,11,0.3,0,5,0,0.05,7,4
 7040,Anguria cocomero fresco,frutta,CREA+USDA,007040,2026-07-28,16,0.4,3.7,0,0.2,7,0.2,0,0,0,0,11.4,8
 5080,Bietola cruda,verdura,CREA,005080,2026-07-26,15,1.3,1.8,0.1,1.2,67,1,0,85,0,0.78,38,24
 127150,Polpo,pesce,CREA,127150,2026-07-26,57,10.6,1.4,1,0,144,1.5,0,0,0,5.1,39,0
-105210,Maiale lombo crudo,carne,CREA+USDA,105210,2026-07-28,146,20.7,0,7,0,7,1.3,0,0,0,1.8,22.0,0
+105210,Maiale lombo crudo,carne,CREA+USDA,105210,2026-07-28,146,20.7,0,7,0,7,1.3,0.5,0,0,1.8,22.0,0
 3020,Corn flakes,cereali,CREA,003020,2026-07-26,367,6.6,87.4,0.8,2.8,74,2.8,0,0,0,0.28,14,0
 1721,Pecorino,latticini,BDA-IEO,1721,2026-07-26,392,25.8,0.2,32,0,607,0.6,0.5,7,1.1,3.4,40,0
 409,Fichi freschi,frutta,BDA-IEO,409,2026-07-26,51,0.9,11.2,0.2,2,43,0.5,0,6,0,0.2,15,7
@@ -92,7 +92,7 @@ food_id,nome,categoria,fonte,codice_fonte,data_verifica,kcal_100g,proteine_g,car
 889001,Quinoa cruda,cereali,BDA-IEO,889001,2026-07-26,376,15.4,57.8,8.1,12.2,46,3.6,0,20,0,2.74,189,0
 777010,Capperi sott'aceto,condimenti,BDA-IEO+USDA,777010,2026-07-28,22,2.6,2.1,0.1,1.5,19,0.9,0,38,0,0.2,33.0,17
 700832,Vongole in scatola al naturale,pesce,BDA-IEO,700832,2026-07-26,140,25.6,5.1,2,0,92,28,4,29,99,2.7,18,22
-101520,Vitello filetto crudo,carne,CREA,101520,2026-07-26,107,20.7,0,2.7,0,14,2.3,0,0,0,2.8,25,0
+101520,Vitello filetto crudo,carne,CREA+USDA,101520,2026-07-28,107,20.7,0,2.7,0,14,2.3,1.2,0,0,2.8,25,0
 115800,Trippa di bovini,carne,CREA+USDA,115800,2026-07-28,108,15.8,0,5,0,8,4,0,0,0,0,13.0,3
 127120,Cozza mitilo,pesce,CREA,127120,2026-07-26,84,11.7,3.4,2.7,0,88,5.8,0,0,0,2.2,44,0
 005000,Aglio,verdura,CREA+BDA-IEO(proxy folati),005000,2026-07-26,53,8.4,1.0,0.8,4.3,15,1.2,0,3,0,0.59,17,9
