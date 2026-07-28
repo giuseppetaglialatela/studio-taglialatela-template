@@ -1,0 +1,68 @@
+food_id,nome,nutriente,motivo
+7040,Anguria cocomero fresco,folati_ug,folati presenti in quasi ogni alimento: dato non pubblicato dalla fonte
+7040,Anguria cocomero fresco,magnesio_mg,minerale mai biologicamente assente in un alimento intero: dato non pubblicato dalla fonte
+7040,Anguria cocomero fresco,zinco_mg,minerale mai biologicamente assente in un alimento intero: dato non pubblicato dalla fonte
+304,Asparagi,magnesio_mg,minerale mai biologicamente assente in un alimento intero: dato non pubblicato dalla fonte
+005060,Barbabietole rosse crude,magnesio_mg,minerale mai biologicamente assente in un alimento intero: dato non pubblicato dalla fonte
+123200,Branzino spigola,folati_ug,folati presenti in quasi ogni alimento: dato non pubblicato dalla fonte
+123200,Branzino spigola,vitamina_b12_ug,"alimento di origine animale: zero implausibile, dato non pubblicato dalla fonte"
+123200,Branzino spigola,vitamina_d_ug,"alimento di origine animale: zero implausibile, dato non pubblicato dalla fonte"
+309,Broccolo a testa,magnesio_mg,minerale mai biologicamente assente in un alimento intero: dato non pubblicato dalla fonte
+777010,Capperi sott'aceto,magnesio_mg,minerale mai biologicamente assente in un alimento intero: dato non pubblicato dalla fonte
+005120,Carciofi,magnesio_mg,minerale mai biologicamente assente in un alimento intero: dato non pubblicato dalla fonte
+312,Carote,magnesio_mg,minerale mai biologicamente assente in un alimento intero: dato non pubblicato dalla fonte
+318,Cetrioli,magnesio_mg,minerale mai biologicamente assente in un alimento intero: dato non pubblicato dalla fonte
+005300,Cipolla,magnesio_mg,minerale mai biologicamente assente in un alimento intero: dato non pubblicato dalla fonte
+323,Cipolline,magnesio_mg,minerale mai biologicamente assente in un alimento intero: dato non pubblicato dalla fonte
+3020,Corn flakes,folati_ug,folati presenti in quasi ogni alimento: dato non pubblicato dalla fonte
+127120,Cozza mitilo,folati_ug,folati presenti in quasi ogni alimento: dato non pubblicato dalla fonte
+127120,Cozza mitilo,vitamina_b12_ug,"alimento di origine animale: zero implausibile, dato non pubblicato dalla fonte"
+127120,Cozza mitilo,vitamina_d_ug,"alimento di origine animale: zero implausibile, dato non pubblicato dalla fonte"
+004125,Fagioli borlotti secchi cotti bolliti,magnesio_mg,minerale mai biologicamente assente in un alimento intero: dato non pubblicato dalla fonte
+101,Fagiolini,magnesio_mg,minerale mai biologicamente assente in un alimento intero: dato non pubblicato dalla fonte
+004425,Fave secche cotte bollite,magnesio_mg,minerale mai biologicamente assente in un alimento intero: dato non pubblicato dalla fonte
+324,Finocchio,magnesio_mg,minerale mai biologicamente assente in un alimento intero: dato non pubblicato dalla fonte
+329,Funghi prataioli coltivati,magnesio_mg,minerale mai biologicamente assente in un alimento intero: dato non pubblicato dalla fonte
+1309,Gambero,vitamina_d_ug,"alimento di origine animale: zero implausibile, dato non pubblicato dalla fonte"
+135020,Latte parzialmente scremato,vitamina_b12_ug,"alimento di origine animale: zero implausibile, dato non pubblicato dalla fonte"
+135020,Latte parzialmente scremato,vitamina_d_ug,"alimento di origine animale: zero implausibile, dato non pubblicato dalla fonte"
+331,Lattuga,magnesio_mg,minerale mai biologicamente assente in un alimento intero: dato non pubblicato dalla fonte
+105210,Maiale lombo crudo,folati_ug,folati presenti in quasi ogni alimento: dato non pubblicato dalla fonte
+105210,Maiale lombo crudo,magnesio_mg,minerale mai biologicamente assente in un alimento intero: dato non pubblicato dalla fonte
+105210,Maiale lombo crudo,vitamina_b12_ug,"alimento di origine animale: zero implausibile, dato non pubblicato dalla fonte"
+105210,Maiale lombo crudo,vitamina_d_ug,"alimento di origine animale: zero implausibile, dato non pubblicato dalla fonte"
+334,Melanzane,magnesio_mg,minerale mai biologicamente assente in un alimento intero: dato non pubblicato dalla fonte
+702901,Olio di oliva extravergine,calcio_mg,minerale mai biologicamente assente in un alimento intero: dato non pubblicato dalla fonte
+592,Olive nere,folati_ug,folati presenti in quasi ogni alimento: dato non pubblicato dalla fonte
+592,Olive nere,magnesio_mg,minerale mai biologicamente assente in un alimento intero: dato non pubblicato dalla fonte
+008820,Olive verdi,magnesio_mg,minerale mai biologicamente assente in un alimento intero: dato non pubblicato dalla fonte
+8734,Orata d'allevamento filetti,vitamina_d_ug,"alimento di origine animale: zero implausibile, dato non pubblicato dalla fonte"
+381,Patate,magnesio_mg,minerale mai biologicamente assente in un alimento intero: dato non pubblicato dalla fonte
+50399,Patate dolci,magnesio_mg,minerale mai biologicamente assente in un alimento intero: dato non pubblicato dalla fonte
+336,Peperoni dolci,magnesio_mg,minerale mai biologicamente assente in un alimento intero: dato non pubblicato dalla fonte
+7290,Pesche fresche con buccia,calcio_mg,minerale mai biologicamente assente in un alimento intero: dato non pubblicato dalla fonte
+7290,Pesche fresche con buccia,ferro_mg,minerale mai biologicamente assente in un alimento intero: dato non pubblicato dalla fonte
+7290,Pesche fresche con buccia,magnesio_mg,minerale mai biologicamente assente in un alimento intero: dato non pubblicato dalla fonte
+7290,Pesche fresche con buccia,zinco_mg,minerale mai biologicamente assente in un alimento intero: dato non pubblicato dalla fonte
+103,Piselli,magnesio_mg,minerale mai biologicamente assente in un alimento intero: dato non pubblicato dalla fonte
+127150,Polpo,folati_ug,folati presenti in quasi ogni alimento: dato non pubblicato dalla fonte
+127150,Polpo,vitamina_b12_ug,"alimento di origine animale: zero implausibile, dato non pubblicato dalla fonte"
+127150,Polpo,vitamina_d_ug,"alimento di origine animale: zero implausibile, dato non pubblicato dalla fonte"
+391,Pomodori da insalata,magnesio_mg,minerale mai biologicamente assente in un alimento intero: dato non pubblicato dalla fonte
+392,Pomodori pelati in scatola,magnesio_mg,minerale mai biologicamente assente in un alimento intero: dato non pubblicato dalla fonte
+005650,Porri,magnesio_mg,minerale mai biologicamente assente in un alimento intero: dato non pubblicato dalla fonte
+339,Radicchio rosso,magnesio_mg,minerale mai biologicamente assente in un alimento intero: dato non pubblicato dalla fonte
+700169,Rucola,magnesio_mg,minerale mai biologicamente assente in un alimento intero: dato non pubblicato dalla fonte
+122800,Sardine fresche,vitamina_d_ug,"valore BDA da campione magro (4.5 g lipidi) abbinato a macro CREA da campione grasso (15.4 g): liposolubile, probabilmente sottostimato"
+343,Sedano,magnesio_mg,minerale mai biologicamente assente in un alimento intero: dato non pubblicato dalla fonte
+345,Spinaci,magnesio_mg,minerale mai biologicamente assente in un alimento intero: dato non pubblicato dalla fonte
+115800,Trippa di bovini,folati_ug,folati presenti in quasi ogni alimento: dato non pubblicato dalla fonte
+115800,Trippa di bovini,magnesio_mg,minerale mai biologicamente assente in un alimento intero: dato non pubblicato dalla fonte
+115800,Trippa di bovini,vitamina_b12_ug,"alimento di origine animale: zero implausibile, dato non pubblicato dalla fonte"
+115800,Trippa di bovini,vitamina_d_ug,"alimento di origine animale: zero implausibile, dato non pubblicato dalla fonte"
+115800,Trippa di bovini,zinco_mg,minerale mai biologicamente assente in un alimento intero: dato non pubblicato dalla fonte
+101520,Vitello filetto crudo,folati_ug,folati presenti in quasi ogni alimento: dato non pubblicato dalla fonte
+101520,Vitello filetto crudo,vitamina_b12_ug,"alimento di origine animale: zero implausibile, dato non pubblicato dalla fonte"
+101520,Vitello filetto crudo,vitamina_d_ug,"alimento di origine animale: zero implausibile, dato non pubblicato dalla fonte"
+347,Zucca gialla,magnesio_mg,minerale mai biologicamente assente in un alimento intero: dato non pubblicato dalla fonte
+349,Zucchine,magnesio_mg,minerale mai biologicamente assente in un alimento intero: dato non pubblicato dalla fonte
