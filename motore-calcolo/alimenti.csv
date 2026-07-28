@@ -5,15 +5,15 @@ food_id,nome,categoria,fonte,codice_fonte,data_verifica,kcal_100g,proteine_g,car
 008540,Mandorle dolci secche,frutta secca,CREA+BDA-IEO,008540,2026-07-26,628,22.0,4.6,55.3,12.7,240,3,0,48,0,2.5,264,0
 000550,Pane integrale,cereali,CREA+BDA-IEO,000550,2026-07-26,224,8.5,44.1,1.3,6.5,25,2.5,0,40,0,1.6,66,0
 100015,Fiocchi di latte magro,latticini,BDA-IEO,100015,2026-07-26,115,9.7,3.2,7.1,0,73,0.1,0.05,27,0.7,0.6,9,0
-391,Pomodori da insalata,verdura,BDA-IEO,391,2026-07-26,19,1.2,2.8,0.2,1.1,11,0.4,0,14,0,0.2,0,21
+391,Pomodori da insalata,verdura,BDA-IEO+USDA,391,2026-07-28,19,1.2,2.8,0.2,1.1,11,0.4,0,14,0,0.2,11.0,21
 8807,Mele con buccia,frutta,BDA-IEO,8807,2026-07-26,44,0.2,10,0,2.6,4,0.1,0,1,0,0.1,5,6
 1631,Yogurt di latte parzialmente scremato,latticini,BDA-IEO,1631,2026-07-26,43,3.4,3.8,1.7,0,120,0.1,0.01,17,0.2,0.6,19,1
 60091,Pasta di semola integrale cruda,cereali,BDA-IEO,60091,2026-07-26,330,13.3,64.8,2.2,7.1,39,2.7,0,29,0,2,100,0
 4005,Ceci secchi cotti bolliti,legumi,CREA,004005,2026-07-26,132,7.0,18.9,2.4,5.8,58,2.2,0,45,0,1.7,37,0.1
-345,Spinaci,verdura,BDA-IEO,345,2026-07-26,35,3.4,3,0.7,1.9,78,2.9,0,150,0,1.43,0,54
+345,Spinaci,verdura,BDA-IEO+USDA,345,2026-07-28,35,3.4,3,0.7,1.9,78,2.9,0,150,0,1.43,79.0,54
 1313,Merluzzo,pesce,BDA-IEO,1313,2026-07-26,71,17,0,0.3,0,25,0.7,0.005,12,1,2,20,0.5
-381,Patate,verdura,BDA-IEO,381,2026-07-26,80,2.1,18,0.1,1.6,10,0.6,0,35,0,0.27,0,15
-101,Fagiolini,verdura,BDA-IEO,101,2026-07-26,24,2.1,2.4,0.1,2.9,35,0.9,0,80,0,0.2,0,16
+381,Patate,verdura,BDA-IEO+USDA,381,2026-07-28,80,2.1,18,0.1,1.6,10,0.6,0,35,0,0.27,23.0,15
+101,Fagiolini,verdura,BDA-IEO+USDA,101,2026-07-28,24,2.1,2.4,0.1,2.9,35,0.9,0,80,0,0.2,28.2,16
 702901,Olio di oliva extravergine,condimenti,BDA-IEO,702901,2026-07-26,899,0,0,99.9,0,0,0.2,0,0.5,0,0.005,0.5,0
 1800,Uovo di gallina intero,uova,BDA-IEO,1800,2026-07-26,128,12.4,0,8.7,0,48,1.5,1.75,50,2.5,1.2,13,0
 600009,Avena cruda,cereali,BDA-IEO,600009,2026-07-26,360,16.9,55.7,6.9,10.6,54,4.7,0,56,0,4,177,0
@@ -25,12 +25,12 @@ food_id,nome,categoria,fonte,codice_fonte,data_verifica,kcal_100g,proteine_g,car
 1321,Sgombro,pesce,BDA-IEO,1321,2026-07-26,170,17,0.5,11.1,0,38,1.2,2.9,1,7,2,21,0
 8734,Orata d'allevamento filetti,pesce,BDA-IEO,8734,2026-07-26,159,19.7,1.2,8.4,0,30,0.6,0,5,2,0.5,24,0
 1309,Gambero,pesce,BDA-IEO,1309,2026-07-26,71,13.6,2.9,0.6,0,110,1.8,0,14,3,1.9,39,2
-349,Zucchine,verdura,BDA-IEO,349,2026-07-26,14,1.3,1.4,0.1,1.3,21,0.5,0,52,0,0.2,0,11
-336,Peperoni dolci,verdura,BDA-IEO,336,2026-07-26,26,0.9,4.2,0.3,1.9,17,0.7,0,24,0,0.2,0,151
-334,Melanzane,verdura,BDA-IEO,334,2026-07-26,20,1.1,2.6,0.1,2.6,14,0.3,0,18,0,0.2,0,11
-331,Lattuga,verdura,BDA-IEO,331,2026-07-26,22,1.8,2.2,0.4,1.5,45,0.8,0,64,0,0.2,0,6
-312,Carote,verdura,BDA-IEO,312,2026-07-26,39,1.1,7.6,0,3.1,44,0.7,0,10,0,0.4,0,4
-700169,Rucola,verdura,BDA-IEO,700169,2026-07-26,28,2.6,2.1,0.7,1.6,160,1.5,0,97,0,0.4,0,15
+349,Zucchine,verdura,BDA-IEO+USDA,349,2026-07-28,14,1.3,1.4,0.1,1.3,21,0.5,0,52,0,0.2,15.3,11
+336,Peperoni dolci,verdura,BDA-IEO+USDA(proxy),336,2026-07-28,26,0.9,4.2,0.3,1.9,17,0.7,0,24,0,0.2,12.0,151
+334,Melanzane,verdura,BDA-IEO+USDA,334,2026-07-28,20,1.1,2.6,0.1,2.6,14,0.3,0,18,0,0.2,13.5,11
+331,Lattuga,verdura,BDA-IEO+USDA(proxy),331,2026-07-28,22,1.8,2.2,0.4,1.5,45,0.8,0,64,0,0.2,11.0,6
+312,Carote,verdura,BDA-IEO+USDA,312,2026-07-28,39,1.1,7.6,0,3.1,44,0.7,0,10,0,0.4,12.4,4
+700169,Rucola,verdura,BDA-IEO+USDA,700169,2026-07-28,28,2.6,2.1,0.7,1.6,160,1.5,0,97,0,0.4,47.0,15
 406,Banana,frutta,BDA-IEO,406,2026-07-26,69,1.2,15.4,0.3,1.8,7,0.8,0,14,0,0.2,34,16
 510,Noci secche,frutta secca,BDA-IEO,510,2026-07-26,702,14.3,5.1,68.1,6.2,61,2.4,0,66,0,5,121,1
 4505,Lenticchie secche cotte bollite,legumi,CREA+BDA-IEO(proxy folati),004505,2026-07-26,109,6.9,16.3,0.4,8.3,29,3,0,110,0,1.1,28,0
@@ -38,17 +38,17 @@ food_id,nome,categoria,fonte,codice_fonte,data_verifica,kcal_100g,proteine_g,car
 11793,Ricotta di vacca,latticini,BDA-IEO,11793,2026-07-26,146,8.8,3.5,10.9,0,295,0.4,0.03,12,0.3,0.5,17,0
 8697,Tacchino petto senza pelle,carne,BDA-IEO,8697,2026-07-26,107,24,0,1.2,0,6,0.8,0.3,17,2,1.1,32,0
 8520,Bovino magro vitellone senza grasso visibile,carne,BDA-IEO,8520,2026-07-26,108,21.58,0,2.38,0,4.4,1.56,0.5,27.6,2,3.76,17.4,0
-592,Olive nere,condimenti,BDA-IEO,592,2026-07-26,240,1.6,0.8,25.1,2.4,62,1.6,0,0,0,0.5,0,20
+592,Olive nere,condimenti,BDA-IEO+USDA(proxy),592,2026-07-28,240,1.6,0.8,25.1,2.4,62,1.6,0,0,0,0.5,4.0,20
 8053,Yogurt greco,latticini,BDA-IEO,8053,2026-07-26,115,6.4,2,9.1,0,150,0.3,0.05,6,0.2,0.5,12,0
 1515,Tonno in scatola al naturale sgocciolato,pesce,BDA-IEO,1515,2026-07-26,103,25.1,0,0.3,0,8,1,2,4,4,0.7,27,0
 122800,Sardine fresche,pesce,CREA+BDA-IEO,122800+1319,2026-07-28,225,20.3,1.5,15.4,0,33,1.8,4.5,3,9,3.9,70,0.5
 135020,Latte parzialmente scremato,latticini,BDA-IEO,135020,2026-07-26,46,3.5,5,1.5,0,120,0.1,0,8,0,0.37,11,1
 701307,Biscotti integrali,cereali,BDA-IEO,701307,2026-07-26,441,8.2,62.2,17.5,8.5,26,1.9,0.06,14,0.1,1.13,68,0
-304,Asparagi,verdura,BDA-IEO,304,2026-07-26,33,3.6,3.3,0.2,2.1,25,1.2,0,175,0,0.3,0,18
+304,Asparagi,verdura,BDA-IEO+USDA,304,2026-07-28,33,3.6,3.3,0.2,2.1,25,1.2,0,175,0,0.3,13.8,18
 30097,Pane di segale,cereali,BDA-IEO,30097,2026-07-26,228,8.3,45.4,1.7,4.6,80,2.5,0,110,0,1.14,40,0
 8077,Gallette di riso,cereali,BDA-IEO,8077,2026-07-26,368,7.4,79.3,3.4,5,14,1.1,0,17,0,1.6,112,0
-347,Zucca gialla,verdura,BDA-IEO,347,2026-07-26,19,1.1,3.5,0.1,0.5,20,0.9,0,10,0,0.2,0,9
-103,Piselli,verdura,BDA-IEO,103,2026-07-26,87,7,12.4,0.2,5.2,47,1.8,0,62,0,0.7,0,28
+347,Zucca gialla,verdura,BDA-IEO+USDA(proxy),347,2026-07-28,19,1.1,3.5,0.1,0.5,20,0.9,0,10,0,0.2,15.0,9
+103,Piselli,verdura,BDA-IEO+USDA,103,2026-07-28,87,7,12.4,0.2,5.2,47,1.8,0,62,0,0.7,33.0,28
 411,Fragole,frutta,BDA-IEO,411,2026-07-26,30,0.9,5.3,0.4,1.6,35,0.8,0,20,0,0.1,10,54
 421,Melone,frutta,BDA-IEO,421,2026-07-26,34,0.8,7.4,0.2,0.7,19,0.3,0,5,0,0.3,11,32
 428,Uva,frutta,BDA-IEO,428,2026-07-26,64,0.5,15.6,0.1,1.5,27,0.4,0,2,0,0.12,7,6
@@ -58,58 +58,58 @@ food_id,nome,categoria,fonte,codice_fonte,data_verifica,kcal_100g,proteine_g,car
 429,Kiwi,frutta,BDA-IEO,429,2026-07-26,48,1.2,9,0.6,2.2,25,0.5,0,25,0,0.1,12,85
 700607,Pistacchi secchi,frutta secca,BDA-IEO,700607,2026-07-26,629,18.1,8.1,56.1,10.6,131,7.3,0,51,0,2.37,158,2
 511,Nocciole secche,frutta secca,BDA-IEO,511,2026-07-26,671,13.8,6.1,64.1,8.1,150,3.3,0,72,0,2,160,4
-324,Finocchio,verdura,BDA-IEO,324,2026-07-26,13,1.2,1,0,2.2,45,0.4,0,49,0,0.1,0,12
-318,Cetrioli,verdura,BDA-IEO,318,2026-07-26,15,0.7,1.8,0.5,0.6,16,0.3,0,9,0,0.09,0,11
+324,Finocchio,verdura,BDA-IEO+USDA,324,2026-07-28,13,1.2,1,0,2.2,45,0.4,0,49,0,0.1,15.0,12
+318,Cetrioli,verdura,BDA-IEO+USDA,318,2026-07-28,15,0.7,1.8,0.5,0.6,16,0.3,0,9,0,0.09,10.1,11
 999692,Avocado,frutta,BDA-IEO,999692,2026-07-26,238,4.4,1.8,23,3.3,13,0.6,0,11,0,0.4,25,18
 8711,Prosciutto crudo senza grasso visibile,carne,BDA-IEO,8711,2026-07-26,159,29.3,0,4.6,0,16,1.3,0.6,4,0.05,2.2,23,0
 100030,Robiola,latticini,BDA-IEO,100030,2026-07-26,338,20,2.3,27.7,0,704,0.7,0.17,19,0.6,4.1,20,0
-339,Radicchio rosso,verdura,BDA-IEO,339,2026-07-26,18,1.4,1.6,0.1,3,36,0.3,0,13,0,0.2,0,10
+339,Radicchio rosso,verdura,BDA-IEO+USDA,339,2026-07-28,18,1.4,1.6,0.1,3,36,0.3,0,13,0,0.2,13.0,10
 100061,Bresaola,carne,BDA-IEO,100061,2026-07-26,151,32,0,2.6,0,7,2.4,0.5,19,2,3.9,34,0
 805080,Feta,latticini,BDA-IEO,805080,2026-07-26,250,15.6,1.5,20.2,0,360,0.2,0.5,23,1.1,0.9,20,0
-329,Funghi prataioli coltivati,verdura,BDA-IEO,329,2026-07-26,23,2.3,1.9,0.4,1.7,10,1.2,0,44,0,0.4,0,4
+329,Funghi prataioli coltivati,verdura,BDA-IEO+USDA,329,2026-07-28,23,2.3,1.9,0.4,1.7,10,1.2,0,44,0,0.4,9.0,4
 3009,Pop corn,cereali,BDA-IEO,3009,2026-07-26,408,12,77.9,4.2,15.1,10,2.7,0,31,0,3.44,144,0
-50399,Patate dolci,verdura,BDA-IEO,50399,2026-07-26,92,1.2,21.3,0.3,2.3,24,0.7,0,17,0,0.3,0,23
+50399,Patate dolci,verdura,BDA-IEO+USDA,50399,2026-07-28,92,1.2,21.3,0.3,2.3,24,0.7,0,17,0,0.3,19.1,23
 888013,Couscous secco,cereali,BDA-IEO,888013,2026-07-26,361,13.7,76.5,1.1,4.5,24,1.9,0,28,0,1.4,52,0
-309,Broccolo a testa,verdura,BDA-IEO,309,2026-07-26,33,3,3.1,0.4,3.1,28,0.8,0,132,0,0.6,0,54
+309,Broccolo a testa,verdura,BDA-IEO+USDA,309,2026-07-28,33,3,3.1,0.4,3.1,28,0.8,0,132,0,0.6,21.0,54
 500021,Mirtillo nero,frutta,BDA-IEO,500021,2026-07-26,31,0.9,5.1,0.2,3.1,41,0.7,0,6,0,0.2,5,15
 1510,Salmone in salamoia (in scatola),pesce,BDA-IEO,1510,2026-07-26,192,21.1,1,11.5,0,66,0.8,17,14,4,0.8,25,0
 123200,Branzino spigola,pesce,CREA,123200,2026-07-26,82,16.5,0.6,1.5,0,20,4.1,0,0,0,2.1,29,0
-7290,Pesche fresche con buccia,frutta,CREA,007290,2026-07-26,28,0.7,5.8,0,1.9,0,0,0,7,0,0,0,0
+7290,Pesche fresche con buccia,frutta,CREA+USDA,007290,2026-07-28,28,0.7,5.8,0,1.9,0,0,0,7,0,0,8.0,0
 7260,Pere fresche senza buccia,frutta,CREA,007260,2026-07-26,43,0.3,8.8,0.1,3.8,11,0.3,0,5,0,0.05,7,4
-7040,Anguria cocomero fresco,frutta,CREA,007040,2026-07-26,16,0.4,3.7,0,0.2,7,0.2,0,0,0,0,0,8
+7040,Anguria cocomero fresco,frutta,CREA+USDA,007040,2026-07-28,16,0.4,3.7,0,0.2,7,0.2,0,0,0,0,11.4,8
 5080,Bietola cruda,verdura,CREA,005080,2026-07-26,15,1.3,1.8,0.1,1.2,67,1,0,85,0,0.78,38,24
 127150,Polpo,pesce,CREA,127150,2026-07-26,57,10.6,1.4,1,0,144,1.5,0,0,0,5.1,39,0
-105210,Maiale lombo crudo,carne,CREA,105210,2026-07-26,146,20.7,0,7,0,7,1.3,0,0,0,1.8,0,0
+105210,Maiale lombo crudo,carne,CREA+USDA,105210,2026-07-28,146,20.7,0,7,0,7,1.3,0,0,0,1.8,22.0,0
 3020,Corn flakes,cereali,CREA,003020,2026-07-26,367,6.6,87.4,0.8,2.8,74,2.8,0,0,0,0.28,14,0
 1721,Pecorino,latticini,BDA-IEO,1721,2026-07-26,392,25.8,0.2,32,0,607,0.6,0.5,7,1.1,3.4,40,0
 409,Fichi freschi,frutta,BDA-IEO,409,2026-07-26,51,0.9,11.2,0.2,2,43,0.5,0,6,0,0.2,15,7
 9007,Prosciutto cotto senza grasso visibile,carne,BDA-IEO,9007,2026-07-26,132,22.2,1,4.4,0,7,0.9,0.8,19,1,2.6,16,0
 11796,Mozzarella di bufala,latticini,BDA-IEO,11796,2026-07-26,288,16.7,0.4,24.4,0,210,0.2,0.16,19,2.1,2.6,10,0
-323,Cipolline,verdura,BDA-IEO,323,2026-07-26,41,1.3,8.5,0.1,1.7,51,0.4,0,17,0,0.2,0,6
-343,Sedano,verdura,BDA-IEO,343,2026-07-26,23,2.3,2.4,0.2,1.6,31,0.5,0,38,0,0.1,0,32
-392,Pomodori pelati in scatola,verdura,BDA-IEO,392,2026-07-26,22,1.2,3,0.5,0.9,9,0.2,0,10,0,0.27,0,18
+323,Cipolline,verdura,BDA-IEO+USDA(proxy),323,2026-07-28,41,1.3,8.5,0.1,1.7,51,0.4,0,17,0,0.2,10.0,6
+343,Sedano,verdura,BDA-IEO+USDA,343,2026-07-28,23,2.3,2.4,0.2,1.6,31,0.5,0,38,0,0.1,10.9,32
+392,Pomodori pelati in scatola,verdura,BDA-IEO+USDA(proxy),392,2026-07-28,22,1.2,3,0.5,0.9,9,0.2,0,10,0,0.27,18.6,18
 21792,Formaggio spalmabile tipo philadelphia,latticini,BDA-IEO,21792,2026-07-26,313,8.6,0,31,0,110,0.1,0.17,13,0.3,0.7,9,0
 889001,Quinoa cruda,cereali,BDA-IEO,889001,2026-07-26,376,15.4,57.8,8.1,12.2,46,3.6,0,20,0,2.74,189,0
-777010,Capperi sott'aceto,condimenti,BDA-IEO,777010,2026-07-26,22,2.6,2.1,0.1,1.5,19,0.9,0,38,0,0.2,0,17
+777010,Capperi sott'aceto,condimenti,BDA-IEO+USDA,777010,2026-07-28,22,2.6,2.1,0.1,1.5,19,0.9,0,38,0,0.2,33.0,17
 700832,Vongole in scatola al naturale,pesce,BDA-IEO,700832,2026-07-26,140,25.6,5.1,2,0,92,28,4,29,99,2.7,18,22
 101520,Vitello filetto crudo,carne,CREA,101520,2026-07-26,107,20.7,0,2.7,0,14,2.3,0,0,0,2.8,25,0
-115800,Trippa di bovini,carne,CREA,115800,2026-07-26,108,15.8,0,5,0,8,4,0,0,0,0,0,3
+115800,Trippa di bovini,carne,CREA+USDA,115800,2026-07-28,108,15.8,0,5,0,8,4,0,0,0,0,13.0,3
 127120,Cozza mitilo,pesce,CREA,127120,2026-07-26,84,11.7,3.4,2.7,0,88,5.8,0,0,0,2.2,44,0
 005000,Aglio,verdura,CREA+BDA-IEO(proxy folati),005000,2026-07-26,53,8.4,1.0,0.8,4.3,15,1.2,0,3,0,0.59,17,9
 005160,Cavolfiore,verdura,CREA,005160,2026-07-26,30,3.2,2.7,0.2,2.4,44,0.8,0,71,0,0.7,28,59
-005300,Cipolla,verdura,CREA+BDA-IEO(proxy zinco),005300,2026-07-26,28,1.0,5.7,0.1,1.0,25,0.4,0,20,0,0.3,0,5
+005300,Cipolla,verdura,CREA+BDA-IEO(proxy zinco)+USDA,005300,2026-07-28,28,1.0,5.7,0.1,1.0,25,0.4,0,20,0,0.3,10.0,5
 008030,Limone,frutta,CREA+BDA-IEO(proxy zinco/magnesio/folati),008030,2026-07-26,16,0.6,2.5,0,1.9,14,0.1,0,11,0,0.1,12,50
 210010,Miele,altro,CREA+BDA-IEO(proxy zinco/folati),210010,2026-07-26,304,0.6,80.3,0,0,5,0.5,0,2,0,0.8,3,1
 100154_2,Pane comune,cereali,BDA-IEO,100154_2,2026-07-26,269,8.4,59.8,0.4,3.8,15,1.0,0,29,0,0.37,15,0
 000100,Riso bianco crudo,cereali,CREA+BDA-IEO(proxy zinco/magnesio/folati),000100,2026-07-26,332,6.7,80.4,0.4,1.0,24,0.8,0,13,0,1.3,20,0
-004125,Fagioli borlotti secchi cotti bolliti,legumi,CREA,004125,2026-07-26,106,6.9,16.4,0.4,6.9,46,2.3,0,32,0,1.2,0,0
-004425,Fave secche cotte bollite,legumi,CREA+BDA-IEO(proxy minerali),004425+203_1,2026-07-26,146,11.0,22.4,1.3,3.0,90,5.0,0,145,0,4.6,0,0
-005120,Carciofi,verdura,CREA+BDA-IEO(proxy zinco/folati),005120,2026-07-26,22,2.7,2.5,0.2,5.5,86,1.0,0,68,0,0.8,0,12
-005650,Porri,verdura,CREA+BDA-IEO(proxy zinco/folati),005650,2026-07-26,29,2.1,5.2,0.1,2.9,54,0.8,0,74,0,0.2,0,9
-005060,Barbabietole rosse crude,verdura,CREA+BDA-IEO(proxy zinco/folati),005060,2026-07-26,19,1.1,4.0,0,2.6,20,0.4,0,101,0,0.4,0,7
+004125,Fagioli borlotti secchi cotti bolliti,legumi,CREA+USDA,004125,2026-07-28,106,6.9,16.4,0.4,6.9,46,2.3,0,32,0,1.2,50.0,0
+004425,Fave secche cotte bollite,legumi,CREA+BDA-IEO(proxy minerali)+USDA,004425+203_1,2026-07-28,146,11.0,22.4,1.3,3.0,90,5.0,0,145,0,4.6,43.0,0
+005120,Carciofi,verdura,CREA+BDA-IEO(proxy zinco/folati)+USDA,005120,2026-07-28,22,2.7,2.5,0.2,5.5,86,1.0,0,68,0,0.8,60.0,12
+005650,Porri,verdura,CREA+BDA-IEO(proxy zinco/folati)+USDA,005650,2026-07-28,29,2.1,5.2,0.1,2.9,54,0.8,0,74,0,0.2,15.7,9
+005060,Barbabietole rosse crude,verdura,CREA+BDA-IEO(proxy zinco/folati)+USDA,005060,2026-07-28,19,1.1,4.0,0,2.6,20,0.4,0,101,0,0.4,21.0,7
 008000,Arance,frutta,CREA+BDA-IEO(proxy zinco/magnesio/folati),008000,2026-07-26,34,0.7,7.8,0.2,1.6,49,0.2,0,31,0,0.2,10,50
 008060,Mandarini,frutta,CREA+BDA-IEO(proxy zinco/magnesio/folati),008060,2026-07-26,72,0.9,17.6,0.3,1.7,32,0.3,0,18,0,0.1,10,42
-008820,Olive verdi,altro,CREA+BDA-IEO(proxy zinco/folati),008820,2026-07-26,142,0.8,1.0,15.0,3.0,64,1.6,0,0.5,0,0.4,0,0
+008820,Olive verdi,altro,CREA+BDA-IEO(proxy zinco/folati)+USDA,008820,2026-07-28,142,0.8,1.0,15.0,3.0,64,1.6,0,0.5,0,0.4,11.0,0
 150010,Yogurt di latte intero,latticini,CREA,150010,2026-07-26,66,3.8,4.3,3.9,0,125,0.1,0.04,18,0.2,0.41,12,1
 166810,Ricotta di pecora,latticini,CREA,166810,2026-07-26,157,9.5,4.2,11.5,0,166,0.3,0.18,12,0.3,0.2,15,0
 000130,Riso basmati crudo,cereali,CREA+BDA-IEO(proxy folati),000130,2026-07-27,367,9.0,82.9,1.9,1.3,5,0.8,0,12,0,1.48,32,0
