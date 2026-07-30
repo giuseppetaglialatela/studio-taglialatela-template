@@ -7,7 +7,7 @@ verifica di derivazione USDA e chiave API stanno lì, non qui.
 
 Rimandi:
 - gerarchia fonti, schema congelato, gap.csv, controllo derivazione USDA → **M1**
-- regole pesi e formati confezione → **M2**
+- regole pesi e formati confezione → **M0** (ripetute per intero in **M2**)
 
 Non si amplia il database durante la composizione di un piano senza dichiararlo:
 ogni riga aggiunta cambia i checksum e obbliga a rieseguire collaudo e
