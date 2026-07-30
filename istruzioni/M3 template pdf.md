@@ -76,11 +76,11 @@ giorno per giorno.
 ## 3. DOCUMENTO DI SPIEGAZIONE DIETA
 
 **File template:** `TEMPLATE_SpiegazioneDieta_StudioTaglialatela_v1.py`
-Percorso: Drive > Template (stessa cartella del template piano alimentare).
 
-> **Stato da chiudere:** il template va caricato anche su GitHub, in radice, come
-> già fatto per il template del piano. Finché sta solo su Drive, il recupero
-> dipende dal canale più lento e fragile dei due.
+Recupero (raw GitHub, in radice):
+`https://raw.githubusercontent.com/giuseppetaglialatela/studio-taglialatela-template/refs/heads/main/TEMPLATE_SpiegazioneDieta_StudioTaglialatela_v1.py`
+
+Copia di riserva: Drive > Template (stessa cartella del template piano alimentare).
 
 ### Cosa è
 
