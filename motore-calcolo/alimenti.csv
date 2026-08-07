@@ -119,3 +119,4 @@ food_id,nome,categoria,fonte,codice_fonte,data_verifica,kcal_100g,proteine_g,car
 1307,Cozza/mitilo fresca,molluschi,BDA-IEO,1307,2026-07-27,84,11.7,3.4,2.7,0,88,5.8,0.005,37,19,2.2,44,0.5
 1328,Vongola fresca,molluschi,BDA-IEO,1328,2026-07-27,72,10.2,2.2,2.5,0,46,14,4,16,49,1.4,9,13
 1320,Seppia fresca,molluschi,BDA-IEO,1320,2026-07-27,72,14,0.7,1.5,0,27,0.8,0.005,13,2,4.2,32,0.5
+122410,Salmone affumicato,pesce,CREA+BDA-IEO,122410+700407,2026-08-07,147,25.4,1.2,4.5,0,19,0.6,0.005,2,3,0.4,32,0.5
