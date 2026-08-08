@@ -121,3 +121,4 @@ food_id,nome,categoria,fonte,codice_fonte,data_verifica,kcal_100g,proteine_g,car
 1320,Seppia fresca,molluschi,BDA-IEO,1320,2026-07-27,72,14,0.7,1.5,0,27,0.8,0.005,13,2,4.2,32,0.5
 122410,Salmone affumicato,pesce,CREA+BDA-IEO,122410+700407,2026-08-07,147,25.4,1.2,4.5,0,19,0.6,0.005,2,3,0.4,32,0.5
 203020,Cioccolato fondente,altro,CREA+BDA-IEO,203020,2026-08-08,531,6.6,49.7,33.6,8,51,5,0,12,0,1.3,89,0
+100110_2,Pesce spada,pesce,BDA-IEO(deroga-energia-macro),100110_2,2026-08-08,109,16.9,1,4.2,0,4,0.4,11,2,2,0.4,27,1
