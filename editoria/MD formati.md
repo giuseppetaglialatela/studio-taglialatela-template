@@ -1,6 +1,6 @@
 # MD — FORMATI DI CONSEGNA
 Motore di scrittura scientifica — settore farmacia
-Ultima modifica: 13/08/2026 · Dipendenze: nessuna
+Ultima modifica: 14/08/2026 · Dipendenze: nessuna
 
 ---
 
@@ -14,6 +14,40 @@ richiede: obiettivi espliciti, target con competenze, metodologia didattica,
 test di apprendimento, questionario di qualità. È il loro lavoro più costoso.
 Consegnarlo già fatto è ciò che sposta il compenso da collaborazione occasionale
 a prestazione professionale.
+
+---
+
+## MISURA DELLA LUNGHEZZA — vale per tutti i formati
+
+*Sezione aggiunta il 14/08/2026. Le misure indicate nei formati qui sotto non
+sono interpretabili senza queste tre regole.*
+
+**1. La convenzione di conteggio si dichiara.** Un limite di battute senza
+convenzione non è un limite. Convenzione predefinita di questo motore:
+
+> corpo del testo, **spazi inclusi**; marcatori `[Fxxx]` **esclusi**; titolo,
+> occhiello e sommario **esclusi**
+
+Va confermata con la testata o il provider al PASSO 0. Se la loro è diversa, il
+conteggio si **rifà**: non si converte a stima.
+
+**2. Il numero si misura sul testo reale.** Mai dichiarare conforme un formato
+senza aver contato. Una stima di 12.300 battute su un testo che ne misurava
+16.669 — errore del 45% — è il motivo per cui questa regola esiste (MA
+principio 8).
+
+**3. Margine minimo del 5% sotto il limite superiore.** La redazione interviene
+aggiungendo: sigle sciolte, nomi commerciali fra parentesi, box, didascalie,
+occhielli. Il limite di formato va quindi letto come **limite operativo**:
+
+| Formato | Limite dichiarato | Limite operativo |
+|---|---|---|
+| Articolo per rivista | 12.000 battute | **11.400** |
+| Abstract e scheda corso | 800 battute | **760** |
+| Nota biografica | 300 battute | **285** |
+
+Un testo consegnato a quattro battute dal limite è un testo che sforerà in
+redazione, e il taglio lo farà qualcun altro.
 
 ---
 
@@ -65,14 +99,24 @@ interesse, nome del responsabile scientifico (lo indica il provider).
 
 ## FORMATO 2 — ARTICOLO PER RIVISTA DI SETTORE
 
-**Pacchetto di consegna — quattro elementi**
+**Pacchetto di consegna — cinque elementi**
 
 | # | Elemento | Misura |
 |---|---|---|
-| 1 | Testo | 8.000-12.000 battute spazi inclusi |
-| 2 | Titolo + occhiello + sommario | titolo max 70 caratteri |
+| 1 | Testo | 8.000-12.000 battute spazi inclusi (**operativo: 11.400**) |
+| 2 | Titolo — **due alternative** + occhiello + sommario | titolo max 70 caratteri |
 | 3 | Bibliografia | 8-12 voci |
-| 4 | Nota biografica autore | 300 battute |
+| 4 | Nota biografica autore | 300 battute (**operativo: 285**) |
+| 5 | Dichiarazione di conteggio | convenzione usata + numero misurato |
+
+Sul punto 2: **due alternative di titolo**, non una. La scelta del titolo è
+della redazione, e proporne uno solo significa farsela riscrivere senza
+controllo. Due titoli plausibili delimitano la direzione entro cui la redazione
+sceglierà.
+
+Sul punto 4: se i dati biografici non sono disponibili — ateneo, città, tipo di
+esercizio — la nota si consegna con **segnaposto espliciti**, non omessa e non
+riempita a verosimiglianza.
 
 **Struttura**
 Apertura con il problema concreto al banco, non con l'inquadramento normativo.
@@ -83,6 +127,22 @@ secondo.
 - Perché conta adesso: il dato o la norma nuova (1 paragrafo)
 - Corpo: 3-4 sottotitoli
 - Chiusura: cosa cambia in pratica
+
+**La prima informazione usabile entro il primo 15%.** Nel formato articolo il
+lettore non ha alcun obbligo di arrivare in fondo, a differenza del discente
+ECM. Due sezioni di inquadramento prima della prima associazione concreta sono
+due sezioni che non verranno lette. Vale il controllo di MC PASSO 1.1.
+
+**Il contesto normativo chiude, non apre.** Se serve — e spesso serve — sta in
+fondo, a spiegare *perché* quel problema sfugge. In apertura chiede pazienza
+prima di aver dato qualcosa in cambio.
+
+**Quando un articolo non ci sta in un articolo**
+Se il bilancio di destinazione al GATE 1 non raggiunge il 65% di sostanza, la
+scissione in **due articoli** è la soluzione preferita al taglio: il primo tiene
+la sostanza, il secondo raccoglie il materiale strumentale — dove si verifica,
+cosa si fa dopo, a chi si segnala — che come pezzo autonomo funziona bene.
+Nel caso reale la scissione ha portato la sostanza dal 44% all'81%.
 
 **Riferimenti**
 In un articolo di settore i riferimenti in linea appesantiscono. Si usa la nota
@@ -134,10 +194,18 @@ che promozionale.
 
 **Dichiarazione conflitti di interesse**
 Sempre presente, anche quando è «nessun conflitto da dichiarare».
+Distinta dal conflitto degli autori delle **fonti** citate, che si tratta
+secondo MB sezione 5.4 e, quando serve, si dichiara in nota nel testo.
 
 **Data di aggiornamento del contenuto**
 La data della fonte più recente utilizzata, non la data di consegna. Se le linee
 guida di riferimento sono del 2022, il contenuto è aggiornato al 2022.
+Una fonte di livello 1 più vecchia di cinque anni si segnala nel testo, anche
+quando è l'unica disponibile.
+
+**Dichiarazione di conteggio**
+Insieme al testo si consegna il numero misurato e la convenzione usata. Costa
+una riga e previene la contestazione più frequente in redazione.
 
 **Nome file**
 `[Tema]_[Formato]_[Committente]_v[N].docx`
