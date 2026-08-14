@@ -1,6 +1,6 @@
-# M-B — REGISTRO BIBLIOGRAFICO
+# MB — REGISTRO BIBLIOGRAFICO
 Modulo operativo del progetto editoriale e formativo — Studio Taglialatela
-Ultima modifica: 13/08/2026 · Dipendenze: nessuna
+Ultima modifica: 14/08/2026 · Dipendenze: nessuna
 
 ---
 
@@ -21,7 +21,9 @@ legge PRIMA di cercare, perché una fonte già presente non va ricercata.
 
 ---
 
-## 2. CARICAMENTO A INIZIO SESSIONE
+## 2. CARICAMENTO E ACCESSO ALLE FONTI
+
+### 2.1 Caricamento del registro — da GitHub, con `curl`
 
 Base raw:
 `https://raw.githubusercontent.com/giuseppetaglialatela/studio-taglialatela-template/refs/heads/main/editoria/`
@@ -36,6 +38,49 @@ curl -s .../editoria/fonti.csv
 Si carica UNA VOLTA per sessione. Se il caricamento fallisce, si dichiara e ci
 si ferma: non si procede a memoria su un registro non letto, perché il rischio
 è duplicare ID e produrre due righe con lo stesso numero.
+
+### 2.2 Accesso alle FONTI — non con `curl`
+
+*Sezione aggiunta il 14/08/2026. Prima di questa revisione il modulo lasciava
+intendere che `curl` fosse la via generale di accesso: non lo è.*
+
+**Il `bash` del motore ha rete limitata a una whitelist** — GitHub, PyPI, npm,
+USDA e poco altro. `curl` **non raggiunge** PubMed Central, Normattiva, ISS,
+AIFA, bjgp.org né alcuna rivista. Vale per il download di un PDF quanto per una
+pagina HTML. Tentare `curl` su un dominio fuori whitelist non produce un errore
+di rete interpretabile: produce un fallimento che somiglia a un sito irraggiungibile.
+
+Per tutto ciò che non è GitHub si usa **`web_fetch`**, con un vincolo:
+
+> **`web_fetch` accetta solo URL già comparsi in conversazione** — forniti
+> dall'autore o restituiti da una ricerca precedente. Un indirizzo composto a
+> mano viene respinto con `PERMISSIONS_ERROR`, anche quando il pattern è noto e
+> corretto.
+
+Sequenza obbligatoria: **prima `web_search`, poi `web_fetch` sul risultato.**
+Mai comporre l'indirizzo a mano per risparmiare una ricerca. Verificato per
+contrasto nella stessa sessione: URL da ricerca accettati, URL costruito
+respinto.
+
+### 2.3 Ostacoli noti — da dichiarare, non da ritentare
+
+| Fonte | Stato | Via praticabile |
+|---|---|---|
+| PubMed Central | reCAPTCHA anche su `web_fetch` | consegna manuale del PDF |
+| Wiley | bot detection | consegna manuale |
+| LWW, Ovid | **402** anche su open access | consegna manuale |
+| `parlamento.it` | blocca | **`leg14.camera.it` funziona** |
+| `normattiva.it` | richiede sessione | `gazzettaufficiale.it/eli/id/AAAA/MM/GG/<codice>/sg`, poi `vediMenuHTML` |
+| `aifa.gov.it` | rifiuta `curl` con 403 | **`web_fetch` sui PDF AIFA funziona** |
+| `medicinali.aifa.gov.it` | SPA, API gateway in 400 | lettura per immagine (sezione 5.3) |
+| `bjgp.org` | nessun ostacolo | `web_fetch` diretto |
+| `api.github.com` | rate limit | pagina HTML dell'albero del repo |
+
+**Regola sugli ostacoli.** Dopo due tentativi falliti su una via, si dichiara
+l'ostacolo reale e si chiede la consegna manuale del documento, invece di
+insistere in silenzio. La consegna manuale ha funzionato ogni volta che è stata
+usata: due full text in una sessione, tre RCP in un'altra. Non è un ripiego di
+serie B, è il canale normale per le fonti dietro barriera.
 
 ---
 
@@ -58,7 +103,23 @@ mai in una citazione biomedica.
 | `temi` | `T1`,`T2`,… separati da virgola | Vedi sezione 4 |
 | `usata_in` | Nome del modulo o articolo | `-` se raccolta ma non ancora usata |
 | `esito_sintetico` | Cosa dice, in una riga | Il campo più importante |
-| `stato` | `verificata`, `da_verificare`, `da_reperire`, `superata` | Vedi sezione 6 |
+| `stato` | `verificata`, `abstract_verificato`, `da_verificare`, `da_reperire`, `superata` | Vedi sezione 6 |
+| `conflitto_dichiarato` | `na`, `no`, `si_neutro`, `si_concorde` | **Campo aggiunto il 14/08/2026.** Vedi sezione 5.4 |
+
+**Posizione del campo nuovo: ultima.** Un campo aggiunto in coda non sposta la
+posizione dei campi esistenti, quindi non rompe una lettura posizionale già
+scritta. Le righe preesistenti sono state completate a mano, non lasciate corte:
+un CSV con righe di lunghezza diversa è un CSV che si romperà più avanti, in
+silenzio.
+
+**Valori di `conflitto_dichiarato`**
+
+| Valore | Quando |
+|---|---|
+| `na` | Non applicabile: normativa, RCP, documento regolatorio |
+| `no` | Nessun conflitto dichiarato dagli autori |
+| `si_neutro` | Conflitto dichiarato, ma non allineato alla conclusione |
+| `si_concorde` | **Conflitto dichiarato allineato alla conclusione.** Richiede azione |
 
 **Sul campo `esito_sintetico`.** È quello che rende il registro utile invece che
 solo ordinato. Una fonte di cui non si ricorda la conclusione va riletta, e
@@ -77,6 +138,7 @@ titolo riformulato: «nessuna differenza significativa vs placebo a 12 settimane
 | `T3` | Privacy, consenso informato e dati sanitari nei servizi |
 | `T4` | Deprescribing e paziente anziano polifarmaco |
 | `T5` | Counseling nelle affezioni minori |
+| `T6` | Categorie di integratori al banco: interazioni per prodotto |
 | `T0` | Trasversale (dati di settore, contesto normativo generale) |
 
 Una fonte può servire più temi. È il caso normale, non l'eccezione: gli RCP
@@ -86,6 +148,8 @@ valgono per T1 e T2 insieme, e questo è esattamente il punto del progetto.
 
 ## 5. GERARCHIA DELLE FONTI
 
+### 5.1 I quattro livelli
+
 | Livello | Cosa | Esempi |
 |---|---|---|
 | 1 | Regolatorie | RCP da AIFA, EPAR EMA, testi da Normattiva |
@@ -93,35 +157,148 @@ valgono per T1 e T2 insieme, e questo è esattamente il punto del progetto.
 | 3 | Revisioni sistematiche | Cochrane, review indicizzate |
 | 4 | Studi primari | Singoli trial, studi osservazionali |
 
-**Non entrano nel registro** riviste di settore, siti divulgativi, schede
-prodotto aziendali, blog. Si leggono per orientarsi; poi si risale alla fonte
-che citano e si registra quella. Se un'affermazione esiste solo su una rivista
-di settore e non è tracciabile a monte, non si usa.
-
 Regola: mai una raccomandazione operativa basata su un solo studio di livello 4.
+
+### 5.2 Cosa NON entra nel registro
+
+Riviste di settore, siti divulgativi, schede prodotto aziendali, blog,
+aggregatori di foglietti illustrativi. Si leggono per orientarsi; poi si risale
+alla fonte che citano e si registra quella. Se un'affermazione esiste solo su
+una rivista di settore e non è tracciabile a monte, non si usa.
+
+**Indagini commissionate da associazioni di categoria — escluse.**
+*Regola aggiunta il 14/08/2026.* Le cifre di consumo che circolano sul settore
+integratori (decine di milioni di utilizzatori, mercato da miliardi) provengono
+da indagini di società di ricerca commissionate dall'associazione dei
+produttori. Non sono dati istituzionali e non hanno metodo pubblicato
+verificabile: si escludono con la stessa logica delle riviste di settore, anche
+quando sono le uniche cifre disponibili sul mercato italiano.
+Conseguenza accettata: talvolta l'unico dato utilizzabile sarà straniero. Si usa
+**dichiarandolo come straniero nel testo**, che è preferibile a un dato italiano
+di provenienza interessata. Nessuna classifica di vendita si afferma su questa
+base; ciò che si può dire è cosa arriva più spesso al banco, dichiarato
+esplicitamente come esperienza professionale.
+
+### 5.3 Modalità di lettura ammesse per il livello 1
+
+Gli RCP sono la fonte di riferimento per gli intervalli di somministrazione, e
+l'accesso è ostacolato: `medicinali.aifa.gov.it` è una SPA il cui markup non
+contiene i documenti, e il gateway che serve i PDF risponde 400 sia in ricerca
+sia in download. Le copie su siti terzi sono spesso verbatim ma **di versione
+non verificabile: non sono la fonte.**
+
+È quindi modalità legittima di verifica di livello 1 la
+**lettura per immagine dello stampato AIFA**: schermate del documento aperto sul
+portale, consegnate in conversazione.
+
+Obblighi quando si usa:
+- registrare nell'`esito_sintetico` la formula «letto per immagine dello
+  stampato AIFA»
+- registrare la data **«documento reso disponibile da AIFA il …»**, leggibile
+  nel piè di pagina di ogni schermata: è quella la data del documento, non
+  quella della consultazione
+- verificare che le schermate coprano la sezione citata per intero (4.2, 4.5),
+  non solo il capoverso che serve
+
+Ha funzionato: tre RCP in due giri.
+
+### 5.4 Conflitto di interessi degli autori della fonte
+
+*Regola aggiunta il 14/08/2026. Colma un vuoto reale: MA principio 6 copre il
+conflitto dell'autore verso il committente, e nessun modulo diceva cosa fare del
+conflitto degli autori di una fonte citata.*
+
+Il caso che l'ha prodotta: una review indicizzata di livello 3, formalmente
+ineccepibile, con tre autori su quattro dipendenti di un produttore, e una
+conclusione che raccomanda proprio la categoria di prodotto del datore di
+lavoro. Il conflitto era dichiarato dagli autori — cioè il sistema aveva
+funzionato — ma il registro non aveva un posto dove metterlo.
+
+**La dichiarazione di conflitto si legge sempre**, e si registra in
+`conflitto_dichiarato`. Quando vale `si_concorde`, cioè quando l'interesse punta
+nella stessa direzione della conclusione, si sceglie una delle due strade:
+
+1. **Ancoraggio indipendente** — si cerca una seconda fonte senza quel conflitto
+   che sostenga lo stesso punto, e si cita quella. Preferibile.
+2. **Dichiarazione in nota** — si usa la fonte, dichiarando il conflitto nel
+   testo. Ammessa quando l'ancoraggio non si trova.
+
+Nel caso reale entrambe hanno funzionato: la nota era stata scritta, e
+l'ancoraggio indipendente è poi arrivato da un RCP che elencava la stessa
+sostanza fra gli induttori enzimatici.
+
+**Una fonte con conflitto dichiarato non è squalificata.** Chi dichiara è più
+affidabile di chi non dichiara. Il campo serve a sapere cosa si sta usando, non
+a escludere.
 
 ---
 
 ## 6. STATI
 
 - `verificata` — testo integrale letto, citazione controllata sulla fonte
-- `abstract_verificato` — letto l'abstract completo, full text non accessibile
-  (paywall). **Usabile**, ma solo per ciò che l'abstract afferma davvero: le
-  conclusioni sintetiche, non i dettagli di metodo o i sottogruppi. Va
-  dichiarato nell'`esito_sintetico` cosa si è potuto leggere
-- `da_verificare` — citazione presa da un riferimento indiretto, non ancora
-  aperta di persona. **Non usabile in un deliverable** finché non diventa
-  `verificata` o `abstract_verificato`
+- `abstract_verificato` — letto l'**abstract completo sulla pagina della fonte o
+  su PubMed**, full text non accessibile (paywall). **Usabile**, ma solo per ciò
+  che l'abstract afferma davvero: le conclusioni sintetiche, non i dettagli di
+  metodo o i sottogruppi
+- `da_verificare` — citazione presa da un riferimento indiretto o da uno
+  snippet, non ancora aperta di persona. **Non usabile in un deliverable**
 - `da_reperire` — si sa che esiste, non si è ancora trovato il testo
 - `superata` — sostituita da una versione più recente. Non si cancella: si
   marca, così un modulo vecchio che la cita resta interpretabile
 
-**Perché `abstract_verificato` esiste.** Molte revisioni sistematiche hanno il
-full text a pagamento. Pretendere il testo integrale per ogni fonte renderebbe
-la regola impossibile da rispettare, e una regola impossibile viene aggirata:
-si finirebbe per marcare `verificata` una fonte letta a metà, che è esattamente
-il rischio da cui il registro deve proteggere. Meglio uno stato onesto e un uso
-limitato.
+### 6.1 Uno snippet di ricerca NON è un abstract verificato
+
+*Regola resa esplicita il 14/08/2026 dopo tre errori documentati, tutti e tre
+plausibili e tutti e tre sbagliati.*
+
+Il frammento di testo che un motore di ricerca mostra sotto un risultato è
+selezionato per pertinenza alla query, non per rappresentatività della fonte.
+Sistematicamente restituisce l'affermazione più netta e lascia fuori la
+condizione che la qualifica. Un contenuto costruito su snippet non è
+approssimativo: è **specificamente** sbagliato nel punto che conta.
+
+I tre casi:
+
+- una review sul pompelmo, da snippet: «distanziare non evita l'interazione».
+  Full text: distanziare **attenua** — effetto dimezzato a 10 ore, un quarto a
+  24. Il senso pratico si salvava, il meccanismo era sbagliato
+- una review sugli anticoagulanti: **citazione attribuita agli autori
+  sbagliati**, presi da un riferimento indiretto. Sarebbe finita in bibliografia
+- una review sull'iperico, da snippet: «l'iperico induce CYP3A4». Vero e
+  inutile: il full text mostra che il determinante è la dose giornaliera di
+  iperforina, con soglia di 1 mg/die e variabilità di trenta volte fra prodotti
+  commerciali. La conclusione pratica sarebbe stata sbagliata
+
+Conseguenze operative:
+
+1. Una fonte letta solo nello snippet entra a registro come `da_verificare`, mai
+   come `abstract_verificato`. `abstract_verificato` richiede di aver **aperto**
+   la pagina dell'abstract
+2. **La citazione — autori, rivista, anno, volume — si controlla sulla fonte
+   primaria o su PubMed, mai sullo snippet e mai su un riferimento indiretto.**
+   Una citazione sbagliata è l'errore che sopravvive più a lungo, perché nessuna
+   rilettura del proprio testo lo rivela
+3. Quando lo snippet e il testo integrale divergono, l'`esito_sintetico`
+   registra la versione del testo integrale e, se utile, che cosa lo snippet
+   faceva credere: è un'informazione che serve alla sessione dopo
+
+### 6.2 Una fonte verificata può avere incoerenze interne
+
+Promemoria, non regola bloccante. In una review verificata il testo discorsivo
+dichiarava tre trial di intervento dove il diagramma PRISMA e la tabella dei
+risultati ne riportavano due.
+
+Quando un numero compare sia in prosa sia in tabella, **si prende dalla
+tabella**. La prosa è il punto in cui gli errori di redazione si accumulano;
+tabelle e diagrammi sono generati dai dati.
+
+### 6.3 Perché `abstract_verificato` esiste
+
+Molte revisioni sistematiche hanno il full text a pagamento. Pretendere il testo
+integrale per ogni fonte renderebbe la regola impossibile da rispettare, e una
+regola impossibile viene aggirata: si finirebbe per marcare `verificata` una
+fonte letta a metà, che è esattamente il rischio da cui il registro deve
+proteggere. Meglio uno stato onesto e un uso limitato.
 
 Regola d'uso: da un `abstract_verificato` si può ricavare la conclusione
 generale, mai un numero specifico, un sottogruppo o un dettaglio di metodo. Per
@@ -133,7 +310,7 @@ anche quando sembra pedante.
 
 ---
 
-## 7. COMPORTAMENTO OPERATIVO — cosa faccio io
+## 7. COMPORTAMENTO OPERATIVO
 
 **All'apertura del lavoro su un tema**
 Leggo `fonti.csv` filtrando sul codice tema. Dichiaro cosa c'è già. Solo dopo
@@ -157,12 +334,15 @@ Produco due cose, sempre, senza che vengano richieste:
    in continuità con l'ultimo presente nel file
 2. Il file `fonti.csv` completo e aggiornato, come allegato scaricabile
 
-Il file completo serve perché il caricamento su GitHub sullo stesso percorso
-sostituisce il file (a differenza di Drive, dove creerebbe un duplicato).
-
 **Assegnazione degli ID**
 Leggo l'ultimo `id` presente e proseguo. Mai ripartire da `F001`. Mai riusare un
 id di una riga rimossa.
+
+**Stato reale del file online**
+Prima di dichiarare che il registro online è indietro rispetto alla copia di
+lavoro, lo si scarica e si contano le righe. Il 14/08/2026 un documento di
+passaggio dichiarava il file online fermo a 3 righe: ne conteneva 15, già
+aggiornate. Un conteggio costa una riga di comando.
 
 ---
 
@@ -239,5 +419,12 @@ Formato: Autori. Titolo. Rivista. Anno;volume(fascicolo):pagine. DOI o PMID.
 Per documenti istituzionali e RCP: Titolo del documento. Ente. Data del
 documento. URL [consultato il GG/MM/AAAA].
 
+Per un RCP letto per immagine: Riassunto delle caratteristiche del prodotto.
+Nome. AIFA, documento reso disponibile il GG/MM/AAAA.
+
 Misura attesa: 20-30 voci per un modulo FAD, 8-12 per un articolo di rivista.
 Cinquanta voci su un modulo di due ore segnalano accumulo, non rigore.
+
+Una fonte con `conflitto_dichiarato = si_concorde` usata senza ancoraggio
+indipendente porta la nota nel testo, non solo nel registro: il lettore della
+bibliografia non vede il CSV.
