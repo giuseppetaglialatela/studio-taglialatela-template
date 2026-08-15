@@ -1,6 +1,6 @@
 # SCHEDE DI TESTATA
 Registro delle testate di destinazione — Studio Taglialatela
-Ultima modifica: 15/08/2026 · Dipendenze: MD · Rilievi R19, R21
+Ultima modifica: 15/08/2026 · Dipendenze: MD · Rilievi R19, R21, R23, R24
 
 File di DATI, non modulo: sta a MD come `fonti.csv` sta a MB. Una scheda per
 testata, aggiunte man mano. Le regole di compilazione stanno in MD; qui stanno
@@ -156,54 +156,35 @@ Ne segue che la differenziazione va cercata dove era già stata ipotizzata — s
 
 ---
 
-## 7. FIRMA DELLO STUDIO — la posizione dichiarata e fallibile
+## 7. SPAZIO PER LA FIRMA DELLO STUDIO SU QUESTA TESTATA
 
-> **SEDE PROVVISORIA — R24.** Questa sezione non appartiene a una scheda di
-> testata: la firma dello Studio è la stessa per Utifar, per una rivista
-> commerciale e per un provider ECM, e non dipende dall'involucro. Va
-> trasferita in **MA** al passaggio R14–R25 e **cancellata da qui**, lasciando
-> nelle schede solo la riga che dice come la firma si adatta a quella testata.
-> Finché sta in due posti, diverge in silenzio: è lo stesso difetto delle copie
-> sciolte dei `.py`.
+> **R24 chiuso il 15/08/2026.** La firma dello Studio — la formula in tre mosse e
+> i quattro segni distintivi — è stata trasferita in **MA sezione 8**, dove
+> appartiene: non dipende dall'involucro ed è la stessa per una rivista di
+> categoria, per una commerciale e per un provider ECM. Le soglie dell'indice di
+> dispersione stanno in **ME, controllo Q10**. Qui resta solo ciò che è proprio
+> di questa testata.
 
-Il campione mostra che la testata non impone un registro. Lo spazio per una voce riconoscibile esiste; va occupato con qualcosa che nessuno degli otto pezzi fa.
+**Quanto spazio c'è.** Il campione mostra che la testata non impone un registro:
+nessun tetto redazionale, apparati liberi, cinque firme con abitudini diverse.
+Lo spazio per una voce riconoscibile esiste ed è ampio.
 
-**Nessuno degli otto autori prende posizione a proprio nome.** Tutti espongono: «gli studi mostrano», «la letteratura indica», «è fondamentale comprendere». Nessuno scrive che cosa *lui* farebbe al banco, con quale grado di fiducia, e a quale condizione cambierebbe idea. È lo spazio libero più ampio del campione, e per un farmacista che scrive per farmacisti è anche il più naturale da occupare.
+**Che cosa nessuno degli otto pezzi fa** — cioè le mosse di MA 8 che qui sono
+davvero libere:
 
-### 7.1 La formula
+| Mossa di MA 8 | Pezzi del campione che la usano |
+|---|---|
+| Giudizio a proprio nome con condizione di revoca | **0 su 8** |
+| Scala di confidenza dichiarata come propria | **0 su 8** |
+| Risultati negativi come sezione | **0 su 8** |
+| Conflitto della fonte in nota | **0 su 8** |
+| Attacco dal banco | **2 su 8** (Fornaro, Polverino) |
 
-Ogni giudizio dello Studio si scrive in tre mosse, e mai in due:
-
-> **il fatto** (con la fonte) → **il giudizio** (dichiarato come proprio) → **la condizione di revoca**
-
-Esempio della forma, non del contenuto:
-> «L'RCP colloca l'intervallo a due ore [F014]. Al banco io ne consiglio quattro, perché la sera nessuno rispetta due ore contate. È una scelta prudenziale mia, non una prescrizione: se emergesse che la finestra stretta non produce fallimenti reali, la ridurrei.»
-
-Tre proprietà che questa forma ha e la prosa impersonale non ha:
-- **non è assoluta** — il giudizio è marcato come giudizio, quindi non pretende autorità che non ha;
-- **non è mush** — l'attenuazione cade sulla conclusione, mai sul fatto. Il dato resta netto e con la sua fonte. Questa è la differenza fra prudenza e vaghezza, e va tenuta ferma: attenuare il fatto è l'errore speculare a rafforzarlo in traduzione (MB 9);
-- **è verificabile** — la condizione di revoca dice al lettore che cosa osservare.
-
-### 7.2 Gli altri quattro segni distintivi
-
-Confermati dal campione, perché nessuno degli otto pezzi li usa:
-
-1. **Scala di confidenza propria** — `consolidato` / `ragionevole ma discusso` / `preliminare`, dichiarata come propria (MA principio 4). Zero pezzi su otto graduano l'evidenza in alcun modo.
-2. **Risultati negativi come sezione**, non come inciso. Ciò che non funziona, e per cui il cliente paga comunque.
-3. **Conflitto della fonte in nota** (MB 5.4), non nel periodo: si dice al lettore chi ha pagato lo studio, senza spezzare la frase.
-4. **Attacco dal banco**, non dal mercato né dal meccanismo. Due pezzi su otto lo fanno (Fornaro con il caso di cronaca, Polverino con la domanda del cliente): è la mossa meno rara delle cinque, ma resta minoritaria.
-
-### 7.3 L'irregolarità non si fabbrica, si controlla
-
-La sezione 4.1 dà una soglia utile, e va usata per quello che è. **Un indice di dispersione non produce una voce: intercetta un testo piatto.** Serve come rilievo di qualità, mai come vincolo bloccante — un testo che insegue il CV inserendo frasi brevi a comando è peggiore di un testo regolare e sincero.
-
-Rilievo se, sul corpo finito:
-- CV dei capoversi **sotto 0,45** (il campione umano sta fra 0,52 e 0,72);
-- **nessun** capoverso sotto 120 battute;
-- **nessuna** frase sotto 8 parole;
-- escursione fra frase minima e massima **sotto 5 volte**.
-
-Quattro rilievi su quattro su un testo dello Studio significano una cosa sola: va riletto ad alta voce da una persona, che è il controllo che ME dichiara di non poter sostituire.
+**Adattamento a questa testata.** L'apparato di riferimenti numerati `[n]` non è
+convenzione redazionale ma firma di un singolo autore (sezione 5): adottarlo
+significherebbe somigliare a un collaboratore, non posizionarsi. Su questa
+testata i riferimenti dello Studio vanno quindi a fine pezzo, e la tracciabilità
+`[Fxxx]` resta nel file di lavoro (MD, FORMATO 2).
 
 ---
 
