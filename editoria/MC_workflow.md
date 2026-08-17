@@ -1,6 +1,6 @@
 # MC — WORKFLOW DI STESURA
 Motore di scrittura scientifica — settore farmacia
-Ultima modifica: 17/08/2026 · Dipendenze: MB, MD · Rilievo R33
+Ultima modifica: 17/08/2026 · Dipendenze: MB, MD · Rilievi R33, R35
 
 ---
 
@@ -170,8 +170,34 @@ Si compila anche `conflitto_dichiarato` (MB sezione 5.4) leggendo la
 dichiarazione degli autori: è il momento in cui costa meno, perché la fonte è
 già aperta.
 
-Misura attesa a fine passo: 25-40 fonti candidate per un modulo FAD, 10-15 per
-un articolo.
+Misura attesa a fine passo, per formato: **50-70 fonti candidate per FORMATO 5**
+(dispensa universitaria, bibliografia finale di 40-60 voci), 25-40 per un modulo
+FAD, 10-15 per un articolo. La riga di FORMATO 5 viene dal GATE 1 e prevale su
+qualunque misura ereditata da un formato più corto.
+
+**REGOLA DI AGGIORNAMENTO** *(R35, 17/08/2026)*
+Una bibliografia può essere ineccepibile e vecchia. Il lettore di un testo
+professionale se ne accorge alla seconda pagina, e da lì non si fida più.
+Perciò, a fine PASSO 4:
+
+- **ogni filone ha almeno una fonte degli ultimi cinque anni.** Se non esiste, va
+  scritto nel testo che non esiste: è un limite del campo, non della ricerca, e
+  dichiararlo vale più che nasconderlo.
+- **nessuna affermazione sullo stato attuale è retta da una fonte anteriore al
+  2020.** Vale per ciò che *è oggi*: tecnologie, sistemi informativi, assetti,
+  pratiche in uso, dati di diffusione.
+
+La regola **non** vale per due categorie, che restano senza limite di data:
+
+1. le fonti **normative**, dove conta la vigenza e non l'anno di pubblicazione;
+2. le fonti **fondative**, cioè quelle su cui poggia esplicitamente una norma o
+   una raccomandazione italiana in vigore. Si citano per quello che sono — la
+   base di ciò che l'ordinamento ha deciso — e mai come stato dell'arte. La loro
+   età, quando la norma non è stata rivista, è essa stessa un argomento.
+
+Al PASSO 8 la verifica è meccanica: si scorre l'anno di ogni fonte per filone e
+si controlla che nessuna frase al presente indicativo sul sistema attuale poggi
+su una fonte pre-2020.
 
 ---
 
