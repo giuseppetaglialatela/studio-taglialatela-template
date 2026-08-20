@@ -1,6 +1,6 @@
 # MD — FORMATI DI CONSEGNA
 Motore di scrittura scientifica — settore farmacia
-Ultima modifica: 19/08/2026 · Dipendenze: nessuna (file di dati collegato: `schede_testata.md`) · Rilievi R26, R30, R36, R38
+Ultima modifica: 19/08/2026 · Dipendenze: nessuna (file di dati collegato: `schede_testata.md`) · Rilievi R26, R30, R36, R38, R40
 
 ---
 
@@ -276,8 +276,9 @@ riscrittura.
 
 ## FORMATO 6 — TESTO BREVE PROMOZIONALE O DIVULGATIVO
 
-*Formato aggiunto il 19/08/2026 (R36). Nato per dare una collocazione a ciò che
-finora non ne aveva: blog post su commessa, contenuti per canali social di un
+*Formato aggiunto il 19/08/2026 (R36). **Speculativo: scritto senza committente**
+(MA §2.1). Non si manutiene finché non arriva una commessa di questo tipo. Nato
+per dare una collocazione a ciò che finora non ne aveva: blog post su commessa, contenuti per canali social di un
 marchio, testi rapidi di portfolio. Prima di questo formato quei lavori venivano
 trattati come FORMATO 2 — apparato sproporzionato alla destinazione — oppure
 scritti senza regole, che è l'esito peggiore dei due.*
@@ -352,6 +353,14 @@ ricevono `id`, non entrano in `fonti.csv`, non entrano in bibliografia
 
 **Otto pezzi**, e la ripartizione per firma si dichiara **accanto a ogni media**,
 mai la media da sola.
+
+**Quando si compila una scheda piena — R40, 19/08/2026.** È l'unica parte del
+motore che costa ore e si ripete per ogni testata. Si compila per intero solo
+dove il lavoro è ricorrente e l'investimento si ammortizza su più consegne.
+Per una testata che si sta **sondando** — un pitch, un primo pezzo di prova —
+basta una stima operativa su due o tre pezzi, **dichiarata come stima** nella
+scheda e nel pacchetto. Una stima dichiarata è utilizzabile; una stima presentata
+come misura no.
 
 Il fatto che ha prodotto la regola: su un campione precedente, l'apparato di
 riferimenti numerati, il capoverso breve e la frase corta erano stati letti come
