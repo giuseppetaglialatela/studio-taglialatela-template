@@ -90,6 +90,16 @@ profilo sanitario sintetico, alla lettera di dimissione, al verbale di pronto
 soccorso, alla cartella clinica, ai referti, alle prescrizioni specialistiche,
 alle vaccinazioni e al taccuino personale [F034].
 
+Che quell'esclusione non sia un residuo mai aggiornato è verificabile, e la
+verifica conta perché è ciò che distingue una scelta di disegno da una svista. Il
+decreto di modifica del novembre 2025 dichiara espressamente di non intervenire
+né sull'articolo 15 né sul paragrafo 4.1.1 dell'allegato A [F036]; quanto al
+decreto del dicembre 2024, la lettura del suo testo integrale elenca le
+disposizioni che modifica e fra queste quelle due non compaiono [F038]. Nel primo caso è
+un'affermazione esplicita, nel secondo un'assenza rilevata in un testo letto per
+intero: prove di forza diversa, che portano nella stessa direzione. La matrice è
+stata riaperta due volte e due volte lasciata com'era.
+
 Il profilo gli consegna il dispensato, cioè esattamente ciò che la farmacia ha
 già registrato al proprio banco, e gli nega i due documenti in cui la transizione
 di cura vive: il profilo sanitario sintetico e la lettera di dimissione. È un
@@ -132,19 +142,31 @@ sanitario sintetico si considera realizzato quando risulta compilato nel 70% dei
 Fascicoli, e subordina a gradualità l'abilitazione all'accesso in consultazione
 dei soggetti indicati dalle lettere c), d) ed e) dell'articolo 15, comma 3 —
 fra cui il farmacista [F038]. Il calendario attuativo è stato poi ridefinito in
-tre fasi, con termine dell'ultima al 31 marzo 2026 [F036]. Il Garante, dal canto
+tre fasi, con termine dell'ultima al 31 marzo 2026 [F036]. **Tutte e tre sono
+spirate**: ad agosto 2026 lo stato dell'abilitazione non è più una questione di
+norma ma una questione di fatto, e va verificata sulla propria regione invece che
+dedotta dal decreto. Il Garante, dal canto
 suo, aveva rilevato nel 2024 che molte disposizioni del decreto del 2023
 risultavano disattese in molte regioni e province autonome [F037]: la formula è
 sua e non è quantificata, e va riportata così.
 
+Un'ultima proprietà del flusso incide sul dato anche là dove l'accesso è pieno,
+ed è quella che al banco si incontra per prima. Chi alimenta il Fascicolo —
+aziende sanitarie, strutture accreditate, professionisti che operano in autonomia
+— vi provvede **entro cinque giorni** dall'erogazione, con responsabilità per
+l'alimentazione mancata, intempestiva o inesatta [F034]. Cinque giorni sono
+esattamente la durata della finestra in cui una transizione di cura si compie: il
+paziente dimesso il venerdì può presentarsi in farmacia il lunedì e trovare un
+Fascicolo in cui il ricovero non è ancora comparso. Anche ciò che il farmacista
+vede, quindi, non è una fotografia del presente, e il ritardo è massimo proprio
+nei giorni successivi a una dimissione.
+
 **Che cosa se ne ricava al lavoro.** Il Fascicolo, per il farmacista, è oggi uno
-strumento di verifica del dispensato e non una fonte sulla terapia in corso. Usato
-per quello che dà — controllare che una prescrizione sia stata effettivamente
-erogata, individuare una duplicazione fra canali — è utile; interrogato per
-sapere che cosa il paziente stia assumendo dopo una dimissione, restituisce un
-silenzio che non dichiara di essere tale. La ricognizione diretta descritta
-nell'unità 1 non è un ripiego in attesa che il sistema maturi: è ciò che il
-sistema, per come è costruito, non prevede di sostituire.
+strumento di verifica del dispensato e non una fonte sulla terapia in corso.
+Interrogato per sapere che cosa il paziente stia assumendo dopo una dimissione,
+restituisce un silenzio che non dichiara di essere tale. La ricognizione diretta
+descritta nell'unità 1 non è un ripiego in attesa che il sistema maturi: è ciò
+che il sistema, per come è costruito, non prevede di sostituire.
 
 ## 4.3 Dossier farmaceutico: traccia l'erogato, mai l'assunto
 
@@ -241,13 +263,12 @@ stessa informazione compare come fattore di rischio, ed è un campo **facoltativ
 risposta ai farmaci è la parte più fragile della documentazione.
 
 Il meccanismo che dà il titolo alla sezione è però un altro. L'articolo 9, comma
-6, prescrive che l'oscuramento avvenga con modalità tali da garantire che tutti i
-soggetti abilitati non possano venire automaticamente a conoscenza del fatto che
-l'assistito ha effettuato tale scelta **e che tali dati esistano** [F034]. Non è
-soltanto il dato a essere nascosto: è nascosta la traccia della sua esistenza. Il
-Garante lo conferma nelle proprie risposte alle domande frequenti [F030], e
-l'allegato tecnico del decreto stabilisce coerentemente che i documenti oscurati
-non vengono mai restituiti in risposta alle transazioni di ricerca [F034].
+6, prescrive che l'oscuramento avvenga con modalità tali da garantire che i
+soggetti abilitati non vengano automaticamente a conoscenza della scelta
+dell'assistito **né dell'esistenza di quei dati** [F034]. Non è soltanto il dato a
+essere nascosto: è nascosta la traccia della sua esistenza. Il Garante lo conferma
+[F030], e l'allegato tecnico stabilisce coerentemente che i documenti oscurati non
+vengono mai restituiti in risposta alle transazioni di ricerca [F034].
 
 Due corollari ne discendono, ed entrambi contano al banco. Il primo: l'oscuramento
 di una **prescrizione** oscura automaticamente le erogazioni collegate e i referti
