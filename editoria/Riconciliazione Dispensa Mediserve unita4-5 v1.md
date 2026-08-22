@@ -68,9 +68,8 @@ alla volta e stabiliscono, per ciascuno, che cosa il farmacista può vederci.
 
 ## 4.2 FSE 2.0: cosa il farmacista vede e cosa gli è negato
 
-La domanda da cui questa sezione parte è concreta: un farmacista che apre il
-Fascicolo di un paziente appena dimesso, che cosa trova. La risposta è scritta in
-una tabella, e non è quella che ci si aspetta.
+Un farmacista che apre il Fascicolo di un paziente appena dimesso, che cosa
+trova? La risposta è scritta in una tabella, e non è quella che ci si aspetta.
 
 Il farmacista **c'è**. L'articolo 15, comma 3, lettera d), del decreto sul FSE
 2.0 lo elenca fra i soggetti che accedono in consultazione per finalità di cura,
@@ -90,38 +89,33 @@ profilo sanitario sintetico, alla lettera di dimissione, al verbale di pronto
 soccorso, alla cartella clinica, ai referti, alle prescrizioni specialistiche,
 alle vaccinazioni e al taccuino personale [F034].
 
-Che quell'esclusione non sia un residuo mai aggiornato è verificabile, e la
-verifica conta perché è ciò che distingue una scelta di disegno da una svista. Il
+Che quell'esclusione non sia un residuo mai aggiornato è verificabile. Il
 decreto di modifica del novembre 2025 dichiara espressamente di non intervenire
 né sull'articolo 15 né sul paragrafo 4.1.1 dell'allegato A [F036]; quanto al
 decreto del dicembre 2024, la lettura del suo testo integrale elenca le
-disposizioni che modifica e fra queste quelle due non compaiono [F038]. Nel primo caso è
-un'affermazione esplicita, nel secondo un'assenza rilevata in un testo letto per
-intero: prove di forza diversa, che portano nella stessa direzione. La matrice è
-stata riaperta due volte e due volte lasciata com'era.
+disposizioni che modifica e fra queste quelle due non compaiono [F038]. Nel primo caso è un'affermazione esplicita del decreto, nel secondo un'assenza
+rilevata in un testo letto per intero: sono prove di forza diversa e la differenza
+va tenuta, ma portano nella stessa direzione. La matrice è stata riaperta due
+volte e due volte lasciata com'era.
 
-Il profilo gli consegna il dispensato, cioè esattamente ciò che la farmacia ha
-già registrato al proprio banco, e gli nega i due documenti in cui la transizione
-di cura vive: il profilo sanitario sintetico e la lettera di dimissione. È un
-rilievo più forte di un'assenza, perché non va dedotto: è scritto in una tabella
-di una fonte a valore prescrittivo.
+Il profilo consegna al farmacista il dispensato — ciò che la farmacia ha già
+registrato al proprio banco — e gli nega i due documenti in cui la transizione
+vive. È un rilievo più forte di un'assenza, perché non va dedotto: è scritto in
+una tabella di una fonte a valore prescrittivo.
 
-Una conseguenza collaterale merita di essere segnalata, perché chiude un discorso
-aperto nell'unità 1. L'unico punto dell'intero Fascicolo in cui compaiono gli
-integratori e i prodotti da banco è il taccuino personale, che l'allegato A
-prevede con una voce dedicata a farmaci e integratori con posologia e frequenza
-[F034]. È alimentato dal paziente, i suoi contenuti sono espressamente
-qualificati come informazioni non certificate e distinguibili da quelle dei
-professionisti [F034], e al farmacista non è accessibile. La parte di terapia che
-il farmacista conosce meglio di chiunque altro è l'unica che il sistema affida
-al paziente e sottrae a lui.
+Una conseguenza collaterale chiude un discorso aperto nell'unità 1. L'unico punto
+del Fascicolo in cui compaiono integratori e prodotti da banco è il taccuino
+personale, con una voce dedicata a farmaci e integratori con posologia e
+frequenza: è alimentato dal paziente, i suoi contenuti sono qualificati come
+informazioni non certificate, e al farmacista non è accessibile [F034]. La parte
+di terapia che il farmacista conosce meglio di chiunque altro è l'unica che il
+sistema affida al paziente e sottrae a lui.
 
-Resta il documento che dovrebbe risolvere il problema, cioè il profilo sanitario
-sintetico, redatto e aggiornato dal medico di medicina generale o dal pediatra di
-libera scelta; al cambio del medico, il nuovo ne redige uno nuovo [F034]. Anche
-prescindendo dal fatto che il farmacista non lo vede, quel documento non contiene
-oggi la terapia in corso. Il decreto attuativo del 2025 che ne definisce i
-contenuti campo per campo distingue infatti due voci: le **terapie
+Resta il documento che dovrebbe risolvere il problema: il profilo sanitario
+sintetico, redatto e aggiornato dal medico di medicina generale o dal pediatra
+[F034]. Anche prescindendo dal fatto che il farmacista non lo vede, quel documento
+non contiene oggi la terapia in corso. Il decreto attuativo del 2025 che ne
+definisce i contenuti campo per campo distingue due voci: le **terapie
 farmacologiche croniche** sono un campo obbligatorio, ma limitatamente alle
 terapie prescritte dal medico di medicina generale o dal pediatra; le **terapie
 farmacologiche** in senso pieno, cioè tutte quelle in atto al momento della
@@ -133,8 +127,8 @@ terapia che il documento oggi non è tenuto a registrare.
 
 Nella stessa condizione sospesa si trovano i piani di cura, i trattamenti e i
 contatti — visite e ricoveri — la cui compilabilità è subordinata a un doppio
-presupposto, la disponibilità dei servizi dell'Ecosistema e la modifica del
-decreto del 2023 [F035]. L'intera traccia dell'episodio ospedaliero, cioè.
+presupposto: la disponibilità dei servizi dell'Ecosistema e la modifica del
+decreto del 2023 [F035]. È l'intera traccia dell'episodio ospedaliero.
 
 Un ultimo elemento riguarda i tempi, e va riportato senza enfasi perché è
 materiale documentale. Il decreto del dicembre 2024 stabilisce che il profilo
@@ -145,10 +139,9 @@ fra cui il farmacista [F038]. Il calendario attuativo è stato poi ridefinito in
 tre fasi, con termine dell'ultima al 31 marzo 2026 [F036]. **Tutte e tre sono
 spirate**: ad agosto 2026 lo stato dell'abilitazione non è più una questione di
 norma ma una questione di fatto, e va verificata sulla propria regione invece che
-dedotta dal decreto. Il Garante, dal canto
-suo, aveva rilevato nel 2024 che molte disposizioni del decreto del 2023
-risultavano disattese in molte regioni e province autonome [F037]: la formula è
-sua e non è quantificata, e va riportata così.
+dedotta dal decreto. Il Garante, nel 2024, aveva
+rilevato che molte disposizioni del decreto del 2023 risultavano disattese in
+molte regioni e province autonome [F037]: la formula è sua e non è quantificata.
 
 Un'ultima proprietà del flusso incide sul dato anche là dove l'accesso è pieno,
 ed è quella che al banco si incontra per prima. Chi alimenta il Fascicolo —
@@ -314,29 +307,28 @@ stabiliti dalle linee guida nazionali [F032]. La norma esiste, è di rango
 primario, e rinvia a un documento tecnico per il come.
 
 Quel documento tecnico esiste: sono le linee guida per i servizi di telemedicina
-approvate con decreto ministeriale del 21 settembre 2022, il cui contenuto sta
-nell'allegato A. **In tutto l'allegato il farmacista e la farmacia non sono mai
-nominati** [F024]. Gli attori clinici che il testo indica espressamente sono il
-medico — cui è rimesso il giudizio sull'eleggibilità clinica del paziente — i
-medici di medicina generale e i pediatri, gli specialisti, gli operatori del
-centro erogatore, i generici professionisti sanitari e il caregiver [F024].
+approvate con decreto ministeriale del 21 settembre 2022. **In tutto l'allegato A
+il farmacista e la farmacia non sono mai nominati**, mentre vi compaiono
+espressamente il medico — cui è rimesso il giudizio sull'eleggibilità clinica —
+i medici di medicina generale e i pediatri, gli specialisti, gli operatori del
+centro erogatore, i professionisti sanitari genericamente intesi e il caregiver
+[F024].
 
-Va detto con precisione che cosa questo significhi e che cosa non significhi. Le
-linee guida sono state adottate su una base normativa diversa da quella
-richiamata dalla lettera e-sexies), e non è stato riscontrato che siano il
-documento a cui quella lettera rinvia: l'affermazione difendibile è dunque che le
-linee guida nazionali sui servizi di telemedicina non prevedono il farmacista in
-alcun ruolo, non che escludano un soggetto che un'altra norma vi indirizza.
+Va detto con precisione che cosa questo significhi. Le linee guida sono state
+adottate su una base normativa diversa da quella richiamata dalla lettera
+e-sexies), e non è stato riscontrato che siano il documento a cui quella lettera
+rinvia: l'affermazione difendibile è che le linee guida nazionali non prevedono
+il farmacista in alcun ruolo, non che escludano un soggetto che un'altra norma vi
+indirizza.
 
-Il documento va inoltre datato: è del 2022, quindi anteriore sia al decreto sul
-FSE 2.0 sia a quello sull'Ecosistema, e non è una linea guida basata su prove né
-contiene alcun grading; sono requisiti tecnici minimi cogenti per le Regioni
-[F024]. I quattro servizi minimi obbligatori sono televisita, teleconsulto e
-teleconsulenza, telemonitoraggio e teleassistenza: nessuno è di area
-farmaceutica, e **la terapia non è mai oggetto di un servizio** [F024]. È lo
-stesso rilievo già incontrato sulla Centrale operativa territoriale: due
-strumenti progettati per la continuità assistenziale, in nessuno dei due il
-farmaco compare come oggetto.
+Il documento va datato: è del 2022, anteriore sia al decreto sul FSE 2.0 sia a
+quello sull'Ecosistema, e non è una linea guida basata su prove ma un insieme di
+requisiti tecnici minimi cogenti per le Regioni [F024]. I quattro servizi minimi
+obbligatori sono televisita, teleconsulto e teleconsulenza, telemonitoraggio e
+teleassistenza: nessuno è di area farmaceutica, e **la terapia non è mai oggetto
+di un servizio** [F024]. È il rilievo già incontrato sulla Centrale operativa
+territoriale: due strumenti progettati per la continuità assistenziale, in
+nessuno dei due il farmaco compare come oggetto.
 
 Una porta, sul piano delle definizioni, resta aperta. Televisita e teleconsulto
 sono qualificati come atti medici; la teleconsulenza è definita attività
