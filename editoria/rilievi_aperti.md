@@ -1,6 +1,6 @@
 # RILIEVI APERTI
 Coda delle modifiche ai moduli in attesa di una sessione dedicata.
-Studio Taglialatela · settore editoria · Ultima modifica: 21/08/2026 (2) · Governato da MA
+Studio Taglialatela · settore editoria · Ultima modifica: 23/08/2026 · Governato da MA
 
 **Perché esiste.** MA §2.1 (R39) vieta di toccare i moduli durante una sessione di
 stesura: i rilievi si accumulano e si applicano in una sessione dedicata. Fino a
@@ -130,6 +130,45 @@ un controllo che gira sul documento intermedio invece che sull'originale.
 
 ---
 
+### A8 · MC PASSO 8 — nessun controllo verifica la conformità al formato
+**Modifica.** Aggiungere ai controlli del PASSO 8 una verifica delle prescrizioni
+del formato di destinazione che riguardano la **struttura del testo**, non il suo
+apparato. Per il FORMATO 5 sono almeno due: il primo esempio clinico applicabile
+entro le prime 900 parole e in ogni unità didattica; il materiale da checklist
+reso con elenchi numerati in linea dove il formato non ammette box.
+
+**Fatto (22-23/08/2026).** Le unità 4 e 5 sono state consegnate al PASSO 7 prive
+di qualunque esempio clinico applicabile, e le sezioni 4.2 e 4.3 riversavano
+elenchi di documenti in periodi lunghi. Entrambe le cose sono vietate da FORMATO 5
+in MD. **I quattro controlli del PASSO 8 sono passati puliti**: verificano
+marcatori, stato delle fonti, copertura degli obiettivi e bibliografia, cioè
+l'apparato, e nessuno guarda la forma prescritta dal formato. Il difetto è stato
+rilevato da Giuseppe alla lettura, non da un controllo, e ha richiesto una
+sessione di riscrittura a testo già chiuso.
+
+**Dove.** MC, PASSO 8, come quinto controllo. La lista delle prescrizioni da
+verificare va letta da MD e non ricopiata in MC, o divergerà.
+
+---
+
+### A9 · MD FORMATO 5 — la velocità di lettura non regge il monte ore
+**Modifica.** Correggere in MD FORMATO 5 la cifra della velocità di lettura di
+studio, oppure il monte ore che ne discende. Le due grandezze oggi si
+contraddicono.
+
+**Fatto (23/08/2026).** MD indica «una velocità di lettura di studio di circa 250
+parole al minuto su testo tecnico» e conclude che 15.000-18.000 parole occupano
+«fra le 12 e le 15 ore effettive». A 250 parole al minuto quelle stesse parole si
+leggono in poco più di un'ora: per ottenere 12-15 ore la velocità implicita è di
+circa **1.200 parole all'ora**, cioè venti al minuto. Il difetto è emerso
+producendo l'elemento 3 del pacchetto Mediserve, dove la conversione va dichiarata
+al committente e quindi il numero doveva reggere. Nel pacchetto è stata usata la
+cifra oraria, con la divergenza dichiarata in nota.
+
+**Dove.** MD, FORMATO 5, paragrafo «Dimensionamento — perché quei numeri».
+
+---
+
 ## B. CANDIDATI — non sono rilievi finché non hanno un fatto
 
 Stanno qui per non essere riscoperti da capo, **non** per essere applicati.
@@ -180,12 +219,29 @@ Nota: F025 e F002 non sono più bloccanti per la stesura — le sezioni 4.2 e 4.
 sono state scritte su fonti verificate. Restano necessarie per sciogliere il
 rinvio dell'art. 1 c. 2 lett. e-sexies) del D.lgs. 153/2009.
 
-### C4 · Convenzione di conteggio — scarto rilevato
-Il contatore usato il 21/08/2026 misura **10.639** parole di corpo sulle unità
-1-3, contro le **10.791** dichiarate dal pacchetto precedente: scarto 1,4%.
-Convenzione in uso: corpo, titoli esclusi, marcatori `[Fxxx]` esclusi, marcatura
-Markdown esclusa. **Tutti i conteggi successivi usano questa.** Al PASSO 8 il
-totale si rimisura per intero, non si somma per unità.
+### C4 · Convenzione di conteggio — scarto rilevato, ora su tre contatori
+Convenzione dichiarata: corpo, titoli esclusi, marcatori `[Fxxx]` esclusi,
+marcatura Markdown esclusa. **Tutti i conteggi successivi usano questa.** Al
+PASSO 8 il totale si rimisura per intero, non si somma per unità.
+
+Il problema è che la convenzione è dichiarata e lo **strumento no**. Sulle stesse
+unità 1-3 si hanno ormai tre misure:
+
+| Data | Unità 1-3 | Scarto sul più basso |
+|---|---|---|
+| pacchetto ante 21/08 | 10.791 | +1,98% |
+| contatore 21/08 | 10.639 | +0,55% |
+| contatore 23/08 | 10.581 | — |
+
+Sullo stesso testo i totali dichiarati sono stati 16.441 e 16.535 nella stessa
+settimana. Nessuno dei tre contatori è nel repository: sono stati scritti da capo
+a ogni sessione, e ogni riscrittura produce uno scarto proprio. Su un formato in
+cui il limite operativo dista 113 parole dal totale, mezzo punto percentuale è
+90 parole: lo scarto non è più trascurabile.
+
+**Azione.** Il contatore va messo nel repository come file, insieme alla
+convenzione, e non riscritto a ogni sessione. Finché non c'è, ogni conteggio si
+dichiara insieme allo strumento che l'ha prodotto.
 
 ### C5 · Approvazione del titolo dell'elaborato
 Aperta.
