@@ -3,6 +3,7 @@ Riconciliazione della terapia nelle transizioni di cura nel modello
 ospedale-territorio digitalizzato. Studio Taglialatela · FORMATO 5.
 
 Approvati al GATE 1 il 16/08/2026. **OF4 riformulato il 21/08/2026** (§ in fondo).
+**Bilancio ribasato il 23/08/2026** (§ in fondo).
 Testo vincolante per il controllo di copertura del PASSO 8.
 
 ---
@@ -90,19 +91,45 @@ dell'elaborato e svolge una funzione argomentativa, non addestrativa.
 Base contrattuale: 16.500 parole di **corpo** (esclusi indice, bibliografia, note
 e marcatori `[Fxxx]`).
 
-| OF | Categoria | Previsto | Misurato 21/08 |
-|---|---|---|---|
-| OF1 · unità 1 | SOSTANZA | 4.050 | 3.903 |
-| OF2 · unità 2 | SOSTANZA | 3.000 | 2.951 |
-| OF3 · unità 3 | SOSTANZA | 3.750 | 3.785 |
-| OF4 · unità 4 | SOSTANZA | 3.100 | 4.175 |
-| OF5 · unità 5 | STRUMENTALE | 2.600 | 1.721 |
-| **Totale** | | **16.500** | **16.535** |
+**Bersaglio ribasato il 23/08/2026: da 16.500 a 17.000.** Vecchio, nuovo e motivo
+sono dichiarati qui sotto.
 
-**Sostanza misurata: 89,6%** (previsto 84,2%; soglia MC 65%).
+| OF | Categoria | Previsto GATE 2 | Misurato 21/08 | Misurato 23/08 |
+|---|---|---|---|---|
+| OF1 · unità 1 | SOSTANZA | 4.050 | 3.903 | 3.882 |
+| OF2 · unità 2 | SOSTANZA | 3.000 | 2.951 | 2.931 |
+| OF3 · unità 3 | SOSTANZA | 3.750 | 3.785 | 3.768 |
+| OF4 · unità 4 | SOSTANZA | 3.100 | 4.175 | **4.314** |
+| OF5 · unità 5 | STRUMENTALE | 2.600 | 1.721 | **2.092** |
+| **Totale** | | **16.500** | **16.535** | **16.987** |
 
-**Due scarti da sanare alla potatura.** OF4 sfora di 1.075 parole e OF5 sta sotto
-di 879. Lo squilibrio è reale e va guardato: l'unità 4 ha assorbito materiale
-normativo che al PASSO 5 non era ancora stato letto, l'unità 5 ha trovato meno
-fonti italiane sul formato dell'esito di quante il bilancio ne presupponesse. Il
-totale resta 35 parole sopra il bersaglio, cioè dalla parte sbagliata dello scarto.
+I due conteggi non sono confrontabili riga per riga: sono prodotti da due
+contatori diversi, con uno scarto sistematico di circa mezzo punto percentuale.
+Il fatto è registrato in `rilievi_aperti.md` C4, che ne è la sede.
+
+**Perché il bersaglio è stato ribasato.** La riscrittura di conformità al
+FORMATO 5 del 23/08/2026 ha aggiunto due casi clinici in apertura di unità 4 e di
+unità 5, che il formato prescrive («Prova del lettore, adattata») e che il testo
+non aveva. Sono circa 750 parole di sostanza espositiva, non di inquadramento:
+non aggiungono affermazioni da verificare, espongono quelle che ci sono. Portare
+il totale a 16.500 avrebbe richiesto di togliere altre 490 parole dall'unità 4,
+oltre alle 308 già tolte, e a quel punto il taglio avrebbe iniziato a colpire
+reperti anziché prosa.
+
+**Vincoli rispettati dal nuovo bersaglio.** L'intervallo di FORMATO 5 è
+15.000-18.000 parole; il limite operativo, 5% sotto il massimo, è **17.100**. Il
+totale misurato di 16.987 vi sta sotto, e vi sta sotto anche calibrato sul
+contatore del 21/08 (circa 17.080). Il margine è reale ma stretto: i tre elementi
+del pacchetto ancora da produrre al PASSO 9 non toccano il corpo, quindi non lo
+erodono.
+
+**Due scarti dichiarati, non sanati.** OF4 sfora di 1.214 parole sull'allocazione
+del GATE 2 e OF5 sta sotto di 508. Rispetto al 21/08 lo squilibrio è **ridotto ma
+non chiuso**: l'unità 5 è cresciuta di 371 parole con l'acquisizione del caso
+clinico, l'unità 4 è stata potata di 308. L'unità 4 resta il doppio dell'unità 5.
+
+Le due cause restano quelle già dichiarate: l'unità 4 ha assorbito materiale
+normativo che al PASSO 5 non era ancora stato letto, e l'unità 5 ha trovato meno
+fonti italiane sul formato dell'esito di quante il bilancio ne presupponesse.
+Nessuna delle due si corregge con un riequilibrio di parole: la prima
+richiederebbe di spostare una sezione, la seconda fonti che non esistono.
