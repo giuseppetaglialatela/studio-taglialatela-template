@@ -1000,6 +1000,13 @@ esiti la certezza delle prove è dichiarata **molto bassa**, con il 90% del pane
 concorde su questa valutazione [F062]. Il grading è del documento e va riportato
 citandolo, non rielaborato.
 
+E c'è un elemento del quesito 4 che non riguarda i numeri. Le prove valutate sono
+tutte su interventi di *pharmaceutical care*: quello che è stato studiato è
+l'intervento del farmacista. La raccomandazione che ne discende parla però di
+valutazione multidimensionale e di approccio multidisciplinare, e il farmacista non
+vi compare [F062]. L'evidenza è raccolta sul farmacista, la raccomandazione è
+scritta sul team.
+
 Il documento di posizione di un consorzio di dieci società scientifiche italiane
 pubblicato nel 2024 — fra le promotrici figurano la Società Italiana di Farmacia
 Ospedaliera e la Società Italiana di Farmacia Clinica e Terapia — descrive il
