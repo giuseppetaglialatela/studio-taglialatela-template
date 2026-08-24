@@ -1,4 +1,4 @@
-# PACCHETTO FORMATO 5 — elementi 3, 4 e 5, unità 1-5
+# PACCHETTO FORMATO 5 — elementi 3, 4, 5 e 6, unità 1-5
 
 Riconciliazione della terapia nelle transizioni di cura nel modello
 ospedale-territorio digitalizzato. Studio Taglialatela.
@@ -6,10 +6,9 @@ ospedale-territorio digitalizzato. Studio Taglialatela.
 Sostituisce `dispensa-pacchetto-ud1-ud3-v1.md`, che copriva gli elementi 4 e 5
 sulle sole unità 1-3. I contenuti di quel file sono qui riportati **invariati**.
 
-Restano fuori: l'elemento 1 (corpo, chiuso) e l'elemento 2 (obiettivi formativi,
-in `obiettivi_formativi.md`), che vivono in file propri; e l'elemento 6, la
-bibliografia Vancouver, che si compila sul set di fonti definitivo — oggi bloccato
-sui sette identificatori del controllo 4 del PASSO 8.
+Restano fuori solo l'elemento 1 (corpo) e l'elemento 2 (obiettivi formativi, in
+`obiettivi_formativi.md`), che vivono in file propri. **Con l'elemento 6 il
+pacchetto è completo.**
 
 ---
 
@@ -28,7 +27,7 @@ confermata dal committente prima della consegna, e finora non lo è stata.
 > conteggio in parole: il committente accademico ragiona in ore, e il testo si
 > adatta al monte ore concordato, non viceversa.
 
-Corpo misurato: **16.987 parole** (convenzione: corpo, titoli esclusi, marcatori
+Corpo misurato: **17.002 parole** (convenzione: corpo, titoli esclusi, marcatori
 `[Fxxx]` esclusi, marcatura Markdown esclusa; contatore `conta.py` nel
 repository). Su 14 ore di lettura di studio la velocità implicita è di circa
 **1.200 parole all'ora**, che è la velocità di lettura di studio su testo tecnico
@@ -36,7 +35,7 @@ repository). Su 14 ore di lettura di studio la velocità implicita è di circa
 
 **Rilievo aperto.** MD FORMATO 5 indica «circa 250 parole al minuto» e insieme
 «fra le 12 e le 15 ore» per 15.000-18.000 parole. Le due cifre non stanno insieme:
-a 250 parole al minuto 16.987 parole si leggono in poco più di un'ora. La cifra
+a 250 parole al minuto 17.002 parole si leggono in poco più di un'ora. La cifra
 usata qui è quella che regge il monte ore, cioè 1.200 parole all'ora, e la
 divergenza è registrata come rilievo A9 in `rilievi_aperti.md`.
 
@@ -46,10 +45,10 @@ divergenza è registrata come rilievo A9 in `rilievi_aperti.md`.
 |---|---|---|---|---|
 | 1 | La lista che nessuno ha | OF1 | 3.882 | 3,25 |
 | 2 | Classificare le discrepanze | OF2 | 2.931 | 2,50 |
-| 3 | I punti di rottura alla dimissione | OF3 | 3.768 | 3,00 |
-| 4 | Cosa ogni flusso conserva e cosa perde | OF4 | 4.314 | 3,50 |
-| 5 | Documentare l'esito e indirizzare | OF5 | 2.092 | 1,75 |
-| | **Totale** | | **16.987** | **14,00** |
+| 3 | I punti di rottura alla dimissione | OF3 | 3.830 | 3,00 |
+| 4 | Cosa ogni flusso conserva e cosa perde | OF4 | 4.248 | 3,50 |
+| 5 | Documentare l'esito e indirizzare | OF5 | 2.111 | 1,75 |
+| | **Totale** | | **17.002** | **14,00** |
 
 Le ore sono ripartite in proporzione alle parole e arrotondate al quarto d'ora.
 
@@ -411,3 +410,67 @@ d) rinviando alla revisione della Raccomandazione n. 17
 → **b**. Non esiste oggi una norma che imponga il servizio: presentarlo come
 adempimento è una strategia che il primo controllo smonta, e la revisione della
 Raccomandazione non risulta pubblicata.
+
+---
+
+## ELEMENTO 6 — BIBLIOGRAFIA
+
+Da `fonti.csv` filtrato su `usata_in`, in stile Vancouver, **numerata secondo
+l'ordine di prima comparsa nel testo** e non secondo l'ordine degli `id`, che è di
+registro. Quaranta voci: tante quante le fonti citate nel corpo, nessuna in più.
+MB chiede **un solo identificatore** per voce, il più stabile disponibile: dove
+esiste un DOI è quello, altrimenti il PMID, altrimenti il PMCID o l'URL. Per gli
+atti normativi l'identificatore è il codice redazionale con gli estremi di
+Gazzetta Ufficiale.
+
+1. Bonaudo M, Martorana M, Dimonte V, D'Alfonso A, Fornero G, Politano G, Gianino MM. Medication discrepancies across multiple care transitions: a retrospective longitudinal cohort study in Italy. PLoS One. 2018;13(1):e0191028. doi:10.1371/journal.pone.0191028
+2. Linee di indirizzo. Riconciliazione della terapia farmacologica sul territorio durante le transizioni di cura: paziente anziano ricoverato in RSA/struttura sanitaria protetta e paziente oncologico ed oncoematologico dimesso da struttura ospedaliera e viceversa. Ministero della Salute, Regione del Veneto, Regione Emilia-Romagna. Settembre 2018. salute.gov.it/imgs/C_17_pubblicazioni_2839_allegato.pdf [consultato il 16/08/2026]
+3. Raccomandazione per la Riconciliazione della terapia farmacologica. Raccomandazione n. 17. Ministero della Salute, Direzione generale della programmazione sanitaria, Ufficio III. Dicembre 2014. buonepratiche.agenas.it/documents/recommendations/ [consultato il 16/08/2026]
+4. Mueller SK, Sponsler KC, Kripalani S, Schnipper JL. Hospital-based medication reconciliation practices: a systematic review. Arch Intern Med. 2012;172(14):1057-69. doi:10.1001/archinternmed.2012.2246
+5. Schnipper JL, Reyes Nieva H, Mallouk M, Mixon A, Rennke S, Chu E, et al. Effects of a refined evidence-based toolkit and mentored implementation on medication reconciliation at 18 hospitals: results of the MARQUIS2 study. BMJ Qual Saf. 2022;31(4):278-286. doi:10.1136/bmjqs-2020-012709
+6. Schnipper JL, Reyes Nieva H, Yoon C, Mallouk M, Mixon AS, Rennke S, et al. What works in medication reconciliation: an on-treatment and site analysis of the MARQUIS2 study. BMJ Qual Saf. 2023;32(8):457-469. doi:10.1136/bmjqs-2022-014806
+7. Kripalani S, Roumie CL, Dalal AK, Cawthon C, Businger A, Eden SK, et al. Effect of a pharmacist intervention on clinically important medication errors after hospital discharge: a randomized controlled trial. Ann Intern Med. 2012;157(1):1-10. doi:10.7326/0003-4819-157-1-201207030-00003
+8. Chiarelli MT, Antoniazzi S, Cortesi L, Pasina L, Novella A, Venturini F, Nobili A, Mannucci PM; ad hoc Deprescribing Study Group. Pharmacist-driven medication recognition/reconciliation in older medical patients. Eur J Intern Med. 2021;83:39-44. doi:10.1016/j.ejim.2020.07.011
+9. Mekonnen AB, McLachlan AJ, Brien JE. Pharmacy-led medication reconciliation programmes at hospital transitions: a systematic review and meta-analysis. J Clin Pharm Ther. 2016;41(2):128-44. doi:10.1111/jcpt.12364
+10. Jost M, Kerec Kos M, Kos M, Knez L. Effectiveness of pharmacist-led medication reconciliation on medication errors at hospital discharge and healthcare utilization in the next 30 days: a pragmatic clinical trial. Front Pharmacol. 2024;15:1377781. doi:10.3389/fphar.2024.1377781
+11. Mekonnen AB, McLachlan AJ, Brien JE. Effectiveness of pharmacist-led medication reconciliation programmes on clinical outcomes at hospital transitions: a systematic review and meta-analysis. BMJ Open. 2016;6(2):e010003. doi:10.1136/bmjopen-2015-010003
+12. Mekonnen AB, Abebe TB, McLachlan AJ, Brien JE. Impact of electronic medication reconciliation interventions on medication discrepancies at hospital transitions: a systematic review and meta-analysis. BMC Med Inform Decis Mak. 2016;16:112. PMID: 27549581
+13. Wang H, Meng L, Song J, Yang J, Li J, Qiu F. Electronic medication reconciliation in hospitals: a systematic review and meta-analysis. Eur J Hosp Pharm. 2018;25(5):245-250. PMID: 31157034
+14. Linee di indirizzo sugli strumenti per concorrere a ridurre gli errori in terapia farmacologica nell'ambito dei servizi assistenziali erogati dalle Farmacie di comunità. Ministero della Salute, Direzione generale della programmazione sanitaria, Ufficio III. Maggio 2014. salute.gov.it/imgs/C_17_pubblicazioni_2189_allegato.pdf [consultato il 20/08/2026]
+15. Chua D, Chu E, Lo A, Lo M, Pataky F, Tang L, Bains A. Effect of misalignment between hospital and provincial formularies on medication discrepancies at discharge: PPITS (Proton Pump Inhibitor Therapeutic Substitution) study. Can J Hosp Pharm. 2012;65(2):98-102. PMCID: PMC3329923
+16. Wang JS, Fogerty RL, Horwitz LI. Effect of therapeutic interchange on medication reconciliation during hospitalization and upon discharge in a geriatric population. PLoS One. 2017;12(10):e0186075. doi:10.1371/journal.pone.0186075
+17. Linea guida inter-societaria per la gestione della multimorbilità e polifarmacoterapia. SIGG, SIGOT, SIMG, SIMI, FADOI, SIF. Roma: Sistema Nazionale Linee Guida, Istituto Superiore di Sanità; 4 giugno 2021, codice LG-314; rivista l'8 novembre 2024 senza modifiche a direzione e forza delle raccomandazioni. iss.it/-/snlg-gestione-multimorbilita-polifarmacoterapia [consultato il 23/08/2026]
+18. Carollo M, Boccardi V, Crisafulli S, Conti V, Gnerre P, Miozzo S, et al.; Italian Scientific Consortium on medication review and deprescribing. Medication review and deprescribing in different healthcare settings: a position statement from an Italian scientific consortium. Aging Clin Exp Res. 2024;36(1):63. doi:10.1007/s40520-023-02679-2
+19. Raccomandazione per la prevenzione degli errori in terapia con farmaci antineoplastici. Raccomandazione n. 14. Ministero della Salute, Direzione generale della programmazione sanitaria, Ufficio III. Ottobre 2012. agenas.gov.it/images/agenas/rischio_clinico/raccomandazioni/ [consultato il 20/08/2026]
+20. Decreto legislativo 3 ottobre 2009, n. 153. Individuazione di nuovi servizi erogati dalle farmacie nell'ambito del Servizio sanitario nazionale, nonché disposizioni in materia di indennità di residenza per i titolari di farmacie rurali. GU Serie Generale n. 257 del 04/11/2009, codice redazionale 09G0162.
+21. Cheema E, Alhomoud FK, Kinsara ASAL-D, Alsiddik J, Barnawi MH, Al-Muwallad MA, et al. The impact of pharmacists-led medicines reconciliation on healthcare outcomes in secondary care: a systematic review and meta-analysis of randomized controlled trials. PLoS One. 2018;13(3):e0193510. doi:10.1371/journal.pone.0193510
+22. McNab D, Bowie P, Ross A, MacWalter G, Ryan M, Morrison J. Systematic review and meta-analysis of the effectiveness of pharmacist-led medication reconciliation in the community after hospital discharge. BMJ Qual Saf. 2018;27(4):308-320. PMID: 29248878
+23. Killin L, Hezam A, Anderson KK, Welk B. Advanced medication reconciliation: a systematic review of the impact on medication errors and adverse drug events associated with transitions of care. Jt Comm J Qual Patient Saf. 2021;47(7):438-451. doi:10.1016/j.jcjq.2021.03.011
+24. Tabja Bortesi JP, Becerra MP, Ranisau J, Wen B, Nadesan P, Devereaux PJ, McGillion M, Petch J. AI-based automation for medication reconciliation: scoping review. J Med Internet Res. 2026;28:e86760. doi:10.2196/86760
+25. Decreto del Ministro della salute e del Sottosegretario di Stato alla Presidenza del Consiglio dei ministri con delega all'innovazione tecnologica, di concerto con il Ministro dell'economia e delle finanze, 7 settembre 2023. Fascicolo sanitario elettronico 2.0. GU Serie Generale n. 249 del 24/10/2023, codice redazionale 23A05829.
+26. Decreto del Ministro della salute 23 maggio 2022, n. 77. Regolamento recante la definizione di modelli e standard per lo sviluppo dell'assistenza territoriale nel Servizio sanitario nazionale. GU Serie Generale n. 144 del 22/06/2022, codice redazionale 22G00085.
+27. Decreto del Ministero della salute 11 novembre 2025. Modifiche al decreto 7 settembre 2023 concernente il Fascicolo sanitario elettronico 2.0. GU Serie Generale n. 286 del 10/12/2025, codice redazionale 25A06570.
+28. Ministero della salute, Sottosegretario di Stato alla Presidenza del Consiglio dei ministri con delega all'innovazione tecnologica, Ministero dell'economia e delle finanze. Decreto 30 dicembre 2024. Modifiche al decreto 7 settembre 2023, in materia di Fascicolo sanitario elettronico 2.0. GU Serie Generale n. 33 del 10/02/2025, codice redazionale 25A00808.
+29. Decreto del Ministero della salute 27 giugno 2025. Indicazioni attuative per la definizione dei contenuti informativi del Profilo sanitario sintetico previsto dall'articolo 4 del decreto 7 settembre 2023, recante il «Fascicolo sanitario elettronico 2.0». GU Serie Generale n. 202 del 01/09/2025, codice redazionale 25A04814.
+30. Parere sullo schema di decreto recante Ecosistema dati sanitari. Garante per la protezione dei dati personali, provvedimento del 26 settembre 2024, doc. web n. 10062302. garanteprivacy.it [consultato il 17/08/2026]
+31. Decreto del Ministero della salute 31 dicembre 2024, n. 334, di concerto con il Ministero dell'economia e delle finanze e il Sottosegretario alla Presidenza del Consiglio con delega all'innovazione tecnologica. Istituzione dell'Ecosistema dati sanitari (EDS). GU Serie Generale n. 53 del 05/03/2025, codice redazionale 25A01321.
+32. Decreto del Ministero della salute 8 luglio 2025. Modifica del decreto 31 dicembre 2024 recante «Istituzione dell'Ecosistema dati sanitari». GU Serie Generale n. 194 del 22/08/2025, codice redazionale 25A04732.
+33. FAQ sul Fascicolo sanitario elettronico. Garante per la protezione dei dati personali. Aggiornamento maggio 2026. garanteprivacy.it/faq/fascicolo-sanitario [consultato il 16/08/2026]
+34. Decreto del Ministro della salute 21 settembre 2022. Approvazione delle Linee guida per i servizi di telemedicina — Requisiti funzionali e livelli di servizio (Allegato A). GU Serie Generale n. 256 del 02/11/2022, codice redazionale 22A06184.
+35. Elenco delle raccomandazioni ministeriali per la sicurezza dei pazienti. Agenas, Osservatorio nazionale delle buone pratiche sulla sicurezza nella sanità. Pagina aggiornata al 17 dicembre 2020. agenas.gov.it/aree-tematiche/qualita-e-sicurezza/ [consultato il 16/08/2026]
+36. Pollice MG, Degli Esposti L, Procacci C, Lenti S, Ancona D, Nappi C, et al. D.I.Ri.M.O. project: deprescription, inappropriateness evaluation and therapeutic reconciliation in hospital medicine. Glob Reg Health Technol Assess. 2025;12:61-69. doi:10.33393/grhta.2025.3194
+37. Canning ML, Barras M, McDougall R, Yerkovich S, Coombes I, Sullivan C, Whitfield K. Defining quality indicators, pharmaceutical care bundles and outcomes of clinical pharmacy service delivery using a Delphi consensus approach. Int J Clin Pharm. 2024;46(2):451-462. PMID: 38240963
+38. Mahomedradja RF, Tichelaar J, Mokkink LB, Sigaloff KCE, van Agtmael MA. Quality indicators for appropriate in-hospital pharmacotherapeutic stewardship: an international modified Delphi study. Br J Clin Pharmacol. 2024;90(5):1280-1300. doi:10.1111/bcp.16015
+39. Phang YY, Kuan JW, Oh AL, Ting CY, Osman NA, Moses S. Effectiveness of digital platform in reducing unintentional medication discrepancies at transition of care from hospital discharge to primary healthcare settings: a randomised controlled trial. BMC Prim Care. 2025;26:206. PMCID: PMC12219133
+40. Moretti F, Mazzi MA, Montresor S, Colpo S, Tocco Tussardi I, Facchinello D, et al. Proximity care pathways and digitalization: opportunities and concerns for medication safety management. Insights from the ProSafe study on community perspectives. Front Public Health. 2025;13:1486814. doi:10.3389/fpubh.2025.1486814
+
+### Due note che appartengono alla bibliografia
+
+**Voci 4, 5 e 6** hanno `conflitto_dichiarato = si_concorde` a registro. Nessuna
+regge da sola un'affermazione portante: la voce 4 è trattata con il vincolo
+dichiarato in `note_uso_fonti.md`, e le voci 5 e 6 sono lo stesso studio, con la
+non indipendenza dichiarata nel testo oltre che nel registro.
+
+**Voci 24 e 37** sono verificate sul solo abstract e nel testo sono usate con la
+sola conclusione generale, come MB §6.3 prescrive: nessun numero, sottogruppo o
+dettaglio di metodo ne è tratto.
