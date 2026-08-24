@@ -1,6 +1,6 @@
 # MA — NUCLEO
 Motore di scrittura scientifica — settore farmacia
-Studio Taglialatela · Ultima modifica: 19/08/2026 · Dipendenze: nessuna · Rilievi R14, R27, R28, R29, R39
+Studio Taglialatela · Ultima modifica: 24/08/2026 · Dipendenze: nessuna · Rilievi R14, R27, R28, R29, R39, A5, A6
 
 Questo file resta SEMPRE attivo. Tutto il resto si carica su richiesta dal
 router (sezione 4).
@@ -66,8 +66,10 @@ sessione successiva è di sola scrittura.
 
 **Regole speculative.** Una parte del motore può essere scritta per un lavoro che
 non esiste ancora. Va marcata come tale nel modulo e non manutenuta finché non
-arriva la commessa. Alla data di questa regola è in questa condizione il
-FORMATO 6 di MD, scritto senza committente.
+arriva la commessa. **Se la commessa non arriva, si pota**: il 24/08/2026 il
+FORMATO 6 di MD è stato rimosso per questa via, a cinque giorni dalla scrittura e
+senza che alcun lavoro in corso vi poggiasse. Una parte di modulo priva del fatto
+che l'ha prodotta è candidata alla rimozione, non alla manutenzione.
 
 ---
 
@@ -191,6 +193,20 @@ Base raw:
 | — | `fonti.csv` | Dati: registro delle fonti (governato da MB) | MB |
 | — | `schede_testata.md` | Dati: schede delle testate misurate (governato da MD) | MD |
 | ME | `ME_collaudo.md` | Controlli pre-consegna | MB, MD |
+| — | `conta.py` | Strumento: contatore canonico del corpo (governato da MD) | MD |
+
+**Il motore è generico, il lavoro è specifico** *(24/08/2026).* La cartella
+`editoria/` contiene **soltanto** i cinque moduli, i due file di dati del motore
+e `conta.py`. I file di una commessa — registro fonti, note d'uso, obiettivi
+formativi, scheletro, corpo del testo, pacchetto di consegna, estratti — stanno
+in `lavori/<commessa>/`, una cartella per commessa.
+
+Motivo: il 23/08/2026 in `editoria/` convivevano i cinque moduli e tre commesse
+diverse, trentotto file. Il difetto non è di ordine, è di collisione: alla seconda
+commessa `fonti.csv` collide con sé stesso, e non c'è modo di caricare il motore
+senza caricare anche il lavoro di qualcun altro. `rilievi_aperti.md` resta in
+**radice**, perché raccoglie i rilievi sul motore e non su una commessa: i rilievi
+di commessa restano nei file della commessa e non entrano lì.
 
 **Convenzione sui nomi dei file** *(fissata il 14/08/2026)*
 I nomi dei moduli usano l'**underscore**, mai lo spazio, e sono
@@ -220,11 +236,47 @@ GitHub: `MC workflow.md` è comparso come «Flusso di lavoro MC.md» e
 `schede testata.md` come «carte testata.md», mentre i nomi con l'underscore
 restavano intatti perché l'underscore li rende una parola sola. Ne è seguita la
 convinzione, sbagliata, che non esistessero due copie dello stesso modulo.
-Su una convenzione case-sensitive **una verifica visiva non fa stato**: la
-presenza o l'assenza di un file si legge dall'albero del repository con
-`bash` + `curl`, e la cronologia dei commit (`.../commits/main.atom`) dice se
-un'operazione è stata davvero committata. Se una schermata va comunque letta a
-occhio, prima si disattiva la traduzione («Mostra originale»).
+Su una convenzione case-sensitive **una verifica visiva non fa stato**. Se una
+schermata va comunque letta a occhio, prima si disattiva la traduzione («Mostra
+originale»).
+
+**Che cosa prova che cosa** *(A6, 21-23/08/2026 — sostituisce la regola
+precedente sull'albero, che era sbagliata).* Le tre verifiche non sono
+intercambiabili e ciascuna prova una cosa sola:
+
+| Domanda | Strumento | Che cosa prova |
+|---|---|---|
+| Il file **non** è mai esistito a questo percorso? | `commits/main/<percorso>.atom` | **Zero voci** lo prova. Voci ≠ 0 **non** provano che ci sia adesso |
+| Il file **c'è** adesso? | codice HTTP sull'endpoint raw | 200 sì, 404 no |
+| Il file è **quello giusto**? | `md5sum` sul raw contro l'atteso | l'unica prova di contenuto |
+| Il file sta **in questa cartella**? | nessuna delle tre a schermo | l'albero della cartella elenca anche nomi che non le appartengono |
+
+**L'albero della cartella non prova nulla in nessuna direzione.** Fatto
+(21/08/2026): `rilievi_aperti.md` è stato creato in **radice** anziché in
+`editoria/`, pur essendo stato aperto l'editor su `/new/main/editoria`. La pagina
+dell'albero di `editoria` lo elencava comunque, e su quella lettura errata sono
+stati costruiti tre tentativi falliti di modifica e cancellazione.
+
+**L'atom conserva la storia di rinomine e spostamenti**, e per questo le voci non
+provano la presenza. Misura del 23/08/2026: cinque voci su
+`editoria/rilievi_aperti.md` e quattro su `editoria/rilievi aperti.md`, **entrambi
+404 sul raw**, mentre il file vivo è in radice con tre voci soltanto.
+
+**L'editor `/new/main/<cartella>` non garantisce la cartella**: prima di digitare
+il nome va controllato che sopra il campo compaia il percorso di destinazione.
+
+**`api.github.com` non è una via di verifica.** Senza autenticazione esaurisce il
+rate limit e risponde 403; per elencare una cartella funziona finché dura, per
+leggere un file si usa il raw.
+
+**Un commit non prova un contenuto — l'editor committa file vuoti senza avvisare**
+*(A5, 21/08/2026).* Il commit `Create rilievi_aperti.md for module modification
+tracking` è stato registrato regolarmente alle 07:07 e il file compariva
+nell'albero, ma **il file era vuoto**: il contenuto non era stato incollato prima
+del commit e l'editor non ha segnalato nulla. Su un blob vuoto il raw risponde
+**404**, non 200 con zero byte, e a prima lettura sembra un ritardo di CDN. Dopo
+ogni creazione o modifica da editor si verifica quindi il **contenuto** —
+dimensione e md5 sul raw — non la presenza del commit.
 
 **Un passaggio alla volta** *(R28, 17/08/2026)*
 **Un link di cancellazione e una rinomina che puntano allo stesso percorso non
