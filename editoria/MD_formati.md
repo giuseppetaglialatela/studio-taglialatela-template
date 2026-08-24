@@ -1,6 +1,6 @@
 # MD — FORMATI DI CONSEGNA
 Motore di scrittura scientifica — settore farmacia
-Ultima modifica: 19/08/2026 · Dipendenze: nessuna (file di dati collegato: `schede_testata.md`) · Rilievi R26, R30, R36, R38, R40
+Ultima modifica: 24/08/2026 · Dipendenze: nessuna (file di dati collegato: `schede_testata.md`) · Rilievi R26, R30, R38, R40, A2, A9, C4
 
 ---
 
@@ -31,6 +31,20 @@ convenzione non è un limite. Convenzione predefinita di questo motore:
 Va confermata con la testata o il provider al PASSO 0. Se la loro è diversa, il
 conteggio si **rifà**: non si converte a stima.
 
+**Lo strumento è nel repository e non si riscrive** *(C4, 23/08/2026).* La
+convenzione era dichiarata, lo strumento no: il contatore veniva riscritto da
+capo a ogni sessione e ogni riscrittura produceva uno scarto proprio. Sullo
+stesso corpo di testo si sono avute tre misure in una settimana — 10.791, 10.639
+e 10.581 parole, quasi due punti percentuali — su un formato in cui il limite
+operativo distava poco più di cento parole dal totale. Il contatore canonico è
+`editoria/conta.py`. **Si scarica e si esegue; non si riscrive a memoria, non si
+sostituisce con un conteggio a occhio o con lo strumento di un editor.** Se per
+qualunque ragione si usa un contatore diverso, il numero si dichiara insieme allo
+strumento che l'ha prodotto, e i due numeri non si confrontano fra loro.
+Corollario già noto: il contatore **non si applica a file concatenati** — le
+unità si contano separatamente e si sommano, ma al PASSO 8 il totale si rimisura
+per intero.
+
 **2. Il numero si misura sul testo reale.** Mai dichiarare conforme un formato
 senza aver contato. Una stima di 12.300 battute su un testo che ne misurava
 16.669 — errore del 45% — è il motivo per cui questa regola esiste (MA
@@ -50,21 +64,43 @@ Un testo consegnato a quattro battute dal limite è un testo che sforerà in
 redazione, e il taglio lo farà qualcun altro.
 
 **Su quale numero si calcola il 5%** *(R30, 17/08/2026 — chiude un'ambiguità che
-ha prodotto due comportamenti diversi su due pezzi).* Quando al PASSO 5 si
-sceglie un **bersaglio o un tetto sotto il massimo di formato** — perché la
-scheda della testata lo colloca più in basso (regola 4) — il margine si calcola
-**sul tetto scelto, non sul massimo di formato**:
+ha prodotto due comportamenti diversi su due pezzi; precisato il 24/08/2026 dopo
+un secondo caso in direzione opposta).*
 
-> limite operativo = tetto scelto × 0,95
+La risposta dipende da **da dove viene il tetto**, e i due casi non si comportano
+allo stesso modo.
 
-Esempio: formato 12.000, tetto scelto 11.000 sulla scheda della testata →
-limite operativo **10.450**, non 11.400.
+**(a) Tetto imposto dalla destinazione** — la scheda della testata, il provider o
+il committente collocano il massimo più in basso del formato astratto (regola 4).
+Il margine si calcola **sul tetto imposto**:
 
-Perché la lettura stretta e non l'altra: il margine non esiste per stare dentro
-il formato, esiste perché **la redazione aggiunge**, e aggiunge sul pezzo
-consegnato, qualunque sia la sua lunghezza. Se poi taglia, taglia i giudizi a
-proprio nome e i risultati negativi — cioè esattamente le mosse della firma
-(MA §8). Il margine protegge quelle.
+> limite operativo = tetto imposto × 0,95
+
+Esempio: formato 12.000, tetto 11.000 sulla scheda della testata → limite
+operativo **10.450**, non 11.400.
+
+**(b) Bersaglio scelto internamente al GATE 2** — nessuno lo ha imposto: è la
+somma dei tetti di sezione, scelta da chi compone per ragioni di equilibrio
+interno. Il margine si calcola **sul massimo di formato**, non sul bersaglio:
+
+> limite operativo = massimo di formato × 0,95
+
+Esempio: FORMATO 5, massimo 18.000 parole, bersaglio scelto al GATE 2 di 17.000
+→ limite operativo **17.100**, non 16.150.
+
+**Perché la differenza.** Il margine non esiste per stare dentro un numero,
+esiste perché **la redazione aggiunge**, e aggiunge sul pezzo consegnato
+qualunque sia la sua lunghezza. Ciò che si sfora, però, ha conseguenze solo se
+qualcuno lo respinge: sforare un tetto imposto è un pezzo fuori specifica,
+sforare un bersaglio interno non è nulla. Trattare il bersaglio come un tetto
+comprime il testo due volte — una sul bersaglio e una sul margine — e i tagli
+che ne seguono cadono per primi sui giudizi a proprio nome e sui risultati
+negativi, cioè esattamente le mosse della firma (MA §8). Il margine protegge
+quelle: comprimerlo oltre il necessario le mette a rischio invece di difenderle.
+
+**Regola pratica.** Al PASSO 5 si dichiara, accanto al bersaglio, **da dove viene
+il tetto**: imposto o scelto. Senza quella riga il limite operativo non è
+calcolabile e il GATE 2 non si chiude.
 
 **4. L'intervallo ha anche un fondo.** *(R15, 15/08/2026.)* Il limite inferiore
 di un formato non è un suggerimento: un pezzo consegnato molto sotto la media
@@ -234,11 +270,21 @@ accademico.*
 
 **Dimensionamento — perché quei numeri**
 Il riferimento è il **CFU**: 1 CFU = 25 ore di impegno complessivo dello
-studente. Un modulo da **2 CFU = 50 ore**, di cui la quota di studio su materiale
-scritto è tipicamente la metà. A una velocità di lettura di studio di circa 250
-parole al minuto su testo tecnico, 15.000-18.000 parole occupano fra le 12 e le
-15 ore effettive: il resto delle ore va a esercitazioni, autovalutazione e
-rilettura.
+studente. Un modulo da **2 CFU = 50 ore**. La cifra che regge il monte ore è
+**circa 1.200 parole all'ora su testo tecnico di studio**, venti al minuto: a
+quel ritmo 15.000-18.000 parole occupano fra le **12 e le 15 ore effettive**, e
+le ore restanti vanno a esercitazioni, autovalutazione e rilettura.
+
+*Perché non 250 parole al minuto (A9, 23/08/2026 — correzione).* Fino a questa
+data il paragrafo dichiarava 250 parole al minuto e insieme 12-15 ore, due
+grandezze che non stanno insieme: a 250 al minuto quelle stesse parole si leggono
+in poco più di un'ora. Le 250 sono la velocità di **lettura corrente**; lo studio
+di un testo tecnico da cui si deve essere esaminati non è lettura corrente —
+comprende rilettura, annotazione e verifica sulle fonti, ed è un ordine di
+grandezza più lento. **La cifra che fa fede è quella oraria**, perché è quella su
+cui è costruito il monte ore che si dichiara al committente. Il difetto è emerso
+producendo la conversione CFU per una commessa reale, dove il numero doveva
+reggere davanti a terzi.
 
 **Il numero si converte, non si trasporta.** Un committente accademico ragiona in
 CFU e ore; il motore misura in parole o battute. La conversione si dichiara al
@@ -271,64 +317,6 @@ Se la dispensa riusa testo già ceduto allo stesso committente o ad altri, si
 verifica **prima della stesura** se la cessione era di diritti o di licenza
 d'uso. È una verifica che costa una domanda e che, fatta dopo, costa la
 riscrittura.
-
----
-
-## FORMATO 6 — TESTO BREVE PROMOZIONALE O DIVULGATIVO
-
-*Formato aggiunto il 19/08/2026 (R36). **Speculativo: scritto senza committente**
-(MA §2.1). Non si manutiene finché non arriva una commessa di questo tipo. Nato
-per dare una collocazione a ciò che finora non ne aveva: blog post su commessa, contenuti per canali social di un
-marchio, testi rapidi di portfolio. Prima di questo formato quei lavori venivano
-trattati come FORMATO 2 — apparato sproporzionato alla destinazione — oppure
-scritti senza regole, che è l'esito peggiore dei due.*
-
-**Pacchetto di consegna — tre elementi**
-
-| # | Elemento | Misura |
-|---|---|---|
-| 1 | Corpo | 300-1.200 parole |
-| 2 | Bibliografia o sitografia cumulativa in calce | tutte le fonti usate |
-| 3 | Dichiarazione del committente | una riga, se il testo è su commessa |
-
-**Che cosa cade, e solo questo**
-- I marcatori `[Fxxx]` **in linea** non sono richiesti. Le fonti si dichiarano
-  cumulativamente in calce. Il marcatore cade come apparato tipografico, non
-  come vincolo: ogni affermazione tecnica ha comunque una fonte a registro, e
-  chi scrive deve poter dire quale, per ciascuna, se richiesto.
-- Il budget di testo si controlla **sul totale**, non sezione per sezione. Non
-  si applicano il calcolo geometrico del PASSO 7.1 né la prova del lettore.
-- Non si applica il bilancio di destinazione del 65% (MC PASSO 1.1): un testo
-  breve non ha unità su cui misurarlo.
-- Il collaudo di ME si esegue sui soli **B2, B6, B7, B9**, più B8 sui tre
-  elementi del pacchetto. I controlli di qualità sono facoltativi.
-
-**Che cosa NON cade — e qui il formato è più severo, non meno**
-La destinazione tipica di questo formato è un committente che vende il prodotto
-di cui il testo parla. È la condizione di conflitto più diretta dell'intero
-modulo: più diretta di quella del white paper, perché il testo è breve, non
-porta apparato e il lettore non ha modo di risalire a nulla.
-
-Perciò:
-- **B6 resta pieno.** Nessun dato numerico da rivista di settore, da sito
-  divulgativo o da indagine commissionata da un'associazione di produttori
-  (MB sezione 5.2). Il fatto che il testo sia promozionale non abbassa la
-  provenienza dei numeri: la alza come requisito, perché sono l'unica parte
-  verificabile.
-- **B7 resta pieno e vale in entrambe le direzioni** — verso il committente e
-  verso le fonti. Nessun contenuto su un medicinale soggetto a prescrizione
-  commissionato da chi lo produce o distribuisce, e nessuna fonte
-  `si_concorde` a reggere l'affermazione portante senza ancoraggio indipendente.
-- **B9 resta pieno.** In un testo breve la traduzione rafforzata è più probabile,
-  non meno: manca lo spazio per le condizioni, ed è lì che `may reduce` diventa
-  «riduce».
-- Il **claim** resta soggetto alla disciplina che gli è propria. Un testo che
-  cade sotto il regolamento sui claim nutrizionali e sulla salute non diventa
-  libero perché il formato è leggero.
-
-**Firma dello Studio**: facoltativa, e la scelta si dichiara al PASSO 0. È
-l'unico formato in cui è facoltativa, perché è l'unico in cui il testo può non
-essere attribuito.
 
 ---
 
