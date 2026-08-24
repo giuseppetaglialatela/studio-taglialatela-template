@@ -98,10 +98,10 @@ sono dichiarati qui sotto.
 |---|---|---|---|---|
 | OF1 · unità 1 | SOSTANZA | 4.050 | 3.903 | 3.882 |
 | OF2 · unità 2 | SOSTANZA | 3.000 | 2.951 | 2.931 |
-| OF3 · unità 3 | SOSTANZA | 3.750 | 3.785 | 3.768 |
-| OF4 · unità 4 | SOSTANZA | 3.100 | 4.175 | **4.314** |
-| OF5 · unità 5 | STRUMENTALE | 2.600 | 1.721 | **2.092** |
-| **Totale** | | **16.500** | **16.535** | **16.987** |
+| OF3 · unità 3 | SOSTANZA | 3.750 | 3.785 | **3.830** |
+| OF4 · unità 4 | SOSTANZA | 3.100 | 4.175 | **4.248** |
+| OF5 · unità 5 | STRUMENTALE | 2.600 | 1.721 | **2.111** |
+| **Totale** | | **16.500** | **16.535** | **17.002** |
 
 I due conteggi non sono confrontabili riga per riga: sono prodotti da due
 contatori diversi, con uno scarto sistematico di circa mezzo punto percentuale.
@@ -110,23 +110,23 @@ Il fatto è registrato in `rilievi_aperti.md` C4, che ne è la sede.
 **Perché il bersaglio è stato ribasato.** La riscrittura di conformità al
 FORMATO 5 del 23/08/2026 ha aggiunto due casi clinici in apertura di unità 4 e di
 unità 5, che il formato prescrive («Prova del lettore, adattata») e che il testo
-non aveva. Sono circa 750 parole di sostanza espositiva, non di inquadramento:
+non aveva. Sono circa 770 parole di sostanza espositiva, non di inquadramento:
 non aggiungono affermazioni da verificare, espongono quelle che ci sono. Portare
 il totale a 16.500 avrebbe richiesto di togliere altre 490 parole dall'unità 4,
-oltre alle 308 già tolte, e a quel punto il taglio avrebbe iniziato a colpire
+oltre alle 374 già tolte, e a quel punto il taglio avrebbe iniziato a colpire
 reperti anziché prosa.
 
 **Vincoli rispettati dal nuovo bersaglio.** L'intervallo di FORMATO 5 è
 15.000-18.000 parole; il limite operativo, 5% sotto il massimo, è **17.100**. Il
-totale misurato di 16.987 vi sta sotto, e vi sta sotto anche calibrato sul
-contatore del 21/08 (circa 17.080). Il margine è reale ma stretto: i tre elementi
-del pacchetto ancora da produrre al PASSO 9 non toccano il corpo, quindi non lo
-erodono.
+totale misurato di 17.002 vi sta sotto, ma calibrato sul contatore del 21/08 vale
+circa 17.096: **il margine è di quattro parole**. Ogni aggiunta al corpo va compensata
+con un taglio di pari misura. I tre elementi del pacchetto prodotti al PASSO 9 non
+toccano il corpo e non lo erodono.
 
-**Due scarti dichiarati, non sanati.** OF4 sfora di 1.214 parole sull'allocazione
-del GATE 2 e OF5 sta sotto di 508. Rispetto al 21/08 lo squilibrio è **ridotto ma
-non chiuso**: l'unità 5 è cresciuta di 371 parole con l'acquisizione del caso
-clinico, l'unità 4 è stata potata di 308. L'unità 4 resta il doppio dell'unità 5.
+**Due scarti dichiarati, non sanati.** OF4 sfora di 1.148 parole sull'allocazione
+del GATE 2 e OF5 sta sotto di 489. Rispetto al 21/08 lo squilibrio è **ridotto ma
+non chiuso**: l'unità 5 è cresciuta di 390 parole con l'acquisizione del caso
+clinico, l'unità 4 è stata potata di 374, di cui 65 per compensare l'aggiunta all'unità 3. L'unità 4 resta il doppio dell'unità 5.
 
 Le due cause restano quelle già dichiarate: l'unità 4 ha assorbito materiale
 normativo che al PASSO 5 non era ancora stato letto, e l'unità 5 ha trovato meno
