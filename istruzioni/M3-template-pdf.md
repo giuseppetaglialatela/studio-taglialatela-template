@@ -1,8 +1,25 @@
 # M3 — TEMPLATE PDF: PIANO ALIMENTARE E DOCUMENTO DI SPIEGAZIONE
 
 Modulo operativo. Si carica **dopo l'approvazione dei calcoli**, per generare i due
-deliverable che il paziente riceve. Dipende da **M2 (Workflow piano alimentare)**:
-copre i suoi PASSO 7 e PASSO 8, e non si esegue prima.
+deliverable che il paziente riceve. Presuppone **M2 già eseguito** (in chat A):
+copre i suoi PASSO 7 e PASSO 8 e non si esegue prima. **In chat B M2 e M1 non si
+ricaricano**: tutto ciò che serve sta nei metadati del piano e nel motore.
+
+### Avvio della chat B
+
+1. I file del paziente (`piano_vN.csv`, `metadati_piano_vN.json`, fascicolo) si
+   chiedono **allegati alla chat**: la cartella uploads non costa token. Drive si
+   usa solo se un allegato manca.
+2. Motore: scarica ed estrai `motore calcolo.zip`, scarica `alimenti.csv` sciolto
+   accanto (URL e procedura in M1, sezione 1 "Avvio di sessione": si legge solo quella sezione, non si carica M1 intero),
+   esegui `python3 collaudo.py`. Il collaudo completo dura meno di un secondo: si
+   esegue intero, come in ogni sessione (principio 7).
+3. Verifica del CSV: leggibile e coerente con le `differenze_da_versione_precedente`
+   dichiarate nei metadati. Non si scaricano versioni precedenti per confronto.
+4. Kcal per pasto e per alternativa: dal motore (`calcolatore.calcola_riga`), mai
+   scritte a mano e mai prese da riassunti.
+5. Se nei metadati manca un campo necessario (titolo, obiettivo, criterio), ci si
+   ferma e lo si chiede: non si decide in chat B.
 
 Il template dell'andamento dieta non sta qui: è in **M5**.
 
@@ -87,6 +104,9 @@ Copia di riserva: Drive > Template (stessa cartella del template piano alimentar
 Documento informativo che accompagna il PDF del piano, generato **di default per
 ogni piano consegnato**. Spiega al paziente il perché delle scelte del piano: non
 introduce contenuti clinici nuovi, riusa solo le scelte già approvate al PASSO 6.
+**Fonte dei contenuti:** i campi `regole_operative`, `scelte_principali`,
+`limiti_noti`, `obiettivo_intestazione`, `criterio_rivalutazione` e `da_escludere`
+di `metadati_piano_vN.json`. Non si recuperano testi dalle chat precedenti.
 
 ### Registro obbligatorio
 
