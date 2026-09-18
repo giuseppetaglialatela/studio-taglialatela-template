@@ -125,3 +125,4 @@ food_id,nome,categoria,fonte,codice_fonte,data_verifica,kcal_100g,proteine_g,car
 122900,Scorfano,pesce,CREA+BDA-IEO,122900,2026-09-15,82,19,0.6,0.4,0,61,5.5,0.005,9,0.6,1.8,21,0
 004010,Ceci in scatola scolati,legumi,CREA+BDA-IEO,004010,2026-09-17,111,6.7,13.9,2.3,5.7,43,1.8,0,42,0,1.03,24,0.5
 182010,Albume di uovo di gallina,uova,CREA+BDA-IEO,182010,2026-09-18,43,10.7,0.05,0.05,0,7,0.1,0,8,0.1,0.26,12,0
+152000,Yogurt di latte scremato,latticini,CREA+BDA-IEO,152000,2026-09-18,36,3.3,4.0,0.9,0,120,0.1,0.01,14,0.2,0.6,18,1
