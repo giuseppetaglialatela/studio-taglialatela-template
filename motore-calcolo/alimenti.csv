@@ -124,3 +124,4 @@ food_id,nome,categoria,fonte,codice_fonte,data_verifica,kcal_100g,proteine_g,car
 100110_2,Pesce spada,pesce,BDA-IEO(deroga-energia-macro),100110_2,2026-08-08,109,16.9,1,4.2,0,4,0.4,11,2,2,0.4,27,1
 122900,Scorfano,pesce,CREA+BDA-IEO,122900,2026-09-15,82,19,0.6,0.4,0,61,5.5,0.005,9,0.6,1.8,21,0
 004010,Ceci in scatola scolati,legumi,CREA+BDA-IEO,004010,2026-09-17,111,6.7,13.9,2.3,5.7,43,1.8,0,42,0,1.03,24,0.5
+182010,Albume di uovo di gallina,uova,CREA+BDA-IEO,182010,2026-09-18,43,10.7,0.05,0.05,0,7,0.1,0,8,0.1,0.26,12,0
