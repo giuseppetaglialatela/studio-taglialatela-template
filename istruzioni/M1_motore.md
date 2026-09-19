@@ -2,7 +2,7 @@
 
 Modulo operativo (principio 6: nucleo + moduli sono l'unica fonte operativa).
 Dipendenze: nessuna. Dipendono da questo modulo: M2 (workflow piano), M6 (estrazione).
-Ultimo aggiornamento: 18/09/2026 (kcal e macro giudicati sulla media settimanale).
+Ultimo aggiornamento: 29/07/2026.
 
 Questo modulo copre: come si avvia una sessione di calcolo, i moduli software, i casi
 golden, il database alimenti e la gerarchia fonti, lo schema CSV congelato, i file
@@ -47,13 +47,15 @@ lavoro: riscarica e riesegui il collaudo prima di fidarti dei numeri.
 ## 2. MODULI SOFTWARE
 
 ### collaudo.py — certificato di inizio sessione
-Cinque controlli:
+Sei controlli:
 1. presenza e integrità di tutti i CSV, incluso il numero di colonne per riga
    (`csv.DictReader` da solo NON lo segnala)
 2. conteggio righe di `alimenti.csv` contro `EXPECTED_ALIMENTI_COUNT`
 3. assenza di `food_id` duplicati
 4. giornata golden confrontata al riferimento congelato
 5. integrità byte per byte contro `SHA256SUMS`
+6. ogni `food_id` di `alimenti.csv` ha un nome paziente in `nomi_paziente.csv`,
+   senza duplicati né righe orfane
 
 Esce con codice 0 (superato) o 1 (fallito).
 
@@ -105,34 +107,15 @@ intero in entrambi i casi: serve a capire cosa correggere.
 istruzioni, non nel software. Entrambi gli errori di processo del primo caso reale sono
 nati da lì.
 
-**Rilievi BLOCCANTI** (piano non presentabile): MEDIA SETTIMANALE delle kcal fuori
-tolleranza (`SETTIMANA_KCAL_FUORI_TOLLERANZA`), media settimanale di un macro fuori
-tolleranza su TUTTO l'intervallo garantito, dallo stesso lato
-(`SETTIMANA_MACRO_FUORI_TOLLERANZA`), target incoerenti, interazione di
+**Rilievi BLOCCANTI** (piano non presentabile): kcal o macro fuori tolleranza, uno
+scenario di scelta fuori tolleranza sulle kcal, target incoerenti, interazione di
 gravità ALTA, orario pasto mancante, terapia dichiarata solo in parte, struttura pasti
 non uniforme, livelli colazione/spuntino incoerenti.
 
 **Rilievi DA DICHIARARE** (non bloccano): micronutrienti sotto l'80% LARN *in media
 settimanale*, distribuzione concentrata, gap dichiarati, falsi positivi Atwater,
 interazioni di gravità media, estremi macro degli scenari di scelta (sono limiti di
-garanzia, non giornate componibili), alternative fuori catalogo, e — dal 18/09/2026 —
-il SINGOLO GIORNO fuori tolleranza su kcal o macro (`KCAL_FUORI_TOLLERANZA`,
-`MACRO_FUORI_TOLLERANZA`, `SCENARIO_KCAL_FUORI_TOLLERANZA`) e un solo estremo della media
-settimanale dei macro fuori (`SETTIMANA_MACRO_ESTREMO_FUORI`).
-
-**Perché il giorno non blocca più (decisione clinica del 18/09/2026).** Il blocco
-giornaliero costringeva a correggere ogni giorno fino a farlo rientrare, producendo
-porzioni e accostamenti che il paziente non mangia (caso reale: 400 g di merluzzo in un
-pasto, 7 albumi in una frittata). Kcal e macro si giudicano come i micronutrienti: sulla
-MEDIA SETTIMANALE. La verifica è in `verifica_settimanale()`, in coda al PASSO 2: giorni
-senza scelte a valore unico, giorni con scelte ai loro estremi. Per le kcal gli estremi
-sono combinazioni reali e basta un estremo fuori per bloccare; per i macro gli estremi %
-non sono una settimana componibile, quindi blocca solo l'intervallo interamente fuori.
-Il giorno fuori tolleranza resta nel report e VA DICHIARATO nella tabella del PASSO 6.
-**Limite di sicurezza giornaliero (decisione clinica 18/09/2026):** un giorno — o uno
-scenario di scelta — oltre **±10% di kcal** BLOCCA anche se la media settimanale compensa
-(`GIORNO_KCAL_OLTRE_LIMITE_SICUREZZA`, costante `LIMITE_SICUREZZA_GIORNO_PCT` in
-`pipeline.py`). Fascia 5-10%: segnalazione. Il limite riguarda solo le kcal, non i macro.
+garanzia, non giornate componibili), alternative fuori catalogo.
 
 Ogni rilievo porta un CODICE stabile oltre al messaggio: la suite di regressione congela
 `(passo, codice)` e non la prosa, così riformulare un messaggio non fa diventare rossa
@@ -268,23 +251,6 @@ documentazione: `descrizione` (cosa copre il caso) e `riferimento` (come è stat
   in media settimanale. NESSUN rilievo deve comparire, exit code 0: protegge il principio
   8. Complementare al caso_06 — quello sorveglia i flag per giorno del PASSO 2, questo
   quelli del PASSO 3.
-- **caso_08_giorno_fuori_settimana_ok** — due giorni senza scelte, il primo a −6,96% kcal
-  (fuori), il secondo a +3,46%, media −1,75%. Il giorno fuori deve essere un'ATTENZIONE,
-  nessun bloccante, exit 0. Fallisce se si torna al blocco giornaliero.
-- **caso_09_settimana_fuori_tolleranza** — due giorni identici a −6,96%: media settimanale
-  fuori, più target proteine 15% e carboidrati 64% che mettono fuori l'intero intervallo
-  dei macro. Attesi `SETTIMANA_KCAL_FUORI_TOLLERANZA` e due `SETTIMANA_MACRO_FUORI_TOLLERANZA`,
-  exit 1. Fallisce se la verifica settimanale viene tolta.
-- **caso_10_giorno_oltre_limite_sicurezza** — giorno 1 a −11,98%, giorno 2 a +7,64%,
-  media −2,17%: la settimana compensa ma il giorno 1 deve bloccare con
-  `GIORNO_KCAL_OLTRE_LIMITE_SICUREZZA`, exit 1.
-  Casi 08-10 verificati con test di sabotaggio il 18/09/2026. Suite: 10 casi.
-
-**Attenzione — sequenza duplicata.** `regressione.py` (caso `pipeline`) riesegue i passi
-della pipeline elencandoli uno per uno invece di chiamare `main()`. Un passo aggiunto a
-`pipeline.main()` e non a `esegui_caso_pipeline()` passa inosservato alla suite: è
-successo il 18/09/2026 con `verifica_settimanale()`, ed è stato corretto. Ogni nuovo
-passo va aggiunto in entrambi i punti.
 
 **Tipi di caso.** `fisso` e `scelta_multipla` sono dedotti dal piano (presenza di
 `gruppo_scelta`), così il tipo non può disallinearsi da cosa il piano contiene davvero.
@@ -332,9 +298,7 @@ sempre, non solo quando conviene. Prima di dichiarare un gap, interroga la cache
 `cerca_cache.py`: fermarsi al livello 1 e scrivere "gap" è l'errore più comune, ed è già
 costato una lettura falsata del magnesio.
 
-**Tolleranze:** ±5% su kcal totali · ±5 punti percentuali sui macronutrienti, applicate
-alla MEDIA SETTIMANALE (bloccante) e al singolo giorno (segnalazione; blocco solo
-oltre ±10% di kcal, limite di sicurezza).
+**Tolleranze:** ±5% su kcal totali · ±5 punti percentuali sui macronutrienti.
 
 ---
 
@@ -360,6 +324,17 @@ Serve un dato nuovo? Va in un file affiancato, mai in una colonna nuova. Nessuno
 contiene valori nutrizionali precalcolati (principio 2).
 
 **gap.csv** — `food_id, nome, nutriente, motivo`
+
+**nomi_paziente.csv** — `food_id, nome_paziente, nota_peso`
+Nome leggibile con cui l'alimento compare nel PDF del paziente e nota di peso da
+mostrargli (`crudo`, `sgocciolato e sciacquato`, `cotto`, `peso netto di confezione`,
+`crude, peso sgusciato`...). Serve perché `alimenti.csv` porta il nome tecnico della
+fonte ("Bovino magro vitellone senza grasso visibile") e riscriverlo a mano a ogni
+piano è testo non controllato che arriva al paziente.
+Il controllo 6 di `collaudo.py` lo tiene allineato: **un alimento nuovo in
+`alimenti.csv` fa fallire il collaudo finché non ha la sua riga qui** — passo da
+eseguire al termine di ogni ampliamento del database (M6).
+Non contiene valori nutrizionali: solo testo.
 
 **colazioni_spuntini.csv** — `alternativa_id, livello, tipo, ingredienti_food_id_grammi, nota`
 Catalogo delle 4 colazioni + 2 spuntini nei due livelli, `standard` e `rinforzata_calcio`
