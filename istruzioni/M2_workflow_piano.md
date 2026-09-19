@@ -123,8 +123,9 @@ sono stati calcolati, per OGNI giorno strutturato, tutti gli scenari possibili �
 non un'unica combinazione scelta come esempio. Il momento esatto in cui farlo è
 nel PASSO 2 qui sotto.
 
-Nota: questa verifica riguarda kcal e macro, che restano un giudizio per giorno.
-Per i micronutrienti vale il principio 8.
+Nota: gli scenari si calcolano per ogni giorno, ma dal 18/09/2026 kcal e macro si
+giudicano sulla MEDIA SETTIMANALE come i micronutrienti (principio 8): il giorno fuori
+tolleranza si dichiara, e blocca solo oltre ±10% di kcal (limite di sicurezza).
 
 **STATO:** protocollo introdotto dopo test su paziente fittizio (Vittorio
 Taglialatela), non ancora attraversato da un paziente reale per intero. Da
@@ -171,9 +172,12 @@ mai copiato tal quale.
 **ORDINE OBBLIGATORIO PER I PASTI A SCELTA MULTIPLA (colazione+spuntino):**
 per ogni giorno, subito DOPO aver fissato pranzo e cena di quel giorno e PRIMA di
 passare al giorno successivo, calcola tutti gli scenari possibili di
-colazione+spuntino su quel giorno e verifica che ciascuno rientri in tolleranza.
-Se anche un solo scenario esce di tolleranza, risolvi (aggiustando pranzo/cena di
-quel giorno, o le alternative stesse) PRIMA di passare al giorno successivo. Non
+colazione+spuntino su quel giorno e guarda dove cadono rispetto alla tolleranza.
+Dal 18/09/2026 un giorno (o uno scenario) fuori tolleranza NON va corretto d'ufficio:
+il giudizio su kcal e macro si dà sulla MEDIA SETTIMANALE, come per i micronutrienti.
+Si corregge un giorno solo se la correzione è naturale (una porzione ragionevole, un
+pasto che il paziente mangerebbe davvero); se per farlo rientrare servono porzioni
+fuori scala o accostamenti forzati, si lascia fuori e si DICHIARA nella tabella. Non
 arrivare alla presentazione finale (PASSO 6) avendo verificato una sola
 combinazione "esemplare" per giorno: è il punto in cui l'errore è più costoso da
 scoprire, perché emerge dopo che il nutrizionista ha già visto una tabella.
@@ -203,7 +207,10 @@ target 40%, per la scarsa quota grassa di una fonte proteica magra) vanno comunq
 dichiarati con la motivazione, ma non corretti d'ufficio: si segnala e si lascia
 decidere.
 
-Tolleranze: **±5% su kcal totali · ±5 punti percentuali sui macronutrienti.**
+Tolleranze: **±5% su kcal totali · ±5 punti percentuali sui macronutrienti**, giudicate
+sulla **media settimanale** (bloccante in `pipeline.py`). Il singolo giorno fuori
+tolleranza è una segnalazione da dichiarare, non un errore da correggere, purché le
+kcal del giorno restino entro **±10%** (limite di sicurezza giornaliero, bloccante).
 
 Se mancano dati per calcolare TDEE o target, chiedili in blocco prima di procedere
 (nucleo M0, dati mancanti). La regola non si sospende sui pazienti fittizi.
