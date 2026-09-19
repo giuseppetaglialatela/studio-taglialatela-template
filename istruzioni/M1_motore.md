@@ -213,12 +213,34 @@ lasciato a zero in silenzio. Energia e macronutrienti non vengono proposti: per 
 fonte è CREA. Non scrive niente in `alimenti.csv`: riporta, la trascrizione resta una
 scelta.
 
-### Estensione ancora su Drive — tdee.py
-`Drive > Motore di calcolo > tdee.py`. Stima TDEE e propone un `target.csv` di partenza
-da peso/altezza/età/sesso/livello di attività (Mifflin-St Jeor + PAL). Testato solo
-contro il TDEE di Vittorio Taglialatela, paziente fittizio (2040 kcal, coincidente). Il
-valore resta SEMPRE da confermare dal nutrizionista: il modulo propone, non decide.
-È l'ultima cosa tecnica rimasta su Drive: andrebbe migrata nello zip.
+### tdee.py
+Nello zip dal 19/09/2026 (prima era l'ultima cosa tecnica rimasta su Drive; la copia
+Drive resta come archivio e non va più usata). Stima il TDEE e propone un `target.csv`
+di partenza da peso/altezza/età/sesso/livello di attività (Mifflin-St Jeor + PAL).
+Testato solo contro il TDEE di Vittorio Taglialatela, paziente fittizio (2040 kcal,
+coincidente): `python3 tdee.py` rifà quel confronto e fallisce con `assert` se la
+formula cambia. Il valore resta SEMPRE da confermare dal nutrizionista: il modulo
+propone, non decide.
+
+`proponi_target_csv` non ha più LARN di default: li legge da `larn.csv` tramite
+`larn.py` e **si ferma con errore se sesso ed età non sono passati** (nucleo, sezione 6).
+Il parametro `larn={...}` resta per sovrascrivere singoli valori con motivazione clinica.
+
+### larn.py + larn.csv — riferimenti per sesso, età e condizione
+`larn.csv` — `gruppo, sesso, eta_min, eta_max, condizione, larn_* (8 colonne), nota`
+Fonte: **LARN V revisione, SINU 2024**, tabelle riassuntive pubblicate su sinu.it/larn/,
+trascritte il 19/09/2026 (decisione del nutrizionista: si usa la V revisione, non la IV).
+Copre adolescenti 11-14 e 15-17, adulti 18-64, 65-74 e ≥75 per entrambi i sessi, più le
+condizioni `menopausa`, `gravidanza`, `allattamento`. Sotto gli 11 anni non è coperta e
+il modulo si ferma: i LARN pediatrici non sono caricati.
+`python3 larn.py` stampa cinque casi tipici; `riferimenti(sesso, eta, condizione)`
+restituisce i valori e la nota della riga usata.
+
+*Differenze rispetto ai valori usati prima* (che erano un ibrido IV/V revisione tarato
+sull'uomo adulto): B12 da 2,4 a **4,0 µg**, folati da 400 a **330 µg**, calcio da 1000 a
+**950 mg** nell'adulto (1100 dai 65 anni e in post-menopausa). Donna in età fertile:
+ferro **18 mg**, zinco 9 mg, vitamina C 85 mg. Il salto sulla B12 è rilevante: un piano
+giudicato adeguato con il riferimento 2,4 µg può non esserlo con 4,0.
 
 ---
 
@@ -324,6 +346,8 @@ Serve un dato nuovo? Va in un file affiancato, mai in una colonna nuova. Nessuno
 contiene valori nutrizionali precalcolati (principio 2).
 
 **gap.csv** — `food_id, nome, nutriente, motivo`
+
+**larn.csv** — vedi la sezione `larn.py` sopra.
 
 **nomi_paziente.csv** — `food_id, nome_paziente, nota_peso`
 Nome leggibile con cui l'alimento compare nel PDF del paziente e nota di peso da
