@@ -171,9 +171,12 @@ mai copiato tal quale.
 **ORDINE OBBLIGATORIO PER I PASTI A SCELTA MULTIPLA (colazione+spuntino):**
 per ogni giorno, subito DOPO aver fissato pranzo e cena di quel giorno e PRIMA di
 passare al giorno successivo, calcola tutti gli scenari possibili di
-colazione+spuntino su quel giorno e verifica che ciascuno rientri in tolleranza.
-Se anche un solo scenario esce di tolleranza, risolvi (aggiustando pranzo/cena di
-quel giorno, o le alternative stesse) PRIMA di passare al giorno successivo. Non
+colazione+spuntino su quel giorno e guarda dove cadono rispetto alla tolleranza.
+Dal 18/09/2026 un giorno (o uno scenario) fuori tolleranza NON va corretto d'ufficio:
+il giudizio su kcal e macro si dà sulla MEDIA SETTIMANALE, come per i micronutrienti.
+Si corregge un giorno solo se la correzione è naturale (una porzione ragionevole, un
+pasto che il paziente mangerebbe davvero); se per farlo rientrare servono porzioni
+fuori scala o accostamenti forzati, si lascia fuori e si DICHIARA nella tabella. Non
 arrivare alla presentazione finale (PASSO 6) avendo verificato una sola
 combinazione "esemplare" per giorno: è il punto in cui l'errore è più costoso da
 scoprire, perché emerge dopo che il nutrizionista ha già visto una tabella.
@@ -203,7 +206,10 @@ target 40%, per la scarsa quota grassa di una fonte proteica magra) vanno comunq
 dichiarati con la motivazione, ma non corretti d'ufficio: si segnala e si lascia
 decidere.
 
-Tolleranze: **±5% su kcal totali · ±5 punti percentuali sui macronutrienti.**
+Tolleranze: **±5% su kcal totali · ±5 punti percentuali sui macronutrienti**, giudicate
+sulla **media settimanale** (bloccante in `pipeline.py`). Il singolo giorno fuori
+tolleranza è una segnalazione da dichiarare, non un errore da correggere, purché le
+kcal del giorno restino entro **±10%** (limite di sicurezza giornaliero, bloccante).
 
 Se mancano dati per calcolare TDEE o target, chiedili in blocco prima di procedere
 (nucleo M0, dati mancanti). La regola non si sospende sui pazienti fittizi.
@@ -327,56 +333,14 @@ Questo è il **gate di approvazione** del nucleo M0: uno solo per piano, non uno
 giorno. Nessun PDF prima di qui, nemmeno con fretta dichiarata, nemmeno se il piano
 sembra identico a uno precedente.
 
-**Nella stessa tabella di approvazione, non in un secondo giro**, si presentano anche:
-- il titolo di ogni piatto come comparirà nel PDF;
-- l'obiettivo da riportare in intestazione e il criterio di rivalutazione. Se il
-  fascicolo non li contiene (es. `peso_obiettivo_concordato` = null), si chiedono
-  QUI, insieme alle altre domande del gate: la chat B non deve mai inventarli;
-- le regole operative da spiegare al paziente (es. sostituzioni, regola verdure) e
-  i contenuti da escludere dal documento di spiegazione.
-
-**Dopo l'approvazione — `metadati_piano_vN.json` (obbligatorio).** Prima di chiudere
-la chat A si scrive questo file, con lo stesso numero di versione del `piano.csv`
-approvato, e lo si salva su Drive nella cartella del paziente accanto al CSV. È ciò
-che la chat B legge: le istruzioni di passaggio rimandano a questo file invece di
-riassumerlo. Contenuto:
-
-```json
-{
-  "versione_piano": "vN",
-  "drive": {"cartella_id": "...", "piano_csv": "piano_vN.csv",
-            "fascicolo": "...", "altri_file": ["..."]},
-  "giorni": {"lavorativi": ["lun", "..."], "libero": "dom",
-             "range_kcal_libero": [min, max]},
-  "livello_colazione": "standard | rinforzata_calcio",
-  "titoli_piatti": {"<giorno>|<pasto>|<opzione>": "titolo approvato"},
-  "obiettivo_intestazione": "...",
-  "criterio_rivalutazione": "...",
-  "regole_operative": ["testo in registro impersonale", "..."],
-  "scelte_principali": ["decisione + motivo in una riga", "..."],
-  "limiti_noti": ["senza percentuali", "..."],
-  "da_escludere": ["...", "..."],
-  "differenze_da_versione_precedente": ["riga/pasto modificato", "..."]
-}
-```
-
-Regole:
-- nessuna kcal, nessun grammo, nessun valore nutrizionale: i numeri li ricalcola
-  il motore in chat B da `piano.csv` (principio 2, i derivati non si scrivono);
-- testi già nel registro impersonale del documento di spiegazione (M3), così la
-  chat B li usa senza riconvertirli;
-- se un campo resta vuoto per scelta del nutrizionista, si scrive
-  `"non concordato"`, non si lascia null.
-
 ### PASSO 7 — GENERAZIONE PDF (solo dopo approvazione)
 
-Vedi **M3**. Di norma in una chat B separata, che parte da `metadati_piano_vN.json`
-e non ricarica questo modulo.
+Vedi **M3**.
 
 ### PASSO 8 — DOCUMENTO DI SPIEGAZIONE DIETA
 
 Default per ogni piano consegnato, subito dopo il PDF del piano. Vedi **M3**.
-Usa solo le scelte già approvate al PASSO 6 e scritte nei metadati del piano: non introduce nuovi contenuti clinici
+Usa solo le scelte già approvate al PASSO 6: non introduce nuovi contenuti clinici
 né richiede un nuovo giro di approvazione dei calcoli. Se qualcosa nel testo
 esplicativo risultasse impreciso rispetto al piano approvato, segnalalo e correggi
 prima di consegnare.
