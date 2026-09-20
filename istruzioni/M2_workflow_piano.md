@@ -356,6 +356,11 @@ a questo file invece di riassumerlo. Contenuto:
   "giorni": {"lavorativi": ["lun", "..."], "libero": "dom",
              "range_kcal_libero": [min, max]},
   "livello_colazione": "standard | rinforzata_calcio",
+  "tdee_confermato_kcal": 0,
+  "intestazione": {"nome": "...", "eta": "XX anni", "condizione": "..."},
+  "avvertenze_box": "allergie ed esclusioni obbligatorie, o \"Nessuna allergia dichiarata.\"",
+  "abbinamento_spuntino": {"<opzione colazione>": "<opzione spuntino>"},
+  "indicazioni_giorno_libero": {"pranzo": "...", "cena": "..."},
   "titoli_piatti": {"<giorno>|<pasto>|<opzione>": "titolo approvato"},
   "obiettivo_intestazione": "...",
   "criterio_rivalutazione": "...",
@@ -369,7 +374,21 @@ a questo file invece di riassumerlo. Contenuto:
 
 Regole:
 - nessuna kcal, nessun grammo, nessun valore nutrizionale: i numeri li ricalcola
-  il motore in chat B da `piano.csv` (principio 2, i derivati non si scrivono);
+  il motore in chat B da `piano.csv` (principio 2, i derivati non si scrivono).
+  Uniche eccezioni, perché sono DATI DI INGRESSO confermati dal nutrizionista e non
+  valori ricavati dal piano: `tdee_confermato_kcal` e `range_kcal_libero`;
+- chiavi di `titoli_piatti`: per un pasto fisso l'opzione è vuota (`"3|pranzo|"`);
+  per colazione e spuntino, uguali in tutti i giorni, si può usare `*` al posto
+  del giorno (`"*|colazione|A"`). L'opzione è quella della colonna `opzione` di
+  `piano.csv`;
+- `abbinamento_spuntino` usa le opzioni di `piano.csv` (non le lettere del PDF) e
+  può indicare più spuntini con una lista; se l'abbinamento non è stato fissato si
+  scrive `"non concordato"` e nel PDF non compare;
+- il giorno libero riporta le stesse colazioni e spuntini dei giorni strutturati;
+  in `indicazioni_giorno_libero` vanno solo pranzo e cena (decisione del
+  19/09/2026);
+- `genera_zona_piano.py` (M1) si ferma se manca uno di questi campi: la chat B non
+  li inventa;
 - testi già nel registro impersonale del documento di spiegazione (M3), così la
   chat B li usa senza riconvertirli;
 - se un campo resta vuoto per scelta del nutrizionista, si scrive
