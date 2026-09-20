@@ -18,6 +18,17 @@ ricaricano**: tutto ciò che serve sta nei metadati del piano e nel motore.
    dichiarate nei metadati. Non si scaricano versioni precedenti per confronto.
 4. Kcal per pasto e per alternativa: dal motore (`calcolatore.calcola_riga`), mai
    scritte a mano e mai prese da riassunti.
+   **Strumento:** `genera_zona_piano.py`, nello zip del motore, compila la zona
+   dati del template v5 e genera il PDF in un comando; la zona dati non si compila
+   a mano. Il template si scarica dal link della sezione 2.
+   ```
+   python3 genera_zona_piano.py --piano piano_vN.csv --target target.csv
+       --metadati metadati_piano_vN.json --template TEMPLATE_..._v5.py
+       --orari orari_pasti.csv --out-py piano_Cognome_vN.py
+       --out-pdf piano_Cognome_vN.pdf
+   ```
+   Se si ferma, stampa quale campo o titolo manca: si chiede al nutrizionista, non
+   si completa a intuito. Il `.py` prodotto è quello da archiviare (sezione 5).
 5. Se nei metadati manca un campo necessario (titolo, obiettivo, criterio), ci si
    ferma e lo si chiede: non si decide in chat B.
 
