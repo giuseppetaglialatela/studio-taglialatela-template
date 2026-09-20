@@ -2,7 +2,7 @@
 
 Modulo operativo (principio 6: nucleo + moduli sono l'unica fonte operativa).
 Dipendenze: nessuna. Dipendono da questo modulo: M2 (workflow piano), M6 (estrazione).
-Ultimo aggiornamento: 29/07/2026.
+Ultimo aggiornamento: 19/09/2026.
 
 Questo modulo copre: come si avvia una sessione di calcolo, i moduli software, i casi
 golden, il database alimenti e la gerarchia fonti, lo schema CSV congelato, i file
@@ -226,6 +226,41 @@ propone, non decide.
 `larn.py` e **si ferma con errore se sesso ed età non sono passati** (nucleo, sezione 6).
 Il parametro `larn={...}` resta per sovrascrivere singoli valori con motivazione clinica.
 
+### genera_zona_piano.py — dal piano approvato al PDF
+Nello zip dal 19/09/2026. Compila la zona dati del template piano v5 (M3) e genera
+il PDF. Legge `piano.csv`, `alimenti.csv`, `nomi_paziente.csv`, `target.csv`,
+`metadati_piano_vN.json` e, se passato, `orari_pasti.csv`.
+
+```
+python3 genera_zona_piano.py --piano piano_vN.csv --target target.csv
+    --metadati metadati_piano_vN.json --template TEMPLATE_..._v5.py
+    --out-py piano_Cognome_vN.py --out-pdf piano_Cognome_vN.pdf
+    [--orari orari_pasti.csv] [--mese "Settembre 2026"]
+python3 genera_zona_piano.py --autotest --template TEMPLATE_..._v5.py
+```
+
+- Le kcal vengono da `calcola_riga`, arrotondate alle 10 con la tilde. Il totale del
+  giorno è l'intervallo min–max sulle combinazioni colazione×spuntino ammesse
+  dall'abbinamento.
+- Il dettaglio dei pasti usa nome e nota di peso di `nomi_paziente.csv`.
+- Le lettere A, B, C... seguono l'ordine della colonna `opzione` di `piano.csv`.
+- Il motore grafico è copiato byte per byte dal template: lo script sostituisce solo
+  la zona dati.
+- Box target: `kcal_target` da `target.csv`, deficit = `tdee_confermato_kcal` dei
+  metadati − target, perdita attesa = deficit × 7 / 7.700 kg/settimana (convenzione
+  decisa il 19/09/2026).
+- Giorno libero: colazione e spuntino sono le stesse alternative dei giorni
+  strutturati, pranzo e cena liberi con le indicazioni dei metadati, totale da
+  `range_kcal_libero` (decisione del 19/09/2026).
+- **Si ferma, nominando il problema**, se manca un campo dei metadati o un titolo di
+  piatto, se un `food_id` non ha nome paziente, se i giorni di `piano.csv` non
+  coincidono con quelli dichiarati, o se un pasto mescola alimenti fissi e
+  alternative (formato che il template non rappresenta).
+- `--autotest` genera il caso golden 03 con metadati fittizi e verifica: kcal uguali
+  al calcolatore, motore grafico identico al template, PDF senza segnaposto,
+  abbinamento risolto in lettere, fermo su metadato mancante. Scrive solo in una
+  cartella temporanea: non sporca i checksum.
+
 ### larn.py + larn.csv — riferimenti per sesso, età e condizione
 `larn.csv` — `gruppo, sesso, eta_min, eta_max, condizione, larn_* (8 colonne), nota`
 Fonte: **LARN V revisione, SINU 2024**, tabelle riassuntive pubblicate su sinu.it/larn/,
@@ -297,8 +332,9 @@ diventa un nuovo caso golden.
 
 ## 4. DATABASE ALIMENTI E GERARCHIA FONTI
 
-**Stato:** 122 alimenti verificati e tracciati alla fonte (verificato su GitHub il
-29/07/2026, nessun `food_id` duplicato).
+**Stato:** 127 alimenti verificati e tracciati alla fonte (verificato su GitHub il
+19/09/2026, nessun `food_id` duplicato; il numero vincolante è
+`EXPECTED_ALIMENTI_COUNT` in `collaudo.py`).
 
 **Criterio di ampliamento "Key Foods":** un alimento si aggiunge solo quando un piano
 reale lo richiede e non è già presente. Oltre le 150 voci solo su richiesta esplicita del
