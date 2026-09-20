@@ -48,21 +48,27 @@ paziente.
 
 ## 2. TEMPLATE PIANO ALIMENTARE
 
-**File obbligatorio:** `TEMPLATE_PianoAlimentare_StudioTaglialatela_v4.py`
+**File obbligatorio:** `TEMPLATE_PianoAlimentare_StudioTaglialatela_v5.py`
 
 Recupero (raw GitHub):
-`https://raw.githubusercontent.com/giuseppetaglialatela/studio-taglialatela-template/refs/heads/main/TEMPLATE_PianoAlimentare_StudioTaglialatela_v4.py`
+`https://raw.githubusercontent.com/giuseppetaglialatela/studio-taglialatela-template/refs/heads/main/TEMPLATE_PianoAlimentare_StudioTaglialatela_v5.py`
 
 Copia di riserva: Drive > Template.
 
-Questo file **sostituisce e annulla** le precedenti v1.0 e v3.0. Se ne trovi altre
-copie in giro, non usarle e segnalalo.
+Questo file **sostituisce e annulla** la v4 e le precedenti v1.0 e v3.0. Se ne
+trovi altre copie in giro, non usarle e segnalalo.
+
+Novità della v5 (19/09/2026): icone dei pasti non più tagliate; emoji ⭐ e 🚫
+dei box info rese come immagine; blocco alternative nativo per colazione e
+spuntino; segnaposto sul modello standard (4 colazioni, spuntino delle 17,
+6 giorni strutturati + 1 libero). Motore grafico per il resto invariato; un
+piano scritto nel formato v4 produce con la v5 lo stesso testo.
 
 ### Due zone
 
 | Zona | Cosa contiene | Si modifica? |
 |---|---|---|
-| ZONA DATI | `PAZIENTE`, `BOX_INFO`, `GIORNI` | Sì — è l'unica |
+| ZONA DATI | `PAZIENTE`, `BOX_INFO`, `COLAZIONI`, `SPUNTINI`, `GIORNI` | Sì — è l'unica |
 | MOTORE GRAFICO | tutto il resto | Mai |
 
 ### Regole
@@ -71,6 +77,8 @@ copie in giro, non usarle e segnalalo.
 - Chiavi emoji ammesse: `"colazione"` · `"pranzo"` · `"spuntino"` · `"cena"`.
   Lo spuntino usa `"spuntino"`, mai `"pranzo"`.
 - Output: A4, **un giorno per pagina**, giorno 1 nella pagina dell'intestazione.
+- Le emoji ⭐ e 🚫 nei testi di `BOX_INFO` si scrivono come carattere normale: il
+  template le converte in immagine.
 - La zona dati accetta un numero libero di giorni. Il piano standard è a 7 giorni
   (6 strutturati + 1 libero, di norma la domenica). Il giorno libero va comunque
   compilato con indicazioni di massima e range calorico: è un margine di
@@ -87,6 +95,25 @@ Il piano espone al paziente le **4 colazioni e i 2 spuntini** del livello scelto
 rinforzata_calcio — è uno solo per l'intero piano settimanale, e le stesse 4+2
 valgono per tutti i giorni strutturati: nel PDF non compaiono colazioni diverse
 giorno per giorno.
+
+**Come si scrivono (v5).** Le alternative si dichiarano una volta sola nelle liste
+`COLAZIONI` e `SPUNTINI` della zona dati; ogni voce è
+`("Nome", "dettaglio", "~kcal", nota_o_None)`. Nel giorno, il pasto con alternative
+porta la lista al posto del nome e `None` in dettaglio e kcal:
+`("colazione", "COLAZIONE — ore 08:00", COLAZIONI, None, None, nota_o_None)`.
+Il template scrive "A scelta tra:" e assegna le lettere A, B, C, D da solo.
+
+**Dove compaiono (decisione del 19/09/2026).** Il blocco alternative è **ripetuto
+in ogni pagina-giorno strutturato**: il paziente apre il giorno e ha tutto. Misurato:
+con testi lunghi e note, il giorno 1 entra nella pagina dell'intestazione con
+circa 40 mm di margine sopra il footer.
+
+L'abbinamento colazione→spuntino non ha ancora un campo nel motore: nel PDF si
+scrive come nota della singola alternativa.
+
+Le kcal di ogni alternativa vengono dal motore (`calcolatore.calcola_riga`), mai
+scritte a mano. Il totale del giorno con alternative è un intervallo
+(min–max secondo la scelta).
 
 ---
 
