@@ -14,13 +14,16 @@ e può essere caricato da solo.
 ## 1. IL TEMPLATE
 
 **File obbligatorio:** `TEMPLATE_AndamentoDieta_StudioTaglialatela_v3.py`
-Percorso: `Drive > Andamento Dieta Pazienti > _Template`
+Percorso: GitHub, radice del repository, accanto agli altri due template.
+Raw: `https://raw.githubusercontent.com/giuseppetaglialatela/studio-taglialatela-template/refs/heads/main/TEMPLATE_AndamentoDieta_StudioTaglialatela_v3.py`
+Si scarica con `bash` + `curl`, come i moduli. Gli stub su Drive
+(`_Template/`, v1-v2-v3) sono resti non funzionanti: non vanno usati.
 
-> **Stato aperto — verificato il 30/07/2026.** Questo template NON è su GitHub: il
-> canale raw risponde 404 sia con underscore sia con spazi. È l'unico dei tre
-> template ancora vincolato a Drive. Non contiene dati di paziente — è codice —
-> quindi per la regola di separazione dovrebbe stare su GitHub come gli altri due.
-> Finché non ci sta, il recupero dipende dal canale più lento e fragile.
+> **RISCRITTURA del 20/09/2026.** Il motore grafico originale era andato perso: su
+> Drive restavano tre file con la sola docstring. La v3 attuale è stata riscritta da
+> docstring v1, changelog v2 e questo modulo, con identità visiva copiata dal
+> template del piano v5. Non è un ripristino: i testi fissi delle pagine 1 e 3 sono
+> nuovi e approvati dal nutrizionista il 20/09/2026.
 
 **Motore grafico congelato**, come per il template del piano (M3): font, colori,
 layout, header, footer, numero di pagina non si toccano mai. Si modificano solo i
@@ -47,7 +50,7 @@ Campi obbligatori per ogni nuovo paziente:
 | `misurazioni` | `[{data, peso, etichetta}]` — una riga per pesata, ordine cronologico |
 | `circ_vita` | `{iniziale_cm, attuale_cm, data_attuale}` — oppure `null` |
 | `obiettivo_peso_kg` | oppure `null` |
-| `weight_floor_kg` | plateau minimo cautelativo (default 96) |
+| `weight_floor_kg` | plateau minimo cautelativo — **obbligatorio, nessun default**: se manca, lo script si ferma. Il 96 che circolava era il valore di un singolo paziente |
 | `nota_glicemia` · `nota_urea` · `nota_extra` | stringa vuota `""` se non rilevanti |
 
 **Formato numeri: punto decimale.** `120.65`, non `120,65`. È un JSON, non un foglio
@@ -59,10 +62,22 @@ di calcolo italiano.
 
 - **Altezza:** usa sempre `altezza_cm` dal JSON. Ignora le altezze che compaiono
   sugli scontrini della bilancia.
-- **Proiezioni:** NON modificare mai `tasso_fase1/2/3` senza indicazione esplicita
-  del nutrizionista. I valori (0,55 / 0,60 / 0,40 kg a settimana) sono cautelativi
-  per scelta clinica, non una stima da raffinare: una proiezione più ottimistica non
-  è una proiezione migliore, è una promessa che il paziente legge come impegno.
+- **Proiezioni, paziente CON farmaco GIP/GLP-1:** tre fasi contate dall'inizio della
+  dieta (settimane 0-8, 8-16, 16+). NON modificare mai `tasso_fase1/2/3` senza
+  indicazione esplicita del nutrizionista. I valori (0,55 / 0,60 / 0,40 kg a
+  settimana) sono cautelativi per scelta clinica, non una stima da raffinare: una
+  proiezione più ottimistica non è una proiezione migliore, è una promessa che il
+  paziente legge come impegno.
+- **Proiezioni, paziente SENZA farmaco** (decisione clinica del 20/09/2026): nessun
+  tasso a priori, perché il calo dipende dalla restrizione calorica effettiva. La
+  linea si ricava per regressione dalle pesate reali, escludendo dal calcolo quelle
+  dei primi 14 giorni — restano nel grafico come punti vuoti. Servono almeno **2
+  pesate dopo il giorno 14**: sotto quella soglia, o con peso stabile o in salita,
+  la proiezione non compare e al suo posto il PDF spiega perché.
+- **Limite noto da dichiarare al nutrizionista:** la regressione prolunga per 27
+  settimane il ritmo di poche pesate recenti, mentre nella realtà il calo rallenta.
+  I tempi indicati sono quindi ottimistici. La curva si ferma comunque a
+  `obiettivo_peso_kg`, se impostato, altrimenti a `weight_floor_kg`.
 - **Soglie circonferenza vita:** automatiche dal campo `sesso`
   (M: 94 / 102 cm — F: 80 / 88 cm). Non si impostano a mano.
 - **Anteprima obbligatoria:** il PDF non viene mai consegnato senza anteprima
