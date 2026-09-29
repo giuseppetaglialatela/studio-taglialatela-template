@@ -2,7 +2,7 @@
 
 Modulo operativo (principio 6: nucleo + moduli sono l'unica fonte operativa).
 Dipendenze: nessuna. Dipendono da questo modulo: M2 (workflow piano), M6 (estrazione).
-Ultimo aggiornamento: 19/09/2026.
+Ultimo aggiornamento: 29/09/2026 (formati confezione, scambi frutta, controllo 7 del collaudo).
 
 Questo modulo copre: come si avvia una sessione di calcolo, i moduli software, i casi
 golden, il database alimenti e la gerarchia fonti, lo schema CSV congelato, i file
@@ -47,7 +47,7 @@ lavoro: riscarica e riesegui il collaudo prima di fidarti dei numeri.
 ## 2. MODULI SOFTWARE
 
 ### collaudo.py — certificato di inizio sessione
-Sei controlli:
+Sette controlli:
 1. presenza e integrità di tutti i CSV, incluso il numero di colonne per riga
    (`csv.DictReader` da solo NON lo segnala)
 2. conteggio righe di `alimenti.csv` contro `EXPECTED_ALIMENTI_COUNT`
@@ -56,6 +56,8 @@ Sei controlli:
 5. integrità byte per byte contro `SHA256SUMS`
 6. ogni `food_id` di `alimenti.csv` ha un nome paziente in `nomi_paziente.csv`,
    senza duplicati né righe orfane
+7. `formati_confezione.csv` e `scambi_frutta.csv`: ogni `food_id` esiste in
+   `alimenti.csv`, unità e tolleranze valide
 
 Esce con codice 0 (superato) o 1 (fallito).
 
@@ -139,7 +141,7 @@ deroghe legittime (spuntino saltato, giorno libero). Il rilievo resta scritto ne
 con il motivo dichiarato.
 
 ### regressione.py
-Suite sui casi golden in `golden/`. Va rieseguita **dopo ogni modifica** al motore o al
+Suite sui casi golden in `golden/` (11 casi dal 29/09/2026: `caso_11_formati_confezione_violati` congela l'attenzione sui formati; i casi 05-07 la contengono perché i loro input di test non seguono i formati commerciali). Va rieseguita **dopo ogni modifica** al motore o al
 database alimenti, e comunque prima di qualsiasi uso clinico. Un comando, esito
 pass/fail per caso.
 
@@ -161,6 +163,17 @@ Incrocia la tabella interazioni — curata e validata dal nutrizionista — con 
 pasti e farmaci. Il motore NON contiene conoscenza farmacologica propria e non inventa
 interazioni: segnala esplicitamente i principi attivi assenti dalla tabella, così che
 l'assenza di allarme non venga scambiata per assenza di rischio.
+
+### formati.py
+Regola anti-spreco (nucleo M0, sezione 5). Legge `formati_confezione.csv` e
+`scambi_frutta.csv`. `pipeline.py` lo usa al PASSO 4, controllo E: per ogni alimento
+del piano vincolato nel CSV verifica che i grammi siano una confezione intera o un
+multiplo (fino a 6) entro la tolleranza. Esito: attenzione
+`FORMATO_CONFEZIONE_NON_RISPETTATO`, **non bloccante** (decisione del 29/09/2026).
+Funzioni: `carica_formati`, `carica_scambi_frutta`, `controlla_piano(piano, formati)`,
+`quantita_valida`. Controllo manuale senza pipeline (chat B):
+`python3 -c "import csv,formati; print(formati.controlla_piano(list(csv.DictReader(open('piano_vN.csv'))), formati.carica_formati()))"`
+stampa `[]` se tutto è a formato.
 
 ### coerenza.py
 Cross-check Atwater, coerenza interna dei target, righe con micronutrienti tutti a zero.
@@ -384,6 +397,15 @@ contiene valori nutrizionali precalcolati (principio 2).
 **gap.csv** — `food_id, nome, nutriente, motivo`
 
 **larn.csv** — vedi la sezione `larn.py` sopra.
+
+**formati_confezione.csv** — `food_id, nome_riferimento, unita_g, tolleranza_g, fonte, stato`
+`unita_g` è una lista separata da `|` (es. `125|150|170`). Un alimento PRESENTE è
+vincolato a confezione intera o multiplo; un alimento ASSENTE è a porzione libera.
+`stato` vale `confermato` o `da_confermare`. Nessun valore nutrizionale.
+
+**scambi_frutta.csv** — `food_id, nome_riferimento, grammi_porzione, stato`
+Porzioni di frutta equivalenti in energia (riferimento: banana 100 g). Usata per la
+tabella di scambio nel documento di spiegazione. Nessun valore nutrizionale.
 
 **nomi_paziente.csv** — `food_id, nome_paziente, nota_peso`
 Nome leggibile con cui l'alimento compare nel PDF del paziente e nota di peso da

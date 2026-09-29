@@ -16,6 +16,8 @@ ricaricano**: tutto ciò che serve sta nei metadati del piano e nel motore.
    esegue intero, come in ogni sessione (principio 7).
 3. Verifica del CSV: leggibile e coerente con le `differenze_da_versione_precedente`
    dichiarate nei metadati. Non si scaricano versioni precedenti per confronto.
+   Si riesegue anche il controllo formati (M1, sezione `formati.py`): deve stampare
+   `[]`, altrimenti si segnala al nutrizionista prima di generare.
 4. Kcal per pasto e per alternativa: dal motore (`calcolatore.calcola_riga`), mai
    scritte a mano e mai prese da riassunti.
    **Strumento:** `genera_zona_piano.py`, nello zip del motore, compila la zona
@@ -31,6 +33,18 @@ ricaricano**: tutto ciò che serve sta nei metadati del piano e nel motore.
    si completa a intuito. Il `.py` prodotto è quello da archiviare (sezione 5).
 5. Se nei metadati manca un campo necessario (titolo, obiettivo, criterio), ci si
    ferma e lo si chiede: non si decide in chat B.
+
+**Verifiche note prima di generare** (emerse in un piano con surplus e due spuntini,
+29/09/2026; da confermare con l'esecuzione reale):
+- il generatore accetta un solo `gruppo_scelta` per pasto: un piano con due spuntini
+  nello stesso giorno si presenta come un unico gruppo `spuntino` le cui opzioni
+  contengono entrambi;
+- il riquadro del target calcola deficit e perdita attesa: con un surplus il segno
+  può risultare invertito. Se compare una «perdita», ci si ferma e si chiede.
+- **Frutta a scelta:** la zona dati del PDF non si modifica. La tabella di scambio
+  (`scambi_frutta.csv`, via `formati.carica_scambi_frutta()`) va nel documento di
+  spiegazione. Se il generatore non gestisce una voce di frutta di riferimento, ci si
+  ferma e si segnala, senza ricostruire il layout.
 
 Il template dell'andamento dieta non sta qui: è in **M5**.
 

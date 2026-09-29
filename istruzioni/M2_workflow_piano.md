@@ -36,13 +36,28 @@ In caso di dubbio su una preparazione, CHIEDI prima di calcolare. Non dedurre
 dalla formulazione del piatto: la stessa dicitura può significare cose diverse
 a seconda dell'alimento.
 
-### Conversione formato confezione → grammi
+### Confezionati senza spreco e conversione formato → grammi
 
-Quando il paziente descrive una porzione in termini commerciali ("una scatoletta
-di tonno", "un vasetto di yogurt"), usa la **Tabella Formati Confezione Standard**
-(Drive > Sistema Presa in Carico). NON è un documento nutrizionale: converte solo
-il formato in grammi da inserire in `piano.csv`. Il dato nutrizionale resta quello
-di `alimenti.csv`, già espresso per 100 g di prodotto sgocciolato/edibile.
+Le quantità dei prodotti confezionati rispettano i formati commerciali: nessuno
+spreco (nucleo M0, sezione 5; qui ripetuta per intero). Fonte: `formati_confezione.csv`
+nello zip del motore (il documento Word su Drive è archivio). Tre casi:
+1. **Monoporzione o deperibile una volta aperto** (yogurt, fiocchi di latte,
+   scatolame, uova): confezione intera o multiplo esatto del formato.
+2. **Acquistabile a peso al banco** (affettati, formaggi, carne, pesce, pane):
+   qualsiasi grammatura.
+3. **Non deperibile o consumabile da tutta la famiglia** (pasta, riso, couscous,
+   cereali, frutta secca, gallette, cioccolato, latte, olive): porzione libera.
+Un alimento assente dal CSV è a porzione libera. Il controllo E del PASSO 4 di
+`pipeline.py` segnala le violazioni senza bloccare: si compone già a formato, e le
+segnalazioni residue si dichiarano al PASSO 6. Quando il paziente descrive una
+porzione commerciale ("una scatoletta di tonno", "un vasetto di yogurt"), il CSV
+converte il formato in grammi da inserire in `piano.csv`. Il dato nutrizionale resta
+quello di `alimenti.csv`, già espresso per 100 g di prodotto sgocciolato/edibile.
+
+**Scambio frutta.** La frutta a scelta si scrive con la voce di riferimento (banana
+100 g) e le alternative stanno in `scambi_frutta.csv`, a parità di energia. Nel
+piano non si moltiplicano le opzioni per la frutta: si dichiara lo scarto massimo
+(pochi kcal e grammi) e la tabella va nel documento di spiegazione.
 
 Le percentuali di sgocciolamento non tratte da CREA/BDA/USDA sono stime di
 mercato: riferimento pratico, non dato verificato.
@@ -339,8 +354,11 @@ sembra identico a uno precedente.
 - l'obiettivo da riportare in intestazione e il criterio di rivalutazione. Se il
   fascicolo non li contiene (es. `peso_obiettivo_concordato` = null), si chiedono
   QUI, insieme alle altre domande del gate: la chat B non deve mai inventarli;
-- le regole operative da spiegare al paziente (es. sostituzioni, regola verdure) e
-  i contenuti da escludere dal documento di spiegazione.
+- le regole operative da spiegare al paziente (es. sostituzioni, regola verdure,
+  scambio frutta, pesci in rotazione) e i contenuti da escludere dal documento di
+  spiegazione;
+- le attenzioni `FORMATO_CONFEZIONE_NON_RISPETTATO` del PASSO 4, se presenti, con la
+  motivazione.
 
 **Dopo l'approvazione — `metadati_piano_vN.json` (obbligatorio).** Prima di chiudere
 la chat A si scrive questo file, con lo stesso numero di versione del `piano.csv`
