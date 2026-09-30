@@ -1,7 +1,8 @@
 # M3 — TEMPLATE PDF: PIANO ALIMENTARE E DOCUMENTO DI SPIEGAZIONE
 
 Modulo operativo. Si carica **dopo l'approvazione dei calcoli**, per generare i due
-deliverable che il paziente riceve. Presuppone **M2 già eseguito** (in chat A):
+deliverable che il paziente riceve.
+Ultimo aggiornamento: 30/09/2026 (secondo spuntino, fino a 5 pasti nel PDF). Presuppone **M2 già eseguito** (in chat A):
 copre i suoi PASSO 7 e PASSO 8 e non si esegue prima. **In chat B M2 e M1 non si
 ricaricano**: tutto ciò che serve sta nei metadati del piano e nel motore.
 
@@ -34,11 +35,16 @@ ricaricano**: tutto ciò che serve sta nei metadati del piano e nel motore.
 5. Se nei metadati manca un campo necessario (titolo, obiettivo, criterio), ci si
    ferma e lo si chiede: non si decide in chat B.
 
+**Due spuntini nello stesso giorno (dal 30/09/2026).** Il secondo spuntino ha il suo
+valore di pasto, `spuntino2`: non si forza più dentro un unico gruppo `spuntino`.
+Nel PDF compare come SECONDO SPUNTINO, con l'icona dello spuntino; le sue kcal entrano
+nel totale del giorno. Verificato con un piano di prova a 5 pasti nel caso peggiore
+per lo spazio (4 colazioni, 2 spuntini e 2 secondi spuntini a scelta): un giorno per
+pagina, giorno 1 nella pagina dell'intestazione con margine sopra il footer.
+
 **Verifiche note prima di generare** (emerse in un piano con surplus e due spuntini,
 29/09/2026; da confermare con l'esecuzione reale):
-- il generatore accetta un solo `gruppo_scelta` per pasto: un piano con due spuntini
-  nello stesso giorno si presenta come un unico gruppo `spuntino` le cui opzioni
-  contengono entrambi;
+- il generatore accetta un solo `gruppo_scelta` per pasto;
 - il riquadro del target calcola deficit e perdita attesa: con un surplus il segno
   può risultare invertito. Se compare una «perdita», ci si ferma e si chiede.
 - **Frutta a scelta:** la zona dati del PDF non si modifica. La tabella di scambio
@@ -100,7 +106,13 @@ piano scritto nel formato v4 produce con la v5 lo stesso testo.
 
 - Copia il template, modifica solo la zona dati, genera il PDF.
 - Chiavi emoji ammesse: `"colazione"` · `"pranzo"` · `"spuntino"` · `"cena"`.
-  Lo spuntino usa `"spuntino"`, mai `"pranzo"`.
+  Lo spuntino usa `"spuntino"`, mai `"pranzo"`. Il **secondo spuntino** usa anch'esso
+  `"spuntino"`, con etichetta `SECONDO SPUNTINO`: il template ha 4 chiavi e non si
+  modifica. La barra legenda resta a 4 voci.
+- Pasti per giorno: fino a 5, contati dai dati; un pasto assente non compare (niente
+  "0", niente riga vuota). Nei piani a 5 pasti l'ordine è colazione, SPUNTINO
+  (metà mattina), pranzo, SECONDO SPUNTINO, cena; se tutti i pasti del giorno hanno
+  un orario, vale l'orario.
 - Output: A4, **un giorno per pagina**, giorno 1 nella pagina dell'intestazione.
 - Le emoji ⭐ e 🚫 nei testi di `BOX_INFO` si scrivono come carattere normale: il
   template le converte in immagine.
@@ -115,7 +127,8 @@ piano scritto nel formato v4 produce con la v5 lo stesso testo.
 
 ### Colazione e spuntino nel PDF
 
-Il piano espone al paziente le **4 colazioni e i 2 spuntini** del livello scelto
+Il piano espone al paziente le **4 colazioni e i 2 spuntini** (più il secondo
+spuntino, se il piano lo ha) del livello scelto
 (M2, sezione 2), non una singola combinazione. Il livello — standard o
 rinforzata_calcio — è uno solo per l'intero piano settimanale, e le stesse 4+2
 valgono per tutti i giorni strutturati: nel PDF non compaiono colazioni diverse
@@ -138,7 +151,8 @@ scrive come nota della singola alternativa.
 
 Le kcal di ogni alternativa vengono dal motore (`calcolatore.calcola_riga`), mai
 scritte a mano. Il totale del giorno con alternative è un intervallo
-(min–max secondo la scelta).
+(min–max secondo la scelta). Se anche il secondo spuntino è a scelta, la frase del
+totale diventa "secondo le alternative scelte".
 
 ---
 

@@ -1,7 +1,8 @@
 # M2 — WORKFLOW PIANO ALIMENTARE
 
 Modulo operativo. Si carica quando si compone, si modifica o si valuta un piano
-alimentare. Dipende da **M1 (Motore di calcolo)**: nessun passo di questo modulo
+alimentare.
+Ultimo aggiornamento: 30/09/2026 (struttura fino a 5 pasti: secondo spuntino). Dipende da **M1 (Motore di calcolo)**: nessun passo di questo modulo
 è eseguibile senza il motore collaudato.
 
 Rimandi:
@@ -87,6 +88,22 @@ Il criterio di abbinamento (compensativo: salata→dolce, dolce→salato/proteic
 oppure in continuità: salata→salato, dolce→dolce) NON è fissato a priori: si
 decide col nutrizionista caso per caso, in base al bilancio micronutrienti del
 giorno. Come la colazione, questi 2 spuntini sono fissi per tutta la settimana.
+
+**SECONDO SPUNTINO — quinto pasto, facoltativo (decisione del 30/09/2026).**
+La struttura prevede fino a 5 pasti: colazione, spuntino, pranzo, secondo spuntino,
+cena. In `piano.csv` il secondo spuntino si scrive `spuntino2`; un pasto senza righe
+semplicemente non esiste in quel piano.
+- Con il secondo spuntino, lo SPUNTINO è quello di metà mattina e il SECONDO
+  SPUNTINO sta nel pomeriggio o prima di dormire. Nei piani a 4 pasti lo spuntino
+  resta quello del pomeriggio, come prima.
+- Nel PDF: etichette SPUNTINO e SECONDO SPUNTINO, stessa icona. Se ci sono gli
+  orari, l'ordine dei pasti nella pagina segue gli orari.
+- Segue le stesse regole dello spuntino: se c'è, è lo stesso in tutti i giorni
+  strutturati (altrimenti il PASSO 6 blocca, salvo deroga dichiarata) e il suo
+  livello si confronta con gli spuntini del catalogo.
+- Uno spuntino fisso e un secondo spuntino fisso vengono dichiarati dal PASSO 6
+  come `LIVELLO_PARZIALE` (il catalogo ne prevede 2 per livello): va solo
+  dichiarato, non blocca.
 
 **DEROGA:** se il fascicolo dichiara lo spuntino saltato, un'allergia che esclude
 un'intera alternativa, o altra indicazione esplicita del paziente, la deroga vince
@@ -396,15 +413,17 @@ Regole:
   Uniche eccezioni, perché sono DATI DI INGRESSO confermati dal nutrizionista e non
   valori ricavati dal piano: `tdee_confermato_kcal` e `range_kcal_libero`;
 - chiavi di `titoli_piatti`: per un pasto fisso l'opzione è vuota (`"3|pranzo|"`);
-  per colazione e spuntino, uguali in tutti i giorni, si può usare `*` al posto
-  del giorno (`"*|colazione|A"`). L'opzione è quella della colonna `opzione` di
-  `piano.csv`;
+  per colazione, spuntino e secondo spuntino, uguali in tutti i giorni, si può
+  usare `*` al posto del giorno (`"*|colazione|A"`, `"*|spuntino2|A"`). L'opzione è
+  quella della colonna `opzione` di `piano.csv`;
 - `abbinamento_spuntino` usa le opzioni di `piano.csv` (non le lettere del PDF) e
   può indicare più spuntini con una lista; se l'abbinamento non è stato fissato si
   scrive `"non concordato"` e nel PDF non compare;
-- il giorno libero riporta le stesse colazioni e spuntini dei giorni strutturati;
-  in `indicazioni_giorno_libero` vanno solo pranzo e cena (decisione del
-  19/09/2026);
+- il giorno libero riporta le stesse colazioni e spuntini dei giorni strutturati,
+  secondo spuntino compreso se il piano lo ha; in `indicazioni_giorno_libero` vanno
+  solo pranzo e cena (decisione del 19/09/2026);
+- `abbinamento_spuntino` riguarda solo colazione → spuntino: il secondo spuntino
+  è una scelta indipendente;
 - `genera_zona_piano.py` (M1) si ferma se manca uno di questi campi: la chat B non
   li inventa;
 - testi già nel registro impersonale del documento di spiegazione (M3), così la
@@ -441,7 +460,11 @@ intervento manuale: è il materiale della validazione sul campo ancora aperta.
 - Il giorno libero è un margine di flessibilità da spiegare al paziente, non un
   giorno saltato: va comunque compilato con indicazioni di massima e range
   calorico.
-- Pasti ammessi in `piano.csv`: `colazione | pranzo | spuntino | cena`.
+- Pasti ammessi in `piano.csv`: `colazione | spuntino | pranzo | spuntino2 | cena`,
+  al massimo 5 (decisione del 30/09/2026). `spuntino2` minuscolo e senza spazi: un
+  valore diverso ferma la pipeline (`PASTO_NON_AMMESSO`).
+- Il numero di pasti del piano non si scrive da nessuna parte: si conta dai dati
+  (intestazione del PDF compresa).
 - Composizione **un giorno per volta**, non sei giorni in blocco: si chiude il
   giorno (pranzo e cena fissati, scenari colazione/spuntino verificati) prima di
   aprire il successivo.
