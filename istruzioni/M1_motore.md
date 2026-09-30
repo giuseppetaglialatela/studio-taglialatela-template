@@ -2,7 +2,9 @@
 
 Modulo operativo (principio 6: nucleo + moduli sono l'unica fonte operativa).
 Dipendenze: nessuna. Dipendono da questo modulo: M2 (workflow piano), M6 (estrazione).
-Ultimo aggiornamento: 29/09/2026 (formati confezione, scambi frutta, controllo 7 del collaudo).
+Ultimo aggiornamento: 30/09/2026 (struttura a 5 pasti: valore `spuntino2`, controllo
+PASTO_NON_AMMESSO, casi golden 12-14) · precedente 29/09/2026 (formati confezione,
+scambi frutta, controllo 7 del collaudo).
 
 Questo modulo copre: come si avvia una sessione di calcolo, i moduli software, i casi
 golden, il database alimenti e la gerarchia fonti, lo schema CSV congelato, i file
@@ -94,7 +96,12 @@ Un comando esegue i passi sempre nello stesso ordine e produce un report unico:
 3. micronutrienti per giorno e media settimanale, con flag LARN e gap
 4. coerenza dei dati + gap dichiarati
 5. interazioni farmaco-alimento
-6. livello unico di colazione e spuntino su tutto il piano
+6. livello unico di colazione e spuntino (e secondo spuntino, se presente) su tutto
+   il piano
+
+Prima del PASSO 1, come per un `food_id` sconosciuto, la pipeline si ferma se
+`piano.csv` usa un valore di pasto non ammesso (`PASTO_NON_AMMESSO`, bloccante): un
+refuso come `spuntino 2` verrebbe sommato nei totali ma scartato dal PDF.
 
 ```
 python3 pipeline.py --piano piano.csv --target target.csv
@@ -112,7 +119,7 @@ nati da lì.
 **Rilievi BLOCCANTI** (piano non presentabile): kcal o macro fuori tolleranza, uno
 scenario di scelta fuori tolleranza sulle kcal, target incoerenti, interazione di
 gravità ALTA, orario pasto mancante, terapia dichiarata solo in parte, struttura pasti
-non uniforme, livelli colazione/spuntino incoerenti.
+non uniforme, livelli colazione/spuntino incoerenti, valore di pasto non ammesso.
 
 **Rilievi DA DICHIARARE** (non bloccano): micronutrienti sotto l'80% LARN *in media
 settimanale*, distribuzione concentrata, gap dichiarati, falsi positivi Atwater,
@@ -131,6 +138,14 @@ estremi per giorno come informazione, non come verdetto.
 - (a) colazione e spuntino identici su tutti i giorni strutturati
 - (b) a quale livello appartengono, confrontandoli con `colazioni_spuntini.csv`
 
+Il secondo spuntino (`spuntino2`) segue le stesse regole dello spuntino (decisione del
+30/09/2026), ma solo se il piano lo contiene: presente in un giorno e assente in un
+altro blocca come struttura non uniforme; il livello si confronta con gli spuntini del
+catalogo. Un piano a 4 pasti non riceve alcun rilievo sul secondo spuntino.
+*Conseguenza da sapere:* il catalogo ha 2 spuntini per livello. Se spuntino e secondo
+spuntino sono fissi (una sola alternativa ciascuno), il PASSO 6 li dichiara
+`LIVELLO_PARZIALE`: attenzione, non blocco.
+
 La (b) intercetta una colazione standard abbinata a uno spuntino rinforzato: i giorni
 sono tutti uguali tra loro, quindi la (a) da sola la lascia passare. Se il piano usa
 alternative costruite su misura non è un errore: viene segnalato come fuori catalogo e
@@ -141,7 +156,10 @@ deroghe legittime (spuntino saltato, giorno libero). Il rilievo resta scritto ne
 con il motivo dichiarato.
 
 ### regressione.py
-Suite sui casi golden in `golden/` (11 casi dal 29/09/2026: `caso_11_formati_confezione_violati` congela l'attenzione sui formati; i casi 05-07 la contengono perché i loro input di test non seguono i formati commerciali). Va rieseguita **dopo ogni modifica** al motore o al
+Suite sui casi golden in `golden/` (14 casi dal 30/09/2026: `caso_11_formati_confezione_violati` congela l'attenzione sui formati; i casi 05-07 la contengono perché i loro input di test non seguono i formati commerciali; i casi 12-14 coprono la struttura a 5 pasti).
+Nei casi `pipeline` la suite ripete la sequenza di `pipeline.main()`: un controllo
+aggiunto a `main()` va messo in una funzione chiamata da entrambi, come
+`controlla_pasti_ammessi`, altrimenti la suite non lo vede. Va rieseguita **dopo ogni modifica** al motore o al
 database alimenti, e comunque prima di qualsiasi uso clinico. Un comando, esito
 pass/fail per caso.
 
@@ -157,6 +175,10 @@ fissi, non che quei numeri siano giusti per un paziente.
 Totali per pasto e per giorno, confronto con i target, flag LARN sui micronutrienti.
 Legge anche `gap.csv` e marca come SOTTOSTIMATI i totali che pescano da voci con dati
 mancanti. È il modulo principale.
+È anche l'**unica fonte** dell'elenco e dell'ordine dei pasti: `PASTI_AMMESSI`,
+`ordine_pasti()` e `pasti_non_ammessi()` vivono qui, e `pipeline.py` e
+`genera_zona_piano.py` li importano invece di riscriverli (30/09/2026: prima i 4 pasti
+erano scritti a mano in quattro file).
 
 ### interazioni.py
 Incrocia la tabella interazioni — curata e validata dal nutrizionista — con gli orari di
@@ -254,7 +276,18 @@ python3 genera_zona_piano.py --autotest --template TEMPLATE_..._v5.py
 
 - Le kcal vengono da `calcola_riga`, arrotondate alle 10 con la tilde. Il totale del
   giorno è l'intervallo min–max sulle combinazioni colazione×spuntino ammesse
-  dall'abbinamento.
+  dall'abbinamento. Un altro pasto a scelta (es. il secondo spuntino) entra nel totale
+  con la sua alternativa minima e massima, come scelta indipendente; prima del
+  30/09/2026 le kcal di un pasto a scelta diverso da colazione e spuntino restavano
+  fuori dal totale del giorno.
+- **Pasti (30/09/2026).** Al massimo 5: un pasto senza righe in `piano.csv` non
+  compare. Nei piani con `spuntino2` l'ordine è colazione, SPUNTINO (metà mattina),
+  pranzo, SECONDO SPUNTINO, cena; nei piani a 4 pasti resta colazione, pranzo,
+  spuntino, cena. Se tutti i pasti di un giorno hanno un orario in `orari_pasti.csv`,
+  vale l'orario (uno spuntino alle 22:30 va dopo la cena). Il secondo spuntino usa la
+  chiave emoji `"spuntino"`: il template non si tocca. "N pasti" nell'intestazione è
+  contato dai dati. Il giorno libero riporta il secondo spuntino dei giorni
+  strutturati. Un valore di pasto non ammesso ferma lo script.
 - Il dettaglio dei pasti usa nome e nota di peso di `nomi_paziente.csv`.
 - Le lettere A, B, C... seguono l'ordine della colonna `opzione` di `piano.csv`.
 - Il motore grafico è copiato byte per byte dal template: lo script sostituisce solo
@@ -321,6 +354,16 @@ documentazione: `descrizione` (cosa copre il caso) e `riferimento` (come è stat
   in media settimanale. NESSUN rilievo deve comparire, exit code 0: protegge il principio
   8. Complementare al caso_06 — quello sorveglia i flag per giorno del PASSO 2, questo
   quelli del PASSO 3.
+- **caso_12_cinque_pasti** — un giorno a 5 pasti (colazione S1, spuntino SPA, pranzo,
+  secondo spuntino SPB, cena). Congela i totali pasto per pasto, secondo spuntino
+  compreso; totali dello `spuntino2` verificati a mano da `alimenti.csv`.
+- **caso_13_secondo_spuntino_non_uniforme** — secondo spuntino nel giorno 1 e non nel
+  giorno 2: unico bloccante `STRUTTURA_NON_UNIFORME` (target tarati sui macro reali
+  perché non ce ne siano altri).
+- **caso_14_pasto_non_ammesso** — `spuntino 2` scritto con lo spazio: unico bloccante
+  `PASTO_NON_AMMESSO`.
+Entrambe le regole nuove sono state verificate anche al contrario (30/09/2026):
+togliendole dal codice, la suite diventa rossa esattamente sul caso che le sorveglia.
 
 **Tipi di caso.** `fisso` e `scelta_multipla` sono dedotti dal piano (presenza di
 `gruppo_scelta`), così il tipo non può disallinearsi da cosa il piano contiene davvero.
@@ -383,7 +426,9 @@ vitamina_b12_ug, zinco_mg, magnesio_mg, vitamina_c_mg`
 
 **piano.csv**
 `giorno, pasto, food_id, grammi` [+ `gruppo_scelta, opzione` — opzionali]
-pasti ammessi: `colazione | pranzo | spuntino | cena`
+pasti ammessi: `colazione | spuntino | pranzo | spuntino2 | cena` — al massimo 5
+(decisione del 30/09/2026). `spuntino2` è il secondo spuntino: minuscolo, tutto
+attaccato, senza spazi (altrimenti `PASTO_NON_AMMESSO`). Le colonne non cambiano.
 
 **target.csv** — `parametro, valore`
 **farmaci_paziente.csv** — `principio_attivo, nome_commerciale, orario_assunzione, note`
