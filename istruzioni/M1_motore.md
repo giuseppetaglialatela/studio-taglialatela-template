@@ -2,9 +2,11 @@
 
 Modulo operativo (principio 6: nucleo + moduli sono l'unica fonte operativa).
 Dipendenze: nessuna. Dipendono da questo modulo: M2 (workflow piano), M6 (estrazione).
-Ultimo aggiornamento: 30/09/2026 (struttura a 5 pasti: valore `spuntino2`, controllo
-PASTO_NON_AMMESSO, casi golden 12-14) · precedente 29/09/2026 (formati confezione,
-scambi frutta, controllo 7 del collaudo).
+Ultimo aggiornamento: 01/10/2026 (`cerca_crea.py` e cache CREA; kcal di 7 voci
+allineate a CREA; database a 135 voci; carciofi tra i falsi positivi Atwater;
+eccezione INSA per i micronutrienti delle sardine) ·
+precedente 30/09/2026 (struttura a 5 pasti: valore `spuntino2`, controllo
+PASTO_NON_AMMESSO, casi golden 12-14).
 
 Questo modulo copre: come si avvia una sessione di calcolo, i moduli software, i casi
 golden, il database alimenti e la gerarchia fonti, lo schema CSV congelato, i file
@@ -25,8 +27,10 @@ All'inizio di ogni sessione che coinvolge calcoli:
 3. Esegui `collaudo.py`. Nessun calcolo su paziente prima dell'esito positivo
    (principio 7).
 
-`cache.zip` e `BDA_alimenti.xlsx` servono **solo** per ampliare il database (M6), non
-per calcolare un piano.
+`cache.zip`, `BDA_alimenti.xlsx` e `crea_cache.zip` servono **solo** per ampliare il
+database (M6), non per calcolare un piano. Stanno sciolti nella cartella `motore-calcolo`
+del repository, fuori dallo zip; `crea_cache.zip` va scaricato accanto ai moduli per usare
+`cerca_crea.py`.
 
 **Convenzione:** il CODICE sta dentro lo zip, i DATI stanno fuori. Non tenere copie
 sciolte dei `.py` nel repository: due copie divergono in silenzio. Non è teorico — il
@@ -68,8 +72,10 @@ sintatticamente valida. Verificato il 28/07/2026 cambiando il calcio del pane in
 da 25 a 26 mg — conteggio giusto, nessun duplicato, giornata golden identica (usa
 `alimenti_test.csv`), tutto verde. Solo il quinto se ne accorgeva.
 
-*File opzionali* (`cache.zip`, `BDA_alimenti.xlsx`): se presenti vengono verificati come
-gli altri, se assenti il collaudo lo dichiara e prosegue. Richiederli sempre farebbe
+*File opzionali* (`cache.zip`, `BDA_alimenti.xlsx`, `crea_cache.zip`): se presenti vengono
+verificati come gli altri, se assenti il collaudo lo dichiara e prosegue. Dal 01/10/2026 i
+tre sono davvero elencati in `SHA256SUMS`: prima il file non li conteneva e il collaudo li
+segnalava solo come informativi, quindi una cache corrotta non veniva vista. Richiederli sempre farebbe
 fallire il collaudo di routine, e un collaudo che fallisce di routine smette di essere
 letto.
 
@@ -248,6 +254,27 @@ lasciato a zero in silenzio. Energia e macronutrienti non vengono proposti: per 
 fonte è CREA. Non scrive niente in `alimenti.csv`: riporta, la trascrizione resta una
 scelta.
 
+### cerca_crea.py
+Interroga `crea_cache.zip`: copia locale delle 832 schede CREA 2019 (scaricata dal sito il
+20/09/2026), con il codice di origine di ogni valore. Sostituisce la lettura delle pagine del
+sito, che passava da un riassunto di modello e non lasciava traccia di un valore trascritto
+male.
+
+```
+python3 cerca_crea.py ricerca "yogurt greco" "ravanelli"
+python3 cerca_crea.py estrai 150030
+python3 cerca_crea.py verifica
+python3 cerca_crea.py --autotest
+```
+
+`estrai` riporta i valori dello schema con l'origine (A analitico, C calcolato, ZL e S
+imputato, B metodica non dichiarata nella scheda) e segnala: campi ASSENTI (si scende a
+BDA-IEO e poi USDA), TRACCE (la cache CREA non porta la soglia: non scrivere zero) e parte
+edibile diversa da 100% (es. fuso di pollo 66%: il peso nel piano va convertito).
+`verifica` confronta kcal, macro e fibra delle righe CREA di `alimenti.csv` con la cache:
+esce 0 se coincidono, 1 se differiscono, e non modifica nulla. Va eseguito dopo ogni
+ampliamento (M6, passo 8). Non fa parte del collaudo perché richiede un file opzionale.
+
 ### tdee.py
 Nello zip dal 19/09/2026 (prima era l'ultima cosa tecnica rimasta su Drive; la copia
 Drive resta come archivio e non va più usata). Stima il TDEE e propone un `target.csv`
@@ -388,9 +415,10 @@ diventa un nuovo caso golden.
 
 ## 4. DATABASE ALIMENTI E GERARCHIA FONTI
 
-**Stato:** 127 alimenti verificati e tracciati alla fonte (verificato su GitHub il
-19/09/2026, nessun `food_id` duplicato; il numero vincolante è
-`EXPECTED_ALIMENTI_COUNT` in `collaudo.py`).
+**Stato:** 135 alimenti verificati e tracciati alla fonte (verificato il 01/10/2026,
+nessun `food_id` duplicato; il numero vincolante è `EXPECTED_ALIMENTI_COUNT` in
+`collaudo.py`). Conformità kcal/macro/fibra a CREA verificabile con
+`python3 cerca_crea.py verifica`.
 
 **Criterio di ampliamento "Key Foods":** un alimento si aggiunge solo quando un piano
 reale lo richiede e non è già presente. Oltre le 150 voci solo su richiesta esplicita del
@@ -403,6 +431,13 @@ nutrizionista.
 2. **BDA-IEO** — vitamina D, folati, B12 e minerali non coperti da CREA.
 3. **USDA FoodData Central** — solo residuale, quando le prime due tacciono. Mai per le
    kcal.
+
+**Eccezione dichiarata — tabella nazionale portoghese INSA** (Base de Dados da Composição
+de Alimentos, INSA, v 7.1 – 2026; citazione della fonte obbligatoria per licenza). Si usa
+SOLO per decisione del nutrizionista, voce per voce, quando le tre fonti sono incoerenti
+tra loro e INSA ha la stessa specie e lo stesso stato (crudo/cotto). Mai per kcal e macro,
+che restano CREA. In `fonte` si scrive `INSA(...)`, in `codice_fonte` `INSA<cod>`.
+Righe oggi in eccezione: 122800 sardine (micronutrienti, 01/10/2026).
 
 **Il terzo livello va usato davvero.** CREA non pubblica calcio, ferro, vitamina D, folati
 e B12 per pesci e carni. Fermarsi al livello 1 lascia quei campi a zero, e uno zero da
@@ -502,8 +537,10 @@ SOTTOSTIMATO, elencando le voci responsabili.
 Un valore sotto l'80% LARN accompagnato da quel flag NON è una carenza accertata: prima di
 intervenire clinicamente, verifica se dipende dal gap.
 
-**Stato attuale:** 8 righe su 4 alimenti — vitamina D (4: latte, orata, sardine, trippa),
-vitamina B12 (2: latte, trippa), folati (1: trippa), zinco (1: trippa).
+**Stato attuale:** 8 righe su 4 alimenti — vitamina D (4: latte parzialmente scremato,
+orata, salmone affumicato, trippa), vitamina B12 (2: latte, trippa), folati (1: trippa),
+zinco (1: trippa). La riga delle sardine è chiusa dal 01/10/2026 (micronutrienti INSA,
+sezione 8).
 Il blocco magnesio (35 celle) è chiuso dal 28/07/2026 via USDA. Il gap calcio dell'olio
 d'oliva è stato chiuso il 28/07/2026: CREA e BDA-IEO concordano su uno zero esplicito, non
 un silenzio.
@@ -562,9 +599,11 @@ controllo sui loro `fdcId` resta da fare.
 **Falso positivo strutturale di coerenza.py.** Su alimenti molto ipocalorici il cross-check
 Atwater sforava per puro effetto percentuale su numeri piccoli. Dal 28/07/2026 l'allarme
 richiede il **doppio criterio** (>12% relativo E >8 kcal/100 g in assoluto).
-Unico residuo atteso: **AGLIO** (53 kcal dichiarate vs 44,8 ricalcolate, -15,5%, scarto
-assoluto 8,20 kcal — appena sopra soglia). Non correggere il dato: dichiara il falso
-positivo e prosegui.
+Residui attesi: **AGLIO** (53 kcal dichiarate vs 44,8 ricalcolate, -15,5%, scarto
+assoluto 8,20 kcal — appena sopra soglia) e, dal 01/10/2026, **CARCIOFI** (33 kcal CREA vs
+22,6 ricalcolate, -31,5%, scarto 10,4 kcal: il metodo Southgate conta la fibra, 5,5 g per
+100 g, circa 11 kcal; macro e kcal coincidono con la scheda CREA). Non correggere il dato:
+dichiara il falso positivo e prosegui.
 Se compaiono NUOVI segnalati con l'ampliamento del database, vanno verificati uno a uno:
 non si alza la soglia per farli sparire.
 
@@ -576,6 +615,18 @@ un'unica riga 122800 secondo gerarchia — CREA per energia e macro, BDA per i m
 mancanti. "Sarda fresca" NON esiste più come voce separata. La vitamina D di questa riga
 viene dal campione magro abbinato ai macro del campione grasso: essendo liposolubile è
 probabilmente sottostimata, ed è dichiarata in `gap.csv`.
+**Aggiornamento 01/10/2026 — micronutrienti da INSA.** La triangolazione tra fonti ha
+mostrato che magnesio e zinco della riga erano inaffidabili: le due schede CREA delle
+sardine (122800 e 122700) citano lo stesso studio (Karakoltsidis et al.) con valori
+incompatibili (Mg 70 contro 10, Zn 3,9 contro 0,8). La tabella nazionale portoghese INSA
+(v 7.1 – 2026), voce 882 «Sardinha gorda crua», misura Mg 31 e Zn 1,6, confermati da
+USDA (39 / 1,31, in scatola) e da uno studio 2024 su sardine italiane crude (39,6 / 1,91
+ricalcolati sul peso fresco). Quella voce corrisponde al campione dei macro CREA (221 kcal,
+16,4 g lipidi contro 225 e 15,4). Decisione del nutrizionista: kcal e macro restano CREA,
+TUTTI i micronutrienti passano a INSA 882 (Ca 72, Fe 1,0, vitamina D 21, folati 15,
+B12 10, Zn 1,6, Mg 31, vitamina C 0). La vitamina D era sottostimata di circa 4,7 volte:
+la riga in `gap.csv` è chiusa. Limite dichiarato: sardina atlantica (Portogallo); la
+vitamina D dei pesci varia per stagione e zona.
 
 ---
 
@@ -595,3 +646,14 @@ Il motore è utilizzabile su pazienti reali, alle condizioni del principio 7.
 emergere due errori di processo. Ogni caso reale successivo va usato anche come collaudo:
 cosa il motore ha intercettato da solo, cosa ha richiesto un intervento manuale, cosa è
 sfuggito. Quello che sfugge diventa un caso golden.
+
+**Kcal allineate a CREA — 01/10/2026.** Il confronto con la cache CREA ha trovato 7 righe
+con kcal diverse dalla scheda: riso 332→334, carciofi 22→33, porri 29→35, barbabietole
+19→25, arance 34→37, mandarini 72→76, olive verdi 142→148. In quattro casi il valore era
+vicino al ricalcolo 4/4/9 dei macro, contro la regola «kcal lette da CREA, mai ricalcolate».
+Allineate. Effetto sulla suite: i casi 02 (olive), 04 (riso) e 12 (arance) cambiano di
++1,20, +1,60 e +6,00 kcal, verificati a mano riga per riga prima di rigenerare gli attesi.
+Nel caso 04, tarato sul confine ±5 punti, rigenerare l'atteso NON bastava: i totali nuovi
+avevano spostato le percentuali e il verdetto sulle proteine era passato da FUORI a OK. I
+target sono stati ricalibrati con gli stessi scarti di prima (+5.001 e +4.999). Lezione: su
+un caso tarato su un confine si ricalibra il target, non solo l'atteso.

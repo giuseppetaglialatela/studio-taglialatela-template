@@ -51,14 +51,21 @@ Cerca anche i **sinonimi**: "kefir" non dà risultati e "latte fermentato"
 nemmeno, ma "cornetto" trova CORNETTO O BRIOCHE e "caffè" trova undici voci. Un
 nome non trovato al primo tentativo non significa che l'alimento non ci sia.
 
-**5. Per i mancanti, CREA via portale.** Il fetch di un URL costruito a mano non
-funziona: serve prima una ricerca web che restituisca il link, poi il fetch.
+**5. CREA dalla cache locale, non dal sito.** CREA è il livello 1 (kcal, macro, fibra,
+minerali) e va consultata per OGNI alimento nuovo, in coppia con la cache BDA-IEO del passo
+4. `crea_cache.zip` (832 schede, stessa cartella `motore-calcolo`) si interroga con
+`python3 cerca_crea.py ricerca "nome"` e `python3 cerca_crea.py estrai <codice>`: riporta i
+valori con il codice di origine, segnala campi assenti, tracce, valori imputati e parte
+edibile. Il fetch delle pagine del sito non è più il percorso normale: passa da un
+riassunto di modello, non da una copia, e il 01/10/2026 il confronto con la cache ha
+trovato 7 kcal del database diverse dalla scheda. Resta solo per una scheda che manca dalla
+cache (ricerca web per il link, poi fetch; i valori vanno riletti due volte).
 
 **6. Estrai e gestisci i casi speciali.**
 
 | Caso | Cosa scrivere |
 |---|---|
-| `tr` (traccia) | il valore di soglia (`vltraccia`), **non** zero |
+| `tr` (traccia) | il valore di soglia (`vltraccia`, BDA-IEO), **non** zero. La cache CREA non porta la soglia: `estrai` segnala la traccia, il valore si decide |
 | campo assente | scendi al livello successivo della gerarchia, fino a USDA compreso; solo se manca ovunque lascia 0 **e aggiungi una riga a gap.csv** con il motivo |
 | zero biologico reale | 0 senza segnalazione (es. B12 in un vegetale) |
 
@@ -85,6 +92,9 @@ concordano.
 viene ciascun dato (es. `CREA+BDA-IEO`, `CREA+BDA-IEO(proxy)+USDA`). Se usi una
 voce generica al posto di quella specifica, marcala come proxy e dichiarala.
 
+- **`codice_fonte`:** codice CREA e id BDA-IEO separati da `+` (es. `135030+1604`), come
+  nelle righe già presenti; per USDA si aggiunge l'`fdcId`; per l'eccezione INSA
+  (M1 sezione 4) si aggiunge `INSA<cod>` (es. `122800+INSA882`).
 - **Un alimento = una riga.** Prima di aggiungere, controlla che non esista già
   sotto un altro nome (sarda/sardina): due righe per lo stesso alimento non sono
   un duplicato di `food_id`, quindi nessun controllo automatico le vede, e chi
@@ -96,6 +106,7 @@ voce generica al posto di quella specifica, marcala come proxy e dichiarala.
 **8. Chiudi il ciclo tecnico.** In quest'ordine:
 
 ```
+python3 cerca_crea.py verifica   # kcal, macro e fibra delle righe CREA = cache
 python3 coerenza.py          # sull'INTERO database, non solo sulle righe nuove
 # aggiorna EXPECTED_ALIMENTI_COUNT in collaudo.py
 python3 collaudo.py --genera-checksums
@@ -155,7 +166,10 @@ diventa più lenta da consultare che ricostruire il pasto.
 
 Mattei · Ivan Vitale · Renata de Angelis (piano + nuove alternative) ·
 Mariapia Florio · Marta · Antonio Taglialatela · Federica Coppola ·
-Sollazzi Giuseppe (da cui le voci di pesce/molluschi del 27/07).
+Sollazzi Giuseppe (da cui le voci di pesce/molluschi del 27/07) · Marco Giaccio
+(01/10/2026, prova di conversione di una dieta esterna: mais in scatola, burro d'arachidi,
+farina d'avena, latte scremato, fette biscottate, fuso di pollo, filetto di manzo, yogurt
+greco 0%).
 
 Da questi piani sono già stati estratti anche i blocchi pasto riutilizzabili
 confluiti in `moduli_pasto.csv`.
@@ -177,9 +191,11 @@ in database, senza creare una riga nuova.
 
 **Cercati su USDA e non risolti** (non riprovare senza una fonte nuova) —
 vitamina D di: orata (USDA non ha *Sparus aurata*, solo generici commerciali) ·
-sardina fresca (USDA ha solo inscatolata/in olio: sostituire il proxy attuale
-con questo lo peggiorerebbe) · latte parzialmente scremato (né CREA né BDA-IEO
-la pubblicano; il dato USDA viene da fortificazione — vedi M1).
+latte parzialmente scremato (né CREA né BDA-IEO la pubblicano; il dato USDA viene
+da fortificazione — vedi M1). La sardina fresca è stata risolta il 01/10/2026 con
+la tabella portoghese INSA (eccezione dichiarata, M1 sezione 4): la stessa tabella
+ha anche orata cruda e latte parzialmente scremato, candidati per chiudere i
+rispettivi gap, sempre su decisione del nutrizionista.
 
 **Esclusi per scelta del nutrizionista** (non riproporre): trippa.
 
@@ -212,3 +228,35 @@ potrebbero essere imputati anziché analitici: una passata di controllo sui loro
 **Fave secche cotte** — caso a parte: minerali e folati presi dalla voce BDA
 delle fave *crude* (proxy), quindi probabilmente **sovrastimati**, non
 sottostimati. Non usarle come fonte portante di ferro o folati.
+
+---
+
+## 7. PROXY E DATI DEBOLI — 01/10/2026
+
+Dal piano Giaccio. Restano scritti qui perché siano verificabili in seguito.
+
+- **Filetto di manzo (101170):** la dieta originale diceva «Scottona»; usata la scheda CREA
+  «Bovino adulto o vitellone, filetto, crudo» come proxy (fonte marcata `proxy scottona`).
+- **Burro d'arachidi (009010):** CREA riporta magnesio 18 mg, BDA-IEO 180 mg. Entrambe
+  citano McCance & Widdowson (BDA riporta il nome originale «Peanuts butter, smooth»).
+  Il 180 è confermato da CREA arachidi tostate (175, analitico), USDA (168 su 18 campioni,
+  193 su 8) e INSA arachidi (160-180): il 18 di CREA è un errore di trascrizione della sua
+  stessa fonte. Scritto 180 da BDA-IEO, confermato il 01/10/2026.
+- **Sardine (122800):** micronutrienti passati a INSA 882 «Sardinha gorda crua» il
+  01/10/2026 (decisione del nutrizionista; motivazione e valori in M1 sezione 8).
+  Metodo che l'ha fatto emergere: confronto della stessa voce tra fonti diverse con
+  segnalazione degli scarti di almeno 3 volte. Limite: CREA e BDA-IEO non sono
+  indipendenti per molti alimenti italiani (valori identici), quindi il loro accordo
+  prova meno dell'accordo con USDA o INSA.
+- **Fuso di pollo senza pelle (106410):** parte edibile 66%: il peso nel piano va espresso
+  senza osso. La variante con pelle (106400, 125 kcal) esiste in cache ma non è nel
+  database: nessun piano la richiede.
+- **Yogurt greco 0% (150030):** macro da CREA; CREA non pubblica i minerali. Calcio, ferro,
+  zinco, magnesio e B12 da USDA Foundation 330137 (analitici, 18 campioni; B12 9). Vitamina D
+  0 da USDA (analitica, 1 campione: debole). Folati 7 µg da USDA SR Legacy 170894
+  (derivazione DA, 0 campioni) e vitamina C 0 (label claim, 1 campione): **dati deboli**.
+  Formato confezione 125|150|170 copiato da 8053, stato `da_confermare`.
+- **Mais dolce in scatola (000070):** nessun formato di confezione registrato in
+  `formati_confezione.csv` (da confermare prima dell'uso nei piani).
+- **Ravanelli (005670) e fuso con pelle (106400):** presenti in cache CREA, non aggiunti
+  (criterio Key Foods: nessun piano li richiede).
