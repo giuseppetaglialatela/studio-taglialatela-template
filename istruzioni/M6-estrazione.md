@@ -197,6 +197,14 @@ la tabella portoghese INSA (eccezione dichiarata, M1 sezione 4): la stessa tabel
 ha anche orata cruda e latte parzialmente scremato, candidati per chiudere i
 rispettivi gap, sempre su decisione del nutrizionista.
 
+**Polvere proteica (whey)** — cercata il 04/10/2026, non inserita. Assente da CREA
+e da BDA-IEO. La voce USDA 173180 «Beverages, Protein powder whey based» ha tutti e
+tredici i valori con derivazione LC (etichetta) o FLC (formulazione stimata) e
+dataPoints 0: nessun dato analitico. Gli integratori sono comunque esclusi (sezione 2).
+Non riprovare. Conseguenza: un piano che contiene il food_id 173180 non è calcolabile.
+Alternativa già calcolata per uno spuntino proteico senza integratore: yogurt greco 0%
+250 g + banana 110 g + mandorle 5 g = 234,8 kcal, 24,9 g proteine, 297 mg calcio.
+
 **Esclusi per scelta del nutrizionista** (non riproporre): trippa.
 
 ---
