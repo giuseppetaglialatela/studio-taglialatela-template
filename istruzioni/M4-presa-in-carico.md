@@ -59,12 +59,11 @@ darebbe la raccolta automatica — decisione non presa.
 **Form B** — sezioni 5-7, preferenze e contesto, **dopo** la presa in carico:
 `https://giuseppetaglialatela.github.io/studio-taglialatela-template/FormB%20SchedaAlimentare.html`
 
-**Form C** — controllo periodico, paziente **già in carico** con un piano in corso:
+**Form C** — controllo di percorso, paziente **già in carico** con un piano in corso:
 `https://giuseppetaglialatela.github.io/studio-taglialatela-template/FormC%20ControlloPeriodico.html`
 
 Sono questi i link da inserire nei messaggi M1/M2 (Form A) e M3/M4 (Form B) del
-protocollo di follow-up. Il Form C non è ancora legato a un messaggio numerato
-(vedi **M7**).
+protocollo di follow-up. Il Form C si manda con il messaggio `M14` (vedi **M7**).
 
 Numero WhatsApp dello studio configurato nei form (costante `NUMERO_WA`):
 `393895068729` — formato internazionale, senza `+` e senza spazi.
