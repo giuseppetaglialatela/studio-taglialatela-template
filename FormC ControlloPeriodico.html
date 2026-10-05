@@ -28,6 +28,7 @@ input[type=text],input[type=number],input[type=date],select,textarea{
   width:100%;padding:12px;border:1px solid var(--bordo);border-radius:9px;
   font-size:16px;background:#fff;color:var(--testo);font-family:inherit}
 textarea{min-height:60px;resize:vertical}
+input.manca{border-color:var(--rosso);border-width:2px}
 input:focus,select:focus,textarea:focus{outline:2px solid var(--verde);outline-offset:1px;border-color:var(--verde)}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
 .chip{position:relative;display:inline-flex;cursor:pointer}
@@ -306,6 +307,7 @@ con fame, una spesa troppo cara. Si cambia senza problemi.</div>
 </main>
 
 <div class="barra"><div class="inner">
+  <div class="err" id="e_barra" style="margin:0 0 9px;text-align:center;font-weight:600"></div>
   <button type="button" id="btn_genera">Prepara le risposte</button>
   <div id="btn_invio" style="display:none">
     <a id="btn_wa" class="btnlink" href="#" rel="noopener">Apri WhatsApp e invia</a>
@@ -333,6 +335,9 @@ function avanzamento(){
 }
 document.addEventListener("change", avanzamento);
 document.addEventListener("input", avanzamento);
+$("nome").addEventListener("input", () => {
+  if (val("nome")) { $("e_barra").classList.remove("on"); $("e_nome").classList.remove("on"); $("nome").classList.remove("manca"); }
+});
 
 function riga(L, et, v){ if (v && v.length) L.push(`${et}: ${Array.isArray(v) ? v.join(", ") : v}`); }
 
@@ -387,20 +392,33 @@ function preparaLink(t){
 }
 
 $("btn_genera").addEventListener("click", () => {
-  if (!val("nome")) {
-    $("e_nome").classList.add("on");
-    $("nome").scrollIntoView({ behavior: "smooth", block: "center" });
-    return;
+  try {
+    if (!val("nome")) {
+      // l'avviso va mostrato DOVE STA IL DITO, non solo accanto al campo in cima
+      $("e_barra").textContent = "Manca il nome in cima alla pagina";
+      $("e_barra").classList.add("on");
+      $("e_nome").classList.add("on");
+      $("nome").classList.add("manca");
+      $("nome").scrollIntoView({ behavior: "smooth", block: "center" });
+      setTimeout(() => $("nome").focus(), 450);   // apre la tastiera: segnale inequivocabile
+      return;
+    }
+    $("e_barra").classList.remove("on");
+    $("e_nome").classList.remove("on");
+    $("nome").classList.remove("manca");
+    const t = testo();
+    $("out_testo").textContent = t;
+    preparaLink(t);
+    $("esito").classList.add("on");
+    $("btn_genera").style.display = "none";
+    $("btn_invio").style.display = "block";
+    $("bar").style.width = "100%";
+    $("esito").scrollIntoView({ behavior: "smooth" });
+  } catch (err) {
+    // rete di sicurezza: un pulsante che non fa niente e' peggio di un messaggio brutto
+    $("e_barra").textContent = "Qualcosa non ha funzionato: manda uno screenshot al dottore";
+    $("e_barra").classList.add("on");
   }
-  $("e_nome").classList.remove("on");
-  const t = testo();
-  $("out_testo").textContent = t;
-  preparaLink(t);
-  $("esito").classList.add("on");
-  $("btn_genera").style.display = "none";
-  $("btn_invio").style.display = "block";
-  $("bar").style.width = "100%";
-  $("esito").scrollIntoView({ behavior: "smooth" });
 });
 
 function copia(id, btn){
