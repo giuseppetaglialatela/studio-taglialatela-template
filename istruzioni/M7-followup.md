@@ -1,8 +1,8 @@
 # M7 — FOLLOW-UP
 
 Modulo operativo. Si carica quando si gestisce il contatto con un paziente già
-in carico: messaggi standard, controllo del lunedì, decisione se e quando
-rivedere il piano.
+in carico: messaggi standard, controllo del lunedì, risposte del Form C
+(controllo periodico), decisione se e quando rivedere il piano.
 
 Non dipende da M1 né da M2: si può caricare da solo. Rimandi:
 - l'aggiornamento delle pesate e il grafico di andamento → **M5**
@@ -26,11 +26,49 @@ sono replicati qui. Va letto quando serve mandare un messaggio, non a ogni
 sessione.
 
 I link dei form da inserire nei messaggi (`M1`/`M2` → Form A, `M3`/`M4` →
-Form B) sono in **M4**.
+Form B) sono in **M4**. Sempre come link, mai come allegato.
+
+Il **Form C** (controllo periodico) serve al paziente già in carico; il link è
+in **M4**. Non è ancora legato a un messaggio numerato del protocollo: finché
+non lo è, si manda con un testo libero breve.
 
 ---
 
-## 2. SOGLIE OPERATIVE
+## 2. FORM C — COSA RACCOGLIE E DOVE VA
+
+Sezioni: chi sei · come si condisce a casa (chi mette l'olio, come lo dosa,
+quanto per piatto, olio in cottura, pane/pasta/riso e carne/pesce/formaggi pesati
+o a occhio) · il periodo appena passato (aderenza, pasti fuori, giorno libero,
+strappi) · quello che non sembra un pasto (bevande, assaggi, fuori pasto, dopo
+cena) · misure · salute · una proposta (diario fotografico) · note libere.
+
+Destinazione delle risposte:
+
+| risposta | dove va |
+|---|---|
+| peso di oggi | `misurazioni` del JSON andamento (**M5**) — **solo se è una pesata nuova** |
+| circonferenza vita | `circ_vita.attuale_cm` + `data_attuale` del JSON andamento (**M5**) |
+| giorno di pesata accettato | sezione 8 del fascicolo |
+| tutto il resto | sezione 8 del fascicolo, con la data del form |
+
+Regole:
+- **Peso dichiarato identico all'ultima pesata registrata → NON è una pesata
+  nuova.** Il paziente ricopia il numero che conosce: aggiungerlo duplicherebbe
+  un punto e falserebbe la regressione del grafico. (Caso reale 05/10/2026.)
+- Il peso dichiarato in un form si registra solo se dichiarato come pesata
+  di oggi; in caso di dubbio si chiede.
+- Una variazione di vita di 1-2 cm è nell'errore di misura: si registra, non si
+  interpreta.
+- Le voci "fuori piano" (bevande, dolce dopo cena, assaggi) arrivano **senza
+  quantità**: sono una pista, non un dato. Prima di trasformarle in una
+  correzione del piano si chiedono le quantità al paziente, in un solo messaggio.
+
+Il JSON andamento si aggiorna seguendo **M5**. La sezione 8 del fascicolo è
+dati del paziente: resta su Drive, mai su GitHub.
+
+---
+
+## 3. SOGLIE OPERATIVE
 
 | Situazione | Azione |
 |---|---|
@@ -43,7 +81,7 @@ non va sostituita con un testo.
 
 ---
 
-## 3. INTEGRAZIONE CLINICA SU `M12`
+## 4. INTEGRAZIONE CLINICA SU `M12`
 
 In un paziente in terapia tiroidea — o comunque con patologia endocrina in
 trattamento — un plateau con aderenza alta non è solo una questione di piano
@@ -61,7 +99,7 @@ proseguire è clinica e va esposta, non applicata in automatico.
 
 ---
 
-## 4. ADERENZA BASSA — COSA GUARDARE PRIMA
+## 5. ADERENZA BASSA — COSA GUARDARE PRIMA
 
 Prima di rivedere le porzioni, guarda **quali** alimenti il paziente salta.
 
@@ -77,7 +115,7 @@ piano, non un compromesso.
 
 ---
 
-## 5. COSA RESTA AL NUTRIZIONISTA
+## 6. COSA RESTA AL NUTRIZIONISTA
 
 - La decisione di rivedere il piano, anche quando una soglia è superata: la
   soglia apre la discussione, non la chiude.

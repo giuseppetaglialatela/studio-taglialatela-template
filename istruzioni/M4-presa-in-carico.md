@@ -37,9 +37,21 @@ Schema di riferimento: `FascicoloPaziente_ESEMPIO.json`
 
 ---
 
-## 2. I DUE FORM DI INTAKE
+## 2. I TRE FORM
 
 Pubblicati su GitHub Pages e raggiungibili direttamente dal paziente.
+Schema dell'indirizzo:
+`https://giuseppetaglialatela.github.io/studio-taglialatela-template/<nome%20file>.html`
+(lo spazio nel nome del file diventa `%20`).
+
+**I form si mandano come LINK, mai come allegato.** Un HTML aperto da un
+allegato sul telefono non esegue JavaScript: il paziente compila e i pulsanti
+non rispondono.
+
+Le risposte arrivano su **WhatsApp** come testo, già impaginato dal form.
+GitHub Pages serve file ma non riceve dati: la raccolta automatica non è
+possibile. Esiste un sito Netlify non collegato a questo repository; collegarlo
+darebbe la raccolta automatica — decisione non presa.
 
 **Form A** — sezioni 1-4, clinico, **prima** della presa in carico:
 `https://giuseppetaglialatela.github.io/studio-taglialatela-template/FormA%20SchedaPrimoAccesso.html`
@@ -47,12 +59,21 @@ Pubblicati su GitHub Pages e raggiungibili direttamente dal paziente.
 **Form B** — sezioni 5-7, preferenze e contesto, **dopo** la presa in carico:
 `https://giuseppetaglialatela.github.io/studio-taglialatela-template/FormB%20SchedaAlimentare.html`
 
+**Form C** — controllo periodico, paziente **già in carico** con un piano in corso:
+`https://giuseppetaglialatela.github.io/studio-taglialatela-template/FormC%20ControlloPeriodico.html`
+
 Sono questi i link da inserire nei messaggi M1/M2 (Form A) e M3/M4 (Form B) del
-protocollo di follow-up.
+protocollo di follow-up. Il Form C non è ancora legato a un messaggio numerato
+(vedi **M7**).
 
 Numero WhatsApp dello studio configurato nei form (costante `NUMERO_WA`):
 `393895068729` — formato internazionale, senza `+` e senza spazi.
-Se cambia, va aggiornato in **entrambi** i file e ricaricato.
+Se cambia, va aggiornato in **tutti e tre** i file e ricaricato.
+
+### Form C — gestione delle risposte
+
+Cosa raccoglie e dove vanno le risposte sta in **M7**, sezione 2: il controllo
+periodico è follow-up, e M7 si carica da solo.
 
 ### Modifica dei form
 
@@ -147,7 +168,6 @@ quando servono:
 
 | File | Uso |
 |---|---|
-| `FormA_SchedaPrimoAccesso.html` · `FormB_SchedaAlimentare.html` | i due form di intake |
 | `FascicoloPaziente_ESEMPIO.json` | schema di riferimento del fascicolo |
 | `Protocollo_Comunicazione_Followup.docx` | i testi dei messaggi M1-M13 (vedi M7) |
 | `Tabella_Formati_Confezione_Standard.docx` | conversione formato → grammi (vedi M2) |
@@ -156,6 +176,7 @@ quando servono:
 
 | File | Nota |
 |---|---|
+| copie `.html` dei form su Drive | la copia operativa dei form è quella **su GitHub**, l'unica che il paziente apre; quelle su Drive non si modificano e non si usano |
 | `Regole_Traduzione_Fascicolo_Piano_v1.docx` | rispecchia la sezione 4 di questo modulo; in caso di divergenza vale il modulo |
 
 Quando in conversazione viene modificata una regola coperta da un documento di
