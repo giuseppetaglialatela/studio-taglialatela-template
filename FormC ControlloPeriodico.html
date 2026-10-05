@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Controllo di percorso · Dott. Taglialatela</title>
+<style>
+:root{
+  --verde:#1f7a5a; --verde-chiaro:#e8f3ee; --testo:#1b2420; --grigio:#6b7770;
+  --bordo:#d8e0dc; --sfondo:#f7f9f8; --giallo:#f0c419; --rosso:#c0392b;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--sfondo);color:var(--testo);
+  font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+header{background:#fff;border-bottom:1px solid var(--bordo);padding:22px 20px 18px;text-align:center}
+header h1{margin:0;font-size:17px;letter-spacing:.02em}
+header p{margin:5px 0 0;color:var(--grigio);font-size:13px}
+.progress{position:sticky;top:0;z-index:10;height:4px;background:var(--bordo)}
+.progress i{display:block;height:100%;width:0;background:var(--verde);transition:width .3s}
+main{max-width:600px;margin:0 auto;padding:18px 16px 130px}
+fieldset{background:#fff;border:1px solid var(--bordo);border-radius:12px;
+  margin:0 0 16px;padding:18px 16px}
+legend{font-weight:600;font-size:15px;padding:0 8px;color:var(--verde)}
+label{display:block;font-size:14px;font-weight:500;margin:16px 0 6px}
+label:first-of-type{margin-top:4px}
+.hint{font-size:13px;color:var(--grigio);font-weight:400;margin:-2px 0 8px;line-height:1.45}
+input[type=text],input[type=number],input[type=date],select,textarea{
+  width:100%;padding:12px;border:1px solid var(--bordo);border-radius:9px;
+  font-size:16px;background:#fff;color:var(--testo);font-family:inherit}
+textarea{min-height:60px;resize:vertical}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--verde);outline-offset:1px;border-color:var(--verde)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.chip{position:relative;display:inline-flex;cursor:pointer}
+.chip input{position:absolute;opacity:0;width:100%;height:100%;left:0;top:0;margin:0;cursor:pointer}
+.chip span{display:block;padding:9px 14px;border:1px solid var(--bordo);border-radius:20px;
+  font-size:14px;background:#fff;transition:.15s}
+.chip input:checked+span{background:var(--verde);border-color:var(--verde);color:#fff;font-weight:500}
+.chip input:focus-visible+span{outline:2px solid var(--verde);outline-offset:2px}
+.nota{background:var(--verde-chiaro);border-radius:10px;padding:14px;margin:0 0 16px;font-size:14px;line-height:1.5}
+.nota strong{display:block;margin-bottom:4px}
+.err{color:var(--rosso);font-size:13px;margin-top:5px;display:none}
+.err.on{display:block}
+.consenso{background:#fff;border:1px solid var(--bordo);border-radius:12px;padding:16px;
+  font-size:13px;color:var(--grigio);line-height:1.5}
+.barra{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--bordo);
+  padding:12px 16px calc(12px + env(safe-area-inset-bottom));z-index:20}
+.barra .inner{max-width:600px;margin:0 auto}
+button{width:100%;padding:15px;border:0;border-radius:11px;background:var(--verde);color:#fff;
+  font-size:16px;font-weight:600;font-family:inherit;cursor:pointer}
+.btnlink{display:block;width:100%;padding:15px;border-radius:11px;background:var(--verde);
+  color:#fff;font-size:16px;font-weight:600;text-align:center;text-decoration:none}
+button.sec{background:#fff;color:var(--verde);border:1.5px solid var(--verde);margin-top:9px}
+#esito{display:none}
+#esito.on{display:block}
+.out{background:#fff;border:1px solid var(--bordo);border-radius:10px;padding:12px;
+  font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;
+  max-height:230px;overflow:auto;margin-top:8px}
+.ok{background:var(--verde-chiaro);border-radius:10px;padding:14px;margin-bottom:14px;font-size:14px}
+footer{text-align:center;font-size:12px;color:var(--grigio);padding:0 20px 30px;line-height:1.6}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="progress"><i id="bar"></i></div>
+
+<header>
+  <h1>Dott. Giuseppe Taglialatela</h1>
+  <p>Controllo di percorso · circa 3 minuti</p>
+</header>
+
+<main>
+
+<div class="nota">
+  <strong>Due righe prima di cominciare.</strong>
+  Il tuo piano è costruito su una <em>stima</em> del fabbisogno, calcolata con una formula. Le formule
+  sbagliano spesso, e per correggerle mi servono informazioni che hai solo tu. Qui sotto non c'è niente
+  di giusto o sbagliato: più sei preciso, più il piano diventa tuo. Quasi tutto si risponde con un tocco.
+</div>
+
+<form id="form" novalidate>
+
+<!-- ══════ 1 ══════ -->
+<fieldset>
+<legend>Chi sei</legend>
+
+<label for="nome">Nome e cognome *</label>
+<input type="text" id="nome" autocomplete="name">
+<div class="err" id="e_nome">Campo obbligatorio</div>
+
+<label>Da quanto segui il piano?</label>
+<div class="chips">
+  <label class="chip"><input type="radio" name="periodo" value="circa 1 settimana"><span>1 settimana</span></label>
+  <label class="chip"><input type="radio" name="periodo" value="circa 2 settimane"><span>2 settimane</span></label>
+  <label class="chip"><input type="radio" name="periodo" value="circa 1 mese"><span>1 mese</span></label>
+  <label class="chip"><input type="radio" name="periodo" value="piu di 1 mese"><span>Più di un mese</span></label>
+</div>
+</fieldset>
+
+<!-- ══════ 2 ══════ -->
+<fieldset>
+<legend>Come si condisce a casa tua</legend>
+<div class="hint" style="margin-top:4px">È la parte che mi serve di più: l'olio è l'alimento più
+calorico del piano e basta poco per cambiare molto i conti.</div>
+
+<label>Chi mette l'olio nel piatto o in padella?</label>
+<div class="chips">
+  <label class="chip"><input type="radio" name="chi_olio" value="io"><span>Io</span></label>
+  <label class="chip"><input type="radio" name="chi_olio" value="chi cucina"><span>Chi cucina</span></label>
+  <label class="chip"><input type="radio" name="chi_olio" value="a volte io a volte chi cucina"><span>A volte io, a volte no</span></label>
+</div>
+
+<label>Come viene dosato?</label>
+<div class="chips">
+  <label class="chip"><input type="radio" name="dose_olio" value="pesato con la bilancia"><span>Pesato</span></label>
+  <label class="chip"><input type="radio" name="dose_olio" value="misurato col cucchiaio"><span>Col cucchiaio</span></label>
+  <label class="chip"><input type="radio" name="dose_olio" value="a occhio"><span>A occhio</span></label>
+  <label class="chip"><input type="radio" name="dose_olio" value="non lo so"><span>Non lo so</span></label>
+</div>
+
+<label>Più o meno quanto olio finisce in un piatto?</label>
+<div class="hint">Vai a sensazione, non serve indovinare.</div>
+<div class="chips">
+  <label class="chip"><input type="radio" name="quanto_olio" value="un filo"><span>Un filo</span></label>
+  <label class="chip"><input type="radio" name="quanto_olio" value="circa 1 cucchiaio"><span>1 cucchiaio</span></label>
+  <label class="chip"><input type="radio" name="quanto_olio" value="circa 2 cucchiai"><span>2 cucchiai</span></label>
+  <label class="chip"><input type="radio" name="quanto_olio" value="piu di 2 cucchiai"><span>Di più</span></label>
+  <label class="chip"><input type="radio" name="quanto_olio" value="non saprei"><span>Non saprei</span></label>
+</div>
+
+<label>Oltre a quello del piatto, se ne aggiunge per cuocere (padella, forno)?</label>
+<div class="chips">
+  <label class="chip"><input type="radio" name="olio_cottura" value="si"><span>Sì</span></label>
+  <label class="chip"><input type="radio" name="olio_cottura" value="no"><span>No</span></label>
+  <label class="chip"><input type="radio" name="olio_cottura" value="non lo so"><span>Non lo so</span></label>
+</div>
+
+<label>Pane, riso e pasta: pesati o a occhio?</label>
+<div class="chips">
+  <label class="chip"><input type="radio" name="pesa_carbo" value="sempre pesati"><span>Sempre pesati</span></label>
+  <label class="chip"><input type="radio" name="pesa_carbo" value="qualche volta"><span>Qualche volta</span></label>
+  <label class="chip"><input type="radio" name="pesa_carbo" value="a occhio"><span>A occhio</span></label>
+</div>
+
+<label>Carne, pesce, formaggi: pesati o a occhio?</label>
+<div class="chips">
+  <label class="chip"><input type="radio" name="pesa_prot" value="sempre pesati"><span>Sempre pesati</span></label>
+  <label class="chip"><input type="radio" name="pesa_prot" value="qualche volta"><span>Qualche volta</span></label>
+  <label class="chip"><input type="radio" name="pesa_prot" value="a occhio"><span>A occhio</span></label>
+</div>
+</fieldset>
+
+<!-- ══════ 3 ══════ -->
+<fieldset>
+<legend>Il periodo appena passato</legend>
+
+<label>Quanto sei riuscito a seguire il piano?</label>
+<div class="hint">Risposta sincera, serve a me per tarare i conti: nessun voto.</div>
+<div class="chips">
+  <label class="chip"><input type="radio" name="aderenza" value="sempre"><span>Sempre</span></label>
+  <label class="chip"><input type="radio" name="aderenza" value="quasi sempre"><span>Quasi sempre</span></label>
+  <label class="chip"><input type="radio" name="aderenza" value="circa a meta"><span>Circa a metà</span></label>
+  <label class="chip"><input type="radio" name="aderenza" value="poco"><span>Poco</span></label>
+</div>
+
+<label>Quante volte hai mangiato fuori casa?</label>
+<div class="hint">Ristorante, pizzeria, cena da amici o parenti, mensa.</div>
+<div class="chips">
+  <label class="chip"><input type="radio" name="fuori_casa" value="mai"><span>Mai</span></label>
+  <label class="chip"><input type="radio" name="fuori_casa" value="1 volta a settimana"><span>1 a settimana</span></label>
+  <label class="chip"><input type="radio" name="fuori_casa" value="2 volte a settimana"><span>2 a settimana</span></label>
+  <label class="chip"><input type="radio" name="fuori_casa" value="piu di 2 volte a settimana"><span>Di più</span></label>
+</div>
+
+<label for="giorno_libero">Se il tuo piano prevede un giorno libero, cosa ci hai mangiato?</label>
+<div class="hint">Una riga basta. Salta la domanda se il tuo piano non lo prevede.</div>
+<textarea id="giorno_libero" placeholder="es. pizza e birra / cena dai miei"></textarea>
+
+<label for="strappi">Ci sono stati strappi fuori dal giorno libero?</label>
+<div class="hint">Quali, quante volte, e più o meno quanto. Serve a me per i conti, non per giudicare:
+uno strappo dichiarato vale molto più di uno nascosto.</div>
+<textarea id="strappi" placeholder="es. una pizza in settimana, qualche dolce"></textarea>
+</fieldset>
+
+<!-- ══════ 4 ══════ -->
+<fieldset>
+<legend>Quello che non sembra un pasto</legend>
+<div class="hint" style="margin-top:4px">Sono le cose che sfuggono a tutti, me compreso. Spesso
+pesano più di uno strappo dichiarato.</div>
+
+<label>In una giornata normale bevi anche…</label>
+<div class="chips">
+  <label class="chip"><input type="checkbox" name="bevande" value="caffe con zucchero"><span>Caffè con zucchero</span></label>
+  <label class="chip"><input type="checkbox" name="bevande" value="birra"><span>Birra</span></label>
+  <label class="chip"><input type="checkbox" name="bevande" value="vino"><span>Vino</span></label>
+  <label class="chip"><input type="checkbox" name="bevande" value="bibite o succhi"><span>Bibite o succhi</span></label>
+  <label class="chip"><input type="checkbox" name="bevande" value="solo acqua"><span>Solo acqua</span></label>
+</div>
+
+<label>Ti capita di assaggiare mentre si cucina, o di finire quello che avanza?</label>
+<div class="chips">
+  <label class="chip"><input type="radio" name="assaggi" value="spesso"><span>Spesso</span></label>
+  <label class="chip"><input type="radio" name="assaggi" value="qualche volta"><span>Qualche volta</span></label>
+  <label class="chip"><input type="radio" name="assaggi" value="quasi mai"><span>Quasi mai</span></label>
+</div>
+
+<label>Fuori pasto, al lavoro o in giro, ci scappa qualcosa?</label>
+<div class="hint">Caffè al bar, un cornetto, un pacchetto di qualcosa, una caramella.</div>
+<div class="chips">
+  <label class="chip"><input type="radio" name="fuoripasto" value="tutti i giorni"><span>Tutti i giorni</span></label>
+  <label class="chip"><input type="radio" name="fuoripasto" value="qualche volta a settimana"><span>Qualche volta</span></label>
+  <label class="chip"><input type="radio" name="fuoripasto" value="quasi mai"><span>Quasi mai</span></label>
+</div>
+
+<label for="sera">La sera, dopo cena, mangi qualcosa?</label>
+<div class="hint">Cioccolato, frutta secca, un gelato, uno snack. Scrivi cosa e quanto, a occhio.</div>
+<input type="text" id="sera" placeholder="es. 3-4 quadretti di cioccolato">
+</fieldset>
+
+<!-- ══════ 5 ══════ -->
+<fieldset>
+<legend>Misure</legend>
+
+<label for="peso">Peso di oggi in kg</label>
+<div class="hint">Al mattino, a digiuno, dopo il bagno, con la stessa bilancia di sempre.</div>
+<input type="number" id="peso" inputmode="decimal" min="35" max="300" step="0.1" placeholder="es. 98,4">
+
+<label for="vita">Circonferenza vita in cm</label>
+<div class="hint">Al mattino, a digiuno, in piedi, metro all'altezza dell'ombelico, senza stringere,
+respirando normalmente. È il numero che spesso si muove prima della bilancia.</div>
+<input type="number" id="vita" inputmode="decimal" min="50" max="200" step="0.5" placeholder="es. 104">
+
+<label>Da adesso ti chiedo di pesarti il <strong>venerdì</strong> mattina, non nel weekend</label>
+<div class="hint">Il peso sale fisiologicamente nel fine settimana: misurandolo di domenica o di lunedì
+vediamo sempre il punto più alto. Al venerdì il dato è molto più pulito.</div>
+<div class="chips">
+  <label class="chip"><input type="radio" name="venerdi" value="ok"><span>Va bene</span></label>
+  <label class="chip"><input type="radio" name="venerdi" value="preferisco un altro giorno"><span>Preferisco un altro giorno</span></label>
+</div>
+</fieldset>
+
+<!-- ══════ 6 ══════ -->
+<fieldset>
+<legend>Salute</legend>
+
+<label>Hai fatto esami del sangue di recente?</label>
+<div class="hint">Se sì e non me li hai ancora mandati, mandami una foto del referto.</div>
+<div class="chips">
+  <label class="chip"><input type="radio" name="esami" value="si, gia inviati"><span>Sì, già inviati</span></label>
+  <label class="chip"><input type="radio" name="esami" value="si, li mando"><span>Sì, li mando</span></label>
+  <label class="chip"><input type="radio" name="esami" value="no"><span>No</span></label>
+</div>
+
+<label>È cambiato qualcosa nella tua salute o nelle terapie?</label>
+<div class="hint">Farmaci nuovi o sospesi, integratori, vitamine, visite, disturbi comparsi.</div>
+<div class="chips">
+  <label class="chip"><input type="radio" name="salute" value="no, niente"><span>No, niente</span></label>
+  <label class="chip"><input type="radio" name="salute" value="si"><span>Sì</span></label>
+</div>
+<input type="text" id="salute_quale" placeholder="Se sì, che cosa">
+
+<label>Problemi di pancia o digestione con questo piano?</label>
+<div class="chips">
+  <label class="chip"><input type="radio" name="intestino" value="nessuno"><span>Nessuno</span></label>
+  <label class="chip"><input type="radio" name="intestino" value="qualcuno"><span>Qualcuno</span></label>
+</div>
+<input type="text" id="intestino_quale" placeholder="Se sì, con quali alimenti">
+</fieldset>
+
+<!-- ══════ 7 ══════ -->
+<fieldset>
+<legend>Una proposta</legend>
+<div class="hint" style="margin-top:4px">Nessun diario da scrivere, nessuna grammatura da annotare.</div>
+
+<p style="font-size:14px;margin:12px 0 4px">Una <strong>foto</strong> a tutto quello che mangi e bevi,
+prima di mangiarlo, per le prossime due settimane. Dieci secondi, dal telefono. Niente da calcolare:
+ai conti penso io.</p>
+
+<label>Te la senti?</label>
+<div class="chips">
+  <label class="chip"><input type="radio" name="foto" value="ci sto"><span>Ci sto</span></label>
+  <label class="chip"><input type="radio" name="foto" value="ci provo"><span>Ci provo</span></label>
+  <label class="chip"><input type="radio" name="foto" value="preferisco di no"><span>Preferisco di no</span></label>
+</div>
+
+<label for="note">C'è qualcosa che vuoi dirmi del piano?</label>
+<div class="hint">Un piatto che non ti va giù, una preparazione troppo lunga, una porzione che ti lascia
+con fame, una spesa troppo cara. Si cambia senza problemi.</div>
+<textarea id="note" placeholder="Facoltativo"></textarea>
+</fieldset>
+
+<div class="consenso">
+  I dati servono solo a tarare il tuo piano e restano nello studio.
+</div>
+
+</form>
+
+<div id="esito">
+  <div class="ok"><strong>Fatto.</strong> Tocca il pulsante verde: si apre WhatsApp col messaggio già
+  scritto, devi solo premere invio.<br><br>
+  <strong>Se non si apre</strong>, tocca il pulsante bianco "Copia il testo": poi apri WhatsApp,
+  vai sulla chat del dottore e incolla (tieni premuto nel campo del messaggio → Incolla).</div>
+  <div class="out" id="out_testo"></div>
+</div>
+
+</main>
+
+<div class="barra"><div class="inner">
+  <button type="button" id="btn_genera">Prepara le risposte</button>
+  <div id="btn_invio" style="display:none">
+    <a id="btn_wa" class="btnlink" href="#" rel="noopener">Apri WhatsApp e invia</a>
+    <button class="sec" type="button" onclick="copia('out_testo',this)">Copia il testo e incollalo in chat</button>
+  </div>
+</div></div>
+
+<footer>Dott. Giuseppe Taglialatela · Farmacista · Consulente in Nutrizione · Napoli</footer>
+
+<script>
+const NUMERO_WA = "393895068729";
+
+const $ = id => document.getElementById(id);
+const val = id => ($(id) ? $(id).value.trim() : "");
+const radio = n => { const e = document.querySelector(`input[name="${n}"]:checked`); return e ? e.value : null; };
+const checks = n => [...document.querySelectorAll(`input[name="${n}"]:checked`)].map(e => e.value);
+
+const CAMPI_RADIO = ["periodo","chi_olio","dose_olio","quanto_olio","olio_cottura","pesa_carbo",
+  "pesa_prot","aderenza","fuori_casa","assaggi","fuoripasto","venerdi","esami","salute","intestino","foto"];
+const CAMPI_TESTO = ["nome","giorno_libero","strappi","sera","peso","vita","note"];
+
+function avanzamento(){
+  const fatti = CAMPI_RADIO.filter(n => radio(n)).length + CAMPI_TESTO.filter(id => val(id)).length;
+  $("bar").style.width = Math.round(fatti / (CAMPI_RADIO.length + CAMPI_TESTO.length) * 100) + "%";
+}
+document.addEventListener("change", avanzamento);
+document.addEventListener("input", avanzamento);
+
+function riga(L, et, v){ if (v && v.length) L.push(`${et}: ${Array.isArray(v) ? v.join(", ") : v}`); }
+
+function testo(){
+  const L = [];
+  L.push("*CONTROLLO DI PERCORSO*");
+  L.push("");
+  L.push(`${val("nome")} · ${new Date().toLocaleDateString("it-IT")}`);
+  riga(L, "Piano in corso da", radio("periodo"));
+  L.push("");
+  L.push("*Condimenti e pesi*");
+  riga(L, "Chi mette l'olio", radio("chi_olio"));
+  riga(L, "Come viene dosato", radio("dose_olio"));
+  riga(L, "Quanto per piatto", radio("quanto_olio"));
+  riga(L, "Olio aggiunto in cottura", radio("olio_cottura"));
+  riga(L, "Pane/riso/pasta", radio("pesa_carbo"));
+  riga(L, "Carne/pesce/formaggi", radio("pesa_prot"));
+  L.push("");
+  L.push("*Il periodo*");
+  riga(L, "Aderenza al piano", radio("aderenza"));
+  riga(L, "Pasti fuori casa", radio("fuori_casa"));
+  riga(L, "Giorno libero", val("giorno_libero"));
+  riga(L, "Strappi fuori dal giorno libero", val("strappi"));
+  L.push("");
+  L.push("*Fuori dai pasti*");
+  riga(L, "Bevande della giornata", checks("bevande"));
+  riga(L, "Assaggi e avanzi", radio("assaggi"));
+  riga(L, "Fuori pasto", radio("fuoripasto"));
+  riga(L, "Dopo cena", val("sera"));
+  L.push("");
+  L.push("*Misure*");
+  riga(L, "Peso", val("peso") ? val("peso") + " kg" : "");
+  riga(L, "Circonferenza vita", val("vita") ? val("vita") + " cm" : "");
+  riga(L, "Pesata al venerdì", radio("venerdi"));
+  L.push("");
+  L.push("*Salute*");
+  riga(L, "Esami del sangue recenti", radio("esami"));
+  riga(L, "Novità su salute o terapie", radio("salute") === "si" ? (val("salute_quale") || "si") : radio("salute"));
+  riga(L, "Disturbi intestinali", radio("intestino") === "qualcuno" ? (val("intestino_quale") || "si") : radio("intestino"));
+  L.push("");
+  L.push("*Prossime due settimane*");
+  riga(L, "Diario fotografico", radio("foto"));
+  const n = val("note");
+  if (n) { L.push(""); L.push("*Note*"); L.push(n); }
+  return L.join("\n");
+}
+
+function preparaLink(t){
+  // un <a> con href pronto: il tap e' una navigazione diretta, non un popup da bloccare
+  const url = `https://wa.me/${NUMERO_WA}?text=${encodeURIComponent(t)}`;
+  $("btn_wa").href = url.length > 7500 ? `https://wa.me/${NUMERO_WA}` : url;
+}
+
+$("btn_genera").addEventListener("click", () => {
+  if (!val("nome")) {
+    $("e_nome").classList.add("on");
+    $("nome").scrollIntoView({ behavior: "smooth", block: "center" });
+    return;
+  }
+  $("e_nome").classList.remove("on");
+  const t = testo();
+  $("out_testo").textContent = t;
+  preparaLink(t);
+  $("esito").classList.add("on");
+  $("btn_genera").style.display = "none";
+  $("btn_invio").style.display = "block";
+  $("bar").style.width = "100%";
+  $("esito").scrollIntoView({ behavior: "smooth" });
+});
+
+function copia(id, btn){
+  const t = $(id).textContent;
+  const fatto = () => { const o = btn.textContent; btn.textContent = "Copiato ✓"; setTimeout(() => btn.textContent = o, 1800); };
+  if (navigator.clipboard) navigator.clipboard.writeText(t).then(fatto);
+  else { const ta = document.createElement("textarea"); ta.value = t; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); ta.remove(); fatto(); }
+}
+</script>
+</body>
+</html>
