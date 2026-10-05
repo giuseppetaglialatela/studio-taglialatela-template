@@ -4,7 +4,7 @@
 ║          TEMPLATE ANDAMENTO DIETA — Studio Nutrizionale Taglialatela         ║
 ║          Dott. Giuseppe Taglialatela — Consulente in Nutrizione              ║
 ╠══════════════════════════════════════════════════════════════════════════════╣
-║  Versione: 3.0 (RISCRITTURA)  |  20/09/2026                                  ║
+║  Versione: 3.2  |  20/09/2026 (grafico alla prima pesata; refusi)                                  ║
 ║                                                                              ║
 ║  Questo file e' una RISCRITTURA, non un ripristino. Il motore grafico        ║
 ║  originale (v1-v3, luglio 2026) e' andato perso: su Drive restavano solo     ║
@@ -39,8 +39,10 @@
 ║  SOGLIE CIRCONFERENZA VITA: automatiche da "sesso" (M 94/102, F 80/88 cm).   ║
 ║  NOTE nota_glicemia / nota_urea / nota_extra: compaiono solo se non vuote.   ║
 ║                                                                              ║
-║  I testi fissi (sezione TESTI) sono BOZZA da approvare: il testo originale   ║
-║  e' perso.                                                                   ║
+║  PAGINA 3 AD PERSONAM (decisione del 20/09/2026): 'consigli' e               ║
+║  'motivazionale' si scrivono nel JSON del paziente. I testi di TESTI sono   ║
+║  solo un ripiego generico.                                                   ║
+║  KPI Variazione: alla prima pesata mostra "—", mai "-0,0 kg".                ║
 ║                                                                              ║
 ║  DIPENDENZE: pip install reportlab matplotlib                                ║
 ║  FONT: /usr/share/fonts/truetype/liberation/LiberationSans-*.ttf             ║
@@ -103,7 +105,7 @@ TESTI = {
     ],
     "avvertenza_farmaco": (
         "La proiezione è una stima prudente, non una promessa. Nelle prime "
-        "settimane il calo è spesso più rapido perchè si perde anche acqua; "
+        "settimane il calo è spesso più rapido perché si perde anche acqua; "
         "col tempo è normale che rallenti. Le variazioni della terapia vanno "
         "sempre concordate con il medico prescrittore."
     ),
@@ -112,7 +114,7 @@ TESTI = {
         "non una promessa. Col passare dei mesi il calo tende naturalmente a "
         "rallentare, per cui i tempi reali possono essere più lunghi di quelli "
         "indicati. Le pesate delle prime due settimane non entrano nel calcolo, "
-        "perchè comprendono soprattutto acqua."
+        "perché comprendono soprattutto acqua."
     ),
     "proiezione_assente_poche": (
         "La proiezione comparirà quando avremo almeno due pesate successive "
@@ -406,8 +408,12 @@ def _grafico(p, pr):
             if f.get(chiave):
                 x = date.fromisoformat(f[chiave])
                 ax.axvline(x, color=navy, lw=0.7, ls="-.", alpha=0.5)
-                ax.text(x, ax.get_ylim()[1], f" {testo}", rotation=90, fontsize=6.5,
-                        color=navy, va="top", ha="right", alpha=0.8)
+                ax.text(x, ax.get_ylim()[1], f" {testo} ", rotation=90, fontsize=6.5,
+                        color=navy, va="top", ha="left", alpha=0.8)
+    if len(dd) < 2 and "punti" not in pr:  # baseline: una sola pesata, nessuna
+        ax.set_xlim(dd[0] - timedelta(days=7),   # proiezione. Senza questo
+                    dd[0] + timedelta(days=28))  # matplotlib apre l'asse su anni
+        ax.set_ylim(ww[0] - 4, ww[0] + 4)
     lo, hi = ax.get_ylim()                 # scala minima 6 kg: evita di
     if hi - lo < 6:                        # ingigantire cali piccoli
         c = (hi + lo) / 2
@@ -451,10 +457,16 @@ def _pagina1(p):
           HRFlowable(width=_INNER, thickness=1.5, color=_ORANGE, spaceAfter=3),
           Paragraph(TESTI["intro"], _sTxt), Spacer(1, 3*mm)]
 
+    if len(p["_mis"]) < 2:
+        v_var, l_var = "—", "Variazione<br/>prima pesata"
+    elif abs(calo) < 0.05:
+        v_var, l_var = "0,0 kg", "Variazione<br/>invariato dal punto di partenza"
+    else:
+        v_var = f"−{_kg(calo)} kg" if calo > 0 else f"+{_kg(-calo)} kg"
+        l_var = f"Variazione<br/>{_kg(calo / w0 * 100)}% del peso iniziale"
     kpi = [(f"{_kg(w0)} kg", f"Peso iniziale<br/>{_dt(d0)}", _NAVY),
            (f"{_kg(w1)} kg", f"Peso attuale<br/>{_dt(d1)}", _TEAL),
-           (f"−{_kg(calo)} kg" if calo >= 0 else f"+{_kg(-calo)} kg",
-            f"Variazione<br/>{_kg(calo / w0 * 100)}% del peso iniziale", _ORANGE),
+           (v_var, l_var, _ORANGE),
            (_kg(_imc(w1, p["altezza_cm"])),
             f"IMC attuale<br/>(iniziale {_kg(_imc(w0, p['altezza_cm']))})", _GOLD),
            (_kg(sett, 0), "Settimane<br/>di percorso", _NAVY)]
@@ -541,12 +553,22 @@ def _pagina2(p, pr):
     return s
 
 
-def _pagina3():
+def _pagina3(p):
+    # Pagina AD PERSONAM: i consigli e la frase di chiusura si scrivono nel JSON
+    # del paziente ('consigli': [[titolo, testo], ...], 'motivazionale': "...").
+    # Se mancano si usano i testi generici di TESTI, che sono un ripiego:
+    # vanno scritti sul singolo paziente a ogni consegna.
+    voci = p.get("consigli") or TESTI["consigli"]
     s = [Paragraph("Consigli pratici", _sSez)]
-    for tit, txt in TESTI["consigli"]:
-        s.append(Paragraph(f"<b>{tit}.</b> {txt}", _sTxt))
+    for voce in voci:
+        if isinstance(voce, (list, tuple)) and len(voce) == 2:
+            tit, txt = voce
+            s.append(Paragraph(f"<b>{tit}.</b> {txt}", _sTxt))
+        else:
+            s.append(Paragraph(str(voce), _sTxt))
         s.append(Spacer(1, 2*mm))
-    s += [Spacer(1, 5*mm), _box(TESTI["motivazionale"], _sBoxT, _BG_TEAL)]
+    s += [Spacer(1, 5*mm),
+          _box(p.get("motivazionale") or TESTI["motivazionale"], _sBoxT, _BG_TEAL)]
     return s
 
 
@@ -561,7 +583,7 @@ def genera(json_path, output_path=None):
                             leftMargin=_MARGIN, rightMargin=_MARGIN,
                             topMargin=17*mm, bottomMargin=14*mm,
                             title=f"Andamento — {p['nome']}")
-    story = _pagina1(p) + [PageBreak()] + _pagina2(p, pr) + [PageBreak()] + _pagina3()
+    story = _pagina1(p) + [PageBreak()] + _pagina2(p, pr) + [PageBreak()] + _pagina3(p)
     cb = lambda c, d: _on_page(c, d, piede)
     doc.build(story, onFirstPage=cb, onLaterPages=cb)
     return output_path, pr
