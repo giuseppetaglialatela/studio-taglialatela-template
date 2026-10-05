@@ -1,7 +1,7 @@
 # M7 — FOLLOW-UP
 
 Modulo operativo. Si carica quando si gestisce il contatto con un paziente già
-in carico: messaggi standard, controllo del lunedì, risposte del Form C
+in carico: messaggi standard, controllo del venerdì, risposte del Form C
 (controllo periodico), decisione se e quando rivedere il piano.
 
 Non dipende da M1 né da M2: si può caricare da solo. Rimandi:
@@ -18,8 +18,9 @@ Non dipende da M1 né da M2: si può caricare da solo. Rimandi:
 
 ## 1. DOVE STANNO I TESTI
 
-Il protocollo dei messaggi standard `M1`–`M13` e del controllo del lunedì è in
-**Protocollo_Comunicazione_Followup.docx** (Drive > Sistema Presa in Carico).
+Il protocollo dei messaggi standard `M1`–`M14` e del controllo del venerdì è in
+**Protocollo_Comunicazione_Followup_v2.docx** (Drive > Sistema Presa in Carico).
+La v1 è superata: pesata e giro settimanale erano il lunedì.
 
 È un file **operativo**, non di archivio: contiene i testi dei messaggi, che non
 sono replicati qui. Va letto quando serve mandare un messaggio, non a ogni
@@ -28,9 +29,8 @@ sessione.
 I link dei form da inserire nei messaggi (`M1`/`M2` → Form A, `M3`/`M4` →
 Form B) sono in **M4**. Sempre come link, mai come allegato.
 
-Il **Form C** (controllo periodico) serve al paziente già in carico; il link è
-in **M4**. Non è ancora legato a un messaggio numerato del protocollo: finché
-non lo è, si manda con un testo libero breve.
+Il **Form C** (controllo di percorso) si manda con il messaggio `M14`; il link è
+in **M4**.
 
 ---
 
@@ -62,6 +62,12 @@ Regole:
 - Le voci "fuori piano" (bevande, dolce dopo cena, assaggi) arrivano **senza
   quantità**: sono una pista, non un dato. Prima di trasformarle in una
   correzione del piano si chiedono le quantità al paziente, in un solo messaggio.
+- Risposta alla proposta del diario fotografico: «Ci sto» o «Ci provo» → si
+  parte con le foto (due settimane) e `M12` non si manda. «Preferisco di no» e
+  plateau non spiegato dal form → `M12`, che chiede solo due giorni.
+- Il Form C fa parte dell'approfondimento del plateau, non è un controllo di
+  routine: contiene la proposta del foto-diario, che il paziente accetta solo
+  davanti a una ragione concreta.
 
 Il JSON andamento si aggiorna seguendo **M5**. La sezione 8 del fascicolo è
 dati del paziente: resta su Drive, mai su GitHub.
@@ -70,11 +76,15 @@ dati del paziente: resta su Drive, mai su GitHub.
 
 ## 3. SOGLIE OPERATIVE
 
+**Giorno di riferimento: venerdì** (pesata e giro settimanale). Nel fine settimana
+il peso sale per sale, liquidi e carboidrati: la pesata del lunedì misura il
+weekend, non la settimana, e sporca la regressione del grafico (**M5**).
+
 | Situazione | Azione |
 |---|---|
 | Aderenza sotto 3 giorni su 7 per **due settimane consecutive** | revisione del piano (`M11`) |
 | **Due settimane di silenzio** | telefonata, non messaggio (`M10`) |
-| **Nessun calo a 4 settimane** con aderenza alta | approfondimento (`M12`) |
+| **Nessun calo a 4 settimane** con aderenza alta | prima il Form C (`M14`), poi eventualmente le foto (`M12`) |
 
 La telefonata di `M10` è l'unico contatto che resta volutamente umano e diretto:
 non va sostituita con un testo.
