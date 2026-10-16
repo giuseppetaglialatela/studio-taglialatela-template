@@ -205,7 +205,7 @@ footer{text-align:center;font-size:12px;color:var(--grigio);padding:0 20px 30px;
   <label class="chip"><input type="checkbox" name="gi" value="reflusso"><span>Reflusso</span></label>
   <label class="chip"><input type="checkbox" name="gi" value="nausea"><span>Nausea</span></label>
   <label class="chip"><input type="checkbox" name="gi" value="dolore"><span>Dolore addominale</span></label>
-  <label class="chip"><input type="checkbox" name="gi" value="nessuno"><span>Nessuno</span></label>
+  <label class="chip"><input type="checkbox" name="gi" value="nessuno" id="gi_nessuno"><span>Nessuno</span></label>
 </div>
 
 <label for="sonno">Quante ore dormi di solito?</label>
@@ -303,7 +303,7 @@ footer{text-align:center;font-size:12px;color:var(--grigio);padding:0 20px 30px;
 
 <label>Integratori</label>
 <div class="chips">
-  <label class="chip"><input type="checkbox" name="int" value="nessuno"><span>Nessuno</span></label>
+  <label class="chip"><input type="checkbox" name="int" value="nessuno" id="int_nessuno"><span>Nessuno</span></label>
   <label class="chip"><input type="checkbox" name="int" value="vitamina_d"><span>Vitamina D</span></label>
   <label class="chip"><input type="checkbox" name="int" value="b12"><span>B12</span></label>
   <label class="chip"><input type="checkbox" name="int" value="ferro"><span>Ferro</span></label>
@@ -394,6 +394,8 @@ function esclusiva(idNessuno, nomeGruppo){
 }
 esclusiva('pat_nessuna', 'pat');
 esclusiva('far_nessuno', 'cat');
+esclusiva('gi_nessuno', 'gi');
+esclusiva('int_nessuno', 'int');
 
 /* ---------- righe farmaco generate dalle categorie ---------- */
 const ORARI = ['mattino a digiuno','a colazione','a pranzo','a cena','la sera','più volte al giorno'];
@@ -495,11 +497,16 @@ const num = v => v === '' ? null : Number(v);
 
 function raccogli(){
   const nome = val('nome');
+  // Ogni categoria segnata resta, anche senza nome: "prendo qualcosa per la pressione
+  // ma non ricordo il nome" è un'informazione clinica, non una risposta vuota.
   const farmaci = [...document.querySelectorAll('.farmaco-row')].map(r => ({
+    categoria: r.dataset.cat,
     nome: r.querySelector('.f-nome').value.trim(),
     dose: r.querySelector('.f-dose').value.trim(),
     orario: r.querySelector('.f-orario').value
-  })).filter(f => f.nome);
+  }));
+  const haDiabete = $('pat_diabete').checked;
+  const esamiSi = radio('esami') === 'si';
 
   return {
     _meta: { schema: "FascicoloPaziente_StudioTaglialatela", versione_schema: "1.0",
@@ -520,9 +527,10 @@ function raccogli(){
       patologie: checks('pat'), patologie_altro: val('pat_altro'),
       insufficienza_venosa_dettaglio: $('pat_venosa').checked
         ? { edema_declive: $('edema').checked, calze_elastiche: $('calze').checked } : null,
-      hba1c_riferita: val('hba1c') || null,
-      esami_ematici: { disponibili_ultimi_6_mesi: radio('esami') === 'si',
-                       data_referto: val('esami_data') || null, referto_ricevuto: false, valori: {} },
+      hba1c_riferita: haDiabete ? (val('hba1c') || null) : null,
+      esami_ematici: { disponibili_ultimi_6_mesi: radio('esami') === null ? null : esamiSi,
+                       data_referto: esamiSi ? (val('esami_data') || null) : null,
+                       referto_ricevuto: false, valori: {} },
       sintomi_funzioni: { alvo: radio('alvo'), sintomi_gi: checks('gi'),
                           ore_sonno: num(val('sonno')), energia_giornata: radio('energia'),
                           bicchieri_acqua_die: num(val('acqua')) },
@@ -532,6 +540,7 @@ function raccogli(){
     },
     sez4_terapia: {
       farmaci: farmaci,
+      nessun_farmaco_dichiarato: checks('cat').includes('nessuno'),
       glp1_gip: radio('glp1') === 'si'
         ? { in_terapia: true, principio_attivo: val('glp1_nome'), dose_attuale: val('glp1_dose'),
             data_inizio: val('glp1_inizio'), titolazioni: [], tollerabilita: radio('glp1_toll') }
@@ -589,20 +598,29 @@ function testo(d){
     riga('Gambe', [v.edema_declive ? 'gonfiore serale' : null, v.calze_elastiche ? 'calze elastiche' : null].filter(Boolean));
   }
   riga('HbA1c riferita', c.hba1c_riferita);
-  riga('Esami ultimi 6 mesi', c.esami_ematici.disponibili_ultimi_6_mesi ? ('sì — ' + (dataIt(c.esami_ematici.data_referto) || 'data non indicata')) : 'no');
+  const ee = c.esami_ematici;
+  riga('Esami ultimi 6 mesi', ee.disponibili_ultimi_6_mesi === null ? 'non risposto'
+       : ee.disponibili_ultimi_6_mesi ? ('sì — ' + (dataIt(ee.data_referto) || 'data non indicata')) : 'no');
   riga('Intestino', etichetta('alvo', c.sintomi_funzioni.alvo)); riga('Disturbi digestivi', etichette('gi', c.sintomi_funzioni.sintomi_gi));
-  riga('Sonno', c.sintomi_funzioni.ore_sonno ? c.sintomi_funzioni.ore_sonno + ' ore' : null);
+  riga('Sonno', c.sintomi_funzioni.ore_sonno !== null ? c.sintomi_funzioni.ore_sonno + ' ore' : null);
   riga('Energia', etichetta('energia', c.sintomi_funzioni.energia_giornata));
-  riga('Acqua', c.sintomi_funzioni.bicchieri_acqua_die ? c.sintomi_funzioni.bicchieri_acqua_die + ' bicchieri' : null);
+  riga('Acqua', c.sintomi_funzioni.bicchieri_acqua_die !== null ? c.sintomi_funzioni.bicchieri_acqua_die + ' bicchieri' : null);
   riga('Alcol/sett.', etichetta('alcol', c.stili_di_vita.alcol_unita_settimana)); riga('Fumo', etichetta('fumo', c.stili_di_vita.fumo));
   riga('Caffè', c.stili_di_vita.caffe_tazzine_die);
   riga('Fame nervosa serale', etichetta('fame', c.stili_di_vita.fame_nervosa_serale));
   riga('Perdita di controllo sul cibo', etichetta('controllo', c.stili_di_vita.perdita_controllo_cibo));
   L.push('');
   L.push('*Farmaci*');
-  if (t.farmaci.length) t.farmaci.forEach(f => L.push(`• ${f.nome}${f.dose ? ' ' + f.dose : ''}${f.orario ? ' — ' + f.orario : ''}`));
-  else L.push('nessuno');
-  if (t.glp1_gip.in_terapia) L.push(`• ${t.glp1_gip.principio_attivo} ${t.glp1_gip.dose_attuale} — da ${dataIt(t.glp1_gip.data_inizio)} — tollerabilità: ${etichetta('glp1_toll', t.glp1_gip.tollerabilita) || 'n.d.'}`);
+  if (t.farmaci.length) t.farmaci.forEach(f => L.push(
+    `• ${etichetta('cat', f.categoria) || f.categoria}: ${f.nome || 'nome non indicato'}` +
+    ` — ${f.dose ? 'dose ' + f.dose : 'dose non indicata'} — ${f.orario || 'orario non indicato'}`));
+  else L.push(t.nessun_farmaco_dichiarato ? 'nessuno' : 'non risposto');
+  const gl = t.glp1_gip;
+  if (gl.in_terapia) L.push(`• Terapia iniettiva: ${gl.principio_attivo || 'nome non indicato'}` +
+    ` — ${gl.dose_attuale ? 'dose ' + gl.dose_attuale : 'dose non indicata'}` +
+    ` — ${gl.data_inizio ? 'da ' + dataIt(gl.data_inizio) : 'inizio non indicato'}` +
+    ` — tollerabilità: ${etichetta('glp1_toll', gl.tollerabilita) || 'non indicata'}`);
+  else if (radio('glp1') === null) L.push('Terapia iniettiva: non risposto');
   riga('Integratori', etichette('int', t.integratori)); riga('Altri integratori', t.integratori_altro);
   if (t.farmaci.length || t.glp1_gip.in_terapia) riga('Regolarità terapia', etichetta('aderenza', t.aderenza_terapia));
   return L.join('\n');
