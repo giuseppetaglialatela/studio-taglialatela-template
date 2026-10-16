@@ -158,7 +158,7 @@ footer{text-align:center;font-size:12px;color:var(--grigio);padding:0 20px 30px;
 
 <label>Restrizioni religiose o culturali</label>
 <div class="chips">
-  <label class="chip"><input type="checkbox" name="rel" value="nessuna"><span>Nessuna</span></label>
+  <label class="chip"><input type="checkbox" name="rel" value="nessuna" id="rel_nessuna"><span>Nessuna</span></label>
   <label class="chip"><input type="checkbox" name="rel" value="halal"><span>Halal</span></label>
   <label class="chip"><input type="checkbox" name="rel" value="kosher"><span>Kosher</span></label>
   <label class="chip"><input type="checkbox" name="rel" value="digiuni"><span>Periodi di digiuno</span></label>
@@ -182,7 +182,7 @@ da qui dipende se il piano sarà mangiabile o no.</div>
 
 <label>Ci sono consistenze che proprio non sopporti?</label>
 <div class="chips">
-  <label class="chip"><input type="checkbox" name="cons" value="nessuna"><span>No</span></label>
+  <label class="chip"><input type="checkbox" name="cons" value="nessuna" id="cons_nessuna"><span>No</span></label>
   <label class="chip"><input type="checkbox" name="cons" value="molliccio"><span>Molliccio</span></label>
   <label class="chip"><input type="checkbox" name="cons" value="viscido"><span>Viscido</span></label>
   <label class="chip"><input type="checkbox" name="cons" value="croccante"><span>Troppo duro</span></label>
@@ -484,6 +484,8 @@ function esclusiva(idNessuno, gruppo){
 }
 esclusiva('all_nessuna', 'all');
 esclusiva('int_nessuna', 'intoll');
+esclusiva('rel_nessuna', 'rel');
+esclusiva('cons_nessuna', 'cons');
 
 /* ---------- barra ---------- */
 function aggiornaBarra(){
@@ -521,7 +523,7 @@ function raccogli(){
                   + Object.values(dove.weekend).filter(v => fuori.includes(v)).length * 2;
 
   const vincoli = [];
-  if (radio('piatto_sep') === 'no')
+  if (radio('cucina_per') === 'anche_altri' && radio('piatto_sep') === 'no')
     vincoli.push("Non può fare piatto separato: il piano deve funzionare sulla stessa base della tavola comune.");
   if (Object.values(dove.feriale).includes('porta_da_casa'))
     vincoli.push("Porta almeno un pasto da casa nel feriale: servono opzioni trasportabili.");
@@ -535,14 +537,22 @@ function raccogli(){
     vincoli.push("Rifiuta i legumi: rivedere fibra, proteine vegetali e sazietà.");
   if (griglia.aglio_cipolla === 'rosso')
     vincoli.push("Rifiuta aglio e cipolla: serve una strategia alternativa di aromatizzazione se il piano è iposodico.");
-  if (radio('motivo') === 'ripetitiva')
+  const dieteFatte = radio('diete') !== null && radio('diete') !== 'mai';
+  if (dieteFatte && radio('motivo') === 'ripetitiva')
     vincoli.push("Ha abbandonato per ripetitività: massima rotazione e liste di scambio.");
-  if (radio('motivo') === 'troppo_complicata')
+  if (dieteFatte && radio('motivo') === 'troppo_complicata')
     vincoli.push("Ha abbandonato per complessità: preparazioni semplici, poche grammature.");
   if (num(val('fiducia')) !== null && num(val('fiducia')) <= 4)
     vincoli.push("Fiducia bassa: obiettivi intermedi ravvicinati e verifiche più frequenti.");
   if (radio('chi_deciso') !== 'io' && radio('chi_deciso') !== null)
     vincoli.push("Motivazione non autonoma: rinforzo e contatti più ravvicinati nelle prime settimane.");
+
+  // Le domande a comparsa contano solo se la domanda madre le rende visibili:
+  // altrimenti una risposta data e poi "nascosta" finirebbe comunque nella scheda.
+  const haAllergie = checks('all').some(v => v !== 'nessuna');
+  const haLattosio = checks('intoll').includes('lattosio');
+  const ancheAltri = radio('cucina_per') === 'anche_altri';
+  const haDiete = radio('diete') !== null && radio('diete') !== 'mai';
 
   const nome = val('nome_b');
   return {
@@ -551,8 +561,8 @@ function raccogli(){
              compilato_il: new Date().toISOString().slice(0,10) },
     codice_paziente: codicePaziente(nome), nome_completo: nome,
     sez5_vincoli_alimentari: {
-      allergie_accertate: checks('all'), allergie_confermate_da_test: radio('all_test'),
-      intolleranze: checks('intoll'), grado_tolleranza_lattosio: radio('latt_grado'),
+      allergie_accertate: checks('all'), allergie_confermate_da_test: haAllergie ? radio('all_test') : null,
+      intolleranze: checks('intoll'), grado_tolleranza_lattosio: haLattosio ? radio('latt_grado') : null,
       regime: radio('regime'), restrizioni_religiose_culturali: checks('rel'),
       griglia_alimenti: griglia,
       alimenti_esclusi_testo_libero: val('cibi_altro'),
@@ -563,15 +573,16 @@ function raccogli(){
     sez6_contesto_vita: {
       dove_mangia: dove, orari_pasti: { colazione: val('ora_col'), pranzo: val('ora_pra'), cena: val('ora_cen') },
       cucina: { chi_cucina: radio('chi_cucina'), cucina_per: radio('cucina_per'),
-                persone_a_tavola: num(val('persone')), puo_fare_piatto_separato: radio('piatto_sep'),
+                persone_a_tavola: ancheAltri ? num(val('persone')) : null,
+                puo_fare_piatto_separato: ancheAltri ? radio('piatto_sep') : null,
                 tempo_disponibile_feriale: radio('tempo_f'), tempo_disponibile_weekend: radio('tempo_w'),
                 abilita_cucina_1_5: num(radio('abilita')) },
       orario_lavoro: radio('lavoro'), fascia_spesa: radio('spesa'),
       _derivato_pasti_fuori_casa_settimana: fuoriSett
     },
     sez7_storia_obiettivi: {
-      diete_precedenti: radio('diete'), esito_precedente: radio('esito'),
-      motivo_interruzione: radio('motivo'),
+      diete_precedenti: radio('diete'), esito_precedente: haDiete ? radio('esito') : null,
+      motivo_interruzione: haDiete ? radio('motivo') : null,
       obiettivo_principale: radio('obiettivo'), obiettivo_entro: val('entro'),
       chi_ha_deciso: radio('chi_deciso'), fiducia_1_10: num(val('fiducia')),
       timore_principale: radio('timore'), supporto_in_casa: radio('supporto'),
@@ -614,13 +625,16 @@ function testo(d){
   riga('Intolleranze', etichette('intoll', g.intolleranze)); riga('Tolleranza lattosio', etichetta('latt_grado', g.grado_tolleranza_lattosio));
   riga('Regime', etichetta('regime', g.regime)); riga('Restrizioni', etichette('rel', g.restrizioni_religiose_culturali));
   L.push('');
-  L.push('*Alimenti non graditi*');
-  const rossi = Object.entries(g.griglia_alimenti).filter(([, v]) => v === 'rosso').map(([k]) => ETICHETTE[k]);
-  const gialli = Object.entries(g.griglia_alimenti).filter(([, v]) => v === 'giallo').map(([k]) => ETICHETTE[k]);
-  L.push(rossi.length ? 'Non li mangia: ' + rossi.join(', ') : 'Non rifiuta nulla');
+  L.push('*Alimenti*');
+  const per = liv => Object.entries(g.griglia_alimenti).filter(([, v]) => v === liv).map(([k]) => ETICHETTE[k]);
+  const verdi = per('verde'), gialli = per('giallo'), rossi = per('rosso'), vuoti = per(null);
+  if (verdi.length) L.push('Volentieri: ' + verdi.join(', '));
   if (gialli.length) L.push('Solo se serve: ' + gialli.join(', '));
+  L.push('Non li mangia: ' + (rossi.length ? rossi.join(', ') : 'nessuno'));
+  if (vuoti.length) L.push('Senza risposta: ' + vuoti.join(', '));
   riga('Altro', g.alimenti_esclusi_testo_libero);
-  riga('Consistenze evitate', etichette('cons', g.avversioni_consistenza.filter(v => v !== 'nessuna')));
+  riga('Consistenze evitate', g.avversioni_consistenza.includes('nessuna') ? 'Nessuna'
+       : etichette('cons', g.avversioni_consistenza));
   riga('Masticazione', etichetta('mastic', g.masticazione));
   riga('Non rinuncia a', g.alimento_irrinunciabile);
   riga('Eliminerebbe subito', g.alimento_eliminabile_subito);
@@ -628,11 +642,13 @@ function testo(d){
   L.push('*Giornate*');
   const dm = c.dove_mangia;
   const LUOGO = Object.fromEntries(LUOGHI);
-  ['colazione','spuntino','pranzo"','cena'].forEach(p => {
+  ['colazione','spuntino','pranzo','cena'].forEach(p => {
     if (dm.feriale[p] || dm.weekend[p])
       L.push(`${p[0].toUpperCase()+p.slice(1)}: feriale ${LUOGO[dm.feriale[p]] || '—'} / weekend ${LUOGO[dm.weekend[p]] || '—'}`);
   });
-  riga('Orari feriali', [c.orari_pasti.colazione, c.orari_pasti.pranzo, c.orari_pasti.cena].filter(Boolean).join(' · '));
+  const op = c.orari_pasti;
+  riga('Orari feriali', [['colazione', op.colazione], ['pranzo', op.pranzo], ['cena', op.cena]]
+       .filter(([, o]) => o).map(([p, o]) => `${p} ${o}`).join(' · '));
   riga('Chi cucina', etichetta('chi_cucina', c.cucina.chi_cucina)); riga('Cucina per', etichetta('cucina_per', c.cucina.cucina_per));
   riga('Persone a tavola', c.cucina.persone_a_tavola);
   riga('Piatto separato possibile', etichetta('piatto_sep', c.cucina.puo_fare_piatto_separato));
