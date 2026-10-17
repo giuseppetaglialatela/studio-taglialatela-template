@@ -137,3 +137,4 @@ food_id,nome,categoria,fonte,codice_fonte,data_verifica,kcal_100g,proteine_g,car
 170510,Formaggio cremoso spalmabile light,latticini,CREA+BDA-IEO,170510+8054_2,2026-10-02,179,9.2,3.1,14.5,0,110,0.1,0.11,13,0.3,0.7,9,0.5
 008610,Anacardi,frutta secca,CREA+BDA-IEO,008610+8802_2,2026-10-02,604,15,33,46,3,45,6,0,68,0,6,260,0
 183010,Tuorlo di uovo di gallina,uova,CREA+BDA-IEO,183010+1802_2,2026-10-02,325,15.8,0.05,29.1,0,116,4.9,4.94,130,6.9,2.14,14,0
+000090,Orzo perlato crudo,cereali,CREA+BDA-IEO,000090+4_2,2026-10-17,346,9.4,73.7,1.5,9.2,21,1.1,0,20,0,1.15,46,0
