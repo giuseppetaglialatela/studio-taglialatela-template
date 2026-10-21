@@ -600,8 +600,9 @@ def passo_4_coerenza(rilievi, db, target, piano, gap, sottostime,
         print("     Le kcal restano quelle della fonte: questo controllo dice")
         print("     dove verificare la trascrizione, non cosa correggere.")
         rilievi.segnala(4, "ATWATER_SEGNALATO", f"{len(anomalie)} alimento/i segnalato/i dal "
-                           f"cross-check Atwater (l'Aglio e' il falso "
-                           f"positivo noto e atteso a 8.20 kcal)")
+                           f"cross-check Atwater (falsi positivi noti e attesi: "
+                           f"aglio, carciofi, semi di lino - M1; ogni altro "
+                           f"nome va verificato)")
 
     problemi = coerenza.check_target(target)
     print(f"\n  B) Coerenza interna dei target:")

@@ -67,7 +67,7 @@ protocollo di follow-up. Il Form C si manda con il messaggio `M14` (vedi **M7**)
 
 Numero WhatsApp dello studio configurato nei form (costante `NUMERO_WA`):
 `393895068729` — formato internazionale, senza `+` e senza spazi.
-Se cambia, va aggiornato in **tutti e tre** i file e ricaricato.
+Se cambia, va aggiornato in **tutti e tre** i file, nello stesso commit.
 
 ### Form C — gestione delle risposte
 
@@ -76,10 +76,9 @@ periodico è follow-up, e M7 si carica da solo.
 
 ### Modifica dei form
 
-Si scarica il file da GitHub (canale raw), si modifica **solo il valore
-necessario**, si ricarica con lo stesso nome sul repository — che sovrascrive.
-
-Dopo il caricamento, verifica il contenuto effettivo online prima di dare conferma.
+Si modifica **solo il valore necessario** nella copia del repository e si salva con un
+commit (nucleo, sezione 7). Dopo il push, verifica il contenuto effettivo online prima di
+dare conferma.
 Attenzione al canale: la CDN di GitHub può servire per qualche minuto la versione
 precedente, quindi **una verifica negativa immediata non è conclusiva** — riprova
 dopo un paio di minuti. Per una verifica non soggetta a cache, leggi l'albero del
