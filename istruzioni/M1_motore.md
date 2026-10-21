@@ -3,7 +3,7 @@
 Modulo operativo (principio 6). Dipendenze: nessuna. Ne dipendono M2 e M6.
 Ultima modifica: 21/10/2026 notte (eccezione etichetta solo su richiesta, fuori dal
 database; pipeline sempre sul database ufficiale; tabella interazioni validata; tag
-vitD/calcio/leggero calcolati; casi golden 18-24). Motivazioni, episodi e date in
+vitD/calcio/leggero calcolati; plausibilità delle etichette; casi golden 18-26). Motivazioni, episodi e date in
 `istruzioni/archivio/M1-motivazioni.md`, che non si carica.
 
 Copre: avvio della sessione, moduli software, casi golden, database e fonti, schema CSV e
@@ -143,7 +143,7 @@ pasti; il rilievo resta nel report con il motivo. Livello misto e catalogo disal
 restano bloccanti anche con la deroga.
 
 ### regressione.py
-Suite sui 24 casi golden in `golden/`: un comando, pass/fail per caso. Si riesegue **dopo
+Suite sui 26 casi golden in `golden/`: un comando, pass/fail per caso. Si riesegue **dopo
 ogni modifica** al motore o al database, e comunque prima di qualsiasi uso clinico.
 - Nei casi `pipeline` la suite ripete la sequenza di `pipeline.main()`: un controllo nuovo
   va in una funzione chiamata da entrambi (come `controlla_pasti_ammessi`), altrimenti la
@@ -380,8 +380,11 @@ validato).
 - **21_eccezione_riusa_voce_ufficiale** — eccezione con il `food_id` dei pomodori: unico
   bloccante `ECCEZIONE_ETICHETTA_NON_VALIDA`.
 - **22_eccezione_valore_non_valido**, **23_eccezione_riga_corta**,
-  **24_eccezione_valore_negativo** — eccezione con calcio «nan», con una riga corta, con
-  kcal negative: unico bloccante `ECCEZIONE_ETICHETTA_NON_VALIDA`.
+  **24_eccezione_valore_negativo**, **25_eccezione_macro_non_plausibili** — eccezione con
+  calcio «nan», con una riga corta, con kcal negative, con macro a 90 g ciascuno: unico
+  bloccante `ECCEZIONE_ETICHETTA_NON_VALIDA`.
+- **26_eccezione_somma_esattamente_100** — etichetta con somma esattamente 100 g: passa
+  (confine della soglia di plausibilità).
 
 **Tipi di caso.** `fisso` e `scelta_multipla` si deducono dal piano (presenza di
 `gruppo_scelta`). `pipeline` è l'unico DICHIARATO, da un `pipeline.json` nella cartella del
@@ -432,7 +435,10 @@ per quelle voci), a `genera_zona_piano.py`. Il motore:
 - blocca il file (`ECCEZIONE_ETICHETTA_NON_VALIDA`) se mancano colonne, se una riga ha
   campi in più o in meno, se `food_id`, nome o fonte sono vuoti, se un valore non è un
   numero finito e non negativo, se un `food_id` è duplicato o riusa una voce ufficiale (un'eccezione
-  non sovrascrive un dato verificato);
+  non sovrascrive un dato verificato), se proteine + carboidrati + grassi + fibra superano
+  100 g per 100 g (soglia del nutrizionista, SOLO per le etichette: CREA esprime i
+  carboidrati in equivalenti di monosaccaridi e voci verificate superano 100, es. pop corn
+  109,2 g; non estenderla al database);
 - dichiara l'eccezione al PASSO 1 (`ALIMENTO_FUORI_DATABASE_SU_RICHIESTA`), tratta come
   gap i micronutrienti a zero (totali sottostimati) e avvisa che gli accoppiamenti non
   controllano quelle voci.

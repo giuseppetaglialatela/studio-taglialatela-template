@@ -1,0 +1,41 @@
+{
+  "tipo": "pipeline",
+  "bloccanti": [],
+  "attenzioni": [
+    [
+      1,
+      "ALIMENTO_FUORI_DATABASE_SU_RICHIESTA"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN_CON_GAP"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN_CON_GAP"
+    ],
+    [
+      4,
+      "ATWATER_SEGNALATO"
+    ],
+    [
+      4,
+      "FORMATO_CONFEZIONE_NON_RISPETTATO"
+    ],
+    [
+      5,
+      "TERAPIA_NON_DICHIARATA"
+    ],
+    [
+      6,
+      "LIVELLO_FUORI_CATALOGO"
+    ],
+    [
+      6,
+      "LIVELLO_FUORI_CATALOGO"
+    ]
+  ],
+  "exit_code": 0,
+  "descrizione": "Confine della soglia di plausibilita': voce da etichetta con proteine 0 + carboidrati 0,2 + grassi 95,9 + fibra 3,9 = esattamente 100 g per 100 g. Deve PASSARE (attenzione ALIMENTO_FUORI_DATABASE_SU_RICHIESTA, nessun ECCEZIONE_ETICHETTA_NON_VALIDA). Senza arrotondamento la somma in virgola mobile vale 100,00000000000001 e un'etichetta valida veniva bloccata.",
+  "riferimento": "21/10/2026, dalla revisione indipendente; verificato al contrario togliendo l'arrotondamento."
+}

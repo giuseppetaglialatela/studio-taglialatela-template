@@ -251,3 +251,12 @@ vitD, calcio e leggero calcolati con le soglie scelte dal nutrizionista (5 µg, 
 M20 (309 mg) prende calcio; M15 (501 kcal) e M19 (452 kcal) perdono «leggero». Secondo giro
 di revisione: commit approvato; aggiunti i casi 23-24 e il nutriente maiuscolo nel caso 20
 perché alcuni controlli del file di eccezione non erano sorvegliati dalla suite.
+
+## 21/10/2026 notte — soglia di plausibilità delle etichette
+Proposta dal revisore, approvata dal nutrizionista: proteine + carboidrati + grassi +
+fibra non oltre 100 g per 100 g, solo per i file di eccezione etichetta. Verifica sul
+database prima di applicarla: pop corn (109,2) e crema di nocciole e cacao (100,4)
+superano 100 senza errori, perché CREA esprime i carboidrati disponibili in equivalenti
+di monosaccaridi (amido circa ×1,1); per questo la soglia non si estende al database. La
+revisione ha trovato che la somma in virgola mobile di un'etichetta esattamente a 100
+(95,9 + 3,9 + 0,2) dava 100,00000000000001 e la bloccava: confronto arrotondato, caso 26.

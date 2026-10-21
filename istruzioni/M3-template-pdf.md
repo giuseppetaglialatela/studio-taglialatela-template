@@ -10,7 +10,8 @@ ricaricano**: tutto ciò che serve sta nei metadati del piano e nel motore.
 
 1. I file del paziente (`piano_vN.csv`, `metadati_piano_vN.json`, fascicolo) si
    chiedono **allegati alla chat**: la cartella uploads non costa token. Drive si
-   usa solo se un allegato manca.
+   usa solo se un allegato manca. Un piano con eccezione etichetta richiede anche il
+   file delle voci da etichetta e quello dei loro nomi paziente (M1, sezione 4).
 2. Motore: un solo comando scarica la cartella del motore ed esegue collaudo e
    regressione:
    ```
@@ -32,6 +33,7 @@ ricaricano**: tutto ciò che serve sta nei metadati del piano e nel motore.
        --metadati metadati_piano_vN.json --template TEMPLATE_..._v5.py
        --orari orari_pasti.csv --out-py piano_Cognome_vN.py
        --out-pdf piano_Cognome_vN.pdf
+       [--eccezione-etichetta voci.csv --nomi-eccezione nomi.csv]
    ```
    Se si ferma, stampa quale campo o titolo manca: si chiede al nutrizionista, non
    si completa a intuito. Il `.py` prodotto è quello da archiviare (sezione 5).

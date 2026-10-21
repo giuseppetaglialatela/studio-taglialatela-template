@@ -105,6 +105,8 @@ def carica_alimenti(path):
     return db
 
 
+SOMMA_MAX_ETICHETTA_G = 100.0
+
 COLONNE_ALIMENTI = ["food_id", "nome", "categoria", "fonte", "codice_fonte",
                     "data_verifica"] + NUTRIENTI_PER_100G
 
@@ -154,6 +156,19 @@ def carica_eccezioni_etichetta(path, db_ufficiale):
                 raise ValueError(f"{path}, riga {n}: {k} = '{row[k]}' non valido "
                                  f"(serve un numero finito e non negativo)")
             valori[k] = v
+        # plausibilita' (decisione del nutrizionista, 21/10/2026): su un'etichetta
+        # UE i carboidrati sono in grammi reali, quindi proteine + carboidrati +
+        # grassi + fibra non superano 100 g per 100 g. NON si applica al database
+        # ufficiale: CREA esprime i carboidrati in equivalenti di monosaccaridi e
+        # voci verificate superano 100 (pop corn 109,2).
+        somma = (valori["proteine_g"] + valori["carboidrati_g"]
+                 + valori["grassi_g"] + valori["fibra_g"])
+        # arrotondata: la somma di decimali puo' dare 100.00000000000001 su
+        # un'etichetta che somma esattamente 100
+        if round(somma, 6) > SOMMA_MAX_ETICHETTA_G:
+            raise ValueError(f"{path}, riga {n}: proteine + carboidrati + grassi + fibra "
+                             f"= {somma:.1f} g per 100 g, oltre {SOMMA_MAX_ETICHETTA_G:.0f} g: "
+                             f"valori non plausibili per un'etichetta")
         valori["nome"] = row["nome"].strip()
         voci[fid] = valori
     return voci
