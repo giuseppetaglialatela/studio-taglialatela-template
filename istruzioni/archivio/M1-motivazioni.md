@@ -1,0 +1,210 @@
+# ARCHIVIO — Motivazioni ed episodi del modulo M1
+
+NON è un modulo operativo e NON si carica nelle sessioni: le regole stanno in
+`istruzioni/M1_motore.md`. Qui sta il PERCHÉ delle regole e la loro storia, per chi le
+rivede o le vuole cambiare. Spostato da M1 il 21/10/2026 con la versione asciutta.
+
+---
+
+## Cronologia delle versioni di M1 (prima della versione asciutta)
+- 21/10/2026, quarto giro: niente più zip, motore sciolto in `motore-calcolo`, scaricato con
+  un comando; modifiche salvate da Claude con un commit.
+- 21/10/2026, terzo giro: regole di accoppiamento su alimento preciso e per pasto; A03
+  formaggi diversi, A04 merluzzo + pasta, A05 carne rossa o maiale + pasta, A06 due frutte
+  secche nello stesso pasto; M01 e C37 tolti; casi golden 16 e 17.
+- 21/10/2026: database a 144 voci (crema di nocciole e cacao, pangrattato, semi di lino);
+  semi di lino tra i falsi positivi Atwater; libreria a 129 blocchi pranzo/cena e 56
+  colazioni/spuntini; M11 corretto a pasta integrale.
+- 21/10/2026, prima: controllo degli accoppiamenti vietati (`ruoli_alimenti.csv`,
+  `accoppiamenti_vietati.csv`, `accoppiamenti.py`, PASSO 4 controllo F, collaudo controllo 8,
+  caso golden 15); libreria estesa a 105 blocchi pranzo/cena e 43 colazioni/spuntini;
+  database a 141 voci.
+- 01/10/2026: `cerca_crea.py` e cache CREA; kcal di 7 voci allineate a CREA; carciofi tra i
+  falsi positivi Atwater; eccezione INSA per i micronutrienti delle sardine.
+- 30/09/2026: struttura a 5 pasti (valore `spuntino2`, controllo PASTO_NON_AMMESSO, casi
+  golden 12-14).
+
+---
+
+## Avvio — perché una sola copia di tutto
+Lo zip era nato per il caricamento manuale; con il salvataggio diretto via commit non serve
+più. Il 28/07/2026 quattro copie sciolte obsolete divergevano dallo zip da tre fasi, e un
+`gap.csv` duplicato dichiarava mancanti dati già recuperati.
+
+## collaudo.py — perché il controllo 5 (impronte)
+I primi quattro controlli non vedono una modifica che resta sintatticamente valida.
+Verificato il 28/07/2026 cambiando il calcio del pane integrale da 25 a 26 mg: conteggio
+giusto, nessun duplicato, giornata golden identica (usa `alimenti_test.csv`), tutto verde.
+Solo il controllo delle impronte se ne accorgeva.
+
+## collaudo.py — perché i file opzionali non sono obbligatori
+Dal 01/10/2026 `cache.zip`, `BDA_alimenti.xlsx` e `crea_cache.zip` sono elencati in
+`SHA256SUMS`: prima non c'erano e il collaudo li segnalava solo come informativi, quindi una
+cache corrotta non veniva vista. Richiederli sempre farebbe fallire il collaudo di routine,
+e un collaudo che fallisce di routine smette di essere letto.
+
+## collaudo.py — perché rigenerare le impronte solo dopo aver capito
+Un ampliamento legittimo non ancora registrato e una corruzione silenziosa si presentano
+allo stesso modo. Rigenerare per far tornare verde un collaudo rosso annulla il controllo.
+
+## pipeline.py — perché esiste
+L'ordine dei passi era imposto per convenzione e viveva nelle istruzioni, non nel software.
+Entrambi gli errori di processo del primo caso reale sono nati da lì.
+
+## pipeline.py — perché PASTO_NON_AMMESSO blocca
+Un refuso come `spuntino 2` verrebbe sommato nei totali ma scartato dal PDF.
+
+## pipeline.py — giudizio settimanale
+Micronutrienti settimanali dal 29/07/2026; kcal e macro settimanali e limite di sicurezza
+giornaliero ±10% dal 18/09/2026 (decisione clinica). Prima del 18/09 il giorno fuori
+tolleranza bloccava.
+
+## pipeline.py — perché la verifica (b) del PASSO 6
+I giorni sono tutti uguali tra loro, quindi la sola verifica di uniformità (a) lascia
+passare una colazione standard abbinata a uno spuntino rinforzato.
+
+## pipeline.py — secondo spuntino
+Segue le regole dello spuntino per decisione del 30/09/2026.
+
+## regressione.py — perché un controllo nuovo va in una funzione condivisa
+La suite ripete la sequenza di `pipeline.main()` invece di chiamarla: un controllo scritto
+solo dentro `main()` non viene visto dalla suite. Esempio: `controlla_pasti_ammessi`.
+
+## regressione.py — perché i casi pipeline congelano i codici e non la prosa
+Riformulare un messaggio non deve far diventare rossa la suite.
+
+## Kcal allineate a CREA — 01/10/2026 (e lezione sul caso 04)
+Il confronto con la cache CREA ha trovato 7 righe con kcal diverse dalla scheda: riso
+332→334, carciofi 22→33, porri 29→35, barbabietole 19→25, arance 34→37, mandarini 72→76,
+olive verdi 142→148. In quattro casi il valore era vicino al ricalcolo 4/4/9 dei macro,
+contro la regola «kcal lette da CREA, mai ricalcolate». Allineate. Effetto sulla suite: i
+casi 02 (olive), 04 (riso) e 12 (arance) cambiano di +1,20, +1,60 e +6,00 kcal, verificati
+a mano riga per riga prima di rigenerare gli attesi. Nel caso 04, tarato sul confine ±5
+punti, rigenerare l'atteso NON bastava: i totali nuovi avevano spostato le percentuali e il
+verdetto sulle proteine era passato da FUORI a OK. I target sono stati ricalibrati con gli
+stessi scarti di prima (+5.001 e +4.999).
+
+## Casi golden — regole verificate al contrario
+Le regole del 30/09/2026 sono state verificate togliendole dal codice: la suite diventa
+rossa esattamente sul caso che le sorveglia. Lo stesso per i casi 15-17 (21/10/2026),
+svuotando le regole di accoppiamento.
+
+## Casi golden — dettagli di costruzione
+- caso 01: validato contro il collaudo archiviato del 26/07/2026.
+- caso 05: giorni a -4,56% e -2,03% di kcal, dentro tolleranza anche su tutti e tre i macro.
+- caso 07: complementare al caso 06 (quello sorveglia i flag per giorno del PASSO 2, questo
+  quelli del PASSO 3).
+- casi 08-10: generati il 18/09/2026 con la decisione sul giudizio settimanale e sul limite
+  di sicurezza; caso 11 il 29/09/2026 come copia del caso 07.
+- caso 13: target tarati sui macro reali perché non compaiano altri rilievi.
+- caso 15: verificato al contrario svuotando le regole.
+
+## Casi golden — limite di copertura, episodio
+Il 28/07/2026 l'aggiornamento della vitamina D di branzino, gambero, maiale e vitello ha
+lasciato la suite verde senza rigenerazione: quegli alimenti non sono in nessun caso.
+
+## calcolatore.py — unica fonte dei pasti
+Il 30/09/2026 i 4 pasti erano scritti a mano in quattro file.
+
+## formati.py
+Non bloccante per decisione del 29/09/2026.
+
+## accoppiamenti.py
+Segnala e non blocca, coppie aggiunte man mano: decisioni del 21/10/2026.
+Falso allarme sui piani anteriori al 30/09/2026, caso reale: latte nello spuntino del
+pomeriggio, yogurt in quello del mattino, registrati entrambi come `spuntino`.
+
+## cerca_cache.py / cerca_crea.py
+`cerca_cache.py` traduce in comando il PASSO 4 del protocollo di estrazione (M6), che prima
+era una procedura a memoria. `crea_cache.zip` (scaricata il 20/09/2026) sostituisce la
+lettura delle pagine del sito CREA, che passava da un riassunto di modello e non lasciava
+traccia di un valore trascritto male.
+
+## tdee.py e genera_zona_piano.py
+Entrambi nel motore dal 19/09/2026; `tdee.py` era l'ultima cosa tecnica rimasta su Drive.
+Prima del 30/09/2026 le kcal di un pasto a scelta diverso da colazione e spuntino restavano
+fuori dal totale del giorno del PDF. Convenzione 7.700 kcal/kg e totale del giorno libero
+da `range_kcal_libero`: decisioni del 19/09/2026.
+
+## larn.csv — perché la V revisione
+Decisione del nutrizionista del 19/09/2026. I valori usati prima erano un ibrido IV/V
+revisione tarato sull'uomo adulto: B12 2,4 µg, folati 400 µg, calcio 1000 mg.
+
+## colazioni_spuntini.csv — perché solo ingredienti
+La prima versione portava i valori precalcolati, e il 28/07/2026 il ricalcolo ha trovato 71
+valori su 72 corretti e uno sbagliato: l'alternativa S1 dichiarava 0,20 µg di vitamina D
+contro 2,10 reali, un fattore dieci sul nutriente che è già il limite noto della dieta, e
+nella direzione che fa sembrare coperto ciò che non lo è. Il dato a monte era sano:
+l'errore stava nel derivato.
+
+## moduli_pasto.csv — perché solo ingredienti
+Portava valori precalcolati fino al 29/07/2026, quando il ricalcolo ha trovato 165 valori su
+168 corretti e tre sbagliati: la vitamina D di M18, M20 e M22. NON erano errori di
+trascrizione: erano corretti il 27/07 e sono diventati falsi il 28/07, quando la vitamina D
+di gambero e polpo è stata recuperata da USDA. La fonte è migliorata sotto il derivato: via
+di divergenza più insidiosa di quella di S1, perché non richiede alcun errore umano.
+
+## moduli_pasto.csv — storia dei blocchi
+M25-M105 dal 21/10/2026, tag ricavati dai ruoli. M106-M129 dal 21/10/2026 sera (P01,
+P06, P07, P04). M11 corretto lo stesso giorno: riportava la pasta di
+semola dove il calcolo approvato di P01 (caso golden 01) usa la pasta integrale. M01
+(pasta + merluzzo) tolto con la regola A04; C37 tolto con la regola A06. Il vecchio tetto di
+20-30 blocchi è superato dalla decisione del 21/10/2026.
+
+## nomi_paziente.csv — perché esiste
+`alimenti.csv` porta il nome tecnico della fonte («Bovino magro vitellone senza grasso
+visibile»): riscriverlo a mano a ogni piano è testo non controllato che arriva al paziente.
+
+## Gerarchia fonti — perché scendere di livello sempre
+CREA non pubblica calcio, ferro, vitamina D, folati e B12 per pesci e carni. Uno zero da
+dato mancante si comporta esattamente come uno zero biologico: abbassa il totale e produce
+un falso allarme di carenza. Fermarsi al livello 1 e scrivere «gap» è l'errore più comune,
+ed è già costato una lettura falsata del magnesio.
+
+## Gap chiusi
+Il blocco magnesio (35 celle) è chiuso dal 28/07/2026 via USDA. Il gap calcio dell'olio
+d'oliva è chiuso dal 28/07/2026: CREA e BDA-IEO concordano su uno zero esplicito, non un
+silenzio. La riga vitamina D delle sardine è chiusa dal 01/10/2026 (micronutrienti INSA).
+
+## USDA — episodio della derivazione
+Il 28/07/2026 la verifica della derivazione ha evitato tre errori: cozza, polpo e trippa
+risultavano a 0,0 di vitamina D con derivazione Z e dataPoints 0. Importare uno zero Z
+significa ereditare in silenzio lo zero di qualcun altro.
+
+## USDA — audit del magnesio
+I 35 valori di magnesio scritti il 28/07/2026 sono stati presi prima che la verifica di
+derivazione diventasse regola. Essendo tutti non-zero, la trappola dello zero assunto non
+li riguarda, ma alcuni potrebbero essere imputati anziché analitici.
+
+## Atwater — doppio criterio e falsi positivi
+Su alimenti molto ipocalorici il cross-check sforava per puro effetto percentuale su numeri
+piccoli: doppio criterio dal 28/07/2026. Numeri dei residui:
+- AGLIO: 53 kcal dichiarate vs 44,8 ricalcolate, -15,5%, scarto 8,20 kcal, appena sopra
+  soglia.
+- CARCIOFI (dal 01/10/2026): 33 kcal CREA vs 22,6 ricalcolate, -31,5%, scarto 10,4 kcal; il
+  metodo Southgate conta la fibra (5,5 g per 100 g, circa 11 kcal); macro e kcal coincidono
+  con la scheda CREA.
+- SEMI DI LINO `9600_1` (dal 21/10/2026): 447 kcal BDA-IEO vs 377 ricalcolate, -15,7%,
+  scarto 70 kcal; BDA-IEO calcola l'energia «con fibra», 34,8 g × 2 kcal = 69,6 kcal;
+  377 + 69,6 = 446,6.
+
+## Sardine — storia della riga unificata
+Esistevano due righe per lo stesso pesce: CREA 122800 (225 kcal, 15,4 g lipidi, ma
+calcio/ferro/vitD/folati/B12 a zero perché CREA non li pubblica) e BDA 1319 «Sarda fresca»
+(129 kcal, 4,5 g lipidi, micronutrienti completi). Entrambe corrette: la differenza è
+variabilità stagionale reale del tenore lipidico. Fuse in 122800 secondo gerarchia. La
+vitamina D veniva dal campione magro abbinato ai macro del campione grasso, quindi
+probabilmente sottostimata.
+01/10/2026: le due schede CREA delle sardine (122800 e 122700) citano lo stesso studio
+(Karakoltsidis et al.) con valori incompatibili (Mg 70 contro 10, Zn 3,9 contro 0,8). INSA
+v 7.1 – 2026, voce 882 «Sardinha gorda crua», misura Mg 31 e Zn 1,6, confermati da USDA
+(39 / 1,31, in scatola) e da uno studio 2024 su sardine italiane crude (39,6 / 1,91 sul
+peso fresco). La voce INSA corrisponde al campione dei macro CREA (221 kcal, 16,4 g lipidi
+contro 225 e 15,4). Valori adottati: Ca 72, Fe 1,0, vitamina D 21, folati 15, B12 10, Zn 1,6,
+Mg 31, vitamina C 0. La vitamina D era sottostimata di circa 4,7 volte.
+
+## Stato di validazione — dettaglio
+Il motore è stato validato ricalcolando riga per riga un piano reale già consegnato
+(P01, lunedì): totale giornata rientrato in tolleranza (-4,56%) dopo la correzione della
+regola sui legumi. Collaudo archiviato su Drive in `Motore di calcolo >
+Collaudo_Motore_PianoP01_Lunedi`. Dal 28/07/2026 quella giornata è `caso_01_base`.

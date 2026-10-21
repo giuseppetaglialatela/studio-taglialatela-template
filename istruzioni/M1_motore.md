@@ -1,62 +1,40 @@
 # M1 — MOTORE DI CALCOLO
 
-Modulo operativo (principio 6: nucleo + moduli sono l'unica fonte operativa).
-Dipendenze: nessuna. Dipendono da questo modulo: M2 (workflow piano), M6 (estrazione).
-Ultimo aggiornamento: 21/10/2026, quarto giro (niente più zip: il motore sta sciolto nella
-cartella `motore-calcolo` del repository e si scarica con un solo comando; le modifiche le
-salva Claude con un commit) · prima, stesso giorno, terzo giro (regole di accoppiamento su alimento preciso e
-per pasto; A03 formaggi diversi, A04 merluzzo + pasta, A05 carne rossa o maiale + pasta, A06 due
-frutte secche nello stesso pasto; M01 e C37 tolti; casi golden 16 e 17) · prima,
-stesso giorno (database a 144 voci: crema di nocciole e cacao,
-pangrattato, semi di lino; semi di lino tra i falsi positivi Atwater; libreria a 129 blocchi
-pranzo/cena e 56 colazioni/spuntini; M11 corretto a pasta integrale) · stesso giorno, prima
-(controllo degli accoppiamenti vietati: `ruoli_alimenti.csv`,
-`accoppiamenti_vietati.csv`, `accoppiamenti.py`, PASSO 4 controllo F, collaudo controllo 8,
-caso golden 15; libreria degli accoppiamenti estesa a 105 blocchi pranzo/cena e 43
-colazioni/spuntini in `moduli_colazione.csv`; database a 141 voci) ·
-precedente 01/10/2026 (`cerca_crea.py` e cache CREA; kcal di 7 voci allineate a CREA;
-carciofi tra i falsi positivi Atwater; eccezione INSA per i micronutrienti delle sardine) ·
-30/09/2026 (struttura a 5 pasti: valore `spuntino2`, controllo
-PASTO_NON_AMMESSO, casi golden 12-14).
+Modulo operativo (principio 6). Dipendenze: nessuna. Ne dipendono M2 e M6.
+Ultima modifica: 21/10/2026 sera (versione asciutta: motivazioni, episodi e date in
+`istruzioni/archivio/M1-motivazioni.md`, che non si carica).
 
-Questo modulo copre: come si avvia una sessione di calcolo, i moduli software, i casi
-golden, il database alimenti e la gerarchia fonti, lo schema CSV congelato, i file
-affiancati, i gap dichiarati, il recupero USDA e lo stato di validazione.
-NON copre: come si compone un piano (M2), come si allarga il database (M6).
+Copre: avvio della sessione, moduli software, casi golden, database e fonti, schema CSV e
+file affiancati, gap, recupero USDA, falsi positivi, stato di validazione.
+NON copre: composizione del piano (M2), ampliamento del database (M6).
 
 ---
 
-## 1. AVVIO DI SESSIONE — obbligatorio prima di qualsiasi calcolo
+## 1. AVVIO E SALVATAGGIO
 
-All'inizio di ogni sessione che coinvolge calcoli, UN comando: scarica in una cartella
-pulita l'intera cartella `motore-calcolo` del repository (codice, dati, casi golden e
-cache, circa 1 secondo), esegue collaudo e regressione.
+**Avvio, obbligatorio prima di qualsiasi calcolo.** UN comando scarica in una cartella
+pulita l'intera cartella `motore-calcolo` (codice, dati, casi golden, cache) ed esegue
+collaudo e regressione:
 ```
 rm -rf /tmp/motore && mkdir /tmp/motore && cd /tmp/motore && curl -sfL https://codeload.github.com/giuseppetaglialatela/studio-taglialatela-template/tar.gz/refs/heads/main | tar xz --strip-components=2 studio-taglialatela-template-main/motore-calcolo && python3 collaudo.py && python3 regressione.py
 ```
 Poi si lavora in `/tmp/motore`. Nessun calcolo su paziente prima dell'esito positivo
-(principio 7). Non serve il repository collegato alla chat: il download è pubblico.
+(principio 7). Il download è pubblico: non serve il repository collegato.
+`cache.zip`, `BDA_alimenti.xlsx` e `crea_cache.zip` servono solo per ampliare il database
+(M6), ma arrivano con lo stesso comando e il collaudo li verifica.
 
-`cache.zip`, `BDA_alimenti.xlsx` e `crea_cache.zip` servono **solo** per ampliare il
-database (M6), ma arrivano comunque con lo stesso comando e il collaudo li verifica.
+**Una sola copia di tutto.** Ogni file esiste una volta sola, in `motore-calcolo`. Non
+reintrodurre zip né copie parallele.
 
-**Una sola copia di tutto.** Dal 21/10/2026 il motore non è più impacchettato in uno zip:
-ogni file esiste una volta sola, nella cartella `motore-calcolo`. Lo zip era nato per il
-caricamento manuale; con il salvataggio diretto (sotto) non serve più. Non reintrodurre
-copie parallele: il 28/07/2026 quattro copie sciolte obsolete divergevano dallo zip da tre
-fasi, e un `gap.csv` duplicato dichiarava mancanti dati già recuperati.
+**Salvare una modifica.** La salva Claude con un commit, dalle sessioni del progetto di
+consolidamento con il repository collegato: `git clone`, modifica, collaudo e regressione,
+commit e push, poi comando d'avvio e nuovo collaudo. Il nutrizionista non carica niente a
+mano. `git log` è il registro delle versioni; ogni modifica è annullabile.
+Ripiego solo senza collegamento: caricamento manuale dalla pagina di upload della
+cartella, poi verifica delle impronte.
 
-**Come si salva una modifica.** La salva Claude con un commit, dalle sessioni del
-progetto di consolidamento con il repository collegato: si lavora su una copia
-(`git clone`), si eseguono collaudo e regressione, si fa il commit e il push, poi si
-riscarica con il comando sopra e si ricollauda. Il nutrizionista non carica niente a mano.
-`git log` sostituisce il registro delle versioni; ogni modifica è annullabile.
-Ripiego, solo se il collegamento non è disponibile: caricamento manuale dalla pagina di
-upload della cartella, con verifica delle impronte dopo il caricamento.
-
-**Sessioni lunghe.** Una chat che ha scaricato il motore all'inizio continua a
-lavorare sulla copia estratta allora, che invecchia in silenzio. Oltre una giornata di
-lavoro: riscarica e riesegui il collaudo prima di fidarti dei numeri.
+**Sessioni lunghe.** La copia estratta all'avvio invecchia in silenzio: oltre una giornata
+di lavoro, riscarica e ricollauda prima di fidarti dei numeri.
 
 ---
 
@@ -66,269 +44,223 @@ lavoro: riscarica e riesegui il collaudo prima di fidarti dei numeri.
 Otto controlli:
 1. presenza e integrità di tutti i CSV, incluso il numero di colonne per riga
    (`csv.DictReader` da solo NON lo segnala)
-2. conteggio righe di `alimenti.csv` contro `EXPECTED_ALIMENTI_COUNT`
-3. assenza di `food_id` duplicati
-4. giornata golden confrontata al riferimento congelato
-5. integrità byte per byte contro `SHA256SUMS`
-6. ogni `food_id` di `alimenti.csv` ha un nome paziente in `nomi_paziente.csv`,
-   senza duplicati né righe orfane
+2. righe di `alimenti.csv` contro `EXPECTED_ALIMENTI_COUNT`
+3. nessun `food_id` duplicato
+4. giornata golden contro il riferimento congelato
+5. integrità byte per byte contro `SHA256SUMS` (standard: verificabile anche con
+   `sha256sum -c SHA256SUMS`)
+6. ogni `food_id` di `alimenti.csv` ha un nome paziente in `nomi_paziente.csv`, senza
+   duplicati né righe orfane
 7. `formati_confezione.csv` e `scambi_frutta.csv`: ogni `food_id` esiste in
    `alimenti.csv`, unità e tolleranze valide
-8. ogni `food_id` ha un ruolo ammesso in `ruoli_alimenti.csv`, le regole di
-   `accoppiamenti_vietati.csv` usano voci valide (ruoli o food_id) e nessun blocco della libreria
-   (`moduli_pasto.csv`, `moduli_colazione.csv`) contiene un accoppiamento vietato
+8. ogni `food_id` ha un ruolo ammesso in `ruoli_alimenti.csv`; le regole di
+   `accoppiamenti_vietati.csv` usano voci valide (ruoli o `food_id`); nessun blocco della
+   libreria (`moduli_pasto.csv`, `moduli_colazione.csv`) contiene un accoppiamento vietato
 
-Esce con codice 0 (superato) o 1 (fallito).
+Esce 0 (superato) o 1 (fallito). File opzionali (`cache.zip`, `BDA_alimenti.xlsx`,
+`crea_cache.zip`): se presenti si verificano come gli altri, se assenti il collaudo lo
+dichiara e prosegue.
 
-*Perché il controllo 5:* i primi quattro non vedono una modifica che resta
-sintatticamente valida. Verificato il 28/07/2026 cambiando il calcio del pane integrale
-da 25 a 26 mg — conteggio giusto, nessun duplicato, giornata golden identica (usa
-`alimenti_test.csv`), tutto verde. Solo il quinto se ne accorgeva.
-
-*File opzionali* (`cache.zip`, `BDA_alimenti.xlsx`, `crea_cache.zip`): se presenti vengono
-verificati come gli altri, se assenti il collaudo lo dichiara e prosegue. Dal 01/10/2026 i
-tre sono davvero elencati in `SHA256SUMS`: prima il file non li conteneva e il collaudo li
-segnalava solo come informativi, quindi una cache corrotta non veniva vista. Richiederli sempre farebbe
-fallire il collaudo di routine, e un collaudo che fallisce di routine smette di essere
-letto.
-
-`python3 collaudo.py --genera-checksums` riscrive `SHA256SUMS`. Si usa dopo aver
-aggiornato `alimenti.csv` o un modulo, e **solo dopo aver capito perché** il file era
-cambiato: un ampliamento legittimo non ancora registrato e una corruzione silenziosa si
-presentano allo stesso modo. Rigenerare per far tornare verde un collaudo rosso annulla
-il controllo.
-
-Attenzione: firma **tutto** ciò che si trova nella cartella. Un file appoggiato lì per
-una verifica finisce nei checksum e fa fallire il collaudo alla sessione dopo, quando
-non c'è più. Prima del commit: `git status` deve mostrare solo i file modificati di
-proposito, e la cartella `__pycache__` resta fuori (`.gitignore`).
-
-`EXPECTED_ALIMENTI_COUNT` va aggiornato a mano quando il database cresce.
-Il formato di `SHA256SUMS` è standard: verificabile anche con `sha256sum -c SHA256SUMS`.
+`python3 collaudo.py --genera-checksums` riscrive `SHA256SUMS`, dopo aver aggiornato
+`alimenti.csv` o un modulo, e **solo dopo aver capito perché** il file era cambiato: mai per
+far tornare verde un collaudo rosso. Firma **tutto** ciò che sta nella cartella, tranne
+`__pycache__` e i file paziente con nome standard nella radice (`piano.csv`, `target.csv`,
+`farmaci_paziente.csv`...): un file appoggiato lì con un altro nome (es. `piano_vN.csv`)
+finisce nei checksum e fa fallire il collaudo alla sessione dopo. Prima del commit
+`git status` mostra solo i file modificati di proposito; `__pycache__` resta fuori
+(`.gitignore`). `EXPECTED_ALIMENTI_COUNT` si aggiorna a mano quando il database cresce.
 
 ### pipeline.py — orchestratore, il modo raccomandato di valutare un piano
-Un comando esegue i passi sempre nello stesso ordine e produce un report unico:
-
+Un comando, passi sempre nello stesso ordine, un report unico:
 0. collaudo (si ferma se fallisce)
 1. calcolo per pasto e per giorno
-2. scenari min/max dei pasti a scelta multipla, PRIMA di ogni riepilogo
+2. scenari min/max dei pasti a scelta multipla, PRIMA di ogni riepilogo; poi verifica
+   settimanale di kcal e macro
 3. micronutrienti per giorno e media settimanale, con flag LARN e gap
-4. coerenza dei dati + gap dichiarati
+4. coerenza dei dati e gap dichiarati; controlli E (formati) e F (accoppiamenti)
 5. interazioni farmaco-alimento
-6. livello unico di colazione e spuntino (e secondo spuntino, se presente) su tutto
-   il piano
+6. livello unico di colazione, spuntino e, se presente, secondo spuntino su tutto il piano
 
-Prima del PASSO 1, come per un `food_id` sconosciuto, la pipeline si ferma se
-`piano.csv` usa un valore di pasto non ammesso (`PASTO_NON_AMMESSO`, bloccante): un
-refuso come `spuntino 2` verrebbe sommato nei totali ma scartato dal PDF.
-
+Prima del PASSO 1 si ferma (bloccante) su un `food_id` sconosciuto o su un valore di pasto
+non ammesso (`PASTO_NON_AMMESSO`, es. `spuntino 2` con lo spazio).
 ```
 python3 pipeline.py --piano piano.csv --target target.csv
   [--farmaci f.csv --interazioni i.csv --orari o.csv]
   [--deroga-struttura "motivo"] [--salta-collaudo]
 ```
+Esce 0 senza rilievi bloccanti, 1 altrimenti; il report si stampa per intero in entrambi i
+casi.
 
-Esce 0 se non ci sono rilievi bloccanti, 1 altrimenti. Il report viene stampato per
-intero in entrambi i casi: serve a capire cosa correggere.
+**Rilievi BLOCCANTI** (piano non presentabile): collaudo fallito o assente; `food_id`
+sconosciuto; valore di pasto non ammesso; **media settimanale delle kcal** fuori tolleranza
+(basta un estremo dell'intervallo); **media settimanale di un macro** fuori tolleranza su
+tutto l'intervallo, dallo stesso lato; **giorno o scenario oltre ±10% di kcal**; target incoerenti; file dei formati o
+degli accoppiamenti illeggibili o accoppiamenti non verificati; interazione di gravità ALTA;
+orario di un pasto mancante; terapia dichiarata solo in parte; struttura pasti non uniforme;
+livelli colazione/spuntino misti o incoerenti tra pasti; catalogo disallineato.
 
-*Perché esiste:* l'ordine dei passi era imposto per convenzione e viveva nelle
-istruzioni, non nel software. Entrambi gli errori di processo del primo caso reale sono
-nati da lì.
+**Rilievi DA DICHIARARE** (non bloccano): giorno con kcal fuori ±5% (entro ±10%) o macro
+fuori ±5 punti; scenario di scelta fuori tolleranza entro ±10%; estremi macro degli scenari
+(limiti di garanzia, non giornate componibili); un solo estremo della media settimanale
+di un macro fuori tolleranza; fibra sotto l'80% del target;
+micronutrienti sotto l'80% LARN *in media settimanale* (con o senza gap); target privo di
+LARN (micronutrienti non confrontati con niente); distribuzione concentrata; falsi positivi
+Atwater; micronutrienti tutti a zero; quantità fuori formato; accoppiamenti vietati;
+interazioni di gravità media o bassa (entrambe sotto il codice `INTERAZIONE_GRAVITA_MEDIA`);
+principi attivi assenti dalla tabella; terapia non dichiarata; pasto assente su tutto il
+piano; livello parziale o fuori catalogo; catalogo assente (livello verificato solo come
+uniforme); collaudo saltato. I totali sottostimati per gap si stampano nel report.
 
-**Rilievi BLOCCANTI** (piano non presentabile): kcal o macro fuori tolleranza, uno
-scenario di scelta fuori tolleranza sulle kcal, target incoerenti, interazione di
-gravità ALTA, orario pasto mancante, terapia dichiarata solo in parte, struttura pasti
-non uniforme, livelli colazione/spuntino incoerenti, valore di pasto non ammesso.
+Ogni rilievo porta un CODICE stabile: la suite congela `(passo, codice)`, non la prosa.
 
-**Rilievi DA DICHIARARE** (non bloccano): micronutrienti sotto l'80% LARN *in media
-settimanale*, distribuzione concentrata, gap dichiarati, falsi positivi Atwater,
-interazioni di gravità media, estremi macro degli scenari di scelta (sono limiti di
-garanzia, non giornate componibili), alternative fuori catalogo.
+**Micronutrienti — giudizio settimanale (principio 8).** I valori di micronutrienti del
+singolo giorno restano stampati senza allarme; il PASSO 2 riporta gli estremi dei
+micronutrienti per giorno come informazione, non come verdetto.
 
-Ogni rilievo porta un CODICE stabile oltre al messaggio: la suite di regressione congela
-`(passo, codice)` e non la prosa, così riformulare un messaggio non fa diventare rossa
-la suite.
-
-**Micronutrienti:** dal 29/07/2026 il giudizio è settimanale (principio 8). I valori per
-singolo giorno restano stampati ma non portano più allarme. Il PASSO 2 riporta gli
-estremi per giorno come informazione, non come verdetto.
-
-**Il PASSO 6 fa due verifiche distinte:**
-- (a) colazione e spuntino identici su tutti i giorni strutturati
-- (b) a quale livello appartengono, confrontandoli con `colazioni_spuntini.csv`
-
-Il secondo spuntino (`spuntino2`) segue le stesse regole dello spuntino (decisione del
-30/09/2026), ma solo se il piano lo contiene: presente in un giorno e assente in un
-altro blocca come struttura non uniforme; il livello si confronta con gli spuntini del
-catalogo. Un piano a 4 pasti non riceve alcun rilievo sul secondo spuntino.
-*Conseguenza da sapere:* il catalogo ha 2 spuntini per livello. Se spuntino e secondo
-spuntino sono fissi (una sola alternativa ciascuno), il PASSO 6 li dichiara
-`LIVELLO_PARZIALE`: attenzione, non blocco.
-
-La (b) intercetta una colazione standard abbinata a uno spuntino rinforzato: i giorni
-sono tutti uguali tra loro, quindi la (a) da sola la lascia passare. Se il piano usa
-alternative costruite su misura non è un errore: viene segnalato come fuori catalogo e
-il livello non è verificabile.
-
-`--deroga-struttura "motivo"` declassa i blocchi del PASSO 6 ad attenzione, per le
-deroghe legittime (spuntino saltato, giorno libero). Il rilievo resta scritto nel report
-con il motivo dichiarato.
+**PASSO 6, due verifiche distinte:**
+- (a) colazione e spuntino identici su tutti i giorni strutturati;
+- (b) a quale livello appartengono, confrontandoli con `colazioni_spuntini.csv`: intercetta
+  una colazione standard con uno spuntino rinforzato, che la (a) lascia passare.
+Alternative costruite su misura: non è un errore, si segnalano come fuori catalogo e il
+livello non è verificabile.
+Il secondo spuntino (`spuntino2`) segue le regole dello spuntino, solo se il piano lo
+contiene: presente in un giorno e assente in un altro blocca come struttura non uniforme; il
+livello si confronta con gli spuntini del catalogo; un piano a 4 pasti non riceve rilievi
+sul secondo spuntino. Il catalogo ha 2 spuntini per livello: spuntino e secondo spuntino
+fissi (una sola alternativa ciascuno) danno `LIVELLO_PARZIALE`, attenzione e non blocco.
+`--deroga-struttura "motivo"` declassa ad attenzione, per le deroghe legittime (spuntino
+saltato, giorno libero), i blocchi di struttura non uniforme e di livello incoerente tra
+pasti; il rilievo resta nel report con il motivo. Livello misto e catalogo disallineato
+restano bloccanti anche con la deroga.
 
 ### regressione.py
-Suite sui casi golden in `golden/` (14 casi dal 30/09/2026: `caso_11_formati_confezione_violati` congela l'attenzione sui formati; i casi 05-07 la contengono perché i loro input di test non seguono i formati commerciali; i casi 12-14 coprono la struttura a 5 pasti; 17 casi dal 21/10/2026).
-Nei casi `pipeline` la suite ripete la sequenza di `pipeline.main()`: un controllo
-aggiunto a `main()` va messo in una funzione chiamata da entrambi, come
-`controlla_pasti_ammessi`, altrimenti la suite non lo vede. Va rieseguita **dopo ogni modifica** al motore o al
-database alimenti, e comunque prima di qualsiasi uso clinico. Un comando, esito
-pass/fail per caso.
+Suite sui 17 casi golden in `golden/`: un comando, pass/fail per caso. Si riesegue **dopo
+ogni modifica** al motore o al database, e comunque prima di qualsiasi uso clinico.
+- Nei casi `pipeline` la suite ripete la sequenza di `pipeline.main()`: un controllo nuovo
+  va in una funzione chiamata da entrambi (come `controlla_pasti_ammessi`), altrimenti la
+  suite non lo vede.
+- `python3 regressione.py --genera` rigenera gli attesi SOLO quando una modifica cambia
+  intenzionalmente i risultati e il nuovo output è già stato verificato a mano. Mai per far
+  passare una suite rossa senza averne capito il motivo.
+- Su un caso tarato su un confine (caso 04), se i dati cambiano si ricalibra il TARGET con
+  gli stessi scarti, non solo l'atteso.
+- Non è una validazione clinica: verifica che il motore dia gli stessi numeri su input
+  fissi, non che quei numeri siano giusti per un paziente.
 
-`python3 regressione.py --genera` rigenera gli attesi: si usa SOLO quando una modifica
-cambia intenzionalmente i risultati e il nuovo output è già stato verificato a mano.
-Rigenerare per far passare una suite rossa senza aver capito perché era rossa annulla lo
-scopo della suite.
-
-Non è una validazione clinica: verifica che il motore produca gli stessi numeri su input
-fissi, non che quei numeri siano giusti per un paziente.
-
-### calcolatore.py
-Totali per pasto e per giorno, confronto con i target, flag LARN sui micronutrienti.
-Legge anche `gap.csv` e marca come SOTTOSTIMATI i totali che pescano da voci con dati
-mancanti. È il modulo principale.
-È anche l'**unica fonte** dell'elenco e dell'ordine dei pasti: `PASTI_AMMESSI`,
-`ordine_pasti()` e `pasti_non_ammessi()` vivono qui, e `pipeline.py` e
-`genera_zona_piano.py` li importano invece di riscriverli (30/09/2026: prima i 4 pasti
-erano scritti a mano in quattro file).
+### calcolatore.py — il modulo principale
+Totali per pasto e per giorno, confronto con i target, flag LARN. Legge `gap.csv` e marca
+SOTTOSTIMATI i totali che pescano da voci con dati mancanti. È l'**unica fonte** di elenco
+e ordine dei pasti (`PASTI_AMMESSI`, `ordine_pasti()`, `pasti_non_ammessi()`):
+`pipeline.py` e `genera_zona_piano.py` li importano, non li riscrivono.
 
 ### interazioni.py
-Incrocia la tabella interazioni — curata e validata dal nutrizionista — con gli orari di
-pasti e farmaci. Il motore NON contiene conoscenza farmacologica propria e non inventa
-interazioni: segnala esplicitamente i principi attivi assenti dalla tabella, così che
-l'assenza di allarme non venga scambiata per assenza di rischio.
+Incrocia la tabella interazioni, curata e validata dal nutrizionista, con gli orari di
+pasti e farmaci. Nessuna conoscenza farmacologica propria, nessuna interazione inventata:
+segnala esplicitamente i principi attivi assenti dalla tabella, perché l'assenza di
+allarme non sia scambiata per assenza di rischio.
 
 ### formati.py
-Regola anti-spreco (nucleo M0, sezione 5). Legge `formati_confezione.csv` e
-`scambi_frutta.csv`. `pipeline.py` lo usa al PASSO 4, controllo E: per ogni alimento
-del piano vincolato nel CSV verifica che i grammi siano una confezione intera o un
-multiplo (fino a 6) entro la tolleranza. Esito: attenzione
-`FORMATO_CONFEZIONE_NON_RISPETTATO`, **non bloccante** (decisione del 29/09/2026).
-Funzioni: `carica_formati`, `carica_scambi_frutta`, `controlla_piano(piano, formati)`,
-`quantita_valida`. Controllo manuale senza pipeline (chat B):
+Regola anti-spreco (nucleo, sezione 5). Legge `formati_confezione.csv` e
+`scambi_frutta.csv`. Al PASSO 4, controllo E: per ogni alimento vincolato verifica che i
+grammi siano una confezione intera o un multiplo (fino a 6) entro la tolleranza. Esito:
+`FORMATO_CONFEZIONE_NON_RISPETTATO`, **non bloccante**. Funzioni: `carica_formati`,
+`carica_scambi_frutta`, `controlla_piano(piano, formati)`, `quantita_valida`. Controllo
+senza pipeline (chat B), stampa `[]` se tutto è a formato:
 `python3 -c "import csv,formati; print(formati.controlla_piano(list(csv.DictReader(open('piano_vN.csv'))), formati.carica_formati()))"`
-stampa `[]` se tutto è a formato.
 
 ### coerenza.py
-Cross-check Atwater, coerenza interna dei target, righe con micronutrienti tutti a zero.
-Intercetta errori nei DATI prima che si propaghino nei piani. Non ha entry point
-standalone: si importa. Vedi §7 per il doppio criterio Atwater.
+Cross-check Atwater (doppio criterio, sezione 8), coerenza interna dei target, righe con
+micronutrienti tutti a zero: intercetta errori nei DATI prima che entrino nei piani. Non ha
+entry point standalone: si importa.
 
 ### scelte_multiple.py
-Intervalli min/max per nutriente sui pasti a scelta. Sono limiti garantiti, non una
-giornata realmente componibile. Distingue ciò che è sotto soglia anche nel best case da
-ciò che dipende dalla scelta del paziente.
-Va eseguito per OGNI giorno del piano subito dopo aver fissato pranzo e cena di quel
-giorno — non a posteriori, dopo aver già presentato una tabella con una singola
-combinazione "esemplare". `pipeline.py` lo fa da solo, al PASSO 2.
+Intervalli min/max per nutriente sui pasti a scelta: limiti garantiti, non una giornata
+realmente componibile. Distingue ciò che è sotto soglia anche nel caso migliore da ciò che
+dipende dalla scelta del paziente. Va eseguito per OGNI giorno subito dopo aver fissato
+pranzo e cena di quel giorno, mai a posteriori dopo una tabella con una sola combinazione
+«esemplare». `pipeline.py` lo fa da solo al PASSO 2.
 
 ### struttura_pasti.py
-Legge `colazioni_spuntini.csv` e riconosce il livello di un piano.
-`python3 struttura_pasti.py` ristampa il catalogo con i valori RICALCOLATI da
-`alimenti.csv`: serve a leggerlo a occhio senza che i numeri possano divergere dalla
-fonte. Segnala anche se le 4 colazioni di un livello hanno kcal troppo distanti tra loro.
+Legge `colazioni_spuntini.csv` e riconosce il livello di un piano. `python3
+struttura_pasti.py` ristampa il catalogo con i valori RICALCOLATI da `alimenti.csv` e
+segnala se le 4 colazioni di un livello hanno kcal troppo distanti tra loro.
 
-### accoppiamenti.py
-Controllo degli accoppiamenti vietati nello stesso pasto (decisione del 21/10/2026:
-**si segnala, non blocca**). Legge `ruoli_alimenti.csv` e `accoppiamenti_vietati.csv`.
-`pipeline.py` lo usa al PASSO 4, controllo F: attenzione `ACCOPPIAMENTO_VIETATO`, una per
-coppia, pasto e scenario, con i giorni in cui compare. I pasti con alternative si
-valutano scenario per scenario: due opzioni dello stesso `gruppo_scelta` non si mangiano
-insieme e non formano un accoppiamento.
+### accoppiamenti.py — si segnala, non si blocca
+Legge `ruoli_alimenti.csv` e `accoppiamenti_vietati.csv`. Al PASSO 4, controllo F:
+attenzione `ACCOPPIAMENTO_VIETATO`, una per coppia, pasto e scenario, con i giorni. I pasti
+con alternative si valutano scenario per scenario: due opzioni dello stesso
+`gruppo_scelta` non si mangiano insieme e non formano un accoppiamento.
 ```
 python3 accoppiamenti.py --piano piano_vN.csv   controlla un piano senza pipeline
 python3 accoppiamenti.py --libreria             controlla la libreria dei blocchi
 ```
-Le coppie vietate crescono man mano che si presentano (decisione del 21/10/2026): una
-riga nuova in `accoppiamenti_vietati.csv`, nessuna modifica al codice. Ogni lato della
-regola nomina un RUOLO (pesce) oppure un `food_id` preciso (1313 merluzzo): serve per le
-coppie che non valgono per tutto il ruolo (pasta con merluzzo no, pasta con alici sì).
-Stesso ruolo sui due lati (formaggio + formaggio) = due alimenti DIVERSI di quel ruolo. Se la regola nuova
-colpisce un blocco della libreria, il collaudo fallisce finché il blocco non viene tolto.
-*Falso allarme noto:* i piani scritti prima del 30/09/2026 con due spuntini (mattina e
-pomeriggio) li registrano entrambi come `spuntino`, e il controllo li legge come un pasto
-unico (caso reale: latte nello spuntino del pomeriggio, yogurt in quello del mattino). Non
-è una violazione: quel piano va riscritto con `spuntino2` prima di essere rivalutato.
+- Una coppia nuova è una riga nuova in `accoppiamenti_vietati.csv`, nessuna modifica al
+  codice; le coppie crescono man mano che si presentano.
+- Ogni lato nomina un RUOLO (pesce) o un `food_id` preciso (1313 merluzzo), per le coppie
+  che non valgono per tutto il ruolo (pasta con merluzzo no, con alici sì).
+- Stesso ruolo sui due lati (formaggio + formaggio) = due alimenti DIVERSI di quel ruolo.
+- Una regola nuova che colpisce un blocco della libreria fa fallire il collaudo finché il
+  blocco non viene tolto.
+- *Falso allarme noto:* i piani scritti prima del 30/09/2026 con due spuntini li registrano
+  entrambi come `spuntino`, e il controllo li legge come un pasto unico. Non è una
+  violazione: il piano va riscritto con `spuntino2` prima di essere rivalutato.
 
 ### moduli_pasto.py
-Legge la libreria degli accoppiamenti: `moduli_pasto.csv` (pranzo/cena) e
-`moduli_colazione.csv` (colazioni/spuntini), ricalcolando i valori da `alimenti.csv` e
-marcando i nutrienti sottostimati da `gap.csv`.
-
+Legge la libreria (`moduli_pasto.csv` pranzo/cena, `moduli_colazione.csv`
+colazioni/spuntini), ricalcolando i valori da `alimenti.csv` e marcando i nutrienti
+sottostimati da `gap.csv`.
 ```
 python3 moduli_pasto.py                     tutta la libreria
 python3 moduli_pasto.py --categoria cena    solo le cene (anche colazione, spuntino, pranzo)
 python3 moduli_pasto.py --tag pesce vitD    blocchi con TUTTI i tag
 python3 moduli_pasto.py --scala M07 1.15    grammature riscalate del 15%
 ```
+Il flag ⛔ sui gap evita di scartare un blocco per la ragione sbagliata (l'orata mostra
+vitamina D 0.00 perché CREA non la pubblica, non perché non ne contenga).
 
-Il flag ⛔ sui gap serve a non far scartare un blocco per la ragione sbagliata: l'orata
-mostra vitamina D 0.00 perché CREA non la pubblica, non perché non ne contenga.
-
-### cerca_cache.py
-Interroga la cache BDA-IEO. Traduce in comando il PASSO 4 del protocollo di estrazione
-(M6), che prima era una procedura a memoria.
-
+### cerca_cache.py — cache BDA-IEO
 ```
 python3 cerca_cache.py ricerca "sgombro" "farro" "kefir"
 python3 cerca_cache.py ricerca --file nomi.txt
 python3 cerca_cache.py estrai 1321_2
 ```
+Si usa al PASSO 4 del protocollo di estrazione (M6). La ricerca interroga l'indice `_foods.json` in un solo passaggio e dice quali nomi mancano
+davvero. L'estrazione riporta i nutrienti dello schema con la fonte di ciascuno: «tr»
+diventa il valore di soglia (`vltraccia`), non zero; un campo assente è dichiarato DA
+CERCARE SU USDA, non lasciato a zero. Energia e macronutrienti non vengono proposti (fonte
+CREA). Non scrive in `alimenti.csv`: la trascrizione resta una scelta.
 
-La ricerca interroga l'indice `_foods.json` in un solo passaggio su tutti i nomi e dice
-quali mancano davvero. L'estrazione riporta i nutrienti dello schema con la fonte citata
-per ciascuno, applicando le regole del protocollo: "tr" diventa il valore di soglia
-(`vltraccia`) e non zero, un campo assente viene dichiarato come DA CERCARE SU USDA e non
-lasciato a zero in silenzio. Energia e macronutrienti non vengono proposti: per quelli la
-fonte è CREA. Non scrive niente in `alimenti.csv`: riporta, la trascrizione resta una
-scelta.
-
-### cerca_crea.py
-Interroga `crea_cache.zip`: copia locale delle 832 schede CREA 2019 (scaricata dal sito il
-20/09/2026), con il codice di origine di ogni valore. Sostituisce la lettura delle pagine del
-sito, che passava da un riassunto di modello e non lasciava traccia di un valore trascritto
-male.
-
+### cerca_crea.py — cache CREA
+`crea_cache.zip`: copia locale delle 832 schede CREA 2019, con il codice di origine di ogni
+valore. Si usa questa, non le pagine del sito.
 ```
 python3 cerca_crea.py ricerca "yogurt greco" "ravanelli"
 python3 cerca_crea.py estrai 150030
 python3 cerca_crea.py verifica
 python3 cerca_crea.py --autotest
 ```
-
-`estrai` riporta i valori dello schema con l'origine (A analitico, C calcolato, ZL e S
-imputato, B metodica non dichiarata nella scheda) e segnala: campi ASSENTI (si scende a
-BDA-IEO e poi USDA), TRACCE (la cache CREA non porta la soglia: non scrivere zero) e parte
-edibile diversa da 100% (es. fuso di pollo 66%: il peso nel piano va convertito).
+`estrai` riporta i valori con l'origine (A analitico, C calcolato, ZL e S imputato, B
+metodica non dichiarata) e segnala: campi ASSENTI (si scende a BDA-IEO, poi USDA); TRACCE
+(la cache non porta la soglia: non scrivere zero); parte edibile diversa da 100% (es. fuso
+di pollo 66%: il peso nel piano va convertito).
 `verifica` confronta kcal, macro e fibra delle righe CREA di `alimenti.csv` con la cache:
-esce 0 se coincidono, 1 se differiscono, e non modifica nulla. Va eseguito dopo ogni
-ampliamento (M6, passo 8). Non fa parte del collaudo perché richiede un file opzionale.
+esce 0 se coincidono, 1 se differiscono, non modifica nulla. Si esegue dopo ogni
+ampliamento (M6, passo 8); non è nel collaudo perché richiede un file opzionale.
 
 ### tdee.py
-Nel motore dal 19/09/2026 (prima era l'ultima cosa tecnica rimasta su Drive; la copia
-Drive resta come archivio e non va più usata). Stima il TDEE e propone un `target.csv`
-di partenza da peso/altezza/età/sesso/livello di attività (Mifflin-St Jeor + PAL).
-Testato solo contro il TDEE di P00, paziente fittizio (2040 kcal,
-coincidente): `python3 tdee.py` rifà quel confronto e fallisce con `assert` se la
-formula cambia. Il valore resta SEMPRE da confermare dal nutrizionista: il modulo
-propone, non decide.
-
-`proponi_target_csv` non ha più LARN di default: li legge da `larn.csv` tramite
-`larn.py` e **si ferma con errore se sesso ed età non sono passati** (nucleo, sezione 6).
-Il parametro `larn={...}` resta per sovrascrivere singoli valori con motivazione clinica.
+Stima il TDEE (Mifflin-St Jeor + PAL) e propone un `target.csv` di partenza da peso,
+altezza, età, sesso e livello di attività. La copia su Drive è archivio e non si usa.
+Testato solo contro P00, paziente fittizio (2040 kcal, coincidente):
+`python3 tdee.py` rifà il confronto e fallisce con `assert` se la formula cambia. Il valore
+è SEMPRE da confermare dal nutrizionista: il modulo propone, non decide.
+`proponi_target_csv` legge i LARN da `larn.csv` tramite `larn.py` e **si ferma con errore
+se sesso ed età non sono passati** (nucleo, sezione 6). Il parametro `larn={...}`
+sovrascrive singoli valori solo con motivazione clinica.
 
 ### genera_zona_piano.py — dal piano approvato al PDF
-Nel motore dal 19/09/2026. Compila la zona dati del template piano v5 (M3) e genera
-il PDF. Legge `piano.csv`, `alimenti.csv`, `nomi_paziente.csv`, `target.csv`,
-`metadati_piano_vN.json` e, se passato, `orari_pasti.csv`.
-
+Compila la zona dati del template piano v5 (M3) e genera il PDF. Legge `piano.csv`,
+`alimenti.csv`, `nomi_paziente.csv`, `target.csv`, `metadati_piano_vN.json` e, se passato,
+`orari_pasti.csv`.
 ```
 python3 genera_zona_piano.py --piano piano_vN.csv --target target.csv
     --metadati metadati_piano_vN.json --template TEMPLATE_..._v5.py
@@ -336,403 +268,317 @@ python3 genera_zona_piano.py --piano piano_vN.csv --target target.csv
     [--orari orari_pasti.csv] [--mese "Settembre 2026"]
 python3 genera_zona_piano.py --autotest --template TEMPLATE_..._v5.py
 ```
-
-- Le kcal vengono da `calcola_riga`, arrotondate alle 10 con la tilde. Il totale del
-  giorno è l'intervallo min–max sulle combinazioni colazione×spuntino ammesse
-  dall'abbinamento. Un altro pasto a scelta (es. il secondo spuntino) entra nel totale
-  con la sua alternativa minima e massima, come scelta indipendente; prima del
-  30/09/2026 le kcal di un pasto a scelta diverso da colazione e spuntino restavano
-  fuori dal totale del giorno.
-- **Pasti (30/09/2026).** Al massimo 5: un pasto senza righe in `piano.csv` non
-  compare. Nei piani con `spuntino2` l'ordine è colazione, SPUNTINO (metà mattina),
-  pranzo, SECONDO SPUNTINO, cena; nei piani a 4 pasti resta colazione, pranzo,
-  spuntino, cena. Se tutti i pasti di un giorno hanno un orario in `orari_pasti.csv`,
-  vale l'orario (uno spuntino alle 22:30 va dopo la cena). Il secondo spuntino usa la
-  chiave emoji `"spuntino"`: il template non si tocca. "N pasti" nell'intestazione è
-  contato dai dati. Il giorno libero riporta il secondo spuntino dei giorni
-  strutturati. Un valore di pasto non ammesso ferma lo script.
-- Il dettaglio dei pasti usa nome e nota di peso di `nomi_paziente.csv`.
-- Le lettere A, B, C... seguono l'ordine della colonna `opzione` di `piano.csv`.
-- Il motore grafico è copiato byte per byte dal template: lo script sostituisce solo
-  la zona dati.
-- Box target: `kcal_target` da `target.csv`, deficit = `tdee_confermato_kcal` dei
-  metadati − target, perdita attesa = deficit × 7 / 7.700 kg/settimana (convenzione
-  decisa il 19/09/2026).
-- Giorno libero: colazione e spuntino sono le stesse alternative dei giorni
-  strutturati, pranzo e cena liberi con le indicazioni dei metadati, totale da
-  `range_kcal_libero` (decisione del 19/09/2026).
-- **Si ferma, nominando il problema**, se manca un campo dei metadati o un titolo di
-  piatto, se un `food_id` non ha nome paziente, se i giorni di `piano.csv` non
-  coincidono con quelli dichiarati, o se un pasto mescola alimenti fissi e
-  alternative (formato che il template non rappresenta).
-- `--autotest` genera il caso golden 03 con metadati fittizi e verifica: kcal uguali
-  al calcolatore, motore grafico identico al template, PDF senza segnaposto,
-  abbinamento risolto in lettere, fermo su metadato mancante. Scrive solo in una
-  cartella temporanea: non sporca i checksum.
+- Kcal da `calcola_riga`, arrotondate alle 10 con la tilde. Totale del giorno = intervallo
+  min–max sulle combinazioni colazione×spuntino ammesse dall'abbinamento; ogni altro pasto a
+  scelta (es. secondo spuntino) entra con la sua alternativa minima e massima, come scelta
+  indipendente.
+- **Pasti:** al massimo 5; un pasto senza righe non compare. Con `spuntino2` l'ordine è
+  colazione, SPUNTINO (metà mattina), pranzo, SECONDO SPUNTINO, cena; a 4 pasti resta
+  colazione, pranzo, spuntino, cena. Se tutti i pasti di un giorno hanno un orario in
+  `orari_pasti.csv`, vale l'orario (uno spuntino alle 22:30 va dopo la cena). Il secondo
+  spuntino usa la chiave emoji `"spuntino"`: il template non si tocca. «N pasti»
+  nell'intestazione è contato dai dati. Un valore di pasto non ammesso ferma lo script.
+- Dettaglio dei pasti con nome e nota di peso di `nomi_paziente.csv`; lettere A, B, C...
+  nell'ordine della colonna `opzione`.
+- Motore grafico copiato byte per byte dal template: si sostituisce solo la zona dati.
+- Box target: `kcal_target` da `target.csv`; deficit = `tdee_confermato_kcal` dei metadati
+  − target; perdita attesa = deficit × 7 / 7.700 kg/settimana.
+- Giorno libero: colazione, spuntino e secondo spuntino come nei giorni strutturati, pranzo
+  e cena liberi con le indicazioni dei metadati, totale da `range_kcal_libero`.
+- **Si ferma, nominando il problema**, se manca un campo dei metadati o un titolo di piatto,
+  se un `food_id` non ha nome paziente, se i giorni di `piano.csv` non coincidono con quelli
+  dichiarati, o se un pasto mescola alimenti fissi e alternative.
+- `--autotest` genera il caso golden 03 con metadati fittizi e verifica: kcal uguali al
+  calcolatore, motore grafico identico al template, PDF senza segnaposto, abbinamento
+  risolto in lettere, fermo su metadato mancante. Scrive solo in una cartella temporanea:
+  non sporca i checksum.
 
 ### larn.py + larn.csv — riferimenti per sesso, età e condizione
-`larn.csv` — `gruppo, sesso, eta_min, eta_max, condizione, larn_* (8 colonne), nota`
-Fonte: **LARN V revisione, SINU 2024**, tabelle riassuntive pubblicate su sinu.it/larn/,
-trascritte il 19/09/2026 (decisione del nutrizionista: si usa la V revisione, non la IV).
-Copre adolescenti 11-14 e 15-17, adulti 18-64, 65-74 e ≥75 per entrambi i sessi, più le
-condizioni `menopausa`, `gravidanza`, `allattamento`. Sotto gli 11 anni non è coperta e
-il modulo si ferma: i LARN pediatrici non sono caricati.
-`python3 larn.py` stampa cinque casi tipici; `riferimenti(sesso, eta, condizione)`
-restituisce i valori e la nota della riga usata.
-
-*Differenze rispetto ai valori usati prima* (che erano un ibrido IV/V revisione tarato
-sull'uomo adulto): B12 da 2,4 a **4,0 µg**, folati da 400 a **330 µg**, calcio da 1000 a
-**950 mg** nell'adulto (1100 dai 65 anni e in post-menopausa). Donna in età fertile:
-ferro **18 mg**, zinco 9 mg, vitamina C 85 mg. Il salto sulla B12 è rilevante: un piano
-giudicato adeguato con il riferimento 2,4 µg può non esserlo con 4,0.
+`larn.csv`: `gruppo, sesso, eta_min, eta_max, condizione, larn_* (8 colonne), nota`.
+Fonte: **LARN V revisione, SINU 2024** (tabelle riassuntive di sinu.it/larn/, trascritte il
+19/09/2026); si usa la V revisione, non la IV. Copre 11-14, 15-17, 18-64, 65-74 e ≥75 anni
+per entrambi i sessi, più `menopausa`, `gravidanza`, `allattamento`. Sotto gli 11 anni il
+modulo si ferma: i LARN pediatrici non sono caricati.
+`python3 larn.py` stampa cinque casi tipici; `riferimenti(sesso, eta, condizione)` dà i
+valori e la nota della riga usata.
+Valori da tenere presenti nell'adulto: B12 **4,0 µg** (non 2,4: un piano adeguato con 2,4
+può non esserlo), folati **330 µg**, calcio **950 mg** (1100 dai 65 anni e in
+post-menopausa). Donna in età fertile: ferro **18 mg**, zinco 9 mg, vitamina C 85 mg.
 
 ---
 
 ## 3. CASI GOLDEN
 
-Cartella `golden/` dentro `motore-calcolo`. Ogni caso è una sottocartella con `piano.csv`,
-`target.csv`, `atteso.json`. `atteso.json` contiene i valori attesi più due campi di
-documentazione: `descrizione` (cosa copre il caso) e `riferimento` (come è stato validato).
+In `motore-calcolo/golden/`, una sottocartella per caso con `piano.csv`, `target.csv`,
+`atteso.json` (valori attesi più `descrizione`, cosa copre, e `riferimento`, come è stato
+validato).
 
-- **caso_01_base** — giornata validata contro il collaudo archiviato del 26/07/2026,
-  riprodotta al decimale su tutti e quattro i pasti. Copre legumi lessati a peso cotto e
-  pesce a peso crudo.
-- **caso_02_legumi_inscatolati** — legumi in scatola, pesce in scatola e olive a peso
-  netto nella stessa giornata; esercita anche il percorso "macro fuori tolleranza".
-- **caso_03_scelta_colazione_spuntino** — colazione e spuntino a scelta multipla (2
-  alternative ciascuno), pranzo e cena fissi. Verifica minimo/massimo per nutriente
-  prodotti da `scelte_multiple.py`, non solo i totali a combinazione fissa.
-- **caso_04_limite_tolleranza** — target tarati a ridosso del confine ±5 punti
-  percentuali (scarti di +4.999/+5.001), non un piano realistico. Limite noto dichiarato
-  nel caso stesso: non distingue un confine incluso da uno escluso scritto male
-  esattamente a scarto = 5.000.
-- **caso_05_livelli_colazione_misti** — piano a 2 giorni con colazioni diverse tra loro.
-  Entrambi i giorni sono deliberatamente dentro tolleranza su kcal (-4,56% e -2,03%) e su
-  tutti e tre i macro: è il punto del caso. Un piano che supera ogni controllo numerico e
-  viene fermato solo dalla regola strutturale del PASSO 6.
-- **caso_06_livelli_incoerenti_tra_pasti** — le 4 colazioni del livello standard con i 2
-  spuntini del rinforzato. I due giorni sono identici tra loro, quindi il controllo di
-  uniformità li dichiara conformi: solo il riconoscimento del livello vede l'incoerenza.
-- **caso_07_micro_basso_giorno_ok_settimana** — calcio al 65% LARN sul giorno 1 e all'85%
-  in media settimanale. NESSUN rilievo deve comparire, exit code 0: protegge il principio
-  8. Complementare al caso_06 — quello sorveglia i flag per giorno del PASSO 2, questo
-  quelli del PASSO 3.
-- **caso_12_cinque_pasti** — un giorno a 5 pasti (colazione S1, spuntino SPA, pranzo,
-  secondo spuntino SPB, cena). Congela i totali pasto per pasto, secondo spuntino
-  compreso; totali dello `spuntino2` verificati a mano da `alimenti.csv`.
-- **caso_13_secondo_spuntino_non_uniforme** — secondo spuntino nel giorno 1 e non nel
-  giorno 2: unico bloccante `STRUTTURA_NON_UNIFORME` (target tarati sui macro reali
-  perché non ce ne siano altri).
-- **caso_14_pasto_non_ammesso** — `spuntino 2` scritto con lo spazio: unico bloccante
+- **01_base** — giornata reale validata (P01, lunedì), riprodotta al decimale su tutti i
+  pasti: legumi lessati a peso cotto, pesce a peso crudo.
+- **02_legumi_inscatolati** — legumi e pesce in scatola e olive a peso netto nella stessa
+  giornata; esercita anche il percorso «macro fuori tolleranza».
+- **03_scelta_colazione_spuntino** — colazione e spuntino a 2 alternative, pranzo e cena
+  fissi: verifica minimo/massimo per nutriente di `scelte_multiple.py`.
+- **04_limite_tolleranza** — target tarati sul confine ±5 punti (scarti +4.999/+5.001), non
+  un piano realistico. Limite dichiarato: non distingue un confine incluso da uno escluso
+  scritto male esattamente a scarto 5.000.
+- **05_livelli_colazione_misti** — 2 giorni con colazioni diverse, entrambi dentro
+  tolleranza su kcal e macro: fermato solo dalla regola strutturale del PASSO 6.
+- **06_livelli_incoerenti_tra_pasti** — colazioni standard con spuntini rinforzati, giorni
+  identici: solo il riconoscimento del livello vede l'incoerenza.
+- **07_micro_basso_giorno_ok_settimana** — calcio al 65% LARN il giorno 1, all'85% in
+  media: nessun rilievo sul calcio (né giornaliero né settimanale), exit 0. Protegge il
+  giudizio settimanale dei micronutrienti.
+- **08_giorno_fuori_settimana_ok** — giorno a -6,96% kcal, media dentro: attenzione
+  `KCAL_FUORI_TOLLERANZA`, non bloccante, exit 0.
+- **09_settimana_fuori_tolleranza** — media a -6,96%: bloccanti
+  `SETTIMANA_KCAL_FUORI_TOLLERANZA` e `SETTIMANA_MACRO_FUORI_TOLLERANZA`, exit 1. Senza
+  questo caso un motore che non blocca più nulla passerebbe la suite.
+- **10_giorno_oltre_limite_sicurezza** — giorno a -11,98% con media dentro: bloccante
+  `GIORNO_KCAL_OLTRE_LIMITE_SICUREZZA`, exit 1.
+- **11_formati_confezione_violati** — fiocchi di latte 100 g (vaschette 200/400):
+  attenzione `FORMATO_CONFEZIONE_NON_RISPETTATO`, non bloccante. I casi 05-07 la
+  contengono anch'essi, perché i loro input di test non seguono i formati commerciali.
+- **12_cinque_pasti** — un giorno a 5 pasti; totali congelati pasto per pasto, secondo
+  spuntino compreso (verificati a mano da `alimenti.csv`).
+- **13_secondo_spuntino_non_uniforme** — secondo spuntino solo nel giorno 1: unico
+  bloccante `STRUTTURA_NON_UNIFORME`.
+- **14_pasto_non_ammesso** — `spuntino 2` con lo spazio: unico bloccante
   `PASTO_NON_AMMESSO`.
-- **caso_15_accoppiamenti_vietati** (21/10/2026) — latte + yogurt in colazione solo nello
-  scenario A, pollo + merluzzo a cena: due attenzioni `ACCOPPIAMENTO_VIETATO`. Controllo
-  negativo: yogurt e latte come alternative dello stesso spuntino non scattano.
-  Verificato al contrario: con le regole svuotate il caso diventa rosso.
-- **caso_16_accoppiamenti_alimento_preciso** (21/10/2026) — a pranzo pasta + merluzzo
-  (A04, regola su alimento preciso) e parmigiano + mozzarella (A03): due attenzioni
-  `ACCOPPIAMENTO_VIETATO`. Controllo negativo a cena: pasta integrale + alici con un solo
-  formaggio non scatta. Verificato al contrario: senza A03 e A04 il caso diventa rosso.
-- **caso_17_carne_pasta_frutta_secca** (21/10/2026) — pasta + vitellone a pranzo (A05) e
-  noci + nocciole nello stesso spuntino (A06): due attenzioni. Controlli negativi: pasta
-  integrale + pollo; mandorle a colazione e noci allo spuntino (pasti diversi). Verificato
-  al contrario: senza A05 e A06 il caso diventa rosso.
-Entrambe le regole nuove sono state verificate anche al contrario (30/09/2026):
-togliendole dal codice, la suite diventa rossa esattamente sul caso che le sorveglia.
+- **15_accoppiamenti_vietati** — latte + yogurt in colazione (solo scenario A), pollo +
+  merluzzo a cena: due attenzioni. Controllo negativo: yogurt e latte alternative dello
+  stesso spuntino non scattano.
+- **16_accoppiamenti_alimento_preciso** — pasta + merluzzo (A04) e parmigiano + mozzarella
+  (A03): due attenzioni. Negativo: pasta integrale + alici con un solo formaggio.
+- **17_carne_pasta_frutta_secca** — pasta + vitellone (A05), noci + nocciole nello stesso
+  spuntino (A06): due attenzioni. Negativi: pasta integrale + pollo; mandorle a colazione e
+  noci allo spuntino.
 
-**Tipi di caso.** `fisso` e `scelta_multipla` sono dedotti dal piano (presenza di
-`gruppo_scelta`), così il tipo non può disallinearsi da cosa il piano contiene davvero.
-`pipeline` è l'unico DICHIARATO, dalla presenza di un `pipeline.json` nella cartella del
-caso (che porta anche le opzioni di esecuzione, es. `deroga_struttura`): dallo stesso
-`piano.csv` non si distingue un caso di calcolo da uno di orchestrazione. I casi
-`pipeline` congelano i VERDETTI dell'orchestratore — passo, codice del rilievo, codice di
-uscita — non i numeri, già coperti dai casi 01-04.
+**Tipi di caso.** `fisso` e `scelta_multipla` si deducono dal piano (presenza di
+`gruppo_scelta`). `pipeline` è l'unico DICHIARATO, da un `pipeline.json` nella cartella del
+caso, che porta anche le opzioni di esecuzione (es. `deroga_struttura`). I casi `pipeline`
+congelano i VERDETTI (passo, codice del rilievo, codice di uscita), non i numeri.
 
-**Copertura reale — limite noto.** I casi coprono pesi, scelta multipla, soglia di
-tolleranza, struttura pasti e lettura settimanale dei micronutrienti, ma toccano solo gli
-alimenti dei rispettivi piani. Carni e pesci diversi non sono coperti: una modifica ai
-loro valori passa la suite senza che nulla la intercetti — è il controllo 5 di
-`collaudo.py` a intercettarla, non la regressione. Verificato il 28/07/2026, quando
-l'aggiornamento della vitamina D di branzino, gambero, maiale e vitello ha lasciato la
-suite verde senza rigenerazione.
+**Limite di copertura.** I casi toccano solo gli alimenti dei rispettivi piani: una
+modifica ai valori di carni e pesci non presenti passa la suite. La intercetta il controllo
+5 del collaudo, non la regressione.
 
-Quando un caso reale fa emergere un errore che il motore non ha intercettato, quell'errore
+Una regola nuova si verifica anche al contrario: togliendola, la suite deve diventare rossa
+sul caso che la sorveglia. Un errore di un caso reale che il motore non ha intercettato
 diventa un nuovo caso golden.
 
 ---
 
 ## 4. DATABASE ALIMENTI E GERARCHIA FONTI
 
-**Stato:** 144 alimenti verificati e tracciati alla fonte (verificato il 21/10/2026,
-nessun `food_id` duplicato; il numero vincolante è `EXPECTED_ALIMENTI_COUNT` in
-`collaudo.py`). Conformità kcal/macro/fibra a CREA verificabile con
+**Stato:** 144 alimenti verificati e tracciati alla fonte; il numero vincolante è
+`EXPECTED_ALIMENTI_COUNT` in `collaudo.py`. Conformità kcal/macro/fibra a CREA:
 `python3 cerca_crea.py verifica`.
 
-**Criterio di ampliamento "Key Foods":** un alimento si aggiunge solo quando un piano
-reale lo richiede e non è già presente. Oltre le 150 voci solo su richiesta esplicita del
-nutrizionista.
+**Criterio «Key Foods»:** un alimento si aggiunge solo quando un piano reale lo richiede e
+non è già presente. Oltre le 150 voci solo su richiesta esplicita del nutrizionista.
 
 **Gerarchia fonti — congelata, non riaprire:**
-1. **CREA eTCA 2019** (alimentinutrizione.it) — kcal, macronutrienti, fibra, minerali.
-   Le kcal si LEGGONO da CREA, mai ricalcolate con 4/4/9: CREA usa il metodo Southgate,
-   con scarto fisiologico noto del 4-8% rispetto ad Atwater.
-2. **BDA-IEO** — vitamina D, folati, B12 e minerali non coperti da CREA.
-3. **USDA FoodData Central** — solo residuale, quando le prime due tacciono. Mai per le
-   kcal.
+1. **CREA eTCA 2019** (alimentinutrizione.it) — kcal, macronutrienti, fibra, minerali. Le
+   kcal si LEGGONO da CREA, mai ricalcolate con 4/4/9 (CREA usa il metodo Southgate, scarto
+   fisiologico noto del 4-8% rispetto ad Atwater).
+2. **BDA-IEO** — vitamina D, folati, B12 e minerali non coperti da CREA. Quando
+   l'alimento non ha scheda CREA, anche kcal e macro vengono da BDA-IEO (oggi 86 voci con
+   fonte `BDA-IEO` o `BDA-IEO+USDA`).
+3. **USDA FoodData Central** — residuale, quando le prime due tacciono. Mai per le kcal.
 
-**Eccezione dichiarata — tabella nazionale portoghese INSA** (Base de Dados da Composição
-de Alimentos, INSA, v 7.1 – 2026; citazione della fonte obbligatoria per licenza). Si usa
-SOLO per decisione del nutrizionista, voce per voce, quando le tre fonti sono incoerenti
-tra loro e INSA ha la stessa specie e lo stesso stato (crudo/cotto). Mai per kcal e macro,
-che restano CREA. In `fonte` si scrive `INSA(...)`, in `codice_fonte` `INSA<cod>`.
-Righe oggi in eccezione: 122800 sardine (micronutrienti, 01/10/2026).
+**Eccezione INSA** (tabella nazionale portoghese, Base de Dados da Composição de Alimentos,
+INSA, v 7.1 – 2026; citazione della fonte obbligatoria per licenza). SOLO per decisione del
+nutrizionista, voce per voce, quando le tre fonti sono incoerenti tra loro e INSA ha la
+stessa specie e lo stesso stato (crudo/cotto). Mai per kcal e macro, che restano CREA. In
+`fonte` si scrive `INSA(...)`, in `codice_fonte` `INSA<cod>`. Righe in eccezione: 122800
+sardine (micronutrienti).
+
+**Eccezione etichetta — regola generale ancora da scrivere.** `ETI001` (vellutata
+surgelata zucca e carote) ha TUTTI i valori, kcal comprese, da un'etichetta, per decisione
+del nutrizionista del 17/10/2026; i micronutrienti sono gap. È l'unica voce che non viene
+da CREA, BDA-IEO, USDA o INSA: non estendere ad altre voci finché la regola non è decisa.
 
 **Il terzo livello va usato davvero.** CREA non pubblica calcio, ferro, vitamina D, folati
-e B12 per pesci e carni. Fermarsi al livello 1 lascia quei campi a zero, e uno zero da
-dato mancante si comporta esattamente come uno zero biologico: abbassa il totale e produce
-un falso allarme di carenza. Quando una fonte tace su un campo si scende di livello —
-sempre, non solo quando conviene. Prima di dichiarare un gap, interroga la cache con
-`cerca_cache.py`: fermarsi al livello 1 e scrivere "gap" è l'errore più comune, ed è già
-costato una lettura falsata del magnesio.
+e B12 per pesci e carni. Quando una fonte tace su un campo si scende di livello, sempre.
+Prima di dichiarare un gap si interroga la cache con `cerca_cache.py`.
 
-**Tolleranze:** ±5% su kcal totali · ±5 punti percentuali sui macronutrienti.
+**Tolleranze:** ±5% sulle kcal totali · ±5 punti percentuali sui macronutrienti.
 
 ---
 
 ## 5. SCHEMA CSV — CONGELATO, non modificare le colonne
 
-**alimenti.csv**
+**alimenti.csv** (valori per 100 g di parte edibile)
 `food_id, nome, categoria, fonte, codice_fonte, data_verifica, kcal_100g, proteine_g,
 carboidrati_g, grassi_g, fibra_g, calcio_mg, ferro_mg, vitamina_d_ug, folati_ug,
 vitamina_b12_ug, zinco_mg, magnesio_mg, vitamina_c_mg`
-(tutti i valori per 100 g di parte edibile)
 
-**piano.csv**
-`giorno, pasto, food_id, grammi` [+ `gruppo_scelta, opzione` — opzionali]
-pasti ammessi: `colazione | spuntino | pranzo | spuntino2 | cena` — al massimo 5
-(decisione del 30/09/2026). `spuntino2` è il secondo spuntino: minuscolo, tutto
-attaccato, senza spazi (altrimenti `PASTO_NON_AMMESSO`). Le colonne non cambiano.
+**piano.csv** — `giorno, pasto, food_id, grammi` [+ `gruppo_scelta, opzione`, opzionali].
+Pasti ammessi: `colazione | spuntino | pranzo | spuntino2 | cena`, al massimo 5.
+`spuntino2` = secondo spuntino: minuscolo, tutto attaccato, senza spazi (altrimenti
+`PASTO_NON_AMMESSO`).
 
 **target.csv** — `parametro, valore`
 **farmaci_paziente.csv** — `principio_attivo, nome_commerciale, orario_assunzione, note`
 **interazioni.csv** — `principio_attivo, tipo_target, target, meccanismo, separazione_ore, gravita`
 **orari_pasti.csv** — `giorno, pasto, orario (HH:MM)`
 
-### File affiancati — non fanno parte dello schema congelato
-Serve un dato nuovo? Va in un file affiancato, mai in una colonna nuova. Nessuno di questi
-contiene valori nutrizionali precalcolati (principio 2).
+### File affiancati — fuori dallo schema congelato
+Un dato nuovo va in un file affiancato, mai in una colonna nuova. Nessuno contiene valori
+nutrizionali precalcolati (principio 2): chi dichiara alimenti dichiara solo ingredienti,
+e i valori si ricalcolano da `alimenti.csv`.
 
-**gap.csv** — `food_id, nome, nutriente, motivo`
+**gap.csv** — `food_id, nome, nutriente, motivo` (sezione 6).
 
-**larn.csv** — vedi la sezione `larn.py` sopra.
+**larn.csv** — vedi `larn.py`.
 
-**formati_confezione.csv** — `food_id, nome_riferimento, unita_g, tolleranza_g, fonte, stato`
-`unita_g` è una lista separata da `|` (es. `125|150|170`). Un alimento PRESENTE è
-vincolato a confezione intera o multiplo; un alimento ASSENTE è a porzione libera.
-`stato` vale `confermato` o `da_confermare`. Nessun valore nutrizionale.
+**formati_confezione.csv** — `food_id, nome_riferimento, unita_g, tolleranza_g, fonte, stato`.
+`unita_g` è una lista separata da `|` (es. `125|150|170`). Alimento PRESENTE = vincolato a
+confezione intera o multiplo; ASSENTE = porzione libera. `stato`: `confermato` o
+`da_confermare`.
 
-**scambi_frutta.csv** — `food_id, nome_riferimento, grammi_porzione, stato`
-Porzioni di frutta equivalenti in energia (riferimento: banana 100 g). Usata per la
-tabella di scambio nel documento di spiegazione. Nessun valore nutrizionale.
+**scambi_frutta.csv** — `food_id, nome_riferimento, grammi_porzione, stato`. Porzioni di
+frutta equivalenti in energia (riferimento banana 100 g), per la tabella di scambio del
+documento di spiegazione.
 
-**nomi_paziente.csv** — `food_id, nome_paziente, nota_peso`
-Nome leggibile con cui l'alimento compare nel PDF del paziente e nota di peso da
-mostrargli (`crudo`, `sgocciolato e sciacquato`, `cotto`, `peso netto di confezione`,
-`crude, peso sgusciato`...). Serve perché `alimenti.csv` porta il nome tecnico della
-fonte ("Bovino magro vitellone senza grasso visibile") e riscriverlo a mano a ogni
-piano è testo non controllato che arriva al paziente.
-Il controllo 6 di `collaudo.py` lo tiene allineato: **un alimento nuovo in
-`alimenti.csv` fa fallire il collaudo finché non ha la sua riga qui** — passo da
-eseguire al termine di ogni ampliamento del database (M6).
-Non contiene valori nutrizionali: solo testo.
+**nomi_paziente.csv** — `food_id, nome_paziente, nota_peso`. Nome leggibile dell'alimento
+nel PDF e nota di peso (`crudo`, `sgocciolato e sciacquato`, `cotto`, `peso netto di
+confezione`, `crude, peso sgusciato`...). Solo testo. **Un alimento nuovo fa fallire il
+collaudo finché non ha la sua riga qui** (controllo 6): passo finale di ogni ampliamento
+(M6).
 
-**colazioni_spuntini.csv** — `alternativa_id, livello, tipo, ingredienti_food_id_grammi, nota`
-Catalogo delle 4 colazioni + 2 spuntini nei due livelli, `standard` e `rinforzata_calcio`
-(S1/S2/D1/D2 + SPA/SPB — Sr1/Sr2/Dr1/Dr2 + SPrA/SPrB). Per leggerlo:
-`python3 struttura_pasti.py`.
-*Perché dichiara solo gli ingredienti:* la prima versione portava i valori precalcolati, e
-il 28/07/2026 il ricalcolo ha trovato 71 valori su 72 corretti e uno sbagliato:
-l'alternativa S1 dichiarava 0,20 µg di vitamina D contro 2,10 reali — un fattore dieci sul
-nutriente che è già il limite noto della dieta, e nella direzione che fa sembrare coperto
-ciò che non lo è. Il dato a monte era sano: l'errore stava nel derivato.
-*Livello di applicazione:* la scelta tra standard e rinforzato è UNA SOLA DECISIONE PER
-L'INTERO PIANO SETTIMANALE, mai giorno per giorno (dettaglio clinico in M2).
+**colazioni_spuntini.csv** — `alternativa_id, livello, tipo, ingredienti_food_id_grammi, nota`.
+Catalogo di 4 colazioni + 2 spuntini per livello: `standard` (S1/S2/D1/D2 + SPA/SPB) e
+`rinforzata_calcio` (Sr1/Sr2/Dr1/Dr2 + SPrA/SPrB). Si legge con `python3
+struttura_pasti.py`. La scelta tra standard e rinforzato è UNA SOLA DECISIONE PER L'INTERO
+PIANO SETTIMANALE, mai giorno per giorno (dettaglio in M2). Non si riempie di alternative:
+quelle stanno nella libreria.
 
-**moduli_pasto.csv** — `modulo_id, nome, categoria, tag, ingredienti_food_id_grammi`
-Libreria di 128 blocchi pranzo/cena riutilizzabili, con tag (halal_ok · mensa_ok ·
-vegetariano · legumi · pesce · carne · vitD · calcio · pratico · leggero). M25-M105 dal
-21/10/2026: tag ricavati dai ruoli (halal_ok · vegetariano · legumi · pesce · carne).
-M106-M129 dal 21/10/2026 sera (P01, P06, P07, P04). M11 corretto
-lo stesso giorno: riportava la pasta di semola dove il calcolo approvato di P01 (caso
-golden 01) usa la pasta integrale. M01 (pasta + merluzzo) tolto il 21/10/2026 con la regola A04.
+**Libreria degli accoppiamenti** — `moduli_pasto.csv` (128 blocchi pranzo/cena) e
+`moduli_colazione.csv` (55 blocchi colazione | spuntino), schema
+`modulo_id, nome, categoria, tag, ingredienti_food_id_grammi`. Tag pranzo/cena: halal_ok ·
+mensa_ok · vegetariano · legumi · pesce · carne · vitD · calcio · pratico · leggero.
+**Limite:** vitD, calcio, mensa_ok, pratico e leggero sono assegnati solo nei blocchi
+M02-M24; da M25 i tag sono solo quelli ricavati dai ruoli (halal_ok, vegetariano, legumi,
+pesce, carne). Un filtro su quei cinque tag ignora M25-M129 senza avvisare. Tag
+colazioni/spuntini: dolce · salata · halal_ok · vegetariano · carne.
+Si legge con `python3 moduli_pasto.py`.
+- Raccoglie gli ACCOPPIAMENTI VALIDI di tutti i piani fatti, per non ricomporre ogni volta
+  pasti mal accoppiati; nessun tetto al numero di blocchi.
+- Un blocco entra solo se il suo NUCLEO non c'è già: alimenti portanti (proteine, cereali,
+  patate, latticini, legumi, frutta secca, dolci); verdura, frutta e condimenti si
+  scambiano e non contano.
+- È una BASE DI PARTENZA da scalare, non un sostituto del calcolo caso per caso.
+- Un blocco che viola una regola di accoppiamento si toglie.
 
-**moduli_colazione.csv** — stesso schema, `categoria` colazione | spuntino, tag dolce |
-salata. 55 blocchi (C01-C56, C37 tolto il 21/10/2026 con la regola A06) dal 21/10/2026. È una LIBRERIA, distinta dal catalogo
-`colazioni_spuntini.csv`, che serve a riconoscere il livello e non va riempito di
-alternative.
+**ruoli_alimenti.csv** — `food_id, ruolo`. Un ruolo per voce: carne, salume, pesce,
+molluschi_crostacei, uova, legumi, latte, yogurt, formaggio, cereale, patate, verdura,
+frutta, frutta_secca, condimento, dolce. Più fine della `categoria` di `alimenti.csv`.
+Patate e patata dolce hanno un ruolo proprio (portano carboidrato, non contorno); i piselli
+sono legumi; il mais dolce è cereale. Ogni voce nuova del database richiede la sua riga
+qui (controllo 8).
 
-**ruoli_alimenti.csv** — `food_id, ruolo`. Un ruolo per ogni voce del database: carne,
-salume, pesce, molluschi_crostacei, uova, legumi, latte, yogurt, formaggio, cereale,
-patate, verdura, frutta, frutta_secca, condimento, dolce. È più fine della `categoria` di
-`alimenti.csv`, che mette insieme il parmigiano e lo yogurt. Patate e patata dolce hanno un
-ruolo proprio (portano carboidrato, non contorno); i piselli sono legumi; il mais dolce è
-cereale. Ogni voce nuova del database richiede la sua riga qui (collaudo, controllo 8).
-
-**accoppiamenti_vietati.csv** — `regola_id, ruoli_a, ruoli_b, motivo, data_decisione, pasti`;
-più voci separate da `|`, ogni voce è un ruolo o un `food_id`. `pasti` (facoltativa: vuota
-= tutti) limita la regola a certi pasti, es. `colazione`; nella libreria un blocco
-`spuntino` vale per spuntino e spuntino2. Al 21/10/2026: A01 latte + yogurt, A02 carne o
-salume + pesce o molluschi/crostacei, A03 due formaggi diversi, A04 merluzzo + pasta
-(semola o integrale), A05 carne rossa o maiale + pasta (vitellone, manzo, vitello, maiale,
-trippa; pollo e tacchino ammessi; i salumi NON sono inclusi), A06 due tipi di frutta secca
-nello stesso pasto (in pasti diversi ammessi; i semi di lino hanno ruolo frutta_secca e
-contano). Nuove coppie: si aggiungono man mano, durante la stesura delle diete. Sono una BASE DI
-PARTENZA da scalare, non un sostituto del calcolo caso per caso. Per leggerla:
-`python3 moduli_pasto.py`.
-*Perché anche questo dichiara solo gli ingredienti:* portava valori precalcolati fino al
-29/07/2026, quando il ricalcolo ha trovato 165 valori su 168 corretti e tre sbagliati — la
-vitamina D di M18, M20 e M22. NON erano errori di trascrizione: erano corretti il 27/07 e
-sono diventati falsi il 28/07, quando la vitamina D di gambero e polpo è stata recuperata
-da USDA. La fonte è migliorata sotto il derivato. È una via di divergenza più insidiosa di
-quella di S1, perché non richiede alcun errore umano.
-*Ampliamento — decisione del 21/10/2026:* la libreria raccoglie gli ACCOPPIAMENTI VALIDI di
-tutti i piani fatti, per non ricomporre ogni volta pasti mal accoppiati; il vecchio tetto di
-20-30 blocchi è superato, la consultazione resta rapida con `--categoria` e `--tag`. Un
-blocco entra solo se il suo NUCLEO non c'è già: gli alimenti portanti (proteine, cereali,
-patate, latticini, legumi, frutta secca, dolci); verdura, frutta e condimenti si scambiano e
-non contano.
+**accoppiamenti_vietati.csv** — `regola_id, ruoli_a, ruoli_b, motivo, data_decisione, pasti`.
+Più voci separate da `|`, ciascuna un ruolo o un `food_id`. `pasti` (vuota = tutti) limita
+la regola a certi pasti; nella libreria un blocco `spuntino` vale per spuntino e spuntino2.
+Regole attuali:
+- A01 latte + yogurt
+- A02 carne o salume + pesce o molluschi/crostacei
+- A03 due formaggi diversi
+- A04 merluzzo + pasta (semola o integrale)
+- A05 carne rossa o maiale + pasta (vitellone, manzo, vitello, maiale, trippa); pollo e
+  tacchino ammessi; i salumi NON sono inclusi
+- A06 due tipi di frutta secca nello stesso pasto (in pasti diversi ammessi; i semi di lino
+  hanno ruolo frutta_secca e contano)
+Nuove coppie: si aggiungono man mano, durante la stesura delle diete.
 
 ---
 
 ## 6. GAP DICHIARATI
 
-Lo schema congelato non sa rappresentare "dato non disponibile": un nutriente che la fonte
-non pubblica finisce a 0 e viene sommato come assenza reale. `gap.csv` elenca le celle il
-cui zero è un dato mancante. `calcolatore.py` lo legge e marca il totale con ⛔ TOTALE
-SOTTOSTIMATO, elencando le voci responsabili.
+Lo schema non sa rappresentare «dato non disponibile»: un nutriente che la fonte non
+pubblica finisce a 0 e viene sommato come assenza reale. `gap.csv` elenca le celle il cui
+zero è un dato mancante; `calcolatore.py` marca il totale con ⛔ TOTALE SOTTOSTIMATO ed
+elenca le voci responsabili.
 
-Un valore sotto l'80% LARN accompagnato da quel flag NON è una carenza accertata: prima di
-intervenire clinicamente, verifica se dipende dal gap.
+Un valore sotto l'80% LARN con quel flag NON è una carenza accertata: prima di intervenire
+clinicamente, verifica se dipende dal gap.
 
-**Stato attuale:** 8 righe su 4 alimenti — vitamina D (4: latte parzialmente scremato,
-orata, salmone affumicato, trippa), vitamina B12 (2: latte, trippa), folati (1: trippa),
-zinco (1: trippa). La riga delle sardine è chiusa dal 01/10/2026 (micronutrienti INSA,
-sezione 8).
-Il blocco magnesio (35 celle) è chiuso dal 28/07/2026 via USDA. Il gap calcio dell'olio
-d'oliva è stato chiuso il 28/07/2026: CREA e BDA-IEO concordano su uno zero esplicito, non
-un silenzio.
+**Stato (verificato sul file il 21/10/2026):** 16 righe su 5 alimenti — latte parzialmente
+scremato (vitamina D, B12), orata (vitamina D), salmone affumicato (vitamina D), trippa
+(vitamina D, B12, folati, zinco), vellutata surgelata `ETI001` (tutti gli 8
+micronutrienti: eccezione etichetta, il cartellino UE non li dichiara).
 
 **Fave secche cotte — caso a parte:** minerali e folati presi dalla voce BDA delle fave
-CRUDE (proxy), quindi probabilmente SOVRASTIMATI, non sottostimati. Non usarle come fonte
-portante di ferro o folati.
+CRUDE (proxy), quindi probabilmente SOVRASTIMATI. Non usarle come fonte portante di ferro o
+folati.
 
-Obiettivo del sistema: non "zero gap", ma **zero gap taciuti**.
+Obiettivo: non «zero gap», ma **zero gap taciuti**.
 
 ---
 
 ## 7. RECUPERO USDA
 
-**API key FoodData Central:** non è scritta qui. Questo modulo è pubblicato su un
-repository pubblico: la chiave sta nel nucleo M0, che resta nelle istruzioni di progetto.
-La `DEMO_KEY` pubblica ha 10 richieste/ora ed è quasi sempre esaurita: non usarla per un
-blocco di gap.
+**Chiave API:** non è qui (repository pubblico): sta nel nucleo M0. La `DEMO_KEY` (10
+richieste/ora, quasi sempre esaurita) non si usa per un blocco di gap.
 
-Ogni valore recuperato: si scrive in `alimenti.csv` con fonte tracciata (es.
-`CREA+BDA-IEO+USDA`), si rimuove la riga da `gap.csv`, si rieseguono collaudo e
-regressione. Quello che nemmeno USDA copre resta in `gap.csv`.
+Ogni valore recuperato si scrive in `alimenti.csv` con fonte tracciata (es.
+`CREA+BDA-IEO+USDA`), si toglie la riga da `gap.csv`, si rieseguono collaudo e
+regressione. Ciò che nemmeno USDA copre resta in `gap.csv`.
 
-### Verifica obbligatoria della derivazione — non saltarla
-Un valore USDA non si accetta dal solo endpoint `/foods/search`: va controllato su
-`/v1/food/{fdcId}`, campo `foodNutrientDerivation`.
+**Verifica della derivazione — obbligatoria.** Un valore non si accetta dal solo
+`/foods/search`: va controllato su `/v1/food/{fdcId}`, campo `foodNutrientDerivation`.
+- **codice Z «Assumed zero»** → assunzione, non dato: non chiude il gap.
+- **codice NC «Calculated»** → ricalcolato, non misurato: mai per le kcal.
+- **dataPoints: 0** → senza campioni analitici: utilizzabile (livello 3 residuale), ma
+  dichiarato come debole.
 
-- **codice Z "Assumed zero"** → NON è un dato, è un'assunzione. Non chiude il gap.
-  Importarlo significa ereditare in silenzio lo zero di qualcun altro.
-- **codice NC "Calculated"** → ricalcolato, non misurato. Mai per le kcal.
-- **dataPoints: 0** → valore pubblicato senza campioni analitici a supporto. Utilizzabile
-  (livello 3 residuale), ma va dichiarato come debole.
+**Valori USA non trasferibili.** Il latte USDA porta vitamina D per la fortificazione
+obbligatoria statunitense, assente nel latte italiano standard: non importarla, maschera la
+carenza strutturale che il piano deve dichiarare. Stessa cautela per ogni alimento
+arricchito per obbligo negli USA (cereali da colazione, farine, bevande vegetali, latti
+fermentati). Nella cache BDA-IEO usare i FIOCCHI DI MAIS (CORNFLAKES) «non fortificati» per
+i prodotti italiani standard.
 
-Il 28/07/2026 questo controllo ha evitato tre errori: cozza, polpo e trippa risultavano a
-0,0 di vitamina D con derivazione Z e dataPoints 0.
-
-### Valori USA non trasferibili — caso latte
-Il latte USDA riporta vitamina D per effetto della fortificazione obbligatoria
-statunitense, che il latte italiano standard non ha. Non importare quel valore:
-maschererebbe la carenza strutturale di vitamina D che il piano deve dichiarare. Stessa
-cautela per ogni alimento soggetto ad arricchimento obbligatorio negli USA (cereali da
-colazione, farine, bevande vegetali, latti fermentati). La cache BDA-IEO distingue
-esplicitamente FIOCCHI DI MAIS (CORNFLAKES) "non fortificati" dalla versione
-"fortificati" — usare sempre la prima per prodotti italiani standard.
-
-### Audit ancora da fare
-I 35 valori di magnesio scritti il 28/07/2026 sono stati presi prima che la verifica di
-derivazione diventasse regola. Essendo tutti non-zero, la trappola dello "zero assunto" non
-li riguarda, ma alcuni potrebbero essere imputati anziché analitici: una passata di
-controllo sui loro `fdcId` resta da fare.
+**Audit da fare:** i 35 valori di magnesio scritti il 28/07/2026, presi prima della regola
+sulla derivazione: controllare i loro `fdcId` (alcuni potrebbero essere imputati anziché
+analitici).
 
 ---
 
 ## 8. CASI RISOLTI — non riaprire
 
-**Falso positivo strutturale di coerenza.py.** Su alimenti molto ipocalorici il cross-check
-Atwater sforava per puro effetto percentuale su numeri piccoli. Dal 28/07/2026 l'allarme
-richiede il **doppio criterio** (>12% relativo E >8 kcal/100 g in assoluto).
-Residui attesi: **AGLIO** (53 kcal dichiarate vs 44,8 ricalcolate, -15,5%, scarto
-assoluto 8,20 kcal — appena sopra soglia) e, dal 01/10/2026, **CARCIOFI** (33 kcal CREA vs
-22,6 ricalcolate, -31,5%, scarto 10,4 kcal: il metodo Southgate conta la fibra, 5,5 g per
-100 g, circa 11 kcal; macro e kcal coincidono con la scheda CREA) e, dal 21/10/2026, **SEMI
-DI LINO** (`9600_1`, 447 kcal BDA-IEO vs 377 ricalcolate, -15,7%, scarto 70 kcal: BDA-IEO
-calcola l'energia «con fibra», 34,8 g × 2 kcal = 69,6 kcal; 377 + 69,6 = 446,6). Non correggere il dato:
-dichiara il falso positivo e prosegui.
-Se compaiono NUOVI segnalati con l'ampliamento del database, vanno verificati uno a uno:
-non si alza la soglia per farli sparire.
+**Atwater, doppio criterio.** `coerenza.py` segnala solo se lo scarto supera **sia** il
+12% relativo **sia** 8 kcal/100 g in assoluto. Falsi positivi noti, attesi:
+- **AGLIO** (`005000`) — atteso -15,5%, scarto 8,20 kcal: appena sopra soglia;
+- **CARCIOFI** (`005120`) — atteso -31,5%, scarto 10,4 kcal: Southgate conta la fibra; kcal
+  e macro coincidono con la scheda CREA;
+- **SEMI DI LINO** (`9600_1`) — atteso -15,7%, scarto 70 kcal: BDA-IEO calcola l'energia
+  «con fibra».
+Uno di questi con scarto diverso da quello atteso non è più il falso positivo noto: va
+verificato come un segnalato nuovo.
+Non correggere il dato: dichiara il falso positivo e prosegui. Un NUOVO segnalato dopo un
+ampliamento si verifica uno a uno: non si alza la soglia per farlo sparire.
 
-**Voci unificate — sardine.** Esistevano due righe per lo stesso pesce, CREA 122800 (225
-kcal, 15,4 g lipidi, ma calcio/ferro/vitD/folati/B12 a zero perché CREA non li pubblica) e
-BDA 1319 "Sarda fresca" (129 kcal, 4,5 g lipidi, micronutrienti completi). Entrambe
-corrette: la differenza è variabilità stagionale reale del tenore lipidico. Fuse in
-un'unica riga 122800 secondo gerarchia — CREA per energia e macro, BDA per i micronutrienti
-mancanti. "Sarda fresca" NON esiste più come voce separata. La vitamina D di questa riga
-viene dal campione magro abbinato ai macro del campione grasso: essendo liposolubile è
-probabilmente sottostimata, ed è dichiarata in `gap.csv`.
-**Aggiornamento 01/10/2026 — micronutrienti da INSA.** La triangolazione tra fonti ha
-mostrato che magnesio e zinco della riga erano inaffidabili: le due schede CREA delle
-sardine (122800 e 122700) citano lo stesso studio (Karakoltsidis et al.) con valori
-incompatibili (Mg 70 contro 10, Zn 3,9 contro 0,8). La tabella nazionale portoghese INSA
-(v 7.1 – 2026), voce 882 «Sardinha gorda crua», misura Mg 31 e Zn 1,6, confermati da
-USDA (39 / 1,31, in scatola) e da uno studio 2024 su sardine italiane crude (39,6 / 1,91
-ricalcolati sul peso fresco). Quella voce corrisponde al campione dei macro CREA (221 kcal,
-16,4 g lipidi contro 225 e 15,4). Decisione del nutrizionista: kcal e macro restano CREA,
-TUTTI i micronutrienti passano a INSA 882 (Ca 72, Fe 1,0, vitamina D 21, folati 15,
-B12 10, Zn 1,6, Mg 31, vitamina C 0). La vitamina D era sottostimata di circa 4,7 volte:
-la riga in `gap.csv` è chiusa. Limite dichiarato: sardina atlantica (Portogallo); la
+**Sardine, riga unica 122800.** «Sarda fresca» (BDA 1319) NON esiste più come voce
+separata. Kcal e macro CREA; TUTTI i micronutrienti da INSA 882 «Sardinha gorda crua»
+(decisione del nutrizionista). Limite dichiarato: sardina atlantica (Portogallo); la
 vitamina D dei pesci varia per stagione e zona.
 
 ---
 
 ## 9. STATO DI VALIDAZIONE
 
-Motore validato ricalcolando riga per riga un piano reale già consegnato (paziente P01,
-Lunedì): totale giornata rientrato in tolleranza (-4,56%) dopo la correzione della regola
-sui legumi. Collaudo archiviato su Drive in `Motore di calcolo >
-Collaudo_Motore_PianoP01_Lunedi`. Dal 28/07/2026 quella giornata è anche
-`caso_01_base` della suite di regressione, riprodotta al decimale: la validazione è
-ripetibile e non più un documento.
+Il motore è validato contro un piano reale già consegnato (P01, lunedì: -4,56% dopo la
+correzione della regola sui legumi), oggi `caso_01_base`: la validazione è ripetibile. È
+utilizzabile su pazienti reali alle condizioni del principio 7.
 
-Il motore è utilizzabile su pazienti reali, alle condizioni del principio 7.
-
-**Validazione sul campo ancora aperta:** orchestratore, protocollo struttura pasti e
-`tdee.py` sono validati su paziente fittizio e su un solo caso reale, che ha già fatto
-emergere due errori di processo. Ogni caso reale successivo va usato anche come collaudo:
-cosa il motore ha intercettato da solo, cosa ha richiesto un intervento manuale, cosa è
-sfuggito. Quello che sfugge diventa un caso golden.
-
-**Kcal allineate a CREA — 01/10/2026.** Il confronto con la cache CREA ha trovato 7 righe
-con kcal diverse dalla scheda: riso 332→334, carciofi 22→33, porri 29→35, barbabietole
-19→25, arance 34→37, mandarini 72→76, olive verdi 142→148. In quattro casi il valore era
-vicino al ricalcolo 4/4/9 dei macro, contro la regola «kcal lette da CREA, mai ricalcolate».
-Allineate. Effetto sulla suite: i casi 02 (olive), 04 (riso) e 12 (arance) cambiano di
-+1,20, +1,60 e +6,00 kcal, verificati a mano riga per riga prima di rigenerare gli attesi.
-Nel caso 04, tarato sul confine ±5 punti, rigenerare l'atteso NON bastava: i totali nuovi
-avevano spostato le percentuali e il verdetto sulle proteine era passato da FUORI a OK. I
-target sono stati ricalibrati con gli stessi scarti di prima (+5.001 e +4.999). Lezione: su
-un caso tarato su un confine si ricalibra il target, non solo l'atteso.
+**Validazione sul campo ancora aperta (FASE 5):** orchestratore e protocollo struttura
+pasti sono validati su paziente fittizio e su casi reali, `tdee.py` solo sul paziente
+fittizio; il primo ha già fatto
+emergere due errori di processo. Il flusso del 21/10/2026 (motore sciolto, salvataggio con
+commit, accoppiamenti) non è ancora passato da un caso reale. Criterio di chiusura: tre
+pazienti reali consecutivi senza errori di processo. Ogni caso reale è
+anche un collaudo: cosa il motore ha intercettato da solo, cosa ha richiesto un intervento
+manuale, cosa è sfuggito. Quello che sfugge diventa un caso golden.
