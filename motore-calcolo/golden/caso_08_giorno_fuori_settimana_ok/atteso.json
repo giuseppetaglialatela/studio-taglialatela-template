@@ -1,0 +1,69 @@
+{
+  "tipo": "pipeline",
+  "bloccanti": [],
+  "attenzioni": [
+    [
+      1,
+      "FIBRA_SOTTO_TARGET"
+    ],
+    [
+      1,
+      "FIBRA_SOTTO_TARGET"
+    ],
+    [
+      1,
+      "KCAL_FUORI_TOLLERANZA"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      4,
+      "ATWATER_SEGNALATO"
+    ],
+    [
+      5,
+      "TERAPIA_NON_DICHIARATA"
+    ],
+    [
+      6,
+      "PASTO_ASSENTE_SU_TUTTO_IL_PIANO"
+    ],
+    [
+      6,
+      "PASTO_ASSENTE_SU_TUTTO_IL_PIANO"
+    ]
+  ],
+  "exit_code": 0,
+  "descrizione": "Piano a 2 giorni senza scelte: giorno 1 a -6.96% kcal (FUORI dal +/-5%), giorno 2 a +3.46% (dentro), media settimanale -1.75% (dentro). Il giorno fuori deve comparire come ATTENZIONE (PASSO 1 KCAL_FUORI_TOLLERANZA), NON come bloccante: kcal e macro si giudicano sulla media settimanale. exit_code 0. Protegge la modifica del 18/09/2026.",
+  "riferimento": "Generato il 18/09/2026: grammi del giorno 2 = giorno 1 x 1,1075 (stessi alimenti, stesse % macro); target kcal = kcal giorno 1 / 0,93. Scarti calcolati dal motore e verificati eseguendo la pipeline prima di congelare l'atteso."
+}

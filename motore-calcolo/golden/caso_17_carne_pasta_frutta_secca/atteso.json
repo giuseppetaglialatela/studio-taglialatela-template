@@ -1,0 +1,78 @@
+{
+  "tipo": "pipeline",
+  "bloccanti": [
+    [
+      2,
+      "SETTIMANA_KCAL_FUORI_TOLLERANZA"
+    ],
+    [
+      2,
+      "SETTIMANA_MACRO_FUORI_TOLLERANZA"
+    ],
+    [
+      2,
+      "SETTIMANA_MACRO_FUORI_TOLLERANZA"
+    ]
+  ],
+  "attenzioni": [
+    [
+      1,
+      "FIBRA_SOTTO_TARGET"
+    ],
+    [
+      1,
+      "KCAL_FUORI_TOLLERANZA"
+    ],
+    [
+      1,
+      "MACRO_FUORI_TOLLERANZA"
+    ],
+    [
+      1,
+      "MACRO_FUORI_TOLLERANZA"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      4,
+      "ACCOPPIAMENTO_VIETATO"
+    ],
+    [
+      4,
+      "ACCOPPIAMENTO_VIETATO"
+    ],
+    [
+      4,
+      "ATWATER_SEGNALATO"
+    ],
+    [
+      5,
+      "TERAPIA_NON_DICHIARATA"
+    ],
+    [
+      6,
+      "LIVELLO_FUORI_CATALOGO"
+    ],
+    [
+      6,
+      "LIVELLO_FUORI_CATALOGO"
+    ]
+  ],
+  "exit_code": 1,
+  "descrizione": "Carne rossa con la pasta e frutta secca mista (21/10/2026): pasta+vitellone a pranzo (A05) e noci+nocciole nello stesso spuntino (A06). Atteso: 2 ACCOPPIAMENTO_VIETATO al PASSO 4. Controlli negativi: pasta integrale con pollo a cena; mandorle a colazione e noci allo spuntino (pasti diversi) NON devono scattare.",
+  "riferimento": ""
+}

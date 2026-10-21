@@ -1,0 +1,15 @@
+gruppo,sesso,eta_min,eta_max,condizione,larn_calcio_mg,larn_ferro_mg,larn_vitamina_d_ug,larn_folati_ug,larn_vitamina_b12_ug,larn_zinco_mg,larn_magnesio_mg,larn_vitamina_c_mg,nota
+adolescenti,M,11,14,nessuna,1150,10,15,270,3.4,12,290,90,
+adolescenti,M,15,17,nessuna,1150,13,15,330,4.0,12,380,105,
+adolescenti,F,11,14,nessuna,1150,18,15,270,3.3,9,290,80,Fe 18 mg se gia' mestruata; 10 mg se non ancora
+adolescenti,F,15,17,nessuna,1150,18,15,330,4.0,9,310,85,
+adulti,M,18,64,nessuna,950,10,15,330,4.0,12,350,105,
+adulti,M,65,74,nessuna,1100,10,15,330,4.0,12,350,105,
+adulti,M,75,120,nessuna,1100,10,20,330,4.0,12,350,105,vitamina D 20 ug oltre i 75 anni
+adulti,F,18,64,nessuna,950,18,15,330,4.0,9,350,85,Fe 18 mg in eta' fertile; folati dieta senza supplementazione
+adulti,F,65,74,nessuna,1100,10,15,330,4.0,9,350,85,
+adulti,F,75,120,nessuna,1100,10,20,330,4.0,9,350,85,vitamina D 20 ug oltre i 75 anni
+adulti,F,18,74,menopausa,1100,10,15,330,4.0,9,350,85,Ca 1100 mg in post-menopausa a qualsiasi eta'
+adulti,F,75,120,menopausa,1100,10,20,330,4.0,9,350,85,vitamina D 20 ug oltre i 75 anni
+adulti,F,14,50,gravidanza,1100,27,15,600,4.5,11,350,100,folati dieta: la supplementazione per i difetti del tubo neurale e' in aggiunta
+adulti,F,14,50,allattamento,1100,11,15,500,5.0,12,350,130,

@@ -1,0 +1,13 @@
+food_id,nome_riferimento,unita_g,tolleranza_g,fonte,stato
+8053,Yogurt greco,125|150|170,2,Tabella Formati Confezione Standard v2 (Drive),confermato
+1631,Yogurt di latte parzialmente scremato,125,2,Tabella Formati Confezione Standard v2 (Drive),confermato
+152000,Yogurt di latte scremato,125,2,Tabella Formati Confezione Standard v2 (Drive),confermato
+150010,Yogurt di latte intero,125,2,Tabella Formati Confezione Standard v2 (Drive),confermato
+100015,Fiocchi di latte magro,200|400,2,Tabella Formati Confezione Standard v2 (Drive),confermato
+1515,Tonno in scatola al naturale sgocciolato,46|52|104,4,Tabella Formati Confezione Standard v2 (Drive),confermato
+1510,Salmone in salamoia (in scatola),135,5,Tabella Formati Confezione Standard v2 (Drive),confermato
+004210,Fagioli cannellini in scatola scolati,145|240,5,Tabella Formati Confezione Standard v2 (Drive),confermato
+004010,Ceci in scatola scolati,145|240,5,Tabella Formati Confezione Standard v2 (Drive),confermato
+392,Pomodori pelati in scatola,400,20,Tabella Formati Confezione Standard v2 (Drive),confermato
+1800,Uovo di gallina intero,52,3,Nutrizionista 29/09/2026 (uovo medio sgusciato),confermato
+150030,Yogurt greco 0% lipidi,150,2,Vasetto 150 g confermato dal nutrizionista 17/10/2026,confermato

@@ -11,9 +11,12 @@ ricaricano**: tutto ciò che serve sta nei metadati del piano e nel motore.
 1. I file del paziente (`piano_vN.csv`, `metadati_piano_vN.json`, fascicolo) si
    chiedono **allegati alla chat**: la cartella uploads non costa token. Drive si
    usa solo se un allegato manca.
-2. Motore: scarica ed estrai `motore calcolo.zip`, scarica `alimenti.csv` sciolto
-   accanto (URL e procedura in M1, sezione 1 "Avvio di sessione": si legge solo quella sezione, non si carica M1 intero),
-   esegui `python3 collaudo.py`. Il collaudo completo dura meno di un secondo: si
+2. Motore: un solo comando scarica la cartella del motore ed esegue collaudo e
+   regressione:
+   ```
+   rm -rf /tmp/motore && mkdir /tmp/motore && cd /tmp/motore && curl -sfL https://codeload.github.com/giuseppetaglialatela/studio-taglialatela-template/tar.gz/refs/heads/main | tar xz --strip-components=2 studio-taglialatela-template-main/motore-calcolo && python3 collaudo.py && python3 regressione.py
+   ```
+   (è lo stesso comando di M1, sezione 1: non serve caricare M1). Il collaudo completo dura meno di un secondo: si
    esegue intero, come in ogni sessione (principio 7).
 3. Verifica del CSV: leggibile e coerente con le `differenze_da_versione_precedente`
    dichiarate nei metadati. Non si scaricano versioni precedenti per confronto.
@@ -21,7 +24,7 @@ ricaricano**: tutto ciò che serve sta nei metadati del piano e nel motore.
    `[]`, altrimenti si segnala al nutrizionista prima di generare.
 4. Kcal per pasto e per alternativa: dal motore (`calcolatore.calcola_riga`), mai
    scritte a mano e mai prese da riassunti.
-   **Strumento:** `genera_zona_piano.py`, nello zip del motore, compila la zona
+   **Strumento:** `genera_zona_piano.py`, nella cartella del motore, compila la zona
    dati del template v5 e genera il PDF in un comando; la zona dati non si compila
    a mano. Il template si scarica dal link della sezione 2.
    ```

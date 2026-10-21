@@ -1,0 +1,54 @@
+{
+  "tipo": "pipeline",
+  "bloccanti": [
+    [
+      6,
+      "LIVELLO_INCOERENTE_TRA_PASTI"
+    ]
+  ],
+  "attenzioni": [
+    [
+      2,
+      "SCENARIO_MACRO_FUORI_TOLLERANZA"
+    ],
+    [
+      2,
+      "SCENARIO_MACRO_FUORI_TOLLERANZA"
+    ],
+    [
+      2,
+      "SETTIMANA_MACRO_ESTREMO_FUORI"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN_CON_GAP"
+    ],
+    [
+      4,
+      "ATWATER_SEGNALATO"
+    ],
+    [
+      4,
+      "FORMATO_CONFEZIONE_NON_RISPETTATO"
+    ],
+    [
+      4,
+      "FORMATO_CONFEZIONE_NON_RISPETTATO"
+    ],
+    [
+      4,
+      "FORMATO_CONFEZIONE_NON_RISPETTATO"
+    ],
+    [
+      4,
+      "FORMATO_CONFEZIONE_NON_RISPETTATO"
+    ],
+    [
+      5,
+      "TERAPIA_NON_DICHIARATA"
+    ]
+  ],
+  "exit_code": 1,
+  "descrizione": "Piano a 2 giorni con le 4 colazioni del livello STANDARD e i 2 spuntini del livello RINFORZATA_CALCIO. I due giorni sono identici tra loro, quindi il controllo di uniformita' del PASSO 6 li dichiara conformi: e' il punto del caso. Solo il riconoscimento per nome contro colazioni_spuntini.csv vede che il piano abbina due livelli diversi. Target tarati (1608 kcal, 21/45/34) perche' entrambi gli estremi degli scenari restino in tolleranza e l'unico bloccante sia LIVELLO_INCOERENTE_TRA_PASTI.",
+  "riferimento": "Costruito il 28/07/2026 dalle alternative reali di colazioni_spuntini.csv, con pranzo e cena di caso_01_base. Intervalli calcolati con scelte_multiple.py (1580.7-1636.2 kcal) e target tarati sulla mediana prima di congelare l'atteso. Atteso rigenerato il 29/07/2026 con il passaggio del giudizio sui micronutrienti dalla giornata alla media settimanale: unica differenza verificata a mano, la scomparsa dei due rilievi CARENZA_STRUTTURALE del PASSO 2, che davano un verdetto di adeguatezza su un singolo giorno. I LARN sono riferimenti per l'assunzione abituale, non soglie giornaliere. Bloccanti ed exit code invariati. Rigenerato il 18/09/2026: aggiunta l'attenzione SETTIMANA_MACRO_ESTREMO_FUORI (verifica settimanale introdotta quel giorno); bloccanti invariati. Atteso rigenerato il 29/09/2026 con l'introduzione del controllo formati confezione (PASSO 4-E): unica differenza verificata a mano, la comparsa dell'attenzione FORMATO_CONFEZIONE_NON_RISPETTATO (le quantita' dei piani di test non seguono i formati commerciali). Bloccanti ed exit code invariati."
+}

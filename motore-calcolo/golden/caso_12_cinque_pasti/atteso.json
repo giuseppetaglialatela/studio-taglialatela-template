@@ -1,0 +1,103 @@
+{
+  "tipo": "fisso",
+  "totale_giorno": {
+    "kcal_100g": 1776.94,
+    "proteine_g": 92.24,
+    "carboidrati_g": 180.395,
+    "grassi_g": 73.119,
+    "fibra_g": 37.37,
+    "calcio_mg": 792.9,
+    "ferro_mg": 19.627,
+    "vitamina_d_ug": 2.167,
+    "folati_ug": 804.655,
+    "vitamina_b12_ug": 4.7,
+    "zinco_mg": 14.36155,
+    "magnesio_mg": 580.055,
+    "vitamina_c_mg": 301.09
+  },
+  "totali_pasto": {
+    "1|cena": {
+      "kcal_100g": 475.47,
+      "proteine_g": 34.33,
+      "carboidrati_g": 50.43,
+      "grassi_g": 14.177,
+      "fibra_g": 10.63,
+      "calcio_mg": 130.5,
+      "ferro_mg": 4.636,
+      "vitamina_d_ug": 0.007,
+      "folati_ug": 251.865,
+      "vitamina_b12_ug": 1.4,
+      "zinco_mg": 4.16665,
+      "magnesio_mg": 145.665,
+      "vitamina_c_mg": 59.7
+    },
+    "1|colazione": {
+      "kcal_100g": 351.95,
+      "proteine_g": 21.18,
+      "carboidrati_g": 29.26,
+      "grassi_g": 16.415,
+      "fibra_g": 5.0,
+      "calcio_mg": 83.6,
+      "ferro_mg": 3.71,
+      "vitamina_d_ug": 2.1,
+      "folati_ug": 98.025,
+      "vitamina_b12_ug": 3.0,
+      "zinco_mg": 2.60025,
+      "magnesio_mg": 66.225,
+      "vitamina_c_mg": 21.0
+    },
+    "1|pranzo": {
+      "kcal_100g": 581.67,
+      "proteine_g": 24.26,
+      "carboidrati_g": 77.05,
+      "grassi_g": 18.367,
+      "fibra_g": 15.42,
+      "calcio_mg": 234.8,
+      "ferro_mg": 9.786,
+      "vitamina_d_ug": 0.0,
+      "folati_ug": 347.765,
+      "vitamina_b12_ug": 0.0,
+      "zinco_mg": 5.90465,
+      "magnesio_mg": 266.565,
+      "vitamina_c_mg": 118.29
+    },
+    "1|spuntino": {
+      "kcal_100g": 193.2,
+      "proteine_g": 9.0,
+      "carboidrati_g": 7.14,
+      "grassi_g": 14.145,
+      "fibra_g": 1.905,
+      "calcio_mg": 223.5,
+      "ferro_mg": 0.6,
+      "vitamina_d_ug": 0.06,
+      "folati_ug": 34.2,
+      "vitamina_b12_ug": 0.3,
+      "zinco_mg": 0.99,
+      "magnesio_mg": 57.6,
+      "vitamina_c_mg": 1.5
+    },
+    "1|spuntino2": {
+      "kcal_100g": 174.65,
+      "proteine_g": 3.47,
+      "carboidrati_g": 16.515,
+      "grassi_g": 10.015,
+      "fibra_g": 4.415,
+      "calcio_mg": 120.5,
+      "ferro_mg": 0.895,
+      "vitamina_d_ug": 0.0,
+      "folati_ug": 72.8,
+      "vitamina_b12_ug": 0.0,
+      "zinco_mg": 0.7,
+      "magnesio_mg": 44.0,
+      "vitamina_c_mg": 100.6
+    }
+  },
+  "verdetti_tolleranza": {
+    "kcal": "OK",
+    "proteine_pct": "OK",
+    "carboidrati_pct": "FUORI TOLLERANZA",
+    "grassi_pct": "FUORI TOLLERANZA"
+  },
+  "descrizione": "Primo caso a 5 pasti (struttura a 5 posti, decisione del 30/09/2026). Un giorno: colazione S1, spuntino SPA a meta' mattina, pranzo e cena del caso_01, secondo spuntino SPB (valore 'spuntino2' in piano.csv) tra pranzo e cena. Congela i totali pasto per pasto, secondo spuntino compreso, e il totale del giorno.",
+  "riferimento": "Totali dello spuntino2 verificati a mano da alimenti.csv il 30/09/2026 (arance 200 g + nocciole 15 g = 168.65 kcal, P 3.47 g). Pipeline eseguita a mano: ordine colazione, spuntino, pranzo, spuntino2, cena; PASSO 6 riconosce il livello standard su tutti e tre i pasti. Aggiornato il 01/10/2026: kcal delle arance allineate a CREA (34 -> 37 per 100 g); delta (+6,00 kcal su 200 g nel secondo spuntino) verificato a mano."
+}

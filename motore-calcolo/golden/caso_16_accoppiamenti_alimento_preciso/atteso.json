@@ -1,0 +1,70 @@
+{
+  "tipo": "pipeline",
+  "bloccanti": [
+    [
+      2,
+      "SETTIMANA_MACRO_FUORI_TOLLERANZA"
+    ],
+    [
+      2,
+      "SETTIMANA_MACRO_FUORI_TOLLERANZA"
+    ],
+    [
+      2,
+      "SETTIMANA_MACRO_FUORI_TOLLERANZA"
+    ]
+  ],
+  "attenzioni": [
+    [
+      1,
+      "FIBRA_SOTTO_TARGET"
+    ],
+    [
+      1,
+      "MACRO_FUORI_TOLLERANZA"
+    ],
+    [
+      1,
+      "MACRO_FUORI_TOLLERANZA"
+    ],
+    [
+      1,
+      "MACRO_FUORI_TOLLERANZA"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      4,
+      "ACCOPPIAMENTO_VIETATO"
+    ],
+    [
+      4,
+      "ACCOPPIAMENTO_VIETATO"
+    ],
+    [
+      4,
+      "ATWATER_SEGNALATO"
+    ],
+    [
+      5,
+      "TERAPIA_NON_DICHIARATA"
+    ],
+    [
+      6,
+      "LIVELLO_FUORI_CATALOGO"
+    ],
+    [
+      6,
+      "LIVELLO_FUORI_CATALOGO"
+    ]
+  ],
+  "exit_code": 1,
+  "descrizione": "Accoppiamenti su alimento preciso (21/10/2026): a pranzo pasta+merluzzo (A04) e parmigiano+mozzarella (A03). Atteso: 2 ACCOPPIAMENTO_VIETATO al PASSO 4. Controllo negativo a cena: pasta integrale con alici e un solo formaggio NON devono scattare.",
+  "riferimento": ""
+}

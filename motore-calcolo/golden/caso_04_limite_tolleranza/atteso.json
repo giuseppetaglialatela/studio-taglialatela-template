@@ -1,0 +1,58 @@
+{
+  "tipo": "fisso",
+  "totale_giorno": {
+    "kcal_100g": 1105.95,
+    "proteine_g": 78.56,
+    "carboidrati_g": 137.92,
+    "grassi_g": 29.945,
+    "fibra_g": 2.5,
+    "calcio_mg": 77.2,
+    "ferro_mg": 8.84,
+    "vitamina_d_ug": 8.7,
+    "folati_ug": 64.025,
+    "vitamina_b12_ug": 0.975,
+    "zinco_mg": 6.39125,
+    "magnesio_mg": 158.625,
+    "vitamina_c_mg": 0.0
+  },
+  "totali_pasto": {
+    "1|cena": {
+      "kcal_100g": 480.1,
+      "proteine_g": 30.11,
+      "carboidrati_g": 65.22,
+      "grassi_g": 12.56,
+      "fibra_g": 0.8,
+      "calcio_mg": 49.2,
+      "ferro_mg": 6.81,
+      "vitamina_d_ug": 8.4,
+      "folati_ug": 23.95,
+      "vitamina_b12_ug": 0.9,
+      "zinco_mg": 4.1905,
+      "magnesio_mg": 59.55,
+      "vitamina_c_mg": 0.0
+    },
+    "1|pranzo": {
+      "kcal_100g": 625.85,
+      "proteine_g": 48.45,
+      "carboidrati_g": 72.7,
+      "grassi_g": 17.385,
+      "fibra_g": 1.7,
+      "calcio_mg": 28.0,
+      "ferro_mg": 2.03,
+      "vitamina_d_ug": 0.3,
+      "folati_ug": 40.075,
+      "vitamina_b12_ug": 0.075,
+      "zinco_mg": 2.20075,
+      "magnesio_mg": 99.075,
+      "vitamina_c_mg": 0.0
+    }
+  },
+  "verdetti_tolleranza": {
+    "kcal": "OK",
+    "proteine_pct": "FUORI TOLLERANZA",
+    "carboidrati_pct": "OK",
+    "grassi_pct": "OK"
+  },
+  "descrizione": "Target tarati (non un piano paziente realistico) per portare i verdetti di tolleranza esattamente a ridosso del confine +/-5 punti percentuali: grassi a scarto +4.999 (appena dentro, OK), proteine a scarto +5.001 (appena fuori, FUORI TOLLERANZA), carboidrati comodo dentro. Diverso da caso_02 (che e' chiaramente fuori, 37.9% vs 30%): qui si testa il confine stesso, non uno sforamento ampio. Esercita anche entro_tolleranza() su verdetti_tolleranza, non solo i grammi totali. LIMITE NOTO (emerso da test di sabotaggio): scarti di 4.999/5.001 non distinguono <= da < esattamente a scarto=5.000 - un bug sul confine incluso/escluso stretto non verrebbe intercettato da questo caso.",
+  "riferimento": "Verificato a mano il 28/07/2026: percentuali macro calcolate da un calcolo indipendente sui grammi del piano, poi target scelti per ottenere scarti di +4.999 e +5.001 rispetto al confine 5.0 di TOLLERANZA_PCT. Verdetti attesi confermati eseguendo regressione.esegui_caso() prima di generare l'atteso.json. Test di sabotaggio (<= sostituito con <): la suite non ha rilevato la mutazione, confermando il limite dichiarato sopra. Aggiornato il 01/10/2026: kcal del riso allineate a CREA (332 -> 334 per 100 g); delta (+1,60 kcal su 80 g) verificato a mano. Target ricalibrati sui nuovi totali con gli stessi scarti di prima (proteine +5.001, grassi +4.999, carboidrati 0): verdetti identici ai precedenti."
+}

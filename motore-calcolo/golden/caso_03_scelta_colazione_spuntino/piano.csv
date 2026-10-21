@@ -1,0 +1,16 @@
+giorno,pasto,food_id,grammi,gruppo_scelta,opzione
+1,pranzo,000800,80,,
+1,pranzo,106500,120,,
+1,pranzo,702901,10,,
+1,cena,123200,180,,
+1,cena,000550,50,,
+1,cena,702901,10,,
+1,colazione,000550,50,colazione_principale,A
+1,colazione,8711,40,colazione_principale,A
+1,colazione,600009,40,colazione_principale,B
+1,colazione,135020,200,colazione_principale,B
+1,colazione,210010,10,colazione_principale,B
+1,spuntino,8053,125,spuntino_principale,A
+1,spuntino,510,15,spuntino_principale,A
+1,spuntino,8807,150,spuntino_principale,B
+1,spuntino,008540,15,spuntino_principale,B

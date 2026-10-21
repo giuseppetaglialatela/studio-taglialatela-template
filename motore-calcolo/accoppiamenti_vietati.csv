@@ -1,0 +1,7 @@
+regola_id,ruoli_a,ruoli_b,motivo,data_decisione,pasti
+A01,latte,yogurt,latte e yogurt nello stesso pasto: due latticini da bere o al cucchiaio,21/10/2026,
+A02,carne|salume,pesce|molluschi_crostacei,carne e pesce nello stesso pasto,21/10/2026,
+A03,formaggio,formaggio,due formaggi diversi nello stesso pasto,21/10/2026,
+A04,1313,000800|60091,merluzzo con la pasta: non si prescrive (pasta con alici o pesce spada si'),21/10/2026,
+A05,8520|101170|101520|105210|115800,000800|60091,carne rossa o maiale con la pasta (pollo e tacchino si'),21/10/2026,
+A06,frutta_secca,frutta_secca,due tipi di frutta secca nello stesso pasto (in pasti diversi si'),21/10/2026,

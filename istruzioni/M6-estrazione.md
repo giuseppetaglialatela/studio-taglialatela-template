@@ -119,12 +119,10 @@ nel CSV.
 
 **9. Riporta quattro cose:** quanti alimenti aggiunti e quali; quali non trovati
 e perché; quali flag e se sono reali o falsi positivi noti; quali righe sono
-state aggiunte a gap.csv. Poi indica i **due** file da ricaricare su GitHub:
-`alimenti.csv` sciolto e `motore calcolo.zip` (checksum e conteggio atteso
-aggiornati). Caricarne uno solo fa fallire il collaudo alla sessione dopo.
-
-Link di upload:
-`https://github.com/giuseppetaglialatela/studio-taglialatela-template/upload/main/motore-calcolo`
+state aggiunte a gap.csv. Poi salva con un commit (M1, sezione 1, «Come si salva una
+modifica»): `alimenti.csv`, `collaudo.py` (conteggio atteso), `nomi_paziente.csv`,
+`ruoli_alimenti.csv` e `SHA256SUMS` vanno nello STESSO commit, altrimenti il collaudo
+fallisce alla sessione dopo.
 
 ---
 

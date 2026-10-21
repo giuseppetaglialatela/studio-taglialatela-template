@@ -1,0 +1,13 @@
+{
+  "tipo": "pipeline",
+  "bloccanti": [
+    [
+      1,
+      "PASTO_NON_AMMESSO"
+    ]
+  ],
+  "attenzioni": [],
+  "exit_code": 1,
+  "descrizione": "Piano con il valore di pasto 'spuntino 2' scritto con lo spazio (il passaggio da chat a telefono trasforma gli underscore/spazi). Senza controllo verrebbe sommato nei totali ma scartato dal PDF. Deve comparire il solo bloccante PASTO_NON_AMMESSO (PASSO 1) e la pipeline si ferma. Exit 1.",
+  "riferimento": "Costruito il 30/09/2026 dal caso_12."
+}

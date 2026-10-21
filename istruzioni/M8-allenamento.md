@@ -2,7 +2,7 @@
 
 Modulo operativo. Si carica quando si prepara, trascrive o modifica una scheda di
 allenamento, o quando si cercano protocolli di riferimento.
-Creato: 19/10/2026. Non dipende da M1-M7: si carica da solo.
+Creato: 19/10/2026 · aggiornato 21/10/2026 (template su GitHub). Non dipende da M1-M7: si carica da solo.
 Rimandi: se l'allenamento cambia il livello di attività del paziente, il ricalcolo
 di TDEE e target segue **M2** (richiede **M1**) e passa dal gate di approvazione.
 
@@ -12,10 +12,9 @@ di TDEE e target segue **M2** (richiede **M1**) e passa dal gate di approvazione
 
 **File:** `TEMPLATE SchedaAllenamento StudioTaglialatela v1.py` (formato telefono,
 100 × 222 mm, un giorno di allenamento per pagina).
-**Dove sta oggi:** Drive, cartella `_Template` dentro "Andamento Dieta Pazienti"
-(ID file `1Twu5Lp8Iis_EtcW9PWE185xxzr5wuXKS`, 5.452 byte). Non è ancora su GitHub:
-finché non ci viene caricato, si scarica da Drive con `download_file_content` e si
-controlla la dimensione prima di usarlo (corruzione silenziosa su Drive, nucleo §7).
+**Dove sta:** GitHub, nella radice del repository (verificato il 21/10/2026: 5.452 byte,
+come la copia su Drive, che resta archivio). Il nome contiene SPAZI, non trattini bassi:
+`https://raw.githubusercontent.com/giuseppetaglialatela/studio-taglialatela-template/refs/heads/main/TEMPLATE%20SchedaAllenamento%20StudioTaglialatela%20v1.py`
 
 **Uso:** `python3 TEMPLATE_..._v1.py dati.json uscita.pdf` (richiede `wkhtmltopdf`).
 Motore grafico congelato (principio 4): si modifica SOLO il JSON dei dati.

@@ -1,0 +1,40 @@
+{
+  "tipo": "scelta_multipla",
+  "per_giorno": {
+    "1": {
+      "minimi": {
+        "kcal_100g": 1168.0,
+        "proteine_g": 90.13,
+        "carboidrati_g": 106.605,
+        "grassi_g": 36.035,
+        "fibra_g": 8.79,
+        "calcio_mg": 131.8,
+        "ferro_mg": 12.64,
+        "vitamina_d_ug": 10.32,
+        "folati_ug": 98.6,
+        "vitamina_b12_ug": 1.14,
+        "zinco_mg": 8.546,
+        "magnesio_mg": 239.85,
+        "vitamina_c_mg": 0.15
+      },
+      "massimi": {
+        "kcal_100g": 1347.65,
+        "proteine_g": 98.825,
+        "carboidrati_g": 137.29,
+        "grassi_g": 52.6,
+        "fibra_g": 14.655,
+        "calcio_mg": 529.65,
+        "ferro_mg": 13.135,
+        "vitamina_d_ug": 10.6225,
+        "folati_ug": 124.3,
+        "vitamina_b12_ug": 1.41,
+        "zinco_mg": 10.136,
+        "magnesio_mg": 304.7,
+        "vitamina_c_mg": 11.1
+      },
+      "n_gruppi": 2
+    }
+  },
+  "descrizione": "Giornata con colazione e spuntino a scelta multipla (2 alternative ciascuno: colazione salata/dolce, spuntino abbinato), pranzo e cena fissi. Esercita scelte_multiple.py: minimo e massimo per nutriente sono calcolati scegliendo l'opzione peggiore/migliore per OGNI nutriente separatamente, non una combinazione unica. Il range kcal (1168-1348) resta sotto il target 1800 in entrambi gli estremi: esercita anche il flag di scostamento fuori tolleranza sia su min sia su max.",
+  "riferimento": "Verificato a mano il 28/07/2026: calcolo indipendente (script separato, senza importare scelte_multiple.py) dei contributi di ogni opzione per ogni nutriente, poi min/max per nutriente confrontati riga per riga con l'output di calcola_intervallo_giorno - coincidenti su tutti i 13 nutrienti."
+}

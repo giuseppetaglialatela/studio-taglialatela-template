@@ -1,0 +1,33 @@
+{
+  "tipo": "pipeline",
+  "bloccanti": [],
+  "attenzioni": [
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      4,
+      "ATWATER_SEGNALATO"
+    ],
+    [
+      4,
+      "FORMATO_CONFEZIONE_NON_RISPETTATO"
+    ],
+    [
+      5,
+      "TERAPIA_NON_DICHIARATA"
+    ],
+    [
+      6,
+      "LIVELLO_FUORI_CATALOGO"
+    ],
+    [
+      6,
+      "LIVELLO_FUORI_CATALOGO"
+    ]
+  ],
+  "exit_code": 0,
+  "descrizione": "Verifica del controllo formati confezione (PASSO 4, sotto-controllo E). Il piano contiene fiocchi di latte magro da 100 g, che non e' una vaschetta intera (200 o 400 g): il motore deve emettere l'attenzione FORMATO_CONFEZIONE_NON_RISPETTATO senza bloccare. Nessun altro rilievo diverso da quelli del caso di origine.",
+  "riferimento": "Creato il 29/09/2026 come copia di caso_07 (stessi input). Atteso generato dopo verifica a mano: l'unica differenza rispetto a caso_07 e' la descrizione; l'attenzione sui formati compare in entrambi perche' l'input e' lo stesso."
+}

@@ -43,7 +43,7 @@ a seconda dell'alimento.
 
 Le quantità dei prodotti confezionati rispettano i formati commerciali: nessuno
 spreco (nucleo M0, sezione 5; qui ripetuta per intero). Fonte: `formati_confezione.csv`
-nello zip del motore (il documento Word su Drive è archivio). Tre casi:
+nella cartella del motore (il documento Word su Drive è archivio). Tre casi:
 1. **Monoporzione o deperibile una volta aperto** (yogurt, fiocchi di latte,
    scatolame, uova): confezione intera o multiplo esatto del formato.
 2. **Acquistabile a peso al banco** (affettati, formaggi, carne, pesce, pane):

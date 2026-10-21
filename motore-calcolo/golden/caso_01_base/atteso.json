@@ -1,0 +1,88 @@
+{
+  "tipo": "fisso",
+  "totale_giorno": {
+    "kcal_100g": 1622.51,
+    "proteine_g": 82.17,
+    "carboidrati_g": 189.28,
+    "grassi_g": 56.381,
+    "fibra_g": 38.06,
+    "calcio_mg": 647.7,
+    "ferro_mg": 17.273,
+    "vitamina_d_ug": 0.0695,
+    "folati_ug": 695.32,
+    "vitamina_b12_ug": 2.35,
+    "zinco_mg": 13.1717,
+    "magnesio_mg": 537.52,
+    "vitamina_c_mg": 210.14
+  },
+  "totali_pasto": {
+    "1|cena": {
+      "kcal_100g": 475.47,
+      "proteine_g": 34.33,
+      "carboidrati_g": 50.43,
+      "grassi_g": 14.177,
+      "fibra_g": 10.63,
+      "calcio_mg": 130.5,
+      "ferro_mg": 4.636,
+      "vitamina_d_ug": 0.007,
+      "folati_ug": 251.865,
+      "vitamina_b12_ug": 1.4,
+      "zinco_mg": 4.16665,
+      "magnesio_mg": 145.665,
+      "vitamina_c_mg": 59.7
+    },
+    "1|colazione": {
+      "kcal_100g": 404.82,
+      "proteine_g": 16.93,
+      "carboidrati_g": 46.59,
+      "grassi_g": 16.182,
+      "fibra_g": 8.14,
+      "calcio_mg": 104.4,
+      "ferro_mg": 2.326,
+      "vitamina_d_ug": 0.05,
+      "folati_ug": 68.64,
+      "vitamina_b12_ug": 0.7,
+      "zinco_mg": 2.0004,
+      "magnesio_mg": 70.14,
+      "vitamina_c_mg": 24.9
+    },
+    "1|pranzo": {
+      "kcal_100g": 581.67,
+      "proteine_g": 24.26,
+      "carboidrati_g": 77.05,
+      "grassi_g": 18.367,
+      "fibra_g": 15.42,
+      "calcio_mg": 234.8,
+      "ferro_mg": 9.786,
+      "vitamina_d_ug": 0.0,
+      "folati_ug": 347.765,
+      "vitamina_b12_ug": 0.0,
+      "zinco_mg": 5.90465,
+      "magnesio_mg": 266.565,
+      "vitamina_c_mg": 118.29
+    },
+    "1|spuntino": {
+      "kcal_100g": 160.55,
+      "proteine_g": 6.65,
+      "carboidrati_g": 15.21,
+      "grassi_g": 7.655,
+      "fibra_g": 3.87,
+      "calcio_mg": 178.0,
+      "ferro_mg": 0.525,
+      "vitamina_d_ug": 0.0125,
+      "folati_ug": 27.05,
+      "vitamina_b12_ug": 0.25,
+      "zinco_mg": 1.1,
+      "magnesio_mg": 55.15,
+      "vitamina_c_mg": 7.25
+    }
+  },
+  "verdetti_tolleranza": {
+    "kcal": "OK",
+    "proteine_pct": "OK",
+    "carboidrati_pct": "OK",
+    "grassi_pct": "OK"
+  },
+  "descrizione": "Giornata base gia' validata contro collaudo archiviato del 26/07/2026. Copre: legumi lessati (peso cotto), pesce a peso crudo, colazione salata + spuntino abbinato.",
+  "riferimento": "Collaudo archiviato: colazione 404.8 / spuntino 160.6 / pranzo 581.7 / cena 475.5 / totale 1622.5 kcal. Ricostruzione verificata al decimale su tutti e quattro i pasti."
+}

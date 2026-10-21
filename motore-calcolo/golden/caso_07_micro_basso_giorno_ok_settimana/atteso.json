@@ -1,0 +1,33 @@
+{
+  "tipo": "pipeline",
+  "bloccanti": [],
+  "attenzioni": [
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      4,
+      "ATWATER_SEGNALATO"
+    ],
+    [
+      4,
+      "FORMATO_CONFEZIONE_NON_RISPETTATO"
+    ],
+    [
+      5,
+      "TERAPIA_NON_DICHIARATA"
+    ],
+    [
+      6,
+      "LIVELLO_FUORI_CATALOGO"
+    ],
+    [
+      6,
+      "LIVELLO_FUORI_CATALOGO"
+    ]
+  ],
+  "exit_code": 0,
+  "descrizione": "Piano a 2 giorni in cui il CALCIO e' sotto l'80% LARN sul giorno 1 (647.7 mg, 65%) ma adeguato sulla MEDIA SETTIMANALE (850.5 mg, 85%). Nessun rilievo sul calcio deve comparire: i LARN sono riferimenti per l'assunzione abituale, non soglie giornaliere, e inseguire il target ogni giorno produce accostamenti di alimenti che il paziente non mangia. E' il caso che protegge il comportamento introdotto il 29/07/2026. Complementare a caso_06: quello sorveglia i flag per giorno del PASSO 2 (scelta multipla), questo quelli del PASSO 3 (totali per giorno). exit_code 0: il piano e' presentabile.",
+  "riferimento": "Costruito il 29/07/2026 da caso_01_base duplicato su 2 giorni, con 35 g di parmigiano aggiunti al pranzo del giorno 2 per portare la media del calcio sopra soglia lasciando il giorno 1 sotto. Target tarati sulla mediana dei due giorni (1690 kcal, 22/45/33) perche' entrambi restino in tolleranza e il caso isoli il solo comportamento sui micronutrienti. LARN calcio 1000 mg, valore reale non artificiale. Atteso rigenerato il 29/09/2026 con l'introduzione del controllo formati confezione (PASSO 4-E): unica differenza verificata a mano, la comparsa dell'attenzione FORMATO_CONFEZIONE_NON_RISPETTATO (le quantita' dei piani di test non seguono i formati commerciali). Bloccanti ed exit code invariati."
+}

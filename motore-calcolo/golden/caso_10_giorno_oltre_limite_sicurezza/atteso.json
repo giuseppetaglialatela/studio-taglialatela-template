@@ -1,0 +1,78 @@
+{
+  "tipo": "pipeline",
+  "bloccanti": [
+    [
+      1,
+      "GIORNO_KCAL_OLTRE_LIMITE_SICUREZZA"
+    ]
+  ],
+  "attenzioni": [
+    [
+      1,
+      "FIBRA_SOTTO_TARGET"
+    ],
+    [
+      1,
+      "FIBRA_SOTTO_TARGET"
+    ],
+    [
+      1,
+      "KCAL_FUORI_TOLLERANZA"
+    ],
+    [
+      1,
+      "KCAL_FUORI_TOLLERANZA"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      4,
+      "ATWATER_SEGNALATO"
+    ],
+    [
+      5,
+      "TERAPIA_NON_DICHIARATA"
+    ],
+    [
+      6,
+      "PASTO_ASSENTE_SU_TUTTO_IL_PIANO"
+    ],
+    [
+      6,
+      "PASTO_ASSENTE_SU_TUTTO_IL_PIANO"
+    ]
+  ],
+  "exit_code": 1,
+  "descrizione": "Piano a 2 giorni senza scelte: giorno 1 a -11.98% kcal (oltre il limite di sicurezza giornaliero del 10%), giorno 2 a +7.64%, media -2.17% (dentro). La media settimanale compensa ma il giorno 1 deve BLOCCARE con GIORNO_KCAL_OLTRE_LIMITE_SICUREZZA. exit 1. Protegge il limite introdotto il 18/09/2026.",
+  "riferimento": "Generato il 18/09/2026: giorno 2 = giorno 1 x 1,227; target kcal = kcal giorno 1 / 0,88. Verificato eseguendo la pipeline e con test di sabotaggio."
+}

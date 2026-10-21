@@ -1,0 +1,62 @@
+{
+  "tipo": "pipeline",
+  "bloccanti": [
+    [
+      2,
+      "SETTIMANA_KCAL_FUORI_TOLLERANZA"
+    ],
+    [
+      2,
+      "SETTIMANA_MACRO_FUORI_TOLLERANZA"
+    ],
+    [
+      2,
+      "SETTIMANA_MACRO_FUORI_TOLLERANZA"
+    ]
+  ],
+  "attenzioni": [
+    [
+      2,
+      "SCENARIO_KCAL_FUORI_TOLLERANZA"
+    ],
+    [
+      2,
+      "SCENARIO_MACRO_FUORI_TOLLERANZA"
+    ],
+    [
+      2,
+      "SCENARIO_MACRO_FUORI_TOLLERANZA"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN_CON_GAP"
+    ],
+    [
+      4,
+      "ACCOPPIAMENTO_VIETATO"
+    ],
+    [
+      4,
+      "ACCOPPIAMENTO_VIETATO"
+    ],
+    [
+      4,
+      "ATWATER_SEGNALATO"
+    ],
+    [
+      5,
+      "TERAPIA_NON_DICHIARATA"
+    ],
+    [
+      6,
+      "LIVELLO_FUORI_CATALOGO"
+    ],
+    [
+      6,
+      "LIVELLO_FUORI_CATALOGO"
+    ]
+  ],
+  "exit_code": 1,
+  "descrizione": "Accoppiamenti vietati (21/10/2026): latte+yogurt in colazione solo nello scenario A, pollo+merluzzo a cena. Atteso: 2 ACCOPPIAMENTO_VIETATO al PASSO 4. Controllo negativo: yogurt (A) e latte (B) alternative dello stesso spuntino NON devono scattare.",
+  "riferimento": "decisione del nutrizionista del 21/10/2026: si segnala, non blocca"
+}

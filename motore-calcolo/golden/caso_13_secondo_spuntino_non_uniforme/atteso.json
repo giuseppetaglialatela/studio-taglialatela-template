@@ -1,0 +1,54 @@
+{
+  "tipo": "pipeline",
+  "bloccanti": [
+    [
+      6,
+      "STRUTTURA_NON_UNIFORME"
+    ]
+  ],
+  "attenzioni": [
+    [
+      1,
+      "KCAL_FUORI_TOLLERANZA"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      4,
+      "ATWATER_SEGNALATO"
+    ],
+    [
+      4,
+      "FORMATO_CONFEZIONE_NON_RISPETTATO"
+    ],
+    [
+      4,
+      "FORMATO_CONFEZIONE_NON_RISPETTATO"
+    ],
+    [
+      5,
+      "TERAPIA_NON_DICHIARATA"
+    ],
+    [
+      6,
+      "LIVELLO_PARZIALE"
+    ],
+    [
+      6,
+      "LIVELLO_PARZIALE"
+    ],
+    [
+      6,
+      "LIVELLO_PARZIALE"
+    ]
+  ],
+  "exit_code": 1,
+  "descrizione": "Piano a 2 giorni: il secondo spuntino c'e' nel giorno 1 e manca nel giorno 2. Il secondo spuntino segue le stesse regole di struttura dello spuntino (decisione del 30/09/2026): deve comparire il bloccante STRUTTURA_NON_UNIFORME al PASSO 6. Exit 1. Target tarati sui macro reali del piano (P 21, C 42, G 37, 1700 kcal) perche' l'unico bloccante sia quello strutturale.",
+  "riferimento": "Costruito il 30/09/2026 dal caso_12."
+}

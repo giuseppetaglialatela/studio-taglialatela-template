@@ -2,7 +2,9 @@
 
 Modulo operativo (principio 6: nucleo + moduli sono l'unica fonte operativa).
 Dipendenze: nessuna. Dipendono da questo modulo: M2 (workflow piano), M6 (estrazione).
-Ultimo aggiornamento: 21/10/2026, terzo giro (regole di accoppiamento su alimento preciso e
+Ultimo aggiornamento: 21/10/2026, quarto giro (niente più zip: il motore sta sciolto nella
+cartella `motore-calcolo` del repository e si scarica con un solo comando; le modifiche le
+salva Claude con un commit) · prima, stesso giorno, terzo giro (regole di accoppiamento su alimento preciso e
 per pasto; A03 formaggi diversi, A04 merluzzo + pasta, A05 carne rossa o maiale + pasta, A06 due
 frutte secche nello stesso pasto; M01 e C37 tolti; casi golden 16 e 17) · prima,
 stesso giorno (database a 144 voci: crema di nocciole e cacao,
@@ -26,32 +28,31 @@ NON copre: come si compone un piano (M2), come si allarga il database (M6).
 
 ## 1. AVVIO DI SESSIONE — obbligatorio prima di qualsiasi calcolo
 
-All'inizio di ogni sessione che coinvolge calcoli:
-
-1. Scarica ed estrai `motore calcolo.zip` in una cartella **pulita**
-   (il `%20` nel link è uno spazio nel nome, è corretto così):
-   `https://raw.githubusercontent.com/giuseppetaglialatela/studio-taglialatela-template/refs/heads/main/motore-calcolo/motore%20calcolo.zip`
-2. Scarica `alimenti.csv` accanto ai moduli (sta **fuori** dallo zip, stessa cartella
-   su GitHub). Serve sempre, in ogni sessione di calcolo.
-3. Esegui `collaudo.py`. Nessun calcolo su paziente prima dell'esito positivo
-   (principio 7).
+All'inizio di ogni sessione che coinvolge calcoli, UN comando: scarica in una cartella
+pulita l'intera cartella `motore-calcolo` del repository (codice, dati, casi golden e
+cache, circa 1 secondo), esegue collaudo e regressione.
+```
+rm -rf /tmp/motore && mkdir /tmp/motore && cd /tmp/motore && curl -sfL https://codeload.github.com/giuseppetaglialatela/studio-taglialatela-template/tar.gz/refs/heads/main | tar xz --strip-components=2 studio-taglialatela-template-main/motore-calcolo && python3 collaudo.py && python3 regressione.py
+```
+Poi si lavora in `/tmp/motore`. Nessun calcolo su paziente prima dell'esito positivo
+(principio 7). Non serve il repository collegato alla chat: il download è pubblico.
 
 `cache.zip`, `BDA_alimenti.xlsx` e `crea_cache.zip` servono **solo** per ampliare il
-database (M6), non per calcolare un piano. Stanno sciolti nella cartella `motore-calcolo`
-del repository, fuori dallo zip; `crea_cache.zip` va scaricato accanto ai moduli per usare
-`cerca_crea.py`.
+database (M6), ma arrivano comunque con lo stesso comando e il collaudo li verifica.
 
-**Convenzione:** il CODICE sta dentro lo zip, i DATI stanno fuori. Non tenere copie
-sciolte dei `.py` nel repository: due copie divergono in silenzio. Non è teorico — il
-28/07/2026 sono state eliminate quattro copie sciolte obsolete, divergenti dallo zip
-da tre fasi; il `gap.csv` sciolto aveva 67 righe contro 8, cioè dichiarava come
-mancanti dei dati già recuperati.
+**Una sola copia di tutto.** Dal 21/10/2026 il motore non è più impacchettato in uno zip:
+ogni file esiste una volta sola, nella cartella `motore-calcolo`. Lo zip era nato per il
+caricamento manuale; con il salvataggio diretto (sotto) non serve più. Non reintrodurre
+copie parallele: il 28/07/2026 quattro copie sciolte obsolete divergevano dallo zip da tre
+fasi, e un `gap.csv` duplicato dichiarava mancanti dati già recuperati.
 
-**Legame zip ↔ database.** `SHA256SUMS` sta dentro lo zip ma firma anche
-`alimenti.csv`, che sta fuori. Quando il database cresce servono quindi DUE
-caricamenti: `alimenti.csv` sciolto e lo zip (che contiene checksum aggiornati e
-`EXPECTED_ALIMENTI_COUNT`). Caricarne uno solo fa fallire il collaudo alla sessione
-successiva — fallisce correttamente, ma fallisce. È il prezzo del quinto controllo.
+**Come si salva una modifica.** La salva Claude con un commit, dalle sessioni del
+progetto di consolidamento con il repository collegato: si lavora su una copia
+(`git clone`), si eseguono collaudo e regressione, si fa il commit e il push, poi si
+riscarica con il comando sopra e si ricollauda. Il nutrizionista non carica niente a mano.
+`git log` sostituisce il registro delle versioni; ogni modifica è annullabile.
+Ripiego, solo se il collegamento non è disponibile: caricamento manuale dalla pagina di
+upload della cartella, con verifica delle impronte dopo il caricamento.
 
 **Sessioni lunghe.** Una chat che ha scaricato il motore all'inizio continua a
 lavorare sulla copia estratta allora, che invecchia in silenzio. Oltre una giornata di
@@ -99,8 +100,8 @@ il controllo.
 
 Attenzione: firma **tutto** ciò che si trova nella cartella. Un file appoggiato lì per
 una verifica finisce nei checksum e fa fallire il collaudo alla sessione dopo, quando
-non c'è più. Estrai sempre in una cartella pulita e riesegui il collaudo prima di
-consegnare lo zip.
+non c'è più. Prima del commit: `git status` deve mostrare solo i file modificati di
+proposito, e la cartella `__pycache__` resta fuori (`.gitignore`).
 
 `EXPECTED_ALIMENTI_COUNT` va aggiornato a mano quando il database cresce.
 Il formato di `SHA256SUMS` è standard: verificabile anche con `sha256sum -c SHA256SUMS`.
@@ -311,7 +312,7 @@ esce 0 se coincidono, 1 se differiscono, e non modifica nulla. Va eseguito dopo 
 ampliamento (M6, passo 8). Non fa parte del collaudo perché richiede un file opzionale.
 
 ### tdee.py
-Nello zip dal 19/09/2026 (prima era l'ultima cosa tecnica rimasta su Drive; la copia
+Nel motore dal 19/09/2026 (prima era l'ultima cosa tecnica rimasta su Drive; la copia
 Drive resta come archivio e non va più usata). Stima il TDEE e propone un `target.csv`
 di partenza da peso/altezza/età/sesso/livello di attività (Mifflin-St Jeor + PAL).
 Testato solo contro il TDEE di P00, paziente fittizio (2040 kcal,
@@ -324,7 +325,7 @@ propone, non decide.
 Il parametro `larn={...}` resta per sovrascrivere singoli valori con motivazione clinica.
 
 ### genera_zona_piano.py — dal piano approvato al PDF
-Nello zip dal 19/09/2026. Compila la zona dati del template piano v5 (M3) e genera
+Nel motore dal 19/09/2026. Compila la zona dati del template piano v5 (M3) e genera
 il PDF. Legge `piano.csv`, `alimenti.csv`, `nomi_paziente.csv`, `target.csv`,
 `metadati_piano_vN.json` e, se passato, `orari_pasti.csv`.
 
@@ -389,7 +390,7 @@ giudicato adeguato con il riferimento 2,4 µg può non esserlo con 4,0.
 
 ## 3. CASI GOLDEN
 
-Cartella `golden/` dentro lo zip. Ogni caso è una sottocartella con `piano.csv`,
+Cartella `golden/` dentro `motore-calcolo`. Ogni caso è una sottocartella con `piano.csv`,
 `target.csv`, `atteso.json`. `atteso.json` contiene i valori attesi più due campi di
 documentazione: `descrizione` (cosa copre il caso) e `riferimento` (come è stato validato).
 
