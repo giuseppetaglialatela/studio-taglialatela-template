@@ -188,6 +188,24 @@ precisi: 1 uovo = 52 g, 1 albume = 35 g, limite inferiore degli intervalli, peso
 gruppo sulla prima verdura nominata, primo alimento nelle alternative «o»; esclusi
 i blocchi con hamburger, primo sale e trippa.
 
+**21/10/2026 sera** — dai PDF allegati: P01 (v2 salmone) · P06 (v5) · P07
+(v2) · P04 Blocchi nuovi M106-M129 e C44-C56. P13 (PDF v8) era già tutto
+in libreria. Aggiunti al database, su decisione del nutrizionista, gli ingredienti che
+impedivano di inserire tre pasti: crema di nocciole e cacao (CREA 203500, usata anche per la
+variante «fondente 70%+», proxy), pangrattato (CREA 000570, usato anche per il pangrattato
+integrale, proxy con fibra sottostimata), semi di lino (BDA-IEO 9600_1 + magnesio USDA
+169414, derivazione analitica). Restano esclusi, per la sezione 2: la minestra di cereali e
+legumi in busta e i cereali precotti con condimento in vasetto di P04; esclusi
+anche gli spuntini di sola frutta (nessun accoppiamento da registrare). Convenzioni nuove,
+oltre a quelle di P03: per P01 valgono le scelte del calcolo approvato (caso golden
+01-02: pomodoro 90 g di pomodori da insalata, frutta fresca = mele, frutta secca = mandorle,
+yogurt bianco = parzialmente scremato, olive = verdi); frutto a unità = porzione di
+`scambi_frutta.csv` (1 mela 150 g, 1 pera 160 g, 1 kiwi 140 g); 1 galletta di riso = 8 g;
+1 cucchiaino di semi di lino = 2 g (porzione standard BDA-IEO); sgombro al naturale in
+scatola = sgombro fresco (proxy, come in M78); nasello e pesce bianco = merluzzo; yogurt
+greco magro = greco 0%; yogurt magro = bianco magro; latte scremato senza lattosio = latte
+scremato; insalata generica = lattuga; aromi senza grammatura omessi.
+
 ---
 
 ## 5. CERCATI E NON TROVATI — non riprovare

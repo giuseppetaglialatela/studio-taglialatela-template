@@ -2,7 +2,10 @@
 
 Modulo operativo (principio 6: nucleo + moduli sono l'unica fonte operativa).
 Dipendenze: nessuna. Dipendono da questo modulo: M2 (workflow piano), M6 (estrazione).
-Ultimo aggiornamento: 21/10/2026 (controllo degli accoppiamenti vietati: `ruoli_alimenti.csv`,
+Ultimo aggiornamento: 21/10/2026 sera (database a 144 voci: crema di nocciole e cacao,
+pangrattato, semi di lino; semi di lino tra i falsi positivi Atwater; libreria a 129 blocchi
+pranzo/cena e 56 colazioni/spuntini; M11 corretto a pasta integrale) · stesso giorno, prima
+(controllo degli accoppiamenti vietati: `ruoli_alimenti.csv`,
 `accoppiamenti_vietati.csv`, `accoppiamenti.py`, PASSO 4 controllo F, collaudo controllo 8,
 caso golden 15; libreria degli accoppiamenti estesa a 105 blocchi pranzo/cena e 43
 colazioni/spuntini in `moduli_colazione.csv`; database a 141 voci) ·
@@ -445,7 +448,7 @@ diventa un nuovo caso golden.
 
 ## 4. DATABASE ALIMENTI E GERARCHIA FONTI
 
-**Stato:** 141 alimenti verificati e tracciati alla fonte (verificato il 21/10/2026,
+**Stato:** 144 alimenti verificati e tracciati alla fonte (verificato il 21/10/2026,
 nessun `food_id` duplicato; il numero vincolante è `EXPECTED_ALIMENTI_COUNT` in
 `collaudo.py`). Conformità kcal/macro/fibra a CREA verificabile con
 `python3 cerca_crea.py verifica`.
@@ -541,12 +544,15 @@ ciò che non lo è. Il dato a monte era sano: l'errore stava nel derivato.
 L'INTERO PIANO SETTIMANALE, mai giorno per giorno (dettaglio clinico in M2).
 
 **moduli_pasto.csv** — `modulo_id, nome, categoria, tag, ingredienti_food_id_grammi`
-Libreria di 105 blocchi pranzo/cena riutilizzabili, con tag (halal_ok · mensa_ok ·
+Libreria di 129 blocchi pranzo/cena riutilizzabili, con tag (halal_ok · mensa_ok ·
 vegetariano · legumi · pesce · carne · vitD · calcio · pratico · leggero). M25-M105 dal
 21/10/2026: tag ricavati dai ruoli (halal_ok · vegetariano · legumi · pesce · carne).
+M106-M129 dal 21/10/2026 sera (P01, P06, P07, P04). M11 corretto
+lo stesso giorno: riportava la pasta di semola dove il calcolo approvato di P01 (caso
+golden 01) usa la pasta integrale.
 
 **moduli_colazione.csv** — stesso schema, `categoria` colazione | spuntino, tag dolce |
-salata. 43 blocchi (C01-C43) dal 21/10/2026. È una LIBRERIA, distinta dal catalogo
+salata. 56 blocchi (C01-C56) dal 21/10/2026. È una LIBRERIA, distinta dal catalogo
 `colazioni_spuntini.csv`, che serve a riconoscere il livello e non va riempito di
 alternative.
 
@@ -652,7 +658,9 @@ richiede il **doppio criterio** (>12% relativo E >8 kcal/100 g in assoluto).
 Residui attesi: **AGLIO** (53 kcal dichiarate vs 44,8 ricalcolate, -15,5%, scarto
 assoluto 8,20 kcal — appena sopra soglia) e, dal 01/10/2026, **CARCIOFI** (33 kcal CREA vs
 22,6 ricalcolate, -31,5%, scarto 10,4 kcal: il metodo Southgate conta la fibra, 5,5 g per
-100 g, circa 11 kcal; macro e kcal coincidono con la scheda CREA). Non correggere il dato:
+100 g, circa 11 kcal; macro e kcal coincidono con la scheda CREA) e, dal 21/10/2026, **SEMI
+DI LINO** (`9600_1`, 447 kcal BDA-IEO vs 377 ricalcolate, -15,7%, scarto 70 kcal: BDA-IEO
+calcola l'energia «con fibra», 34,8 g × 2 kcal = 69,6 kcal; 377 + 69,6 = 446,6). Non correggere il dato:
 dichiara il falso positivo e prosegui.
 Se compaiono NUOVI segnalati con l'ampliamento del database, vanno verificati uno a uno:
 non si alza la soglia per farli sparire.
