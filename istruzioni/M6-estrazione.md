@@ -179,7 +179,11 @@ confluiti in `moduli_pasto.csv`.
 **21/10/2026** — P10 · P11 · P12, più di nuovo P03
 (piano + nuove alternative) per la libreria degli accoppiamenti: tutte le voci dei
 tre piani attivi erano già in database (nessun alimento aggiunto). Blocchi nuovi:
-M25-M76 e C01-C22. Convenzioni usate per P03, che non dava sempre grammi
+M25-M76 e C01-C22. Dai CSV su Drive, nello stesso giorno: P05 (piano v11),
+P13 (piano v8), P14 (piano v2, approvato ad agosto): M77-M105 e
+C23-C43. Escluso P15: il suo file di calcoli dichiara l'approvazione non
+ancora registrata. Esclusi i modelli per patologia di `Modelli_Dieta`: non sono
+piani approvati. Convenzioni usate per P03, che non dava sempre grammi
 precisi: 1 uovo = 52 g, 1 albume = 35 g, limite inferiore degli intervalli, peso di
 gruppo sulla prima verdura nominata, primo alimento nelle alternative «o»; esclusi
 i blocchi con hamburger, primo sale e trippa.

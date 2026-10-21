@@ -4,7 +4,7 @@ Modulo operativo (principio 6: nucleo + moduli sono l'unica fonte operativa).
 Dipendenze: nessuna. Dipendono da questo modulo: M2 (workflow piano), M6 (estrazione).
 Ultimo aggiornamento: 21/10/2026 (controllo degli accoppiamenti vietati: `ruoli_alimenti.csv`,
 `accoppiamenti_vietati.csv`, `accoppiamenti.py`, PASSO 4 controllo F, collaudo controllo 8,
-caso golden 15; libreria degli accoppiamenti estesa a 76 blocchi pranzo/cena e 22
+caso golden 15; libreria degli accoppiamenti estesa a 105 blocchi pranzo/cena e 43
 colazioni/spuntini in `moduli_colazione.csv`; database a 141 voci) ·
 precedente 01/10/2026 (`cerca_crea.py` e cache CREA; kcal di 7 voci allineate a CREA;
 carciofi tra i falsi positivi Atwater; eccezione INSA per i micronutrienti delle sardine) ·
@@ -242,6 +242,10 @@ python3 accoppiamenti.py --libreria             controlla la libreria dei blocch
 Le coppie vietate crescono man mano che si presentano (decisione del 21/10/2026): una
 riga nuova in `accoppiamenti_vietati.csv`, nessuna modifica al codice. Se la regola nuova
 colpisce un blocco della libreria, il collaudo fallisce finché il blocco non viene tolto.
+*Falso allarme noto:* i piani scritti prima del 30/09/2026 con due spuntini (mattina e
+pomeriggio) li registrano entrambi come `spuntino`, e il controllo li legge come un pasto
+unico (caso reale: latte nello spuntino del pomeriggio, yogurt in quello del mattino). Non
+è una violazione: quel piano va riscritto con `spuntino2` prima di essere rivalutato.
 
 ### moduli_pasto.py
 Legge la libreria degli accoppiamenti: `moduli_pasto.csv` (pranzo/cena) e
@@ -537,12 +541,12 @@ ciò che non lo è. Il dato a monte era sano: l'errore stava nel derivato.
 L'INTERO PIANO SETTIMANALE, mai giorno per giorno (dettaglio clinico in M2).
 
 **moduli_pasto.csv** — `modulo_id, nome, categoria, tag, ingredienti_food_id_grammi`
-Libreria di 76 blocchi pranzo/cena riutilizzabili, con tag (halal_ok · mensa_ok ·
-vegetariano · legumi · pesce · carne · vitD · calcio · pratico · leggero). M25-M76 dal
+Libreria di 105 blocchi pranzo/cena riutilizzabili, con tag (halal_ok · mensa_ok ·
+vegetariano · legumi · pesce · carne · vitD · calcio · pratico · leggero). M25-M105 dal
 21/10/2026: tag ricavati dai ruoli (halal_ok · vegetariano · legumi · pesce · carne).
 
 **moduli_colazione.csv** — stesso schema, `categoria` colazione | spuntino, tag dolce |
-salata. 22 blocchi (C01-C22) dal 21/10/2026. È una LIBRERIA, distinta dal catalogo
+salata. 43 blocchi (C01-C43) dal 21/10/2026. È una LIBRERIA, distinta dal catalogo
 `colazioni_spuntini.csv`, che serve a riconoscere il livello e non va riempito di
 alternative.
 
