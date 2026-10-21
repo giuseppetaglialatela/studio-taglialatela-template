@@ -3,7 +3,8 @@
 Modulo operativo (principio 6: nucleo + moduli sono l'unica fonte operativa).
 Dipendenze: nessuna. Dipendono da questo modulo: M2 (workflow piano), M6 (estrazione).
 Ultimo aggiornamento: 21/10/2026, terzo giro (regole di accoppiamento su alimento preciso e
-per pasto; A03 formaggi diversi, A04 merluzzo + pasta; M01 tolto; caso golden 16) · prima,
+per pasto; A03 formaggi diversi, A04 merluzzo + pasta, A05 carne rossa o maiale + pasta, A06 due
+frutte secche nello stesso pasto; M01 e C37 tolti; casi golden 16 e 17) · prima,
 stesso giorno (database a 144 voci: crema di nocciole e cacao,
 pangrattato, semi di lino; semi di lino tra i falsi positivi Atwater; libreria a 129 blocchi
 pranzo/cena e 56 colazioni/spuntini; M11 corretto a pasta integrale) · stesso giorno, prima
@@ -173,7 +174,7 @@ deroghe legittime (spuntino saltato, giorno libero). Il rilievo resta scritto ne
 con il motivo dichiarato.
 
 ### regressione.py
-Suite sui casi golden in `golden/` (14 casi dal 30/09/2026: `caso_11_formati_confezione_violati` congela l'attenzione sui formati; i casi 05-07 la contengono perché i loro input di test non seguono i formati commerciali; i casi 12-14 coprono la struttura a 5 pasti; 16 casi dal 21/10/2026).
+Suite sui casi golden in `golden/` (14 casi dal 30/09/2026: `caso_11_formati_confezione_violati` congela l'attenzione sui formati; i casi 05-07 la contengono perché i loro input di test non seguono i formati commerciali; i casi 12-14 coprono la struttura a 5 pasti; 17 casi dal 21/10/2026).
 Nei casi `pipeline` la suite ripete la sequenza di `pipeline.main()`: un controllo
 aggiunto a `main()` va messo in una funzione chiamata da entrambi, come
 `controlla_pasti_ammessi`, altrimenti la suite non lo vede. Va rieseguita **dopo ogni modifica** al motore o al
@@ -431,6 +432,10 @@ documentazione: `descrizione` (cosa copre il caso) e `riferimento` (come è stat
   (A04, regola su alimento preciso) e parmigiano + mozzarella (A03): due attenzioni
   `ACCOPPIAMENTO_VIETATO`. Controllo negativo a cena: pasta integrale + alici con un solo
   formaggio non scatta. Verificato al contrario: senza A03 e A04 il caso diventa rosso.
+- **caso_17_carne_pasta_frutta_secca** (21/10/2026) — pasta + vitellone a pranzo (A05) e
+  noci + nocciole nello stesso spuntino (A06): due attenzioni. Controlli negativi: pasta
+  integrale + pollo; mandorle a colazione e noci allo spuntino (pasti diversi). Verificato
+  al contrario: senza A05 e A06 il caso diventa rosso.
 Entrambe le regole nuove sono state verificate anche al contrario (30/09/2026):
 togliendole dal codice, la suite diventa rossa esattamente sul caso che le sorveglia.
 
@@ -561,7 +566,7 @@ lo stesso giorno: riportava la pasta di semola dove il calcolo approvato di P01 
 golden 01) usa la pasta integrale. M01 (pasta + merluzzo) tolto il 21/10/2026 con la regola A04.
 
 **moduli_colazione.csv** — stesso schema, `categoria` colazione | spuntino, tag dolce |
-salata. 56 blocchi (C01-C56) dal 21/10/2026. È una LIBRERIA, distinta dal catalogo
+salata. 55 blocchi (C01-C56, C37 tolto il 21/10/2026 con la regola A06) dal 21/10/2026. È una LIBRERIA, distinta dal catalogo
 `colazioni_spuntini.csv`, che serve a riconoscere il livello e non va riempito di
 alternative.
 
@@ -577,7 +582,10 @@ più voci separate da `|`, ogni voce è un ruolo o un `food_id`. `pasti` (facolt
 = tutti) limita la regola a certi pasti, es. `colazione`; nella libreria un blocco
 `spuntino` vale per spuntino e spuntino2. Al 21/10/2026: A01 latte + yogurt, A02 carne o
 salume + pesce o molluschi/crostacei, A03 due formaggi diversi, A04 merluzzo + pasta
-(semola o integrale). Sono una BASE DI
+(semola o integrale), A05 carne rossa o maiale + pasta (vitellone, manzo, vitello, maiale,
+trippa; pollo e tacchino ammessi; i salumi NON sono inclusi), A06 due tipi di frutta secca
+nello stesso pasto (in pasti diversi ammessi; i semi di lino hanno ruolo frutta_secca e
+contano). Nuove coppie: si aggiungono man mano, durante la stesura delle diete. Sono una BASE DI
 PARTENZA da scalare, non un sostituto del calcolo caso per caso. Per leggerla:
 `python3 moduli_pasto.py`.
 *Perché anche questo dichiara solo gli ingredienti:* portava valori precalcolati fino al
