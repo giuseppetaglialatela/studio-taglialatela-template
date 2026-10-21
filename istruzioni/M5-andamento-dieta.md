@@ -142,7 +142,8 @@ della sezione 2. In questo caso ci si ferma qui: niente PDF alla prima pesata.
 **6. Salva su Drive il JSON aggiornato con il numero di versione successivo**, nella
 cartella del paziente, insieme al PDF. Il connettore non sovrascrive: un nome già
 esistente crea un duplicato. Segnala quale versione è la corrente e come distinguere
-la vecchia (nome e dimensione); la cancellazione è manuale e differibile.
+la vecchia (nome e dimensione); la si sposta nel cestino (`trash_file`) solo su richiesta
+del nutrizionista, ed è comunque differibile.
 
 ---
 

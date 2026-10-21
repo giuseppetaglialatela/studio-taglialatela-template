@@ -180,7 +180,8 @@ quando servono:
 
 Quando in conversazione viene modificata una regola coperta da un documento di
 archivio, segnalalo a fine conversazione: la versione aggiornata la propone
-l'assistente, il caricamento e la cancellazione della vecchia restano manuali.
+l'assistente; la versione vecchia va nel cestino (`trash_file`) solo su richiesta del
+nutrizionista.
 L'allineamento non è mai bloccante per il lavoro clinico in corso.
 
 ---

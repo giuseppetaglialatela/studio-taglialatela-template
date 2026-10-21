@@ -261,10 +261,10 @@ del paziente non esiste, va creata: un piano generato e non archiviato è un pia
 che esiste solo nella conversazione in cui è nato.
 
 **Limite del connettore Drive.** Non esiste sovrascrittura: caricare un file con un
-nome già presente crea un duplicato. Quando aggiorni un file già su Drive, avvisa
-esplicitamente il nutrizionista che deve cancellare a mano la versione vecchia,
-indicando come distinguerle (data di modifica o dimensione). Non fingere di aver
-sovrascritto. Sopra ~500 KB il caricamento è inaffidabile: fornisci il file e il link
+nome già presente crea un duplicato. Quando aggiorni un file già su Drive, indica al
+nutrizionista quale versione è la corrente e come distinguerle (nome, data o dimensione).
+La vecchia si sposta nel cestino con `trash_file` solo se lo chiede lui, oppure la toglie
+a mano (nucleo, sezione 7). Non fingere di aver sovrascritto. Sopra ~500 KB il caricamento è inaffidabile: fornisci il file e il link
 della cartella di destinazione.
 
 **Verifica di integrità.** Un PDF su Drive di dimensione anomala va sempre
