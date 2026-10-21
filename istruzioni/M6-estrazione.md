@@ -156,9 +156,11 @@ Link di upload:
 non è già presente. Oltre le 150 voci solo su richiesta esplicita del
 nutrizionista.
 
-Stesso criterio per `moduli_pasto.csv`: un blocco si aggiunge quando un piano
-reale lo richiede. Range utile a regime 20-30 blocchi; oltre, la libreria
-diventa più lenta da consultare che ricostruire il pasto.
+Per la libreria degli accoppiamenti (`moduli_pasto.csv`, `moduli_colazione.csv`)
+il criterio è diverso, per decisione del 21/10/2026: si estraggono TUTTI i pasti
+dei piani fatti, e un blocco entra se il suo nucleo (alimenti portanti, esclusi
+verdura, frutta e condimenti) non c'è già. Il vecchio tetto di 20-30 blocchi è
+superato. Dettaglio in M1, sezione 5.
 
 ---
 
@@ -173,6 +175,14 @@ greco 0%).
 
 Da questi piani sono già stati estratti anche i blocchi pasto riutilizzabili
 confluiti in `moduli_pasto.csv`.
+
+**21/10/2026** — P10 · P11 · P12, più di nuovo P03
+(piano + nuove alternative) per la libreria degli accoppiamenti: tutte le voci dei
+tre piani attivi erano già in database (nessun alimento aggiunto). Blocchi nuovi:
+M25-M76 e C01-C22. Convenzioni usate per P03, che non dava sempre grammi
+precisi: 1 uovo = 52 g, 1 albume = 35 g, limite inferiore degli intervalli, peso di
+gruppo sulla prima verdura nominata, primo alimento nelle alternative «o»; esclusi
+i blocchi con hamburger, primo sale e trippa.
 
 ---
 
@@ -263,7 +273,7 @@ Dal piano P09. Restano scritti qui perché siano verificabili in seguito.
   zinco, magnesio e B12 da USDA Foundation 330137 (analitici, 18 campioni; B12 9). Vitamina D
   0 da USDA (analitica, 1 campione: debole). Folati 7 µg da USDA SR Legacy 170894
   (derivazione DA, 0 campioni) e vitamina C 0 (label claim, 1 campione): **dati deboli**.
-  Formato confezione 125|150|170 copiato da 8053, stato `da_confermare`.
+  Formato confezione confermato a vasetto da 150 g (prima 125|150|170 copiato da 8053).
 - **Mais dolce in scatola (000070):** nessun formato di confezione registrato in
   `formati_confezione.csv` (da confermare prima dell'uso nei piani).
 - **Ravanelli (005670) e fuso con pelle (106400):** presenti in cache CREA, non aggiunti

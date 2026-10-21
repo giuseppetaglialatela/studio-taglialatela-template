@@ -2,7 +2,9 @@
 
 Modulo operativo. Si carica quando si compone, si modifica o si valuta un piano
 alimentare.
-Ultimo aggiornamento: 30/09/2026 (struttura fino a 5 pasti: secondo spuntino). Dipende da **M1 (Motore di calcolo)**: nessun passo di questo modulo
+Ultimo aggiornamento: 21/10/2026 (libreria degli accoppiamenti anche per colazioni e
+spuntini; accoppiamenti vietati segnalati dal PASSO 4) · precedente 30/09/2026 (struttura
+fino a 5 pasti: secondo spuntino). Dipende da **M1 (Motore di calcolo)**: nessun passo di questo modulo
 è eseguibile senza il motore collaudato.
 
 Rimandi:
@@ -195,11 +197,15 @@ da lì.
 Se il TDEE o i target non sono già stati concordati, usa `tdee.py` per proporli: la
 proposta va sempre confermata dal nutrizionista prima di calcolare il piano.
 
-Per pranzo e cena, parti dai blocchi di `moduli_pasto.csv` quando esiste un blocco
-compatibile con i vincoli del paziente: risparmia cicli di aggiustamento
-grammature. Consultali con `python3 moduli_pasto.py --tag ...`, che filtra e
+Per OGNI pasto parti dalla libreria degli accoppiamenti quando esiste un blocco
+compatibile con i vincoli del paziente: `moduli_pasto.csv` (pranzo/cena) e
+`moduli_colazione.csv` (colazioni/spuntini). Sono accoppiamenti già approvati in piani
+reali: evitano sia i cicli di aggiustamento grammature sia gli accostamenti sbagliati.
+Consultali con `python3 moduli_pasto.py --categoria ... --tag ...`, che filtra e
 ricalcola. Il blocco va comunque riscalato e ricalcolato nel piano del paziente,
-mai copiato tal quale.
+mai copiato tal quale. Un pasto composto da zero, fuori libreria, passa comunque dal
+controllo degli accoppiamenti vietati (PASSO 4, controllo F): prima di presentarlo,
+`python3 accoppiamenti.py --piano piano_vN.csv`.
 
 **ORDINE OBBLIGATORIO PER I PASTI A SCELTA MULTIPLA (colazione+spuntino):**
 per ogni giorno, subito DOPO aver fissato pranzo e cena di quel giorno e PRIMA di
@@ -375,7 +381,10 @@ sembra identico a uno precedente.
   scambio frutta, pesci in rotazione) e i contenuti da escludere dal documento di
   spiegazione;
 - le attenzioni `FORMATO_CONFEZIONE_NON_RISPETTATO` del PASSO 4, se presenti, con la
-  motivazione.
+  motivazione;
+- le attenzioni `ACCOPPIAMENTO_VIETATO` del PASSO 4, se presenti: si segnalano e non
+  bloccano (decisione del 21/10/2026), ma un accoppiamento vietato rimasto nel piano va
+  motivato, non lasciato passare in silenzio.
 
 **Dopo l'approvazione — `metadati_piano_vN.json` (obbligatorio).** Prima di chiudere
 la chat A si scrive questo file, con lo stesso numero di versione del `piano.csv`

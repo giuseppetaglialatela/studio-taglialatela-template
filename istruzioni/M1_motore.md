@@ -2,10 +2,13 @@
 
 Modulo operativo (principio 6: nucleo + moduli sono l'unica fonte operativa).
 Dipendenze: nessuna. Dipendono da questo modulo: M2 (workflow piano), M6 (estrazione).
-Ultimo aggiornamento: 01/10/2026 (`cerca_crea.py` e cache CREA; kcal di 7 voci
-allineate a CREA; database a 135 voci; carciofi tra i falsi positivi Atwater;
-eccezione INSA per i micronutrienti delle sardine) ·
-precedente 30/09/2026 (struttura a 5 pasti: valore `spuntino2`, controllo
+Ultimo aggiornamento: 21/10/2026 (controllo degli accoppiamenti vietati: `ruoli_alimenti.csv`,
+`accoppiamenti_vietati.csv`, `accoppiamenti.py`, PASSO 4 controllo F, collaudo controllo 8,
+caso golden 15; libreria degli accoppiamenti estesa a 76 blocchi pranzo/cena e 22
+colazioni/spuntini in `moduli_colazione.csv`; database a 141 voci) ·
+precedente 01/10/2026 (`cerca_crea.py` e cache CREA; kcal di 7 voci allineate a CREA;
+carciofi tra i falsi positivi Atwater; eccezione INSA per i micronutrienti delle sardine) ·
+30/09/2026 (struttura a 5 pasti: valore `spuntino2`, controllo
 PASTO_NON_AMMESSO, casi golden 12-14).
 
 Questo modulo copre: come si avvia una sessione di calcolo, i moduli software, i casi
@@ -53,7 +56,7 @@ lavoro: riscarica e riesegui il collaudo prima di fidarti dei numeri.
 ## 2. MODULI SOFTWARE
 
 ### collaudo.py — certificato di inizio sessione
-Sette controlli:
+Otto controlli:
 1. presenza e integrità di tutti i CSV, incluso il numero di colonne per riga
    (`csv.DictReader` da solo NON lo segnala)
 2. conteggio righe di `alimenti.csv` contro `EXPECTED_ALIMENTI_COUNT`
@@ -64,6 +67,9 @@ Sette controlli:
    senza duplicati né righe orfane
 7. `formati_confezione.csv` e `scambi_frutta.csv`: ogni `food_id` esiste in
    `alimenti.csv`, unità e tolleranze valide
+8. ogni `food_id` ha un ruolo ammesso in `ruoli_alimenti.csv`, le regole di
+   `accoppiamenti_vietati.csv` usano ruoli validi e nessun blocco della libreria
+   (`moduli_pasto.csv`, `moduli_colazione.csv`) contiene un accoppiamento vietato
 
 Esce con codice 0 (superato) o 1 (fallito).
 
@@ -162,7 +168,7 @@ deroghe legittime (spuntino saltato, giorno libero). Il rilievo resta scritto ne
 con il motivo dichiarato.
 
 ### regressione.py
-Suite sui casi golden in `golden/` (14 casi dal 30/09/2026: `caso_11_formati_confezione_violati` congela l'attenzione sui formati; i casi 05-07 la contengono perché i loro input di test non seguono i formati commerciali; i casi 12-14 coprono la struttura a 5 pasti).
+Suite sui casi golden in `golden/` (14 casi dal 30/09/2026: `caso_11_formati_confezione_violati` congela l'attenzione sui formati; i casi 05-07 la contengono perché i loro input di test non seguono i formati commerciali; i casi 12-14 coprono la struttura a 5 pasti; 15 casi dal 21/10/2026).
 Nei casi `pipeline` la suite ripete la sequenza di `pipeline.main()`: un controllo
 aggiunto a `main()` va messo in una funzione chiamata da entrambi, come
 `controlla_pasti_ammessi`, altrimenti la suite non lo vede. Va rieseguita **dopo ogni modifica** al motore o al
@@ -222,13 +228,29 @@ Legge `colazioni_spuntini.csv` e riconosce il livello di un piano.
 `alimenti.csv`: serve a leggerlo a occhio senza che i numeri possano divergere dalla
 fonte. Segnala anche se le 4 colazioni di un livello hanno kcal troppo distanti tra loro.
 
+### accoppiamenti.py
+Controllo degli accoppiamenti vietati nello stesso pasto (decisione del 21/10/2026:
+**si segnala, non blocca**). Legge `ruoli_alimenti.csv` e `accoppiamenti_vietati.csv`.
+`pipeline.py` lo usa al PASSO 4, controllo F: attenzione `ACCOPPIAMENTO_VIETATO`, una per
+coppia, pasto e scenario, con i giorni in cui compare. I pasti con alternative si
+valutano scenario per scenario: due opzioni dello stesso `gruppo_scelta` non si mangiano
+insieme e non formano un accoppiamento.
+```
+python3 accoppiamenti.py --piano piano_vN.csv   controlla un piano senza pipeline
+python3 accoppiamenti.py --libreria             controlla la libreria dei blocchi
+```
+Le coppie vietate crescono man mano che si presentano (decisione del 21/10/2026): una
+riga nuova in `accoppiamenti_vietati.csv`, nessuna modifica al codice. Se la regola nuova
+colpisce un blocco della libreria, il collaudo fallisce finché il blocco non viene tolto.
+
 ### moduli_pasto.py
-Legge `moduli_pasto.csv`, la libreria dei 24 blocchi pranzo/cena, ricalcolando i valori
-da `alimenti.csv` e marcando i nutrienti sottostimati da `gap.csv`.
+Legge la libreria degli accoppiamenti: `moduli_pasto.csv` (pranzo/cena) e
+`moduli_colazione.csv` (colazioni/spuntini), ricalcolando i valori da `alimenti.csv` e
+marcando i nutrienti sottostimati da `gap.csv`.
 
 ```
 python3 moduli_pasto.py                     tutta la libreria
-python3 moduli_pasto.py --categoria cena    solo le cene
+python3 moduli_pasto.py --categoria cena    solo le cene (anche colazione, spuntino, pranzo)
 python3 moduli_pasto.py --tag pesce vitD    blocchi con TUTTI i tag
 python3 moduli_pasto.py --scala M07 1.15    grammature riscalate del 15%
 ```
@@ -389,6 +411,10 @@ documentazione: `descrizione` (cosa copre il caso) e `riferimento` (come è stat
   perché non ce ne siano altri).
 - **caso_14_pasto_non_ammesso** — `spuntino 2` scritto con lo spazio: unico bloccante
   `PASTO_NON_AMMESSO`.
+- **caso_15_accoppiamenti_vietati** (21/10/2026) — latte + yogurt in colazione solo nello
+  scenario A, pollo + merluzzo a cena: due attenzioni `ACCOPPIAMENTO_VIETATO`. Controllo
+  negativo: yogurt e latte come alternative dello stesso spuntino non scattano.
+  Verificato al contrario: con le regole svuotate il caso diventa rosso.
 Entrambe le regole nuove sono state verificate anche al contrario (30/09/2026):
 togliendole dal codice, la suite diventa rossa esattamente sul caso che le sorveglia.
 
@@ -415,7 +441,7 @@ diventa un nuovo caso golden.
 
 ## 4. DATABASE ALIMENTI E GERARCHIA FONTI
 
-**Stato:** 135 alimenti verificati e tracciati alla fonte (verificato il 01/10/2026,
+**Stato:** 141 alimenti verificati e tracciati alla fonte (verificato il 21/10/2026,
 nessun `food_id` duplicato; il numero vincolante è `EXPECTED_ALIMENTI_COUNT` in
 `collaudo.py`). Conformità kcal/macro/fibra a CREA verificabile con
 `python3 cerca_crea.py verifica`.
@@ -511,8 +537,25 @@ ciò che non lo è. Il dato a monte era sano: l'errore stava nel derivato.
 L'INTERO PIANO SETTIMANALE, mai giorno per giorno (dettaglio clinico in M2).
 
 **moduli_pasto.csv** — `modulo_id, nome, categoria, tag, ingredienti_food_id_grammi`
-Libreria di 24 blocchi pranzo/cena riutilizzabili, con tag (halal_ok · mensa_ok ·
-vegetariano · legumi · pesce · carne · vitD · calcio · pratico · leggero). Sono una BASE DI
+Libreria di 76 blocchi pranzo/cena riutilizzabili, con tag (halal_ok · mensa_ok ·
+vegetariano · legumi · pesce · carne · vitD · calcio · pratico · leggero). M25-M76 dal
+21/10/2026: tag ricavati dai ruoli (halal_ok · vegetariano · legumi · pesce · carne).
+
+**moduli_colazione.csv** — stesso schema, `categoria` colazione | spuntino, tag dolce |
+salata. 22 blocchi (C01-C22) dal 21/10/2026. È una LIBRERIA, distinta dal catalogo
+`colazioni_spuntini.csv`, che serve a riconoscere il livello e non va riempito di
+alternative.
+
+**ruoli_alimenti.csv** — `food_id, ruolo`. Un ruolo per ogni voce del database: carne,
+salume, pesce, molluschi_crostacei, uova, legumi, latte, yogurt, formaggio, cereale,
+patate, verdura, frutta, frutta_secca, condimento, dolce. È più fine della `categoria` di
+`alimenti.csv`, che mette insieme il parmigiano e lo yogurt. Patate e patata dolce hanno un
+ruolo proprio (portano carboidrato, non contorno); i piselli sono legumi; il mais dolce è
+cereale. Ogni voce nuova del database richiede la sua riga qui (collaudo, controllo 8).
+
+**accoppiamenti_vietati.csv** — `regola_id, ruoli_a, ruoli_b, motivo, data_decisione`;
+più ruoli separati da `|`. Al 21/10/2026: A01 latte + yogurt, A02 carne o salume + pesce o
+molluschi/crostacei. Sono una BASE DI
 PARTENZA da scalare, non un sostituto del calcolo caso per caso. Per leggerla:
 `python3 moduli_pasto.py`.
 *Perché anche questo dichiara solo gli ingredienti:* portava valori precalcolati fino al
@@ -521,9 +564,12 @@ vitamina D di M18, M20 e M22. NON erano errori di trascrizione: erano corretti i
 sono diventati falsi il 28/07, quando la vitamina D di gambero e polpo è stata recuperata
 da USDA. La fonte è migliorata sotto il derivato. È una via di divergenza più insidiosa di
 quella di S1, perché non richiede alcun errore umano.
-*Ampliamento:* stesso criterio Key Foods. Range utile a regime 20-30 blocchi; oltre, la
-libreria diventa più lenta da consultare che ricostruire il pasto. Previa conferma del
-nutrizionista.
+*Ampliamento — decisione del 21/10/2026:* la libreria raccoglie gli ACCOPPIAMENTI VALIDI di
+tutti i piani fatti, per non ricomporre ogni volta pasti mal accoppiati; il vecchio tetto di
+20-30 blocchi è superato, la consultazione resta rapida con `--categoria` e `--tag`. Un
+blocco entra solo se il suo NUCLEO non c'è già: gli alimenti portanti (proteine, cereali,
+patate, latticini, legumi, frutta secca, dolci); verdura, frutta e condimenti si scambiano e
+non contano.
 
 ---
 
