@@ -2,7 +2,9 @@
 
 Modulo operativo (principio 6: nucleo + moduli sono l'unica fonte operativa).
 Dipendenze: nessuna. Dipendono da questo modulo: M2 (workflow piano), M6 (estrazione).
-Ultimo aggiornamento: 21/10/2026 sera (database a 144 voci: crema di nocciole e cacao,
+Ultimo aggiornamento: 21/10/2026, terzo giro (regole di accoppiamento su alimento preciso e
+per pasto; A03 formaggi diversi, A04 merluzzo + pasta; M01 tolto; caso golden 16) · prima,
+stesso giorno (database a 144 voci: crema di nocciole e cacao,
 pangrattato, semi di lino; semi di lino tra i falsi positivi Atwater; libreria a 129 blocchi
 pranzo/cena e 56 colazioni/spuntini; M11 corretto a pasta integrale) · stesso giorno, prima
 (controllo degli accoppiamenti vietati: `ruoli_alimenti.csv`,
@@ -71,7 +73,7 @@ Otto controlli:
 7. `formati_confezione.csv` e `scambi_frutta.csv`: ogni `food_id` esiste in
    `alimenti.csv`, unità e tolleranze valide
 8. ogni `food_id` ha un ruolo ammesso in `ruoli_alimenti.csv`, le regole di
-   `accoppiamenti_vietati.csv` usano ruoli validi e nessun blocco della libreria
+   `accoppiamenti_vietati.csv` usano voci valide (ruoli o food_id) e nessun blocco della libreria
    (`moduli_pasto.csv`, `moduli_colazione.csv`) contiene un accoppiamento vietato
 
 Esce con codice 0 (superato) o 1 (fallito).
@@ -171,7 +173,7 @@ deroghe legittime (spuntino saltato, giorno libero). Il rilievo resta scritto ne
 con il motivo dichiarato.
 
 ### regressione.py
-Suite sui casi golden in `golden/` (14 casi dal 30/09/2026: `caso_11_formati_confezione_violati` congela l'attenzione sui formati; i casi 05-07 la contengono perché i loro input di test non seguono i formati commerciali; i casi 12-14 coprono la struttura a 5 pasti; 15 casi dal 21/10/2026).
+Suite sui casi golden in `golden/` (14 casi dal 30/09/2026: `caso_11_formati_confezione_violati` congela l'attenzione sui formati; i casi 05-07 la contengono perché i loro input di test non seguono i formati commerciali; i casi 12-14 coprono la struttura a 5 pasti; 16 casi dal 21/10/2026).
 Nei casi `pipeline` la suite ripete la sequenza di `pipeline.main()`: un controllo
 aggiunto a `main()` va messo in una funzione chiamata da entrambi, come
 `controlla_pasti_ammessi`, altrimenti la suite non lo vede. Va rieseguita **dopo ogni modifica** al motore o al
@@ -243,7 +245,10 @@ python3 accoppiamenti.py --piano piano_vN.csv   controlla un piano senza pipelin
 python3 accoppiamenti.py --libreria             controlla la libreria dei blocchi
 ```
 Le coppie vietate crescono man mano che si presentano (decisione del 21/10/2026): una
-riga nuova in `accoppiamenti_vietati.csv`, nessuna modifica al codice. Se la regola nuova
+riga nuova in `accoppiamenti_vietati.csv`, nessuna modifica al codice. Ogni lato della
+regola nomina un RUOLO (pesce) oppure un `food_id` preciso (1313 merluzzo): serve per le
+coppie che non valgono per tutto il ruolo (pasta con merluzzo no, pasta con alici sì).
+Stesso ruolo sui due lati (formaggio + formaggio) = due alimenti DIVERSI di quel ruolo. Se la regola nuova
 colpisce un blocco della libreria, il collaudo fallisce finché il blocco non viene tolto.
 *Falso allarme noto:* i piani scritti prima del 30/09/2026 con due spuntini (mattina e
 pomeriggio) li registrano entrambi come `spuntino`, e il controllo li legge come un pasto
@@ -422,6 +427,10 @@ documentazione: `descrizione` (cosa copre il caso) e `riferimento` (come è stat
   scenario A, pollo + merluzzo a cena: due attenzioni `ACCOPPIAMENTO_VIETATO`. Controllo
   negativo: yogurt e latte come alternative dello stesso spuntino non scattano.
   Verificato al contrario: con le regole svuotate il caso diventa rosso.
+- **caso_16_accoppiamenti_alimento_preciso** (21/10/2026) — a pranzo pasta + merluzzo
+  (A04, regola su alimento preciso) e parmigiano + mozzarella (A03): due attenzioni
+  `ACCOPPIAMENTO_VIETATO`. Controllo negativo a cena: pasta integrale + alici con un solo
+  formaggio non scatta. Verificato al contrario: senza A03 e A04 il caso diventa rosso.
 Entrambe le regole nuove sono state verificate anche al contrario (30/09/2026):
 togliendole dal codice, la suite diventa rossa esattamente sul caso che le sorveglia.
 
@@ -544,12 +553,12 @@ ciò che non lo è. Il dato a monte era sano: l'errore stava nel derivato.
 L'INTERO PIANO SETTIMANALE, mai giorno per giorno (dettaglio clinico in M2).
 
 **moduli_pasto.csv** — `modulo_id, nome, categoria, tag, ingredienti_food_id_grammi`
-Libreria di 129 blocchi pranzo/cena riutilizzabili, con tag (halal_ok · mensa_ok ·
+Libreria di 128 blocchi pranzo/cena riutilizzabili, con tag (halal_ok · mensa_ok ·
 vegetariano · legumi · pesce · carne · vitD · calcio · pratico · leggero). M25-M105 dal
 21/10/2026: tag ricavati dai ruoli (halal_ok · vegetariano · legumi · pesce · carne).
 M106-M129 dal 21/10/2026 sera (P01, P06, P07, P04). M11 corretto
 lo stesso giorno: riportava la pasta di semola dove il calcolo approvato di P01 (caso
-golden 01) usa la pasta integrale.
+golden 01) usa la pasta integrale. M01 (pasta + merluzzo) tolto il 21/10/2026 con la regola A04.
 
 **moduli_colazione.csv** — stesso schema, `categoria` colazione | spuntino, tag dolce |
 salata. 56 blocchi (C01-C56) dal 21/10/2026. È una LIBRERIA, distinta dal catalogo
@@ -563,9 +572,12 @@ patate, verdura, frutta, frutta_secca, condimento, dolce. È più fine della `ca
 ruolo proprio (portano carboidrato, non contorno); i piselli sono legumi; il mais dolce è
 cereale. Ogni voce nuova del database richiede la sua riga qui (collaudo, controllo 8).
 
-**accoppiamenti_vietati.csv** — `regola_id, ruoli_a, ruoli_b, motivo, data_decisione`;
-più ruoli separati da `|`. Al 21/10/2026: A01 latte + yogurt, A02 carne o salume + pesce o
-molluschi/crostacei. Sono una BASE DI
+**accoppiamenti_vietati.csv** — `regola_id, ruoli_a, ruoli_b, motivo, data_decisione, pasti`;
+più voci separate da `|`, ogni voce è un ruolo o un `food_id`. `pasti` (facoltativa: vuota
+= tutti) limita la regola a certi pasti, es. `colazione`; nella libreria un blocco
+`spuntino` vale per spuntino e spuntino2. Al 21/10/2026: A01 latte + yogurt, A02 carne o
+salume + pesce o molluschi/crostacei, A03 due formaggi diversi, A04 merluzzo + pasta
+(semola o integrale). Sono una BASE DI
 PARTENZA da scalare, non un sostituto del calcolo caso per caso. Per leggerla:
 `python3 moduli_pasto.py`.
 *Perché anche questo dichiara solo gli ingredienti:* portava valori precalcolati fino al
