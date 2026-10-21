@@ -302,7 +302,9 @@ python3 genera_zona_piano.py --autotest --template TEMPLATE_..._v5.py
   − target; perdita attesa = deficit × 7 / 7.700 kg/settimana.
 - Giorno libero: colazione, spuntino e secondo spuntino come nei giorni strutturati, pranzo
   e cena liberi con le indicazioni dei metadati, totale da `range_kcal_libero`.
-- **Si ferma, nominando il problema**, se manca un campo dei metadati o un titolo di piatto,
+- **Si ferma, nominando il problema**, se manca un campo obbligatorio dei metadati (elenco
+  in M2, PASSO 6; `versione_piano` e `abbinamento_spuntino` invece non lo fermano) o un
+  titolo di piatto,
   se un `food_id` non ha nome paziente, se i giorni di `piano.csv` non coincidono con quelli
   dichiarati, o se un pasto mescola alimenti fissi e alternative.
 - `--autotest` genera il caso golden 03 con metadati fittizi e verifica: kcal uguali al

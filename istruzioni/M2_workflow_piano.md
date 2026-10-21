@@ -1,398 +1,303 @@
 # M2 — WORKFLOW PIANO ALIMENTARE
 
-Modulo operativo. Si carica quando si compone, si modifica o si valuta un piano
-alimentare.
-Ultimo aggiornamento: 21/10/2026 (libreria degli accoppiamenti anche per colazioni e
-spuntini; accoppiamenti vietati segnalati dal PASSO 4) · precedente 30/09/2026 (struttura
-fino a 5 pasti: secondo spuntino). Dipende da **M1 (Motore di calcolo)**: nessun passo di questo modulo
-è eseguibile senza il motore collaudato.
+Modulo operativo: si carica quando si compone, si modifica o si valuta un piano.
+Dipende da **M1**: nessun passo è eseguibile senza il motore collaudato.
+Ultima modifica: 21/10/2026 notte (versione asciutta: motivazioni, episodi e date in
+`istruzioni/archivio/M2-motivazioni.md`, che non si carica).
 
-Rimandi:
-- il motore, i CSV, i gap e la gerarchia fonti → **M1**
-- la generazione del PDF del piano e del documento di spiegazione → **M3**
-- il fascicolo paziente e la Tabella Vincoli (PASSO 0) → **M4**
-- l'ampliamento del database alimenti → **M6**
-
-In caso di divergenza tra questo modulo e un documento di archivio su Drive,
-vale questo modulo (nucleo M0, principio 6).
+Rimandi: motore, CSV, gap, fonti → **M1** · PDF del piano e documento di spiegazione →
+**M3** · fascicolo e Tabella Vincoli (PASSO 0) → **M4** · ampliamento del database →
+**M6**. Se un documento d'archivio su Drive diverge, vale questo modulo (principio 6).
 
 ---
 
-## 1. REGOLE PESI
+## 1. REGOLE PESI (ripetute per intero dal nucleo M0, sezione 5; se cambiano, cambiano in entrambi; il nucleo prevale)
 
-Da leggere PRIMA di ogni calcolo. Sbagliare qui invalida tutto ciò che segue:
-l'errore realmente rilevato su questa regola valeva +42% su un singolo pasto e
-+9,3% sul totale giornata.
+Da leggere PRIMA di ogni calcolo: un errore qui invalida tutto ciò che segue.
 
-**Regola generale: pesi sempre a CRUDO.**
+**Pesi sempre a CRUDO**, con due sole eccezioni:
+1. inscatolati e simili → **peso NETTO di confezione**;
+2. legumi lessati cotti in casa (ceci, fagioli, lenticchie) → **peso COTTO**.
 
-Due eccezioni, e solo queste:
+Carne e pesce SEMPRE a crudo, anche se il piatto è descritto cotto («merluzzo 140 g al
+vapore» = 140 g crudi). Nel dubbio su una preparazione, CHIEDI prima di calcolare: non
+dedurre dalla formulazione del piatto.
 
-1. Inscatolati e simili → **peso netto di confezione**
-2. Legumi lessati (ceci, fagioli, lenticchie cotti in casa) → **peso COTTO**
+**Formati di confezione — nessuno spreco.** Fonte: `formati_confezione.csv`, nella cartella
+del motore.
+1. **Monoporzione o deperibile una volta aperto** (yogurt, fiocchi di latte, scatolame,
+   uova): confezione intera o multiplo esatto del formato.
+2. **A peso al banco** (affettati, formaggi, carne, pesce, pane): qualsiasi grammatura.
+3. **Non deperibile o consumabile in famiglia** (pasta, riso, couscous, cereali, frutta
+   secca, gallette, cioccolato, latte, olive): porzione libera.
+Assente dal CSV = porzione libera. Il controllo E del PASSO 4 di `pipeline.py` SEGNALA (non
+blocca) le quantità fuori formato: si compone già a formato, e le segnalazioni residue si
+dichiarano al PASSO 6. Formato nuovo: stato `da_confermare` finché il nutrizionista non lo
+conferma. Il CSV converte un formato commerciale in grammi (es. «una scatoletta di tonno»,
+«un vasetto di yogurt» → grammi in `piano.csv`), non è un dato nutrizionale: il dato resta
+quello di `alimenti.csv`, già per 100 g di prodotto sgocciolato/edibile. Le percentuali di
+sgocciolamento non tratte da CREA/BDA/USDA sono stime di mercato, non dati verificati.
 
-Carne e pesce restano SEMPRE a peso crudo, anche quando il piatto è descritto
-come cotto: "merluzzo 140 g al vapore" significa 140 g crudi, non 140 g di
-prodotto cotto nel piatto.
+**Foto di una confezione:** serve solo per il formato in grammi e la variante (intero o
+scremato), che determina quale voce del database usare. I valori dell'etichetta NON
+entrano nel database. Deroghe alle tre fonti: INSA, voce per voce su decisione del
+nutrizionista e solo per i micronutrienti, mai per kcal e macro (M1, sezione 4); etichetta, SOLO su richiesta esplicita del nutrizionista e
+per il singolo piano, con `--eccezione-etichetta` (M1, sezione 4), mai in `alimenti.csv`.
+L'eccezione si dichiara nella tabella del PASSO 6.
 
-In caso di dubbio su una preparazione, CHIEDI prima di calcolare. Non dedurre
-dalla formulazione del piatto: la stessa dicitura può significare cose diverse
-a seconda dell'alimento.
-
-### Confezionati senza spreco e conversione formato → grammi
-
-Le quantità dei prodotti confezionati rispettano i formati commerciali: nessuno
-spreco (nucleo M0, sezione 5; qui ripetuta per intero). Fonte: `formati_confezione.csv`
-nella cartella del motore (il documento Word su Drive è archivio). Tre casi:
-1. **Monoporzione o deperibile una volta aperto** (yogurt, fiocchi di latte,
-   scatolame, uova): confezione intera o multiplo esatto del formato.
-2. **Acquistabile a peso al banco** (affettati, formaggi, carne, pesce, pane):
-   qualsiasi grammatura.
-3. **Non deperibile o consumabile da tutta la famiglia** (pasta, riso, couscous,
-   cereali, frutta secca, gallette, cioccolato, latte, olive): porzione libera.
-Un alimento assente dal CSV è a porzione libera. Il controllo E del PASSO 4 di
-`pipeline.py` segnala le violazioni senza bloccare: si compone già a formato, e le
-segnalazioni residue si dichiarano al PASSO 6. Quando il paziente descrive una
-porzione commerciale ("una scatoletta di tonno", "un vasetto di yogurt"), il CSV
-converte il formato in grammi da inserire in `piano.csv`. Il dato nutrizionale resta
-quello di `alimenti.csv`, già espresso per 100 g di prodotto sgocciolato/edibile.
-
-**Scambio frutta.** La frutta a scelta si scrive con la voce di riferimento (banana
-100 g) e le alternative stanno in `scambi_frutta.csv`, a parità di energia. Nel
-piano non si moltiplicano le opzioni per la frutta: si dichiara lo scarto massimo
-(pochi kcal e grammi) e la tabella va nel documento di spiegazione.
-
-Le percentuali di sgocciolamento non tratte da CREA/BDA/USDA sono stime di
-mercato: riferimento pratico, non dato verificato.
-
-La foto di una confezione è utile per DUE cose e solo quelle: il formato in
-grammi, e la variante del prodotto (intero/scremato) che determina quale voce del
-database usare. I valori nutrizionali dell'etichetta NON entrano nel database:
-non sono una delle tre fonti e non hanno un codice tracciabile. Unica eccezione: su
-richiesta esplicita del nutrizionista, per il singolo piano, con `--eccezione-etichetta`
-(M1, sezione 4), mai in `alimenti.csv`.
+**Scambio frutta:** nel piano la voce di riferimento (banana 100 g), le alternative a
+parità di energia in `scambi_frutta.csv`. La tabella di scambio va nel documento di
+spiegazione; le alternative non si calcolano come scenari uno per uno, e lo scarto (pochi
+kcal e grammi) si dichiara.
 
 ---
 
-## 2. REGOLE STRUTTURA PASTI
+## 2. STRUTTURA DEI PASTI
 
-Protocollo di DEFAULT per ogni piano, derogabile caso per caso quando il
-fascicolo del paziente lo richiede esplicitamente (es. spuntino dichiarato come
-saltato in sez6).
+Protocollo di DEFAULT, derogabile caso per caso quando il fascicolo lo richiede
+esplicitamente.
 
-**COLAZIONE — 4 alternative fisse: 2 salate, 2 dolci.**
-Le quattro vanno calcolate con kcal tra loro il più possibile vicine, così che la
-scelta del paziente non sposti il bilancio della giornata.
-Queste 4 alternative sono LE STESSE per tutti i giorni strutturati del piano: non
-cambiano da un giorno all'altro. Il paziente sceglie liberamente ogni giorno tra
-le stesse 4; non gli si assegna una colazione diversa per calendario.
+**COLAZIONE — 4 alternative fisse: 2 salate, 2 dolci**, con kcal tra loro il più vicine
+possibile, così che la scelta del paziente non sposti il bilancio. Sono LE STESSE in tutti
+i giorni strutturati: il paziente sceglie ogni giorno tra le stesse 4, non gli si assegna
+una colazione per calendario.
 
-**SPUNTINO — 2 alternative, legate alla colazione scelta (salata/dolce).**
-Il criterio di abbinamento (compensativo: salata→dolce, dolce→salato/proteico;
-oppure in continuità: salata→salato, dolce→dolce) NON è fissato a priori: si
-decide col nutrizionista caso per caso, in base al bilancio micronutrienti del
-giorno. Come la colazione, questi 2 spuntini sono fissi per tutta la settimana.
+**SPUNTINO — 2 alternative, legate alla colazione scelta (salata/dolce)**, fisse per tutta
+la settimana. Il criterio di abbinamento (compensativo: salata→dolce, dolce→salato o
+proteico; oppure in continuità: salata→salato, dolce→dolce) NON è fissato a priori: si
+decide col nutrizionista caso per caso, in base al bilancio dei micronutrienti.
 
-**SECONDO SPUNTINO — quinto pasto, facoltativo (decisione del 30/09/2026).**
-La struttura prevede fino a 5 pasti: colazione, spuntino, pranzo, secondo spuntino,
-cena. In `piano.csv` il secondo spuntino si scrive `spuntino2`; un pasto senza righe
-semplicemente non esiste in quel piano.
-- Con il secondo spuntino, lo SPUNTINO è quello di metà mattina e il SECONDO
-  SPUNTINO sta nel pomeriggio o prima di dormire. Nei piani a 4 pasti lo spuntino
-  resta quello del pomeriggio, come prima.
-- Nel PDF: etichette SPUNTINO e SECONDO SPUNTINO, stessa icona. Se ci sono gli
-  orari, l'ordine dei pasti nella pagina segue gli orari.
-- Segue le stesse regole dello spuntino: se c'è, è lo stesso in tutti i giorni
-  strutturati (altrimenti il PASSO 6 blocca, salvo deroga dichiarata) e il suo
-  livello si confronta con gli spuntini del catalogo.
-- Uno spuntino fisso e un secondo spuntino fisso vengono dichiarati dal PASSO 6
-  come `LIVELLO_PARZIALE` (il catalogo ne prevede 2 per livello): va solo
-  dichiarato, non blocca.
+**SECONDO SPUNTINO — quinto pasto, facoltativo.** Fino a 5 pasti: colazione, spuntino,
+pranzo, secondo spuntino, cena; in `piano.csv` si scrive `spuntino2`, e un pasto senza
+righe non esiste in quel piano.
+- Con il secondo spuntino, lo SPUNTINO è di metà mattina e il SECONDO SPUNTINO sta nel
+  pomeriggio o prima di dormire; nei piani a 4 pasti lo spuntino resta del pomeriggio.
+- Nel PDF: etichette SPUNTINO e SECONDO SPUNTINO, stessa icona; con gli orari, l'ordine
+  dei pasti segue gli orari.
+- Segue le regole dello spuntino: se c'è, è lo stesso in tutti i giorni strutturati
+  (altrimenti il PASSO 6 della pipeline blocca, salvo deroga) e il suo livello si
+  confronta con gli spuntini del catalogo.
+- Spuntino fisso e secondo spuntino fisso: se presi dal catalogo danno `LIVELLO_PARZIALE`
+  (il catalogo ne prevede 2 per livello), se costruiti su misura `LIVELLO_FUORI_CATALOGO`;
+  in entrambi i casi si dichiara, non blocca.
 
-**DEROGA:** se il fascicolo dichiara lo spuntino saltato, un'allergia che esclude
-un'intera alternativa, o altra indicazione esplicita del paziente, la deroga vince
-sempre sul protocollo di default — non forzare la struttura standard.
-Nel motore la deroga si dichiara con `--deroga-struttura "motivo"`: il rilievo
-resta scritto nel report ma non blocca.
+**DEROGA:** spuntino saltato, allergia che esclude un'intera alternativa o altra
+indicazione esplicita del paziente nel fascicolo: la deroga vince SEMPRE sul protocollo,
+non si forza la struttura standard. Nel motore: `--deroga-struttura "motivo"`, il rilievo
+resta nel report ma non blocca.
 
-### Tensione nota con i micronutrienti — da gestire, non da ignorare
+**Livello rinforzato.** `colazioni_spuntini.csv` (M1) ha due livelli, `standard` e
+`rinforzata_calcio`. Il passaggio al rinforzato è **una sola decisione per l'intero piano
+settimanale** (tutti i giorni strutturati), mai per il singolo giorno critico.
+- **DA DECIDERE — criterio del passaggio.** Finché non è deciso vale il criterio storico
+  («anche un solo giorno sotto l'80% LARN di calcio»), e la scelta va esposta al
+  nutrizionista. Alternative: **(a)** media settimanale del calcio sotto l'80% LARN,
+  coerente con il principio 8; **(b)** calcio concentrato su meno di 3 giorni su 6,
+  coerente con l'argomento della saturazione (circa 500 mg per assunzione).
+- Prima di passare al rinforzato, verificare che il calcio sotto soglia non sia marcato
+  ⛔ TOTALE SOTTOSTIMATO: la carenza può essere apparente.
+- NON si abbina la colazione di un livello con lo spuntino dell'altro: il PASSO 6 della
+  pipeline lo blocca. Con `--deroga-struttura` diventa un'attenzione
+  (`LIVELLO_INCOERENTE_IN_DEROGA`), ma la deroga di struttura non autorizza livelli misti:
+  si correggono; restano solo su decisione esplicita del nutrizionista, motivata nella
+  tabella del PASSO 6.
 
-Fissare la stessa colazione e lo stesso spuntino su tutti i giorni toglie la leva
-che serviva a compensare calcio e vitamina D nei giorni deboli, e sposta l'intero
-peso del bilanciamento su pranzo e cena. Su un paziente con pranzo vincolato
-(mensa, halal, patologia) il margine può non bastare.
+**Scenari di scelta — verifica obbligatoria.** Il paziente può scegliere ogni giorno una
+qualsiasi delle 4 colazioni con lo spuntino abbinato: il piano NON è verificato finché non
+sono calcolati, per OGNI giorno strutturato, tutti gli scenari possibili, non una sola
+combinazione d'esempio (momento esatto: PASSO 2). Kcal e macro si giudicano comunque sulla
+media settimanale (principio 8): il giorno fuori tolleranza si dichiara; blocca solo un
+giorno o uno scenario oltre ±10% di kcal.
 
-Contromisura: `colazioni_spuntini.csv` (M1) contiene un secondo livello
-**rinforzata_calcio**. Il passaggio al livello rinforzato vale per L'INTERO PIANO
-(tutti i giorni strutturati), mai per il singolo giorno critico. È **una sola
-decisione per l'intero piano settimanale**.
-
-> **DA DECIDERE — unica soglia giornaliera rimasta nel sistema**
-> Il criterio storico per passare al livello rinforzato era: "se anche un solo
-> giorno scende sotto l'80% LARN di calcio". Dal 29/07/2026 il principio 8
-> stabilisce che il giudizio sui micronutrienti è settimanale, e questo criterio
-> è l'unico punto in cui sopravvive una soglia giornaliera.
-> Non è necessariamente un residuo da eliminare: il calcio è l'unico nutriente
-> con un argomento reale a favore della lettura per giorno, perché l'assorbimento
-> satura intorno ai 500 mg per singola assunzione. Ma il criterio così com'è
-> scritto usa l'80% LARN giornaliero, che è una soglia, non un argomento di
-> distribuzione.
-> Le due formulazioni possibili: **(a)** media settimanale del calcio sotto l'80%
-> LARN, coerente con il principio 8; **(b)** calcio concentrato su meno di 3
-> giorni su 6, coerente con l'argomento della saturazione.
-> Finché non è deciso, vale il criterio storico e la scelta va esposta al
-> nutrizionista.
-
-Prima di passare al livello rinforzato, verifica comunque che il calcio sotto
-soglia non sia marcato ⛔ TOTALE SOTTOSTIMATO: in quel caso la carenza può essere
-apparente.
-
-NON si abbina la colazione di un livello con lo spuntino dell'altro: il PASSO 6 di
-`pipeline.py` lo blocca, ed è un'incoerenza che il solo controllo di uniformità tra
-giorni non vedrebbe, perché i giorni resterebbero tutti uguali tra loro.
-
-### Verifica obbligatoria sugli scenari di scelta
-
-Poiché il paziente può scegliere liberamente una qualsiasi delle 4 colazioni (con
-il relativo spuntino abbinato) ogni giorno, il piano NON è verificato finché non
-sono stati calcolati, per OGNI giorno strutturato, tutti gli scenari possibili —
-non un'unica combinazione scelta come esempio. Il momento esatto in cui farlo è
-nel PASSO 2 qui sotto.
-
-Nota: gli scenari si calcolano per ogni giorno, ma dal 18/09/2026 kcal e macro si
-giudicano sulla MEDIA SETTIMANALE come i micronutrienti (principio 8): il giorno fuori
-tolleranza si dichiara, e blocca solo oltre ±10% di kcal (limite di sicurezza).
-
-**STATO:** protocollo introdotto dopo test su paziente fittizio (P00
-Taglialatela), non ancora attraversato da un paziente reale per intero. Da
-confermare o rivedere dopo il primo caso vero che lo percorre tutto.
+**Stato:** protocollo testato su paziente fittizio, non ancora attraversato per intero da
+un paziente reale: da confermare o rivedere dopo il primo caso vero che lo percorre tutto.
 
 ---
 
 ## 3. I NOVE PASSI
 
-Per ogni nuovo piano o modifica, esegui i passi IN QUESTO ORDINE.
-Se è disponibile un fascicolo paziente strutturato, c'è un **PASSO 0** che precede
-tutto: vedi **M4**.
+Per ogni nuovo piano o modifica, IN QUESTO ORDINE. Con un fascicolo strutturato c'è prima
+un **PASSO 0**: vedi M4.
 
 ### PASSO 1 — RICERCA SCIENTIFICA
-
-Cerca gli studi più recenti pertinenti al profilo clinico del paziente (patologie,
-farmaci in terapia, obiettivi nutrizionali). Sintetizza i punti rilevanti che
-influenzano il piano, comprese eventuali evidenze che ridimensionano l'efficacia
-attesa di una scelta già concordata (es. fonti omega-3 vegetali vs marine):
-segnalale comunque, anche dopo l'approvazione della scelta.
+Studi più recenti pertinenti al profilo clinico (patologie, farmaci, obiettivi). Sintetizza
+i punti che influenzano il piano, comprese le evidenze che ridimensionano l'efficacia
+attesa di una scelta già concordata (es. omega-3 vegetali vs marini): segnalale comunque,
+anche dopo l'approvazione della scelta.
 
 ### PASSO 2 — CALCOLI (prima di qualsiasi bozza grafica)
+Con il motore (M1), mai a mente, su grammature reali e con le regole pesi della sezione 1.
+**Precondizione:** `collaudo.py` superato (principio 7).
 
-Esegui i calcoli con il motore deterministico (M1), mai a mente, su grammature
-reali e secondo le regole pesi della sezione 1.
-**Precondizione:** `collaudo.py` deve aver dato esito positivo (principio 7).
+**Modo raccomandato: `pipeline.py`**, che impone l'ordine dei passi e produce in un colpo
+collaudo, calcoli, scenari, micronutrienti, coerenza, interazioni e livello colazione. I
+moduli singoli servono ad approfondire un punto, ma l'ordine dei passi non si ricostruisce
+a mano.
 
-**MODO RACCOMANDATO:** esegui `pipeline.py`, che impone l'ordine dei passi e
-produce in un colpo solo collaudo, calcoli, scenari di scelta multipla,
-micronutrienti, coerenza, interazioni e verifica del livello colazione. I moduli
-singoli restano utili per approfondire un punto, ma l'ordine dei passi non va
-ricostruito a mano: entrambi gli errori di processo del primo caso reale sono nati
-da lì.
+TDEE o target non concordati: proponili con `tdee.py`; la proposta va sempre confermata
+dal nutrizionista prima di calcolare il piano.
 
-Se il TDEE o i target non sono già stati concordati, usa `tdee.py` per proporli: la
-proposta va sempre confermata dal nutrizionista prima di calcolare il piano.
+**Libreria degli accoppiamenti.** Per OGNI pasto si parte dalla libreria quando esiste un
+blocco compatibile con i vincoli del paziente: `moduli_pasto.csv` (pranzo/cena) e
+`moduli_colazione.csv` (colazioni/spuntini), accoppiamenti già approvati in piani reali.
+Si consulta con `python3 moduli_pasto.py --categoria ... --tag ...` (tag in M1, sezione 5).
+Il blocco si riscala e si ricalcola nel piano del paziente, mai copiato tal quale. Un pasto
+composto da zero, fuori libreria, passa comunque dal controllo degli accoppiamenti vietati
+prima di essere presentato: `python3 accoppiamenti.py --piano piano_vN.csv`.
 
-Per OGNI pasto parti dalla libreria degli accoppiamenti quando esiste un blocco
-compatibile con i vincoli del paziente: `moduli_pasto.csv` (pranzo/cena) e
-`moduli_colazione.csv` (colazioni/spuntini). Sono accoppiamenti già approvati in piani
-reali: evitano sia i cicli di aggiustamento grammature sia gli accostamenti sbagliati.
-Consultali con `python3 moduli_pasto.py --categoria ... --tag ...`, che filtra e
-ricalcola. Il blocco va comunque riscalato e ricalcolato nel piano del paziente,
-mai copiato tal quale. Un pasto composto da zero, fuori libreria, passa comunque dal
-controllo degli accoppiamenti vietati (PASSO 4, controllo F): prima di presentarlo,
-`python3 accoppiamenti.py --piano piano_vN.csv`.
+**Ordine obbligatorio per colazione e spuntino a scelta:** per ogni giorno, subito DOPO
+aver fissato pranzo e cena e PRIMA di passare al giorno successivo, calcola tutti gli
+scenari colazione+spuntino e guarda dove cadono rispetto alla tolleranza. Un giorno o uno
+scenario fuori tolleranza NON si corregge d'ufficio: si corregge solo se la correzione è
+naturale (porzione ragionevole, pasto che il paziente mangerebbe davvero); se servono
+porzioni fuori scala o accostamenti forzati, si lascia e si DICHIARA in tabella. Non si
+arriva al PASSO 6 avendo verificato una sola combinazione «esemplare» per giorno.
+`pipeline.py` lo fa da solo, al suo PASSO 2, prima di ogni riepilogo.
 
-**ORDINE OBBLIGATORIO PER I PASTI A SCELTA MULTIPLA (colazione+spuntino):**
-per ogni giorno, subito DOPO aver fissato pranzo e cena di quel giorno e PRIMA di
-passare al giorno successivo, calcola tutti gli scenari possibili di
-colazione+spuntino su quel giorno e guarda dove cadono rispetto alla tolleranza.
-Dal 18/09/2026 un giorno (o uno scenario) fuori tolleranza NON va corretto d'ufficio:
-il giudizio su kcal e macro si dà sulla MEDIA SETTIMANALE, come per i micronutrienti.
-Si corregge un giorno solo se la correzione è naturale (una porzione ragionevole, un
-pasto che il paziente mangerebbe davvero); se per farlo rientrare servono porzioni
-fuori scala o accostamenti forzati, si lascia fuori e si DICHIARA nella tabella. Non
-arrivare alla presentazione finale (PASSO 6) avendo verificato una sola
-combinazione "esemplare" per giorno: è il punto in cui l'errore è più costoso da
-scoprire, perché emerge dopo che il nutrizionista ha già visto una tabella.
-`pipeline.py` fa questo da solo, al suo PASSO 2, e prima di ogni riepilogo.
+**Produci:**
+- kcal per ogni pasto e totale giornaliero, verificato pasto per pasto;
+- macronutrienti in grammi E percentuale (proteine, carboidrati, grassi);
+- fibre totali giornaliere, confrontate con il target del paziente;
+- deficit calorico reale rispetto al TDEE;
+- coerenza della % di grassi con il target del piano;
+- assenza di ripetizioni degli ingredienti principali in giorni o pasti consecutivi.
 
-Produci:
+**Segnalazione proattiva**, alla prima lettura e senza attendere domande: carichi
+glicemici elevati · ripetizioni di ingredienti · scostamenti tra target dichiarati e
+valori reali.
 
-- kcal per ogni singolo pasto
-- totale kcal giornaliero, verificato pasto per pasto
-- macronutrienti in grammi E percentuale (proteine, carboidrati, grassi)
-- fibre totali giornaliere, confrontate con il target del paziente
-- deficit calorico reale rispetto al TDEE stimato
-- coerenza della % di grassi con il target del piano
-- assenza di ripetizioni degli ingredienti principali in giorni o pasti consecutivi
+Calcoli che non tornano (totale ≠ somma dei pasti, macro incoerenti col target): segnala e
+proponi la correzione PRIMA della tabella, **testandola sul motore prima di applicarla**
+(principio 3: anche la direzione si verifica). Scostamenti minori entro tolleranza (es.
+42% di carboidrati contro un target del 40% per la scarsa quota grassa di una proteina
+magra): si dichiarano con la motivazione, non si correggono d'ufficio; decide il
+nutrizionista.
 
-**SEGNALAZIONE PROATTIVA** — già alla prima lettura, senza attendere domande:
-carichi glicemici elevati · ripetizioni di ingredienti · scostamenti tra target
-dichiarati e valori reali.
+**Tolleranze:** ±5% sulle kcal totali · ±5 punti percentuali sui macro, giudicate sulla
+**media settimanale** (bloccante in `pipeline.py`). Il singolo giorno fuori tolleranza si
+dichiara, purché le kcal del giorno e di ogni suo scenario restino entro **±10%** (limite
+di sicurezza, bloccante).
 
-Se i calcoli non tornano (totale ≠ somma pasti, macro incoerenti col target):
-segnala la discrepanza e proponi la correzione PRIMA di presentare la tabella,
-**testando l'ipotesi di correzione sul motore prima di applicarla** (principio 3:
-anche la direzione di una correzione va verificata, non intuita).
+Dati mancanti per TDEE o target: chiedili in blocco prima di procedere (nucleo, sezione
+6), anche sui pazienti fittizi.
 
-Scostamenti minori entro tolleranza (es. una giornata a 42% carboidrati contro un
-target 40%, per la scarsa quota grassa di una fonte proteica magra) vanno comunque
-dichiarati con la motivazione, ma non corretti d'ufficio: si segnala e si lascia
-decidere.
-
-Tolleranze: **±5% su kcal totali · ±5 punti percentuali sui macronutrienti**, giudicate
-sulla **media settimanale** (bloccante in `pipeline.py`). Il singolo giorno fuori
-tolleranza è una segnalazione da dichiarare, non un errore da correggere, purché le
-kcal del giorno restino entro **±10%** (limite di sicurezza giornaliero, bloccante).
-
-Se mancano dati per calcolare TDEE o target, chiedili in blocco prima di procedere
-(nucleo M0, dati mancanti). La regola non si sospende sui pazienti fittizi.
-
-### PASSO 3 — MICRONUTRIENTI (sempre obbligatorio prima dell'approvazione)
-
-Riporta per ogni piano: calcio, ferro, vitamina D, folato (B9), vitamina B12,
-zinco, magnesio, vitamina C.
-
-- **Il giudizio si dà sulla MEDIA SETTIMANALE** (principio 8). Segnala ⚠️ solo
-  quando la media settimanale è sotto l'80% del riferimento LARN.
-- Riporta comunque i valori per singolo giorno, SENZA allarme: servono a vedere la
-  distribuzione, non a essere corretti uno per uno. Un micronutriente concentrato
-  su pochi giorni (tipicamente la vitamina D con il pesce grasso) risulta basso sul
-  giorno e adeguato sulla settimana: è normale, non un difetto del piano.
-- Segnala ⚠ se un micronutriente critico compare in **meno di 3 giorni su 6/7**,
-  anche quando la media è adeguata: è l'unico caso in cui la distribuzione conta di
-  per sé.
-- **DISTINGUI CARENZA DA GAP:** se il motore marca il nutriente con
-  ⛔ TOTALE SOTTOSTIMATO, quel valore sotto soglia NON è una carenza accertata.
-  Riporta il flag insieme al numero e alle voci che lo causano, e non proporre
-  correzioni del piano né integrazioni su un nutriente sottostimato senza aver
-  prima verificato il gap. Un intervento clinico su una carenza inesistente è un
-  errore, non una precauzione.
-- Quando ci sono pasti a scelta multipla, riporta lo scenario MINIMO e MASSIMO già
-  calcolato al PASSO 2 — non ricalcolarlo qui da zero.
-- **NON INSEGUIRE I NUMERI CON GLI ALIMENTI.** Prima di aggiungere un alimento per
-  chiudere un micronutriente, verifica che il deficit sia reale (media settimanale,
-  non giorno; e non marcato come sottostimato). L'aderenza è un esito clinico: un
-  accostamento sgradito che il paziente salta peggiora il piano invece di
-  migliorarlo.
-- **VERIFICA STRUTTURALE:** quando un vincolo farmacologico o una preferenza del
-  paziente limita strutturalmente un micronutriente (es. rifiuto di pesce →
-  omega-3/vitamina D), trattalo come carenza sistematica su tutto il piano, non
-  occasionale, e segnalalo esplicitamente anche se già accettato dal nutrizionista
-  come compromesso.
-- **VITAMINA D:** è il limite noto della dieta, non un difetto del piano. Anche con
-  pesce grasso 3 volte a settimana la media settimanale resta intorno al 65-75%
-  LARN. Portarla oltre richiederebbe pesce grasso quasi quotidiano. Dichiarala come
-  carenza strutturale e lascia al nutrizionista la decisione clinica (esposizione
-  solare o integrazione): non forzare il piano.
+### PASSO 3 — MICRONUTRIENTI (sempre, prima dell'approvazione)
+Calcio, ferro, vitamina D, folati (B9), vitamina B12, zinco, magnesio, vitamina C.
+- **Giudizio sulla MEDIA SETTIMANALE** (principio 8): ⚠️ solo se la media è sotto l'80% del
+  LARN.
+- I valori per giorno si riportano SENZA allarme, per vedere la distribuzione, e non si
+  correggono uno per uno: un micronutriente concentrato su pochi giorni (tipicamente la
+  vitamina D con il pesce grasso) è basso sul giorno e adeguato sulla settimana, ed è
+  normale.
+- ⚠ anche se un micronutriente critico compare in **meno di 3 giorni su 6 o 7**, pur con
+  media adeguata: è l'unico caso in cui la distribuzione conta di per sé. Il motore
+  (`DISTRIBUZIONE_CONCENTRATA`, piani da almeno 6 giorni) conta come presente un valore
+  maggiore di zero, tracce comprese, e nei giorni a scelta basta che lo sia in almeno uno
+  scenario: la sua assenza NON esclude la concentrazione, che si valuta sui valori per
+  giorno.
+- **Distingui carenza da gap:** un nutriente marcato ⛔ TOTALE SOTTOSTIMATO sotto soglia
+  NON è una carenza accertata. Riporta il flag con il numero e le voci che lo causano;
+  nessuna correzione del piano né integrazione su un nutriente sottostimato prima di aver
+  verificato il gap.
+- Con pasti a scelta, riporta gli scenari MINIMO e MASSIMO già calcolati al PASSO 2, senza
+  ricalcolarli.
+- **Non inseguire i numeri con gli alimenti:** prima di aggiungere un alimento per chiudere
+  un micronutriente, verifica che il deficit sia reale (media settimanale, non giorno; e
+  non marcato sottostimato). Un accostamento sgradito che il paziente salta peggiora il
+  piano.
+- **Verifica strutturale:** un vincolo farmacologico o una preferenza che limita
+  strutturalmente un micronutriente (es. rifiuto del pesce → omega-3, vitamina D) è una
+  carenza sistematica su tutto il piano: si segnala esplicitamente anche se già accettata
+  dal nutrizionista come compromesso.
+- **Vitamina D:** limite noto della dieta, non un difetto del piano; anche con pesce grasso
+  3 volte a settimana la media resta intorno al 65-75% LARN. Si dichiara come carenza
+  strutturale e la decisione clinica (sole o integrazione) resta al nutrizionista: non si
+  forza il piano.
 
 ### PASSO 4 — INTERAZIONI FARMACO-ALIMENTO
+Verifica SEMPRE, anche quando non mostri la tabella: interazioni note tra farmaci in
+terapia e alimenti del piano; alimenti che riducono o potenziano l'assorbimento dei
+farmaci; alimenti che interferiscono con micronutrienti già a rischio per la terapia.
+Ogni criticità con ⚠️ e il **meccanismo**.
 
-Verifica SEMPRE, anche quando non mostri la tabella:
+- Una separazione temporale imposta da un'interazione (es. levotiroxina lontano da calcio,
+  ferro e caffè) si applica alla struttura dei pasti di OGNI giorno e si verifica giorno
+  per giorno prima dell'approvazione: non resta solo in tabella.
+- Una terapia dichiarata nel fascicolo si **TRADUCE nei tre CSV del motore**
+  (`farmaci_paziente.csv`, `interazioni.csv`, `orari_pasti.csv`), non solo annotata nella
+  Tabella Vincoli. Senza nessun file il PASSO 5 della pipeline dà
+  `TERAPIA_NON_DICHIARATA` (attenzione: va confermato che il paziente non sia in
+  terapia); con i file solo in parte blocca (`TERAPIA_INCOMPLETA`). L'assenza del file non
+  è l'assenza di terapia, e un'osservazione discorsiva non è una verifica: con una terapia
+  dichiarata nel fascicolo, `TERAPIA_NON_DICHIARATA` vale come bloccante e il piano non si
+  presenta finché i tre CSV non arrivano alla pipeline. Senza terapia, la conferma si
+  scrive nella tabella del PASSO 6.
+- Il meccanismo in `interazioni.csv` deve corrispondere alla farmacologia reale del
+  principio attivo: una separazione oraria vale per un'interazione di assorbimento
+  sistemico, non per un farmaco ad azione locale sul contenuto gastrico. Una riga proposta
+  e non validata dal nutrizionista si dichiara come tale.
 
-- interazioni note tra i farmaci in terapia e gli alimenti del piano
-- alimenti che riducono o potenziano l'assorbimento dei farmaci
-- alimenti che interferiscono con micronutrienti già a rischio per la terapia
-
-Segnala ogni criticità con ⚠️ specificando il **meccanismo**.
-
-Quando un'interazione impone una separazione temporale (es. levotiroxina a distanza
-da calcio/ferro e dal caffè), il vincolo non resta in tabella: va applicato alla
-struttura dei pasti di OGNI giorno del piano e verificato giorno per giorno prima
-dell'approvazione.
-
-Una terapia dichiarata nel fascicolo va **TRADOTTA nei tre CSV del motore**
-(`farmaci_paziente.csv`, `interazioni.csv`, `orari_pasti.csv`), non solo annotata a
-voce nella Tabella Vincoli: se i file non arrivano a `pipeline.py`, il PASSO 5 lo
-dichiara come rilievo bloccante. L'assenza del file non è l'assenza di terapia, e
-un'osservazione discorsiva non è una verifica.
-
-Il meccanismo dichiarato in `interazioni.csv` deve corrispondere alla farmacologia
-reale del principio attivo: una separazione oraria ha senso per un'interazione di
-assorbimento sistemico, non per un farmaco che agisce localmente sul contenuto
-gastrico. Una riga proposta e non validata dal nutrizionista va dichiarata come
-tale, altrimenti alla rilettura successiva viene scambiata per dato consolidato.
-
-**RICONOSCIMENTO FARMACI — schema a tre esiti**
+**Riconoscimento dei farmaci — tre esiti**
 
 | Esito | Comportamento |
 |---|---|
 | Riconosciuto | proponi il principio attivo, il nutrizionista conferma |
 | Ambiguo | esponi le alternative con l'ipotesi più probabile, motivata dalla dose |
-| Non riconosciuto | dicitura "farmaco non riconosciuto, verifica manuale", nessun vincolo derivato calcolato su di esso |
+| Non riconosciuto | «farmaco non riconosciuto, verifica manuale», nessun vincolo derivato calcolato su di esso |
 
-In tutti e tre i casi: se un nome commerciale non torna con il contesto clinico
-dichiarato (formulazione, via di somministrazione, setting di cura incompatibili),
-FERMATI e segnala l'incongruenza prima di proseguire — non forzare un'ipotesi solo
-perché dose e orario sembrano plausibili.
-In caso di incertezza reale, verifica su banca dati AIFA. Se resta un dubbio che
-potrebbe avere conseguenze cliniche, dillo esplicitamente: si chiede al paziente,
+In tutti e tre i casi: un nome commerciale che non torna con il contesto clinico
+(formulazione, via di somministrazione, setting di cura) → FERMATI e segnala prima di
+proseguire, anche se dose e orario sembrano plausibili. Incertezza reale: banca dati AIFA.
+Un dubbio con possibili conseguenze cliniche si dice esplicitamente: si chiede al paziente,
 non si indovina.
 
-**TABELLA RIEPILOGATIVA:** mostrala SOLO alla prima dieta del paziente, oppure
-quando la terapia è cambiata rispetto alle diete precedenti. Per diete successive
-con farmaci invariati: verifica comunque, ma non ripetere la tabella salvo nuove
-criticità.
+**Tabella riepilogativa:** SOLO alla prima dieta del paziente o quando la terapia è
+cambiata. Per le diete successive con farmaci invariati si verifica comunque, senza
+ripetere la tabella salvo nuove criticità.
 
 ### PASSO 5 — CONFLITTI TRA VINCOLI
-
-Gerarchia a 4 livelli (si applica quando c'è un fascicolo strutturato, vedi M4):
-
+Gerarchia a 4 livelli (con fascicolo strutturato, M4):
 - **Livello 0 — SICUREZZA.** Mai negoziabile, vince su tutto.
-- **Livello 1 — NECESSITÀ CLINICA.** Si somma, non si esclude. Conflitti sullo
-  stesso nutriente o timing si risolvono prima con separazione temporale o
-  spaziale; se non basta, il nodo va esposto, mai deciso in automatico.
-- **Livello 2 — FATTIBILITÀ OPERATIVA.** Si adatta intorno a 0 e 1, non li viola
-  mai.
-- **Livello 3 — PREFERENZE PAZIENTE.** Le uniche davvero negoziabili, ma una
-  preferenza non accolta va sempre motivata in tabella.
+- **Livello 1 — NECESSITÀ CLINICA.** Si somma, non si esclude. Conflitti sullo stesso
+  nutriente o timing: prima separazione temporale o spaziale; se non basta, il nodo si
+  espone, mai deciso in automatico.
+- **Livello 2 — FATTIBILITÀ OPERATIVA.** Si adatta intorno a 0 e 1, non li viola mai.
+- **Livello 3 — PREFERENZE DEL PAZIENTE.** Le sole negoziabili; una preferenza non accolta
+  si motiva sempre in tabella.
 
-Nessun conflitto si risolve dietro le quinte quando non c'è una soluzione ovvia:
-esponi le opzioni realistiche e chiedi come risolverlo.
-
-**ESTENSIONE DELLE ESCLUSIONI.** Le esclusioni dichiarate dal paziente vanno
-interpretate nella loro estensione reale, non massima: un rifiuto generico ("il
-pesce") può riguardare una sola categoria (azzurro/grasso) e non l'intera classe.
-Chiedi conferma della portata prima di escludere alimenti che il paziente non ha
-davvero rifiutato.
+Nessun conflitto senza soluzione ovvia si risolve dietro le quinte: si espongono le
+opzioni realistiche e si chiede.
+**Estensione delle esclusioni:** un'esclusione dichiarata va letta nella sua estensione
+reale, non massima (un rifiuto generico del «pesce» può riguardare solo quello azzurro):
+chiedi la portata prima di escludere alimenti che il paziente non ha davvero rifiutato.
 
 ### PASSO 6 — PRESENTAZIONE PER APPROVAZIONE
+TUTTI i dati in tabella, con analisi esplicita di punti di forza e criticità. **Attendi
+approvazione esplicita.** Se `pipeline.py` esce con codice 1 il piano NON è presentabile:
+risolvi i bloccanti e riesegui.
 
-Presenta TUTTI i dati in tabella, con un'analisi esplicita di punti di forza e
-criticità. **Attendi approvazione esplicita.**
-Se `pipeline.py` è uscito con codice 1, il piano NON è presentabile: risolvi i
-rilievi bloccanti e riesegui prima di arrivare qui.
+È il **gate** del nucleo: uno solo per piano, non uno per giorno. Nessun PDF prima di qui,
+né con fretta dichiarata né con un piano identico a uno precedente.
 
-Questo è il **gate di approvazione** del nucleo M0: uno solo per piano, non uno per
-giorno. Nessun PDF prima di qui, nemmeno con fretta dichiarata, nemmeno se il piano
-sembra identico a uno precedente.
-
-**Nella stessa tabella di approvazione, non in un secondo giro**, si presentano anche:
+**Nella stessa tabella, non in un secondo giro:**
 - il titolo di ogni piatto come comparirà nel PDF;
-- l'obiettivo da riportare in intestazione e il criterio di rivalutazione. Se il
-  fascicolo non li contiene (es. `peso_obiettivo_concordato` = null), si chiedono
-  QUI, insieme alle altre domande del gate: la chat B non deve mai inventarli;
-- le regole operative da spiegare al paziente (es. sostituzioni, regola verdure,
-  scambio frutta, pesci in rotazione) e i contenuti da escludere dal documento di
-  spiegazione;
-- le attenzioni `FORMATO_CONFEZIONE_NON_RISPETTATO` del PASSO 4, se presenti, con la
-  motivazione;
-- le attenzioni `ACCOPPIAMENTO_VIETATO` del PASSO 4, se presenti: si segnalano e non
-  bloccano (decisione del 21/10/2026), ma un accoppiamento vietato rimasto nel piano va
-  motivato, non lasciato passare in silenzio.
+- l'obiettivo in intestazione e il criterio di rivalutazione; se il fascicolo non li ha
+  (es. `peso_obiettivo_concordato` = null) si chiedono QUI: la chat B non li inventa mai;
+- le regole operative da spiegare al paziente (sostituzioni, regola verdure, scambio
+  frutta, pesci in rotazione) e i contenuti da escludere dal documento di spiegazione;
+- le attenzioni `FORMATO_CONFEZIONE_NON_RISPETTATO`, con la motivazione;
+- le attenzioni `ACCOPPIAMENTO_VIETATO`: non bloccano, ma un accoppiamento vietato rimasto
+  nel piano va motivato, non lasciato passare in silenzio;
+- l'eccezione etichetta, se usata (`ALIMENTO_FUORI_DATABASE_SU_RICHIESTA`);
+- la conferma che il paziente non è in terapia, se la pipeline ha dato
+  `TERAPIA_NON_DICHIARATA` (PASSO 4);
+- l'attenzione `LIVELLO_INCOERENTE_IN_DEROGA`, se presente, con la decisione del
+  nutrizionista (sezione 2).
 
-**Dopo l'approvazione — `metadati_piano_vN.json` (obbligatorio).** Prima di chiudere
-la chat A si scrive questo file, con lo stesso numero di versione del `piano.csv`
-approvato, e lo si salva su Drive nella cartella del paziente accanto al CSV. È ciò
-che la chat B legge (M3, "Avvio della chat B"): le istruzioni di passaggio rimandano
-a questo file invece di riassumerlo. Contenuto:
+**Dopo l'approvazione — `metadati_piano_vN.json` (obbligatorio).** Prima di chiudere la
+chat A si scrive questo file, con lo stesso numero di versione del `piano.csv` approvato, e
+si salva su Drive nella cartella del paziente accanto al CSV. È ciò che legge la chat B
+(M3): le istruzioni di passaggio rimandano al file invece di riassumerlo.
 
 ```json
 {
@@ -417,65 +322,61 @@ a questo file invece di riassumerlo. Contenuto:
   "differenze_da_versione_precedente": ["riga/pasto modificato", "..."]
 }
 ```
-
-Regole:
-- nessuna kcal, nessun grammo, nessun valore nutrizionale: i numeri li ricalcola
-  il motore in chat B da `piano.csv` (principio 2, i derivati non si scrivono).
-  Uniche eccezioni, perché sono DATI DI INGRESSO confermati dal nutrizionista e non
-  valori ricavati dal piano: `tdee_confermato_kcal` e `range_kcal_libero`;
-- chiavi di `titoli_piatti`: per un pasto fisso l'opzione è vuota (`"3|pranzo|"`);
-  per colazione, spuntino e secondo spuntino, uguali in tutti i giorni, si può
-  usare `*` al posto del giorno (`"*|colazione|A"`, `"*|spuntino2|A"`). L'opzione è
-  quella della colonna `opzione` di `piano.csv`;
-- `abbinamento_spuntino` usa le opzioni di `piano.csv` (non le lettere del PDF) e
-  può indicare più spuntini con una lista; se l'abbinamento non è stato fissato si
-  scrive `"non concordato"` e nel PDF non compare;
-- il giorno libero riporta le stesse colazioni e spuntini dei giorni strutturati,
-  secondo spuntino compreso se il piano lo ha; in `indicazioni_giorno_libero` vanno
-  solo pranzo e cena (decisione del 19/09/2026);
-- `abbinamento_spuntino` riguarda solo colazione → spuntino: il secondo spuntino
-  è una scelta indipendente;
-- `genera_zona_piano.py` (M1) si ferma se manca uno di questi campi: la chat B non
-  li inventa;
-- testi già nel registro impersonale del documento di spiegazione (M3), così la
-  chat B li usa senza riconvertirli;
-- se un campo resta vuoto per scelta del nutrizionista, si scrive
-  `"non concordato"`, non si lascia null.
+- Nessuna kcal, nessun grammo, nessun valore nutrizionale: i numeri li ricalcola il motore
+  in chat B da `piano.csv` (principio 2). Sole eccezioni, perché DATI DI INGRESSO
+  confermati dal nutrizionista: `tdee_confermato_kcal` e `range_kcal_libero`.
+- `titoli_piatti`: per un pasto fisso l'opzione è vuota (`"3|pranzo|"`); colazione,
+  spuntino e secondo spuntino, uguali tutti i giorni, possono usare `*` al posto del
+  giorno (`"*|colazione|A"`, `"*|spuntino2|A"`). L'opzione è quella della colonna
+  `opzione` di `piano.csv`.
+- `abbinamento_spuntino` usa le opzioni di `piano.csv` (non le lettere del PDF), può
+  indicare più spuntini con una lista, riguarda solo colazione → spuntino (il secondo
+  spuntino è una scelta indipendente); non fissato → `"non concordato"`, e nel PDF non
+  compare.
+- Giorno libero: stesse colazioni e spuntini dei giorni strutturati, secondo spuntino
+  compreso se il piano lo ha; in `indicazioni_giorno_libero` solo pranzo e cena.
+- Piano con eccezione etichetta: il file delle voci e quello dei loro nomi paziente vanno
+  in `drive.altri_file`, perché la chat B li chiede allegati.
+- `genera_zona_piano.py` (M1) si ferma se mancano `giorni` (con `lavorativi`, e
+  `range_kcal_libero` se c'è il giorno libero), `titoli_piatti`, `intestazione` (nome, età,
+  condizione), `tdee_confermato_kcal`, `obiettivo_intestazione`, `criterio_rivalutazione`,
+  `avvertenze_box` e, se c'è il giorno libero, `indicazioni_giorno_libero`. Usa anche
+  `versione_piano` e `abbinamento_spuntino` ma NON si ferma se mancano: vanno scritti
+  sempre. Gli altri campi li legge la chat B. Nessun campo si inventa in chat B.
+- Testi già nel registro impersonale del documento di spiegazione (M3).
+- Campo lasciato vuoto per scelta del nutrizionista: `"non concordato"`, mai null. NON vale
+  per `obiettivo_intestazione`, `criterio_rivalutazione` e `avvertenze_box`, che finiscono
+  nel PDF del paziente: si chiedono al PASSO 6 (le avvertenze senza allergie si scrivono
+  «Nessuna allergia dichiarata.»).
 
 ### PASSO 7 — GENERAZIONE PDF (solo dopo approvazione)
+Vedi **M3**. Di norma in una chat B separata, che parte da `metadati_piano_vN.json` e non
+ricarica questo modulo.
 
-Vedi **M3**. Di norma in una chat B separata, che parte da `metadati_piano_vN.json`
-e non ricarica questo modulo.
-
-### PASSO 8 — DOCUMENTO DI SPIEGAZIONE DIETA
-
-Default per ogni piano consegnato, subito dopo il PDF del piano. Vedi **M3**.
-Usa solo le scelte già approvate al PASSO 6 e scritte nei metadati del piano: non introduce nuovi contenuti clinici
-né richiede un nuovo giro di approvazione dei calcoli. Se qualcosa nel testo
-esplicativo risultasse impreciso rispetto al piano approvato, segnalalo e correggi
-prima di consegnare.
+### PASSO 8 — DOCUMENTO DI SPIEGAZIONE
+Default per ogni piano consegnato, subito dopo il PDF (M3). Usa solo le scelte approvate
+al PASSO 6 e scritte nei metadati: nessun contenuto clinico nuovo, nessun nuovo giro di
+approvazione dei calcoli. Un'imprecisione rispetto al piano approvato si segnala e si
+corregge prima di consegnare.
 
 ### PASSO 9 — RITORNO SULLA SUITE
-
-Se durante il piano è emerso un errore che il motore NON ha intercettato da solo,
-proponi di trasformarlo in un nuovo caso golden (M1). Quello che sfugge una volta
-deve poter fallire da solo la volta dopo.
-Riporta anche cosa il motore HA intercettato da solo e cosa ha richiesto un
-intervento manuale: è il materiale della validazione sul campo ancora aperta.
+Un errore emerso che il motore NON ha intercettato da solo diventa una proposta di nuovo
+caso golden (M1): ciò che sfugge una volta deve poter fallire da solo la volta dopo.
+Riporta anche cosa il motore HA intercettato da solo e cosa ha richiesto un intervento
+manuale: è il materiale della validazione sul campo.
 
 ---
 
 ## 4. STRUTTURA DEL PIANO — DEFAULT
 
-- Piano standard a **7 giorni**: 6 strutturati + 1 libero, di norma la domenica.
-- Il giorno libero è un margine di flessibilità da spiegare al paziente, non un
-  giorno saltato: va comunque compilato con indicazioni di massima e range
-  calorico.
-- Pasti ammessi in `piano.csv`: `colazione | spuntino | pranzo | spuntino2 | cena`,
-  al massimo 5 (decisione del 30/09/2026). `spuntino2` minuscolo e senza spazi: un
-  valore diverso ferma la pipeline (`PASTO_NON_AMMESSO`).
-- Il numero di pasti del piano non si scrive da nessuna parte: si conta dai dati
-  (intestazione del PDF compresa).
-- Composizione **un giorno per volta**, non sei giorni in blocco: si chiude il
-  giorno (pranzo e cena fissati, scenari colazione/spuntino verificati) prima di
-  aprire il successivo.
+- **7 giorni**: 6 strutturati + 1 libero, di norma la domenica. Il giorno libero è un
+  margine di flessibilità da spiegare al paziente, non un giorno saltato: si compila
+  comunque con indicazioni di massima e range calorico.
+- Pasti ammessi in `piano.csv`: `colazione | spuntino | pranzo | spuntino2 | cena`, al
+  massimo 5; `spuntino2` minuscolo e senza spazi, altrimenti la pipeline si ferma
+  (`PASTO_NON_AMMESSO`).
+- Il numero di pasti non si scrive da nessuna parte: si conta dai dati (intestazione del
+  PDF compresa).
+- Composizione **un giorno per volta**, non sei giorni in blocco: si chiude il giorno
+  (pranzo e cena fissati, scenari colazione/spuntino verificati) prima di aprire il
+  successivo.
