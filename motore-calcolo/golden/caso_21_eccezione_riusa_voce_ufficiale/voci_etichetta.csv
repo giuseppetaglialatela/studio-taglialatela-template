@@ -1,0 +1,2 @@
+food_id,nome,categoria,fonte,codice_fonte,data_verifica,kcal_100g,proteine_g,carboidrati_g,grassi_g,fibra_g,calcio_mg,ferro_mg,vitamina_d_ug,folati_ug,vitamina_b12_ug,zinco_mg,magnesio_mg,vitamina_c_mg
+391,Pomodori (etichetta fittizia),verdura,ETICHETTA(test),ETICHETTA-test,2026-10-21,99,1,1,1,1,0,0,0,0,0,0,0,0

@@ -7,11 +7,3 @@ food_id,nome,nutriente,motivo
 115800,Trippa di bovini,vitamina_d_ug,"alimento di origine animale: zero implausibile, dato non pubblicato dalla fonte"
 115800,Trippa di bovini,zinco_mg,minerale mai biologicamente assente in un alimento intero: dato non pubblicato dalla fonte
 122410,Salmone affumicato,vitamina_d_ug,"BDA-IEO dichiara traccia (0.005) su un pesce grasso; USDA riporta 17.1 ug ma con derivazione BFSN da altra forma dell alimento, dataPoints 0: valore probabilmente sottostimato, non usare come fonte portante"
-ETI001,Vellutata surgelata zucca e carote,calcio_mg,"eccezione etichetta: il cartellino UE non dichiara micronutrienti"
-ETI001,Vellutata surgelata zucca e carote,ferro_mg,"eccezione etichetta: il cartellino UE non dichiara micronutrienti"
-ETI001,Vellutata surgelata zucca e carote,vitamina_d_ug,"eccezione etichetta: il cartellino UE non dichiara micronutrienti"
-ETI001,Vellutata surgelata zucca e carote,folati_ug,"eccezione etichetta: il cartellino UE non dichiara micronutrienti"
-ETI001,Vellutata surgelata zucca e carote,vitamina_b12_ug,"eccezione etichetta: il cartellino UE non dichiara micronutrienti"
-ETI001,Vellutata surgelata zucca e carote,zinco_mg,"eccezione etichetta: il cartellino UE non dichiara micronutrienti"
-ETI001,Vellutata surgelata zucca e carote,magnesio_mg,"eccezione etichetta: il cartellino UE non dichiara micronutrienti"
-ETI001,Vellutata surgelata zucca e carote,vitamina_c_mg,"eccezione etichetta: il cartellino UE non dichiara micronutrienti"

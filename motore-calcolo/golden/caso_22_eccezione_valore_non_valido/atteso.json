@@ -1,0 +1,13 @@
+{
+  "tipo": "pipeline",
+  "bloccanti": [
+    [
+      1,
+      "ECCEZIONE_ETICHETTA_NON_VALIDA"
+    ]
+  ],
+  "attenzioni": [],
+  "exit_code": 1,
+  "descrizione": "File di eccezione etichetta con calcio 'nan': unico bloccante ECCEZIONE_ETICHETTA_NON_VALIDA, exit 1. Prima della correzione del 21/10/2026 un 'nan' veniva accettato e faceva sparire il confronto LARN del calcio.",
+  "riferimento": "21/10/2026, dopo la revisione indipendente: verdetto controllato a mano prima di congelare l'atteso; verificato al contrario."
+}

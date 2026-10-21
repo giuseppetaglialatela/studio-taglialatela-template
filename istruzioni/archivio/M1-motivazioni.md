@@ -208,3 +208,46 @@ Il motore è stato validato ricalcolando riga per riga un piano reale già conse
 (P01, lunedì): totale giornata rientrato in tolleranza (-4,56%) dopo la correzione della
 regola sui legumi. Collaudo archiviato su Drive in `Motore di calcolo >
 Collaudo_Motore_PianoP01_Lunedi`. Dal 28/07/2026 quella giornata è `caso_01_base`.
+
+---
+
+## 21/10/2026 notte — decisioni del nutrizionista dopo la versione asciutta
+- **Eccezione etichetta.** La vellutata surgelata zucca e carote (`ETI001`, valori da
+  etichetta, entrata il 17/10/2026) era nel database con 8 righe di gap; il blocco M81 la
+  conteneva. Decisione: un'eccezione da etichetta passa solo su richiesta del
+  nutrizionista e non va nel database. Tolte la voce (database a 143) e M81 (libreria a
+  127). La prova sulla pipeline di allora ha mostrato tre difetti: una voce fuori database
+  passava senza alcun avviso, i suoi micronutrienti a zero entravano nei totali senza flag
+  di sottostima, gli accoppiamenti la ignoravano in silenzio. Da qui il controllo
+  `ALIMENTO_FUORI_DATABASE` e l'opzione `--eccezione-etichetta`.
+- **Gravità delle interazioni.** Riprodotto il difetto: ogni gravità diversa esattamente da
+  «alta» diventava «media», per cui «Alta» con la maiuscola o un refuso facevano perdere il
+  blocco a un'interazione grave. Corretto con lettura in minuscolo, codice per la gravità
+  bassa, blocco sulle gravità non riconosciute (scelta tecnica delegata).
+- **Gerarchia delle fonti.** La revisione aveva proposto di scrivere al livello 2 che kcal e
+  macro vengono da BDA-IEO quando manca la scheda CREA (86 voci). Decisione: il testo della
+  gerarchia resta com'era, le regole erano già state fatte.
+- **Regole confermate come obbligo:** verifica al contrario di ogni regola nuova;
+  ricalibrazione del target sui casi tarati su un confine.
+- **Tag della libreria:** completamento approvato, criteri da fissare. I tag esistenti
+  erano incoerenti (M10, tonno con 24,5 µg di vitamina D, senza tag vitD; M13 con 3,2 µg
+  taggato; M20 con 309 mg di calcio senza tag calcio, M08 con 359 mg taggato).
+
+## 21/10/2026 notte — esito della revisione indipendente sulle modifiche al motore
+La revisione ha trovato un punto bloccante: con l'opzione `--alimenti` (copia di
+`alimenti.csv`) un'eccezione etichetta poteva sostituire in silenzio una voce ufficiale,
+perché il controllo dei doppioni confrontava con la copia. Tolta `--alimenti` dalla
+pipeline (nessun modulo la usava): la pipeline usa sempre il database ufficiale, e la
+voce non dichiarata diventa un `food_id` sconosciuto (il codice `ALIMENTO_FUORI_DATABASE`
+non serve più). Corretti anche: file di eccezione malformati che facevano crollare lo
+script o passavano (`nan`, negativi, righe corte, BOM di Excel); caricamento del database
+e controllo dei food_id ora in funzioni comuni a pipeline e suite; `tipo_target` scritto
+con la maiuscola o sbagliato, che annullava l'interazione in silenzio (stesso difetto
+della gravità, già presente); caso 20 esteso alla gravità media; `genera_zona_piano.py`
+con file mancante o nomi non corrispondenti. Tag della libreria: mensa_ok e pratico
+assegnati da Claude a M25-M129 con criteri scritti (da confermare dal nutrizionista);
+vitD, calcio e leggero calcolati con le soglie scelte dal nutrizionista (5 µg, 300 mg,
+450 kcal). Effetto: M10 (tonno, 24,5 µg) prende vitD, M13 (sgombro, 3,2 µg) lo perde;
+M20 (309 mg) prende calcio; M15 (501 kcal) e M19 (452 kcal) perdono «leggero». Secondo giro
+di revisione: commit approvato; aggiunti i casi 23-24 e il nutriente maiuscolo nel caso 20
+perché alcuni controlli del file di eccezione non erano sorvegliati dalla suite.

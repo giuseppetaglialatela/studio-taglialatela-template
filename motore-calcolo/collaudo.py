@@ -45,7 +45,7 @@ import sys
 BASE = os.path.dirname(os.path.abspath(__file__))
 
 # --- valore da aggiornare manualmente quando il database cresce ---
-EXPECTED_ALIMENTI_COUNT = 144
+EXPECTED_ALIMENTI_COUNT = 143
 
 # File coperti dai checksum ma NON necessari a ogni sessione. Se presenti
 # vengono verificati come tutti gli altri; se assenti, il collaudo lo dice e
@@ -258,6 +258,11 @@ def controllo_8_accoppiamenti():
             ids = {r["food_id"] for r in csv.DictReader(f)}
         problemi = accoppiamenti.valida_file(ids)
         n_regole = len(accoppiamenti.carica_regole())
+        # tag calcolati (vitD, calcio, leggero): si ricavano dai valori, scritti
+        # a mano divergono (21/10/2026)
+        import moduli_pasto
+        for mid, tag in moduli_pasto.tag_calcolati_scritti(moduli_pasto.carica_moduli()):
+            problemi.append(f"libreria: {mid} riporta a mano il tag calcolato '{tag}'")
     except Exception as e:
         return False, f"controllo accoppiamenti non eseguibile: {e}"
     if problemi:

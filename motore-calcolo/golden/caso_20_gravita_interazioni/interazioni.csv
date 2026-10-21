@@ -1,0 +1,8 @@
+principio_attivo,tipo_target,target,meccanismo,separazione_ore,gravita
+levotiroxina,nutriente,calcio_mg,test: gravita scritta con la maiuscola,4,Alta
+levotiroxina,nutriente,ferro_mg,test: gravita bassa,4,bassa
+levotiroxina,Nutriente,Zinco_mg,test: gravita media e tipo con la maiuscola,4,media
+levotiroxina,nutriente,magnesio_mg,test: gravita non riconosciuta,4,grave
+levotiroxina,nutriente,calcio,test: nutriente scritto male,4,alta
+levotiroxina,alimento,702901,test: tipo non riconosciuto,4,alta
+levotiroxina,food_id,999999,test: food_id inesistente,4,media

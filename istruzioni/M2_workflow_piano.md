@@ -68,7 +68,9 @@ mercato: riferimento pratico, non dato verificato.
 La foto di una confezione è utile per DUE cose e solo quelle: il formato in
 grammi, e la variante del prodotto (intero/scremato) che determina quale voce del
 database usare. I valori nutrizionali dell'etichetta NON entrano nel database:
-non sono una delle tre fonti e non hanno un codice tracciabile.
+non sono una delle tre fonti e non hanno un codice tracciabile. Unica eccezione: su
+richiesta esplicita del nutrizionista, per il singolo piano, con `--eccezione-etichetta`
+(M1, sezione 4), mai in `alimenti.csv`.
 
 ---
 

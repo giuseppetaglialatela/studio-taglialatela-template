@@ -1,0 +1,13 @@
+{
+  "tipo": "pipeline",
+  "bloccanti": [
+    [
+      1,
+      "ECCEZIONE_ETICHETTA_NON_VALIDA"
+    ]
+  ],
+  "attenzioni": [],
+  "exit_code": 1,
+  "descrizione": "File di eccezione etichetta con kcal negative: unico bloccante ECCEZIONE_ETICHETTA_NON_VALIDA, exit 1. Prima della correzione del 21/10/2026 un valore negativo veniva accettato.",
+  "riferimento": "21/10/2026, dopo il secondo giro di revisione; verdetto controllato a mano; verificato al contrario."
+}

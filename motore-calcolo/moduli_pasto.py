@@ -32,7 +32,9 @@ moduli_pasto.csv
   modulo_id, nome, categoria, tag, ingredienti_food_id_grammi
   categoria: pranzo | cena
   tag: elenco separato da virgole (halal_ok, mensa_ok, vegetariano, legumi,
-       pesce, carne, vitD, calcio, pratico, leggero)
+       pesce, carne, pratico). vitD, calcio e leggero NON si scrivono: si
+       calcolano dai valori (vedi TAG_CALCOLATI); scritti a mano fanno fallire
+       il collaudo
   ingredienti: "food_id:grammi;food_id:grammi;..."
 
 USO
@@ -68,6 +70,37 @@ BASE = os.path.dirname(os.path.abspath(__file__))
 MODULI_DEFAULT = os.path.join(BASE, "moduli_pasto.csv")
 COLAZIONI_DEFAULT = os.path.join(BASE, "moduli_colazione.csv")
 CATEGORIE = ("colazione", "spuntino", "pranzo", "cena")
+
+# Tag CALCOLATI (decisione del nutrizionista, 21/10/2026): non si scrivono nel
+# file ma si ricavano a ogni esecuzione dai valori ricalcolati, come i
+# nutrienti (principio 2). Scritti a mano erano incoerenti: un tonno con 24,5 ug
+# di vitamina D senza tag vitD, uno sgombro con 3,2 ug con il tag.
+# Valgono per pranzo e cena: le soglie sono state scelte su quei blocchi.
+TAG_CALCOLATI = {
+    "vitD": ("vitamina_d_ug", ">=", 5.0),     # un terzo del LARN adulto (15 ug)
+    "calcio": ("calcio_mg", ">=", 300.0),     # circa un terzo del LARN (950 mg)
+    "leggero": ("kcal_100g", "<=", 450.0),    # il quarto piu' leggero della libreria
+}
+CATEGORIE_TAG_CALCOLATI = ("pranzo", "cena")
+
+
+def tag_calcolati(modulo, totali):
+    """Tag ricavati dai valori del blocco (vedi TAG_CALCOLATI)."""
+    if modulo["categoria"] not in CATEGORIE_TAG_CALCOLATI:
+        return []
+    fuori = []
+    for tag, (nutriente, verso, soglia) in TAG_CALCOLATI.items():
+        valore = totali[nutriente]
+        if (valore >= soglia) if verso == ">=" else (valore <= soglia):
+            fuori.append(tag)
+    return fuori
+
+
+def tag_calcolati_scritti(moduli):
+    """Blocchi che riportano a mano un tag calcolato: e' un errore, perche'
+    il tag scritto puo' divergere dai valori. Restituisce [(modulo_id, tag)]."""
+    return [(m["modulo_id"], t) for m in moduli for t in m["tag"]
+            if t in TAG_CALCOLATI]
 
 
 def carica_moduli(path=None):
@@ -165,6 +198,14 @@ def main():
     db = carica_alimenti(args.alimenti)
     gap = carica_gap(os.path.join(BASE, "gap.csv"))
 
+    scritti = tag_calcolati_scritti(moduli)
+    if scritti:
+        print("ERRORE: tag calcolati scritti a mano nella libreria "
+              "(si ricavano dai valori, non si scrivono):")
+        for mid, tag in scritti:
+            print(f"  {mid}: {tag}")
+        return 1
+
     mancanti = food_id_mancanti(moduli, db)
     if mancanti:
         print("ERRORE: food_id della libreria assenti da alimenti.csv:")
@@ -191,6 +232,10 @@ def main():
               "l'approvazione.\n")
         return 0
 
+    totali = {m["modulo_id"]: valori(db, m["ingredienti"]) for m in moduli}
+    for m in moduli:
+        m["tag"] = m["tag"] + tag_calcolati(m, totali[m["modulo_id"]])
+
     selezione = [m for m in moduli
                  if (not args.categoria or m["categoria"] == args.categoria)
                  and all(t in m["tag"] for t in args.tag)]
@@ -199,6 +244,8 @@ def main():
     print("LIBRERIA BLOCCHI PASTO - valori ricalcolati da alimenti.csv")
     print("=" * 78)
     print("I valori NON sono memorizzati: sono ricalcolati a ogni esecuzione.")
+    print("Tag calcolati (pranzo e cena): vitD >= 5 ug, calcio >= 300 mg, "
+          "leggero <= 450 kcal.")
     print("Il file dichiara solo gli ingredienti.\n")
     if args.categoria or args.tag:
         filtri = []
@@ -222,7 +269,7 @@ def main():
         print(f"--- {categoria.upper()} ---")
         _intestazione()
         for m in blocchi:
-            _riga(m, valori(db, m["ingredienti"]),
+            _riga(m, totali[m["modulo_id"]],
                   gap_del_blocco(m["ingredienti"], gap))
             print(f"        tag: {', '.join(m['tag'])}")
         print()

@@ -1,0 +1,70 @@
+{
+  "tipo": "pipeline",
+  "bloccanti": [
+    [
+      5,
+      "INTERAZIONE_GRAVITA_ALTA"
+    ],
+    [
+      5,
+      "INTERAZIONE_GRAVITA_ALTA"
+    ],
+    [
+      5,
+      "INTERAZIONE_GRAVITA_NON_RICONOSCIUTA"
+    ],
+    [
+      5,
+      "INTERAZIONE_NUTRIENTE_NON_RICONOSCIUTO"
+    ],
+    [
+      5,
+      "INTERAZIONE_TIPO_NON_RICONOSCIUTO"
+    ]
+  ],
+  "attenzioni": [
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      4,
+      "ATWATER_SEGNALATO"
+    ],
+    [
+      4,
+      "FORMATO_CONFEZIONE_NON_RISPETTATO"
+    ],
+    [
+      5,
+      "INTERAZIONE_FOOD_ID_ASSENTE"
+    ],
+    [
+      5,
+      "INTERAZIONE_GRAVITA_BASSA"
+    ],
+    [
+      5,
+      "INTERAZIONE_GRAVITA_MEDIA"
+    ],
+    [
+      5,
+      "INTERAZIONE_GRAVITA_MEDIA"
+    ],
+    [
+      6,
+      "LIVELLO_FUORI_CATALOGO"
+    ],
+    [
+      6,
+      "LIVELLO_FUORI_CATALOGO"
+    ]
+  ],
+  "exit_code": 1,
+  "descrizione": "Tabella interazioni con valori scritti male o non standard: 'Alta' con la maiuscola deve BLOCCARE come INTERAZIONE_GRAVITA_ALTA; 'bassa' da' INTERAZIONE_GRAVITA_BASSA; 'Nutriente' con la maiuscola e gravita' media da' INTERAZIONE_GRAVITA_MEDIA; 'grave' blocca (INTERAZIONE_GRAVITA_NON_RICONOSCIUTA); il nutriente 'calcio' invece di calcio_mg blocca (INTERAZIONE_NUTRIENTE_NON_RICONOSCIUTO); il tipo 'alimento' blocca (INTERAZIONE_TIPO_NON_RICONOSCIUTO); un food_id inesistente da' l'attenzione INTERAZIONE_FOOD_ID_ASSENTE. Protegge la correzione del 21/10/2026: prima una gravita' diversa da 'alta' diventava 'media' e un tipo o un nutriente scritto male faceva sparire l'interazione in silenzio.",
+  "riferimento": "21/10/2026, dopo la revisione indipendente: verdetto controllato a mano prima di congelare l'atteso; verificato al contrario."
+}

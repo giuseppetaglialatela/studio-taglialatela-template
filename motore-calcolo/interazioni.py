@@ -57,11 +57,17 @@ def carica_interazioni(path):
         for row in csv.DictReader(f):
             inter.append({
                 "principio_attivo": row["principio_attivo"].strip(),
-                "tipo_target": row["tipo_target"].strip(),
-                "target": row["target"].strip(),
+                # minuscolo: "Nutriente" e "nutriente" sono lo stesso tipo, e i
+                # nomi dei nutrienti sono colonne minuscole; il food_id resta
+                # com'e' (21/10/2026)
+                "tipo_target": row["tipo_target"].strip().lower(),
+                "target": (row["target"].strip().lower()
+                           if row["tipo_target"].strip().lower() == "nutriente"
+                           else row["target"].strip()),
                 "meccanismo": row["meccanismo"].strip(),
                 "separazione_ore": float(row["separazione_ore"]),
-                "gravita": row["gravita"].strip(),
+                # minuscolo: "Alta" e "alta" sono la stessa gravita' (21/10/2026)
+                "gravita": row["gravita"].strip().lower(),
             })
     return inter
 

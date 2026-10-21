@@ -139,7 +139,6 @@ food_id,nome,categoria,fonte,codice_fonte,data_verifica,kcal_100g,proteine_g,car
 183010,Tuorlo di uovo di gallina,uova,CREA+BDA-IEO,183010+1802_2,2026-10-02,325,15.8,0.05,29.1,0,116,4.9,4.94,130,6.9,2.14,14,0
 000090,Orzo perlato crudo,cereali,CREA+BDA-IEO,000090+4_2,2026-10-17,346,9.4,73.7,1.5,9.2,21,1.1,0,20,0,1.15,46,0
 106856,Tacchino fesa cotta al forno (proxy fesa affettata),carne,CREA+BDA-IEO(proxy fesa affettata),106856+8698_2,2026-10-17,131,29.6,0,1.4,0,11,1.5,0.4,7,1,1.3,39,0
-ETI001,Vellutata surgelata zucca e carote (etichetta - marca non nota),verdura,ETICHETTA(eccezione nutrizionista 17/10/2026),ETICHETTA-foto-20261017-marca-non-nota,2026-10-17,44,0.8,4.2,2.4,1.2,0,0,0,0,0,0,0,0
 203500,Crema di nocciole e cacao,altro,CREA+BDA-IEO,203500+2008_2,2026-10-21,537,6.9,58.1,32.4,3,143,3.6,0.005,14,0.05,1,65,0
 000570,Pangrattato,cereali,CREA+BDA-IEO,000570+35_2,2026-10-21,357,10.1,77.8,2.1,3.2,110,2.1,0,39,0,0.5,20,0
 9600_1,Semi di lino secchi,frutta secca,BDA-IEO+USDA,9600_1+169414,2026-10-21,447,24.5,0,31,34.8,198,8.2,0,60,0,7.8,392,0

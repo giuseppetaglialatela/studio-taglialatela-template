@@ -1,0 +1,2 @@
+food_id,nome,categoria,fonte,codice_fonte,data_verifica,kcal_100g,proteine_g,carboidrati_g,grassi_g,fibra_g,calcio_mg,ferro_mg,vitamina_d_ug,folati_ug,vitamina_b12_ug,zinco_mg,magnesio_mg,vitamina_c_mg
+ETI_TEST,Vellutata di prova (etichetta fittizia per test),verdura,ETICHETTA(test),ETICHETTA-test,2026-10-21,40,1.0,6.0,1.2,1.5,nan,0,0,0,0,0,0,0

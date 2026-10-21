@@ -26,8 +26,9 @@ USO
                       [--farmaci farmaci_paziente.csv
                        --interazioni interazioni.csv
                        --orari orari_pasti.csv]
-                      [--alimenti alimenti.csv] [--gap gap.csv]
+                      [--gap gap.csv]
                       [--deroga-struttura "motivo dichiarato"]
+                      [--eccezione-etichetta voci_etichetta.csv]
                       [--salta-collaudo]
 
 ESITO
@@ -53,6 +54,7 @@ from collections import defaultdict
 
 from calcolatore import (
     carica_alimenti, carica_piano, carica_target, carica_gap,
+    carica_eccezioni_etichetta,
     calcola_riga, somma_nutrienti, nutrienti_sottostimati,
     entro_tolleranza, formatta_num,
     NUTRIENTI_PER_100G, MICRONUTRIENTI_LARN, TOLLERANZA_PCT,
@@ -159,6 +161,55 @@ def passo_0_collaudo(rilievi, saltato):
 # --------------------------------------------------------------------------
 # PASSO 1 - totali per pasto e per giorno
 # --------------------------------------------------------------------------
+
+def carica_database(rilievi, eccezione_path):
+    """Database del piano: SEMPRE quello ufficiale del motore, piu' le eventuali
+    voci da etichetta dichiarate con --eccezione-etichetta (decisione del
+    21/10/2026: solo su richiesta del nutrizionista, mai in alimenti.csv).
+    Un file di eccezione non valido blocca. Chiamata da main() e dalla suite.
+    Restituisce (db, eccezioni, fermo).
+    """
+    db = carica_alimenti(os.path.join(BASE, "alimenti.csv"))
+    if not eccezione_path:
+        return db, {}, False
+    try:
+        eccezioni = carica_eccezioni_etichetta(eccezione_path, db)
+    except (OSError, ValueError) as e:
+        rilievi.blocca(1, "ECCEZIONE_ETICHETTA_NON_VALIDA", str(e))
+        return db, {}, True
+    db.update(eccezioni)
+    return db, eccezioni, False
+
+
+def controlla_food_id(rilievi, piano, db, gap, eccezioni):
+    """food_id del piano: sconosciuti = blocco; voci da etichetta dichiarate =
+    rilievo da dichiarare, con i micronutrienti a zero trattati come gap
+    (totali sottostimati) e l'avviso che gli accoppiamenti non le controllano
+    (non hanno un ruolo). Modifica gap sul posto. Restituisce True se blocca.
+    """
+    sconosciuti = sorted({r["food_id"] for r in piano if r["food_id"] not in db})
+    if sconosciuti:
+        print(f"\n  ERRORE: food_id assenti dal database: {', '.join(sconosciuti)}")
+        rilievi.blocca(1, "FOOD_ID_SCONOSCIUTO",
+                       f"food_id non presenti in alimenti.csv: {', '.join(sconosciuti)}. "
+                       f"Una voce da etichetta passa solo su richiesta del "
+                       f"nutrizionista, con --eccezione-etichetta")
+        return True
+    usate = sorted({r["food_id"] for r in piano if r["food_id"] in eccezioni})
+    for f in usate:
+        for nutriente in MICRONUTRIENTI_LARN:
+            if not db[f].get(nutriente):
+                gap.setdefault(f, {}).setdefault(
+                    nutriente, "eccezione etichetta: dato non dichiarato")
+    if usate:
+        elenco = ", ".join(f"{f} ({db[f]['nome']})" for f in usate)
+        rilievi.segnala(1, "ALIMENTO_FUORI_DATABASE_SU_RICHIESTA",
+                        f"eccezione etichetta su richiesta del nutrizionista: "
+                        f"{elenco}. Valori non da CREA/BDA-IEO/USDA; "
+                        f"micronutrienti a zero trattati come gap; "
+                        f"accoppiamenti non controllati per queste voci")
+    return False
+
 
 def controlla_pasti_ammessi(rilievi, piano):
     """Blocca se piano.csv usa un valore di pasto fuori da PASTI_AMMESSI.
@@ -685,6 +736,9 @@ def passo_4_coerenza(rilievi, db, target, piano, gap, sottostime,
 # PASSO 5 - interazioni farmaco-alimento
 # --------------------------------------------------------------------------
 
+GRAVITA_AMMESSE = ("alta", "media", "bassa")
+
+
 def passo_5_interazioni(rilievi, piano, db, farmaci_path, interazioni_path,
                         orari_path):
     titolo(5, "INTERAZIONI FARMACO-ALIMENTO")
@@ -714,6 +768,33 @@ def passo_5_interazioni(rilievi, piano, db, farmaci_path, interazioni_path,
     farmaci = mod_interazioni.carica_farmaci(farmaci_path)
     tabella = mod_interazioni.carica_interazioni(interazioni_path)
     orari = mod_interazioni.carica_orari(orari_path)
+
+    # una gravita' scritta male non si declassa in silenzio: prima del
+    # 21/10/2026 tutto cio' che non era esattamente "alta" diventava "media",
+    # e un "Alta" maiuscolo perdeva il blocco
+    ignote = sorted({(i["principio_attivo"], i["target"], i["gravita"])
+                     for i in tabella if i["gravita"] not in GRAVITA_AMMESSE})
+    for principio, target_i, grav in ignote:
+        rilievi.blocca(5, "INTERAZIONE_GRAVITA_NON_RICONOSCIUTA",
+                       f"tabella interazioni: gravita' '{grav}' non riconosciuta per "
+                       f"{principio} / {target_i} (ammesse: alta, media, bassa)")
+    # stessa famiglia: un tipo o un nutriente scritto male faceva sparire
+    # l'interazione senza alcun avviso
+    for i in tabella:
+        etichetta = f"{i['principio_attivo']} / {i['tipo_target']} / {i['target']}"
+        if i["tipo_target"] not in ("nutriente", "food_id"):
+            rilievi.blocca(5, "INTERAZIONE_TIPO_NON_RICONOSCIUTO",
+                           f"tabella interazioni: tipo_target non riconosciuto in "
+                           f"{etichetta} (ammessi: nutriente, food_id)")
+        elif i["tipo_target"] == "nutriente" and i["target"] not in NUTRIENTI_PER_100G:
+            rilievi.blocca(5, "INTERAZIONE_NUTRIENTE_NON_RICONOSCIUTO",
+                           f"tabella interazioni: nutriente non riconosciuto in "
+                           f"{etichetta} (deve essere una colonna di alimenti.csv, "
+                           f"es. calcio_mg)")
+        elif i["tipo_target"] == "food_id" and i["target"] not in db:
+            rilievi.segnala(5, "INTERAZIONE_FOOD_ID_ASSENTE",
+                            f"tabella interazioni: {etichetta}: food_id assente dal "
+                            f"database, l'interazione non puo' scattare")
 
     allerte, coperture_mancanti = mod_interazioni.verifica_interazioni(
         piano, db, farmaci, tabella, orari)
@@ -754,8 +835,11 @@ def passo_5_interazioni(rilievi, piano, db, farmaci_path, interazioni_path,
                      f"{a['separazione_richiesta']}h ({a['gravita']})")
             if a["gravita"] == "alta":
                 rilievi.blocca(5, "INTERAZIONE_GRAVITA_ALTA", testo)
-            else:
+            elif a["gravita"] == "media":
                 rilievi.segnala(5, "INTERAZIONE_GRAVITA_MEDIA", testo)
+            elif a["gravita"] == "bassa":
+                rilievi.segnala(5, "INTERAZIONE_GRAVITA_BASSA", testo)
+            # gravita' non riconosciuta: gia' bloccata sopra, riga per riga
 
 
 # --------------------------------------------------------------------------
@@ -1012,7 +1096,6 @@ def main():
         description="Orchestratore del motore di calcolo - FASE 3")
     ap.add_argument("--piano", required=True)
     ap.add_argument("--target", required=True)
-    ap.add_argument("--alimenti", default=os.path.join(BASE, "alimenti.csv"))
     ap.add_argument("--gap", default=os.path.join(BASE, "gap.csv"))
     ap.add_argument("--farmaci")
     ap.add_argument("--interazioni")
@@ -1022,6 +1105,9 @@ def main():
                          "non uniforme (PASSO 6): declassa il blocco ad "
                          "attenzione, ma il rilievo resta nel report")
     ap.add_argument("--salta-collaudo", action="store_true")
+    ap.add_argument("--eccezione-etichetta", dest="eccezione_etichetta", default=None,
+                    help="file con le sole voci da etichetta (colonne di alimenti.csv), "
+                         "SOLO su richiesta del nutrizionista; non entrano nel database")
     args = ap.parse_args()
 
     print("=" * 68)
@@ -1029,7 +1115,9 @@ def main():
     print("=" * 68)
     print(f"  piano:    {args.piano}")
     print(f"  target:   {args.target}")
-    print(f"  alimenti: {args.alimenti}")
+    print(f"  alimenti: database ufficiale del motore"
+          + (f" + eccezione etichetta {args.eccezione_etichetta}"
+             if args.eccezione_etichetta else ""))
 
     rilievi = Rilievi()
 
@@ -1037,18 +1125,15 @@ def main():
     if rilievi.bloccanti:
         return verdetto(rilievi)
 
-    db = carica_alimenti(args.alimenti)
+    db, eccezioni, fermo = carica_database(rilievi, args.eccezione_etichetta)
+    if fermo:
+        return verdetto(rilievi)
     piano = carica_piano(args.piano)
     righe_estese = carica_piano_esteso(args.piano)
     target = carica_target(args.target)
     gap = carica_gap(args.gap)
 
-    sconosciuti = sorted({r["food_id"] for r in piano if r["food_id"] not in db})
-    if sconosciuti:
-        print(f"\n  ERRORE: food_id assenti dal database: "
-              f"{', '.join(sconosciuti)}")
-        rilievi.blocca(1, "FOOD_ID_SCONOSCIUTO", f"food_id non presenti in alimenti.csv: "
-                          f"{', '.join(sconosciuti)}")
+    if controlla_food_id(rilievi, piano, db, gap, eccezioni):
         return verdetto(rilievi)
 
     if controlla_pasti_ammessi(rilievi, piano):

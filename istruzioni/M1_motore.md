@@ -1,8 +1,10 @@
 # M1 — MOTORE DI CALCOLO
 
 Modulo operativo (principio 6). Dipendenze: nessuna. Ne dipendono M2 e M6.
-Ultima modifica: 21/10/2026 sera (versione asciutta: motivazioni, episodi e date in
-`istruzioni/archivio/M1-motivazioni.md`, che non si carica).
+Ultima modifica: 21/10/2026 notte (eccezione etichetta solo su richiesta, fuori dal
+database; pipeline sempre sul database ufficiale; tabella interazioni validata; tag
+vitD/calcio/leggero calcolati; casi golden 18-24). Motivazioni, episodi e date in
+`istruzioni/archivio/M1-motivazioni.md`, che non si carica.
 
 Copre: avvio della sessione, moduli software, casi golden, database e fonti, schema CSV e
 file affiancati, gap, recupero USDA, falsi positivi, stato di validazione.
@@ -56,6 +58,7 @@ Otto controlli:
 8. ogni `food_id` ha un ruolo ammesso in `ruoli_alimenti.csv`; le regole di
    `accoppiamenti_vietati.csv` usano voci valide (ruoli o `food_id`); nessun blocco della
    libreria (`moduli_pasto.csv`, `moduli_colazione.csv`) contiene un accoppiamento vietato
+   o un tag calcolato scritto a mano (vitD, calcio, leggero)
 
 Esce 0 (superato) o 1 (fallito). File opzionali (`cache.zip`, `BDA_alimenti.xlsx`,
 `crea_cache.zip`): se presenti si verificano come gli altri, se assenti il collaudo lo
@@ -81,32 +84,38 @@ Un comando, passi sempre nello stesso ordine, un report unico:
 5. interazioni farmaco-alimento
 6. livello unico di colazione, spuntino e, se presente, secondo spuntino su tutto il piano
 
-Prima del PASSO 1 si ferma (bloccante) su un `food_id` sconosciuto o su un valore di pasto
-non ammesso (`PASTO_NON_AMMESSO`, es. `spuntino 2` con lo spazio).
+La pipeline usa SEMPRE il database ufficiale del motore, più le sole voci da etichetta
+dichiarate con `--eccezione-etichetta` (sezione 4): non accetta un altro `alimenti.csv`.
+Prima del PASSO 1 si ferma (bloccante) su un file di eccezione non valido, su un `food_id`
+sconosciuto (compresa una voce da etichetta non dichiarata) o su un valore di pasto non
+ammesso (`PASTO_NON_AMMESSO`, es. `spuntino 2` con lo spazio).
 ```
 python3 pipeline.py --piano piano.csv --target target.csv
   [--farmaci f.csv --interazioni i.csv --orari o.csv]
-  [--deroga-struttura "motivo"] [--salta-collaudo]
+  [--deroga-struttura "motivo"] [--eccezione-etichetta voci.csv] [--salta-collaudo]
 ```
 Esce 0 senza rilievi bloccanti, 1 altrimenti; il report si stampa per intero in entrambi i
 casi.
 
 **Rilievi BLOCCANTI** (piano non presentabile): collaudo fallito o assente; `food_id`
-sconosciuto; valore di pasto non ammesso; **media settimanale delle kcal** fuori tolleranza
+sconosciuto; valore di pasto non ammesso; file di eccezione etichetta non valido; **media settimanale delle kcal** fuori tolleranza
 (basta un estremo dell'intervallo); **media settimanale di un macro** fuori tolleranza su
 tutto l'intervallo, dallo stesso lato; **giorno o scenario oltre ±10% di kcal**; target incoerenti; file dei formati o
 degli accoppiamenti illeggibili o accoppiamenti non verificati; interazione di gravità ALTA;
+gravità, tipo o nutriente non riconosciuti nella tabella interazioni;
 orario di un pasto mancante; terapia dichiarata solo in parte; struttura pasti non uniforme;
 livelli colazione/spuntino misti o incoerenti tra pasti; catalogo disallineato.
 
-**Rilievi DA DICHIARARE** (non bloccano): giorno con kcal fuori ±5% (entro ±10%) o macro
+**Rilievi DA DICHIARARE** (non bloccano): eccezione etichetta dichiarata
+(`ALIMENTO_FUORI_DATABASE_SU_RICHIESTA`); giorno con kcal fuori ±5% (entro ±10%) o macro
 fuori ±5 punti; scenario di scelta fuori tolleranza entro ±10%; estremi macro degli scenari
 (limiti di garanzia, non giornate componibili); un solo estremo della media settimanale
 di un macro fuori tolleranza; fibra sotto l'80% del target;
 micronutrienti sotto l'80% LARN *in media settimanale* (con o senza gap); target privo di
 LARN (micronutrienti non confrontati con niente); distribuzione concentrata; falsi positivi
 Atwater; micronutrienti tutti a zero; quantità fuori formato; accoppiamenti vietati;
-interazioni di gravità media o bassa (entrambe sotto il codice `INTERAZIONE_GRAVITA_MEDIA`);
+interazioni di gravità media o bassa (`INTERAZIONE_GRAVITA_MEDIA`, `_BASSA`); riga della
+tabella interazioni su un `food_id` assente dal database;
 principi attivi assenti dalla tabella; terapia non dichiarata; pasto assente su tutto il
 piano; livello parziale o fuori catalogo; catalogo assente (livello verificato solo come
 uniforme); collaudo saltato. I totali sottostimati per gap si stampano nel report.
@@ -134,7 +143,7 @@ pasti; il rilievo resta nel report con il motivo. Livello misto e catalogo disal
 restano bloccanti anche con la deroga.
 
 ### regressione.py
-Suite sui 17 casi golden in `golden/`: un comando, pass/fail per caso. Si riesegue **dopo
+Suite sui 24 casi golden in `golden/`: un comando, pass/fail per caso. Si riesegue **dopo
 ogni modifica** al motore o al database, e comunque prima di qualsiasi uso clinico.
 - Nei casi `pipeline` la suite ripete la sequenza di `pipeline.main()`: un controllo nuovo
   va in una funzione chiamata da entrambi (come `controlla_pasti_ammessi`), altrimenti la
@@ -155,7 +164,14 @@ e ordine dei pasti (`PASTI_AMMESSI`, `ordine_pasti()`, `pasti_non_ammessi()`):
 
 ### interazioni.py
 Incrocia la tabella interazioni, curata e validata dal nutrizionista, con gli orari di
-pasti e farmaci. Nessuna conoscenza farmacologica propria, nessuna interazione inventata:
+pasti e farmaci. La tabella si legge senza distinzione tra maiuscole e minuscole:
+- gravità ammesse `alta` (blocca), `media`, `bassa` (si dichiarano); ogni altro valore
+  blocca, perché il motore non decide da solo quanto è grave un'interazione;
+- `tipo_target` ammessi `nutriente` e `food_id`; un nutriente deve essere una colonna di
+  `alimenti.csv` (es. `calcio_mg`); altri valori bloccano, perché farebbero sparire
+  l'interazione in silenzio;
+- un `food_id` assente dal database si dichiara: quell'interazione non può scattare.
+Nessuna conoscenza farmacologica propria, nessuna interazione inventata:
 segnala esplicitamente i principi attivi assenti dalla tabella, perché l'assenza di
 allarme non sia scambiata per assenza di rischio.
 
@@ -207,8 +223,8 @@ python3 accoppiamenti.py --libreria             controlla la libreria dei blocch
 
 ### moduli_pasto.py
 Legge la libreria (`moduli_pasto.csv` pranzo/cena, `moduli_colazione.csv`
-colazioni/spuntini), ricalcolando i valori da `alimenti.csv` e marcando i nutrienti
-sottostimati da `gap.csv`.
+colazioni/spuntini), ricalcolando i valori da `alimenti.csv`, marcando i nutrienti
+sottostimati da `gap.csv` e aggiungendo i tag calcolati (vitD, calcio, leggero, sezione 5).
 ```
 python3 moduli_pasto.py                     tutta la libreria
 python3 moduli_pasto.py --categoria cena    solo le cene (anche colazione, spuntino, pranzo)
@@ -266,6 +282,7 @@ python3 genera_zona_piano.py --piano piano_vN.csv --target target.csv
     --metadati metadati_piano_vN.json --template TEMPLATE_..._v5.py
     --out-py piano_Cognome_vN.py --out-pdf piano_Cognome_vN.pdf
     [--orari orari_pasti.csv] [--mese "Settembre 2026"]
+    [--eccezione-etichetta voci.csv --nomi-eccezione nomi.csv]
 python3 genera_zona_piano.py --autotest --template TEMPLATE_..._v5.py
 ```
 - Kcal da `calcola_riga`, arrotondate alle 10 con la tilde. Totale del giorno = intervallo
@@ -353,10 +370,23 @@ validato).
 - **17_carne_pasta_frutta_secca** — pasta + vitellone (A05), noci + nocciole nello stesso
   spuntino (A06): due attenzioni. Negativi: pasta integrale + pollo; mandorle a colazione e
   noci allo spuntino.
+- **18_eccezione_etichetta_dichiarata** — voce da etichetta fittizia passata con
+  `--eccezione-etichetta`: attenzione `ALIMENTO_FUORI_DATABASE_SU_RICHIESTA`, exit 0.
+- **19_alimento_fuori_database** — la stessa voce non dichiarata: unico bloccante
+  `FOOD_ID_SCONOSCIUTO`.
+- **20_gravita_interazioni** — «Alta» con la maiuscola blocca come gravità alta; «bassa» e
+  «media» (con «Nutriente» e «Zinco_mg» maiuscoli) si dichiarano; «grave», il nutriente «calcio» e
+  il tipo «alimento» bloccano; un `food_id` inesistente si dichiara.
+- **21_eccezione_riusa_voce_ufficiale** — eccezione con il `food_id` dei pomodori: unico
+  bloccante `ECCEZIONE_ETICHETTA_NON_VALIDA`.
+- **22_eccezione_valore_non_valido**, **23_eccezione_riga_corta**,
+  **24_eccezione_valore_negativo** — eccezione con calcio «nan», con una riga corta, con
+  kcal negative: unico bloccante `ECCEZIONE_ETICHETTA_NON_VALIDA`.
 
 **Tipi di caso.** `fisso` e `scelta_multipla` si deducono dal piano (presenza di
 `gruppo_scelta`). `pipeline` è l'unico DICHIARATO, da un `pipeline.json` nella cartella del
-caso, che porta anche le opzioni di esecuzione (es. `deroga_struttura`). I casi `pipeline`
+caso, che porta anche le opzioni di esecuzione (`deroga_struttura`, `farmaci`,
+`interazioni`, `orari`, `eccezione_etichetta`). I casi `pipeline`
 congelano i VERDETTI (passo, codice del rilievo, codice di uscita), non i numeri.
 
 **Limite di copertura.** I casi toccano solo gli alimenti dei rispettivi piani: una
@@ -371,7 +401,7 @@ diventa un nuovo caso golden.
 
 ## 4. DATABASE ALIMENTI E GERARCHIA FONTI
 
-**Stato:** 144 alimenti verificati e tracciati alla fonte; il numero vincolante è
+**Stato:** 143 alimenti verificati e tracciati alla fonte; il numero vincolante è
 `EXPECTED_ALIMENTI_COUNT` in `collaudo.py`. Conformità kcal/macro/fibra a CREA:
 `python3 cerca_crea.py verifica`.
 
@@ -382,9 +412,7 @@ non è già presente. Oltre le 150 voci solo su richiesta esplicita del nutrizio
 1. **CREA eTCA 2019** (alimentinutrizione.it) — kcal, macronutrienti, fibra, minerali. Le
    kcal si LEGGONO da CREA, mai ricalcolate con 4/4/9 (CREA usa il metodo Southgate, scarto
    fisiologico noto del 4-8% rispetto ad Atwater).
-2. **BDA-IEO** — vitamina D, folati, B12 e minerali non coperti da CREA. Quando
-   l'alimento non ha scheda CREA, anche kcal e macro vengono da BDA-IEO (oggi 86 voci con
-   fonte `BDA-IEO` o `BDA-IEO+USDA`).
+2. **BDA-IEO** — vitamina D, folati, B12 e minerali non coperti da CREA.
 3. **USDA FoodData Central** — residuale, quando le prime due tacciono. Mai per le kcal.
 
 **Eccezione INSA** (tabella nazionale portoghese, Base de Dados da Composição de Alimentos,
@@ -394,10 +422,22 @@ stessa specie e lo stesso stato (crudo/cotto). Mai per kcal e macro, che restano
 `fonte` si scrive `INSA(...)`, in `codice_fonte` `INSA<cod>`. Righe in eccezione: 122800
 sardine (micronutrienti).
 
-**Eccezione etichetta — regola generale ancora da scrivere.** `ETI001` (vellutata
-surgelata zucca e carote) ha TUTTI i valori, kcal comprese, da un'etichetta, per decisione
-del nutrizionista del 17/10/2026; i micronutrienti sono gap. È l'unica voce che non viene
-da CREA, BDA-IEO, USDA o INSA: non estendere ad altre voci finché la regola non è decisa.
+**Eccezione etichetta — solo su richiesta esplicita del nutrizionista, mai nel database.**
+I valori di un'etichetta non entrano in `alimenti.csv`. Quando il nutrizionista lo chiede
+per un piano, le voci da etichetta (TUTTE le colonne di `alimenti.csv`, `food_id` nuovo,
+fonte compilata) vanno in un file a parte, fuori dalla cartella del motore, passato con
+`--eccezione-etichetta` alla pipeline e, con il nome paziente in `--nomi-eccezione` (solo
+per quelle voci), a `genera_zona_piano.py`. Il motore:
+- tratta una voce da etichetta non dichiarata come `food_id` sconosciuto: blocca;
+- blocca il file (`ECCEZIONE_ETICHETTA_NON_VALIDA`) se mancano colonne, se una riga ha
+  campi in più o in meno, se `food_id`, nome o fonte sono vuoti, se un valore non è un
+  numero finito e non negativo, se un `food_id` è duplicato o riusa una voce ufficiale (un'eccezione
+  non sovrascrive un dato verificato);
+- dichiara l'eccezione al PASSO 1 (`ALIMENTO_FUORI_DATABASE_SU_RICHIESTA`), tratta come
+  gap i micronutrienti a zero (totali sottostimati) e avvisa che gli accoppiamenti non
+  controllano quelle voci.
+Il file vale per quel piano: non si salva nel repository. Va dichiarato nella tabella di
+approvazione (M2, PASSO 6).
 
 **Il terzo livello va usato davvero.** CREA non pubblica calcio, ferro, vitamina D, folati
 e B12 per pesci e carni. Quando una fonte tace su un campo si scende di livello, sempre.
@@ -455,14 +495,20 @@ struttura_pasti.py`. La scelta tra standard e rinforzato è UNA SOLA DECISIONE P
 PIANO SETTIMANALE, mai giorno per giorno (dettaglio in M2). Non si riempie di alternative:
 quelle stanno nella libreria.
 
-**Libreria degli accoppiamenti** — `moduli_pasto.csv` (128 blocchi pranzo/cena) e
+**Libreria degli accoppiamenti** — `moduli_pasto.csv` (127 blocchi pranzo/cena) e
 `moduli_colazione.csv` (55 blocchi colazione | spuntino), schema
-`modulo_id, nome, categoria, tag, ingredienti_food_id_grammi`. Tag pranzo/cena: halal_ok ·
-mensa_ok · vegetariano · legumi · pesce · carne · vitD · calcio · pratico · leggero.
-**Limite:** vitD, calcio, mensa_ok, pratico e leggero sono assegnati solo nei blocchi
-M02-M24; da M25 i tag sono solo quelli ricavati dai ruoli (halal_ok, vegetariano, legumi,
-pesce, carne). Un filtro su quei cinque tag ignora M25-M129 senza avvisare. Tag
-colazioni/spuntini: dolce · salata · halal_ok · vegetariano · carne.
+`modulo_id, nome, categoria, tag, ingredienti_food_id_grammi`.
+- **Tag scritti nel file**, pranzo/cena: halal_ok · mensa_ok · vegetariano · legumi ·
+  pesce · carne · pratico. *pratico* = piatto unico freddo o da portar via (insalata,
+  insalatona, bowl, cereali freddi, panino) o con la proteina già pronta (scatolame,
+  affettati, latticini freschi, uova sode, legumi in scatola). *mensa_ok* = primo semplice
+  (pasta o riso con legumi, pomodoro, verdure o tonno) o secondo semplice di pollo,
+  tacchino, pesce bianco o uova con contorno. Colazioni/spuntini: dolce · salata ·
+  halal_ok · vegetariano · carne.
+- **Tag calcolati**, solo pranzo e cena, ricavati a ogni esecuzione dai valori ricalcolati
+  (soglie decise dal nutrizionista il 21/10/2026): **vitD** ≥ 5 µg, **calcio** ≥ 300 mg,
+  **leggero** ≤ 450 kcal. Non si scrivono nel file: scritti a mano fanno fallire il
+  collaudo (controllo 8).
 Si legge con `python3 moduli_pasto.py`.
 - Raccoglie gli ACCOPPIAMENTI VALIDI di tutti i piani fatti, per non ricomporre ogni volta
   pasti mal accoppiati; nessun tetto al numero di blocchi.
@@ -505,10 +551,9 @@ elenca le voci responsabili.
 Un valore sotto l'80% LARN con quel flag NON è una carenza accertata: prima di intervenire
 clinicamente, verifica se dipende dal gap.
 
-**Stato (verificato sul file il 21/10/2026):** 16 righe su 5 alimenti — latte parzialmente
+**Stato (verificato sul file il 21/10/2026):** 8 righe su 4 alimenti — latte parzialmente
 scremato (vitamina D, B12), orata (vitamina D), salmone affumicato (vitamina D), trippa
-(vitamina D, B12, folati, zinco), vellutata surgelata `ETI001` (tutti gli 8
-micronutrienti: eccezione etichetta, il cartellino UE non li dichiara).
+(vitamina D, B12, folati, zinco).
 
 **Fave secche cotte — caso a parte:** minerali e folati presi dalla voce BDA delle fave
 CRUDE (proxy), quindi probabilmente SOVRASTIMATI. Non usarle come fonte portante di ferro o

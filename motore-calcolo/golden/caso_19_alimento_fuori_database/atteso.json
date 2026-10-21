@@ -1,0 +1,13 @@
+{
+  "tipo": "pipeline",
+  "bloccanti": [
+    [
+      1,
+      "FOOD_ID_SCONOSCIUTO"
+    ]
+  ],
+  "attenzioni": [],
+  "exit_code": 1,
+  "descrizione": "Stesso piano del caso 18, ma la voce da etichetta NON e' dichiarata con --eccezione-etichetta: unico bloccante FOOD_ID_SCONOSCIUTO, exit 1. La pipeline usa sempre il database ufficiale (opzione --alimenti tolta il 21/10/2026): una voce fuori database passa solo dichiarata. Complementare al caso 18.",
+  "riferimento": "21/10/2026, dopo la revisione indipendente: verdetto controllato a mano prima di congelare l'atteso; verificato al contrario."
+}

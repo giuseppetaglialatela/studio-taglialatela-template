@@ -144,7 +144,8 @@ fallisce alla sessione dopo.
   zuccheri, proteine e sale — 4 delle 13 colonne nutrizionali dello schema — e
   lascerebbe 9 campi a zero, tra cui il calcio su un latticino. L'uso legittimo
   della foto di una confezione (formato in grammi, variante del prodotto) è in
-  **M2**.
+  **M2**. Su richiesta esplicita del nutrizionista una voce da etichetta può servire a
+  un singolo piano, ma resta fuori dal database (M1, sezione 4).
 
 ---
 

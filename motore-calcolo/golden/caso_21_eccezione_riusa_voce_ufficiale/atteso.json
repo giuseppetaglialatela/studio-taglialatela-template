@@ -1,0 +1,13 @@
+{
+  "tipo": "pipeline",
+  "bloccanti": [
+    [
+      1,
+      "ECCEZIONE_ETICHETTA_NON_VALIDA"
+    ]
+  ],
+  "attenzioni": [],
+  "exit_code": 1,
+  "descrizione": "File di eccezione etichetta con il food_id 391 (pomodori, voce ufficiale) e valori diversi: unico bloccante ECCEZIONE_ETICHETTA_NON_VALIDA, exit 1. Un'eccezione non sovrascrive mai un dato verificato.",
+  "riferimento": "21/10/2026, dopo la revisione indipendente: verdetto controllato a mano prima di congelare l'atteso; verificato al contrario."
+}

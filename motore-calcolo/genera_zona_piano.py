@@ -50,7 +50,7 @@ import argparse, csv, datetime, json, os, subprocess, sys, tempfile
 
 QUI = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, QUI)
-from calcolatore import (carica_alimenti, carica_target, calcola_riga,
+from calcolatore import (carica_alimenti, carica_eccezioni_etichetta, carica_target, calcola_riga,
                          PASTI_AMMESSI, ordine_pasti, pasti_non_ammessi)
 from scelte_multiple import carica_piano_esteso
 
@@ -389,9 +389,31 @@ def componi_py(template_src, zona):
 
 
 def genera(piano_p, target_p, meta_p, template_p, out_py, out_pdf, orari_p=None,
-           mese=None, alimenti_p=None, nomi_p=None):
+           mese=None, alimenti_p=None, nomi_p=None, eccezione_p=None,
+           nomi_eccezione_p=None):
     db = carica_alimenti(alimenti_p or os.path.join(QUI, "alimenti.csv"))
     nomi = carica_nomi(nomi_p or os.path.join(QUI, "nomi_paziente.csv"))
+    # voci da etichetta: solo su richiesta del nutrizionista, mai nel database
+    # (21/10/2026); stesse regole della pipeline, nome paziente da file a parte
+    eccezioni = {}
+    if eccezione_p:
+        try:
+            eccezioni = carica_eccezioni_etichetta(eccezione_p, db)
+        except (OSError, ValueError) as e:
+            raise Fermo(str(e))
+        db.update(eccezioni)
+    if nomi_eccezione_p:
+        if not eccezione_p:
+            raise Fermo("--nomi-eccezione senza --eccezione-etichetta")
+        try:
+            aggiunti = carica_nomi(nomi_eccezione_p)
+        except (OSError, KeyError) as e:
+            raise Fermo(f"{nomi_eccezione_p} non leggibile: {e}")
+        estranei = sorted(set(aggiunti) - set(eccezioni))
+        if estranei:
+            raise Fermo(f"{nomi_eccezione_p}: food_id che non sono voci da etichetta "
+                        f"dichiarate: {', '.join(estranei)}")
+        nomi.update(aggiunti)
     piano = carica_piano_esteso(piano_p)
     target = carica_target(target_p)
     with open(meta_p, encoding="utf-8") as f:
@@ -490,6 +512,8 @@ def main():
     ap.add_argument("--autotest", action="store_true")
     ap.add_argument("--piano"); ap.add_argument("--target"); ap.add_argument("--metadati")
     ap.add_argument("--orari"); ap.add_argument("--mese")
+    ap.add_argument("--eccezione-etichetta", dest="eccezione")
+    ap.add_argument("--nomi-eccezione", dest="nomi_eccezione")
     ap.add_argument("--out-py"); ap.add_argument("--out-pdf")
     a = ap.parse_args()
     try:
@@ -498,7 +522,8 @@ def main():
         for n in ("piano", "target", "metadati", "out_py", "out_pdf"):
             if not getattr(a, n):
                 ap.error(f"--{n.replace('_', '-')} obbligatorio")
-        genera(a.piano, a.target, a.metadati, a.template, a.out_py, a.out_pdf, a.orari, a.mese)
+        genera(a.piano, a.target, a.metadati, a.template, a.out_py, a.out_pdf, a.orari, a.mese,
+               eccezione_p=a.eccezione, nomi_eccezione_p=a.nomi_eccezione)
     except Fermo as e:
         print(f"FERMO: {e}")
         return 1

@@ -105,6 +105,60 @@ def carica_alimenti(path):
     return db
 
 
+COLONNE_ALIMENTI = ["food_id", "nome", "categoria", "fonte", "codice_fonte",
+                    "data_verifica"] + NUTRIENTI_PER_100G
+
+
+def carica_eccezioni_etichetta(path, db_ufficiale):
+    """Voci da etichetta, SOLO su richiesta esplicita del nutrizionista (21/10/2026).
+
+    I valori di un'etichetta non entrano mai nel database ufficiale: si passano
+    per il singolo piano in un file a parte, con le colonne di alimenti.csv.
+    Restituisce {food_id: valori} come carica_alimenti.
+    Si ferma (ValueError) se: mancano colonne di alimenti.csv; una riga ha campi
+    in piu' o in meno; food_id, nome o fonte sono vuoti; un valore non e' un
+    numero finito e non negativo; un food_id e' duplicato o e' gia' una voce
+    del database ufficiale (un'eccezione non sovrascrive un dato verificato).
+    db_ufficiale deve essere il database del motore, non una copia.
+    """
+    import math
+    with open(path, newline="", encoding="utf-8-sig") as f:
+        lettore = csv.DictReader(f)
+        mancanti = [c for c in COLONNE_ALIMENTI if c not in (lettore.fieldnames or [])]
+        if mancanti:
+            raise ValueError(f"{path}: colonne mancanti {', '.join(mancanti)} "
+                             f"(servono tutte le colonne di alimenti.csv)")
+        righe = list(lettore)
+    if not righe:
+        raise ValueError(f"{path}: nessuna voce")
+    voci = {}
+    for n, row in enumerate(righe, start=2):
+        if None in row or any(v is None for v in row.values()):
+            raise ValueError(f"{path}, riga {n}: numero di campi diverso dall'intestazione")
+        fid = row["food_id"].strip()
+        for campo in ("food_id", "nome", "fonte"):
+            if not row[campo].strip():
+                raise ValueError(f"{path}, riga {n}: campo '{campo}' vuoto")
+        if fid in db_ufficiale:
+            raise ValueError(f"{path}: {fid} esiste gia' nel database ufficiale: "
+                             f"un'eccezione non sovrascrive un dato verificato")
+        if fid in voci:
+            raise ValueError(f"{path}: food_id duplicato {fid}")
+        valori = {}
+        for k in NUTRIENTI_PER_100G:
+            try:
+                v = float(row[k])
+            except ValueError:
+                raise ValueError(f"{path}, riga {n}: {k} = '{row[k]}' non e' un numero")
+            if not math.isfinite(v) or v < 0:
+                raise ValueError(f"{path}, riga {n}: {k} = '{row[k]}' non valido "
+                                 f"(serve un numero finito e non negativo)")
+            valori[k] = v
+        valori["nome"] = row["nome"].strip()
+        voci[fid] = valori
+    return voci
+
+
 def carica_piano(path):
     righe = []
     with open(path, newline="", encoding="utf-8") as f:

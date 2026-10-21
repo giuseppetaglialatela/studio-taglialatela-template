@@ -115,27 +115,27 @@ def esegui_caso_pipeline(nome_caso):
         valore = opzioni.get(chiave)
         return os.path.join(cartella, valore) if valore else None
 
-    db = pl.carica_alimenti(os.path.join(BASE, "alimenti.csv"))
     piano = pl.carica_piano(os.path.join(cartella, "piano.csv"))
     righe_estese = pl.carica_piano_esteso(os.path.join(cartella, "piano.csv"))
     target = pl.carica_target(os.path.join(cartella, "target.csv"))
     gap = pl.carica_gap(os.path.join(BASE, "gap.csv"))
 
-    sconosciuti = sorted({r["food_id"] for r in piano if r["food_id"] not in db})
-    if sconosciuti:
-        raise ValueError(
-            f"food_id assenti dal database: {', '.join(sconosciuti)}. "
-            f"Il caso golden e' disallineato rispetto ad alimenti.csv."
-        )
-
+    # stessa sequenza di pipeline.main(), con le stesse funzioni: database
+    # (ufficiale + eventuale eccezione etichetta), food_id, pasti ammessi.
+    # Ognuno di questi controlli puo' fermare tutto.
     rilievi = pl.Rilievi()
+    with redirect_stdout(io.StringIO()):
+        db, eccezioni, fermo = pl.carica_database(
+            rilievi, percorso_opzionale("eccezione_etichetta"))
+        if not fermo:
+            fermo = pl.controlla_food_id(rilievi, piano, db, gap, eccezioni)
+        if not fermo:
+            fermo = pl.controlla_pasti_ammessi(rilievi, piano)
     sottostime = pl.nutrienti_sottostimati(piano, gap)
     giorni_con_scelte = {r["giorno"] for r in righe_estese if r["gruppo_scelta"]}
 
     # l'output a video non serve alla suite: conta il verdetto, non la prosa
-    with redirect_stdout(io.StringIO()):
-        # come in pipeline.main(): un pasto non ammesso ferma tutto (30/09/2026)
-        fermo = pl.controlla_pasti_ammessi(rilievi, piano)
+    # un controllo d'ingresso che ferma (sopra) salta tutti i passi, come in main()
     with redirect_stdout(io.StringIO()):
         if not fermo:
             dati = pl.passo_1_calcolo(rilievi, piano, db, target, giorni_con_scelte)
