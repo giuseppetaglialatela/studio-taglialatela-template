@@ -26,7 +26,7 @@ serviva a compensare calcio e vitamina D nei giorni deboli, e sposta il bilancia
 pranzo e cena. Su un paziente con pranzo vincolato (mensa, halal, patologia) il margine
 può non bastare: da qui il livello `rinforzata_calcio`.
 
-## Criterio del livello rinforzato — perché è «da decidere»
+## Criterio del livello rinforzato — perché era «da decidere» (superata dal 22/10/2026, vedi sotto)
 Il criterio storico («anche un solo giorno sotto l'80% LARN di calcio») è dal 29/07/2026
 l'unico punto in cui sopravvive una soglia giornaliera, contro il principio 8. Non è
 necessariamente un residuo: il calcio è l'unico nutriente con un argomento reale per la
@@ -81,3 +81,31 @@ attenzione da una deroga di struttura presa per altro motivo; terapia dichiarata
 fascicolo senza i tre CSV, che lasciava il piano apparentemente presentabile; definizione
 di «presente» del motore (valore > 0, scenario massimo, tracce comprese); limite ±10% esteso
 agli scenari come nel nucleo. Gli ultimi quattro difetti c'erano già nel vecchio M2.
+
+## 22/10/2026 — distribuzione del calcio e livello rinforzato
+La voce del 21/10 notte descrive la definizione di «presente» allora in vigore (valore > 0,
+scenario massimo, tracce comprese): resta come storia. Dal 22/10 (commit `cb14208` e
+`6f9da61`), su decisione del nutrizionista:
+- «Presente» = almeno il 30% del LARN nel giorno. Con > 0 il rilievo non scattava quasi
+  mai: bastavano tracce di calcio per contare il giorno.
+- Nei giorni a scelta conta lo scenario MINIMO: il rilievo deve proteggere il paziente
+  qualunque alternativa scelga.
+- Il controllo vale SOLO per il calcio. Misura sulla libreria: con la regola su tutti i
+  nutrienti, la vitamina D (concentrata per natura in pesce e uova) darebbe il rilievo in
+  circa 6 settimane su 10, senza motivo clinico. La saturazione dell'assorbimento (circa
+  500 mg per assunzione, dato più solido per i supplementi) è specifica del calcio.
+- Livello rinforzato: il criterio storico «anche un solo giorno sotto l'80%» contraddiceva
+  il giudizio settimanale (principio 8). Ricerca del 22/10: l'adeguatezza si valuta
+  sull'assunzione abituale, non sul giorno; l'80% del LARN 950 corrisponde circa al
+  fabbisogno medio EFSA/NNR (750 mg); per il singolo si pianifica sul LARN pieno. Da qui
+  l'avviso non bloccante: media sotto l'80% OPPURE presenza in meno di 3 giorni su 6.
+- `MEDIA_SOTTO_LARN` guarda lo scenario massimo (carenza anche nel caso migliore),
+  l'avviso il minimo: letture diverse volute.
+- Scelte tecniche di Claude: l'avviso tace con il livello rinforzato parziale; il secondo
+  spuntino non conta (scelta indipendente).
+
+## 22/10/2026 — nessun segnaposto nel PDF del paziente (commit `a08feeb`)
+«Non concordato» per obiettivo, criterio e avvertenze era vietato solo dal testo di M2, e lo
+script stampava «Obiettivo: non concordato» nel PDF. Decisione delegata a Claude «in base
+a evidenze»: lo script si ferma su ogni segnaposto e testo d'esempio nei testi del
+paziente, sul campo intero, perché frasi vere con le stesse parole devono passare.

@@ -2,7 +2,7 @@
 
 Modulo operativo. Si carica **dopo l'approvazione dei calcoli**, per generare i due
 deliverable che il paziente riceve.
-Ultimo aggiornamento: 30/09/2026 (secondo spuntino, fino a 5 pasti nel PDF). Presuppone **M2 già eseguito** (in chat A):
+Ultimo aggiornamento: 22/10/2026 (fermo sui segnaposto nei testi del paziente; prima: 30/09/2026, secondo spuntino, fino a 5 pasti nel PDF). Presuppone **M2 già eseguito** (in chat A):
 copre i suoi PASSO 7 e PASSO 8 e non si esegue prima. **In chat B M2 e M1 non si
 ricaricano**: tutto ciò che serve sta nei metadati del piano e nel motore.
 
@@ -35,10 +35,14 @@ ricaricano**: tutto ciò che serve sta nei metadati del piano e nel motore.
        --out-pdf piano_Cognome_vN.pdf
        [--eccezione-etichetta voci.csv --nomi-eccezione nomi.csv]
    ```
-   Se si ferma, stampa quale campo o titolo manca: si chiede al nutrizionista, non
-   si completa a intuito. Il `.py` prodotto è quello da archiviare (sezione 5).
-5. Se nei metadati manca un campo necessario (titolo, obiettivo, criterio), ci si
-   ferma e lo si chiede: non si decide in chat B.
+   Se si ferma, stampa quale campo o titolo manca o contiene un segnaposto («non
+   concordato», «N/D», «XX kg», testi d'esempio del template; elenco in M1): si chiede
+   al nutrizionista, non si completa a intuito. Il `.py` prodotto è quello da
+   archiviare (sezione 5).
+5. Se nei metadati manca un campo necessario (titolo, obiettivo, criterio) o contiene
+   un segnaposto, ci si ferma e lo si chiede: non si decide in chat B. Il documento di
+   spiegazione NON passa da `genera_zona_piano.py`: obiettivo e criterio vi si
+   controllano a mano, con la stessa regola.
 
 **Due spuntini nello stesso giorno (dal 30/09/2026).** Il secondo spuntino ha il suo
 valore di pasto, `spuntino2`: non si forza più dentro un unico gruppo `spuntino`.

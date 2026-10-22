@@ -1,9 +1,9 @@
 # M1 — MOTORE DI CALCOLO
 
 Modulo operativo (principio 6). Dipendenze: nessuna. Ne dipendono M2 e M6.
-Ultima modifica: 21/10/2026 notte (eccezione etichetta solo su richiesta, fuori dal
-database; pipeline sempre sul database ufficiale; tabella interazioni validata; tag
-vitD/calcio/leggero calcolati; plausibilità delle etichette; casi golden 18-26). Motivazioni, episodi e date in
+Ultima modifica: 22/10/2026 (distribuzione del solo calcio, «presente» = 30% LARN, scenario
+minimo; avviso `VALUTARE_LIVELLO_RINFORZATO`; fermi di `genera_zona_piano.py` sui
+segnaposto; casi golden 27-44). Motivazioni, episodi e date in
 `istruzioni/archivio/M1-motivazioni.md`, che non si carica.
 
 Copre: avvio della sessione, moduli software, casi golden, database e fonti, schema CSV e
@@ -118,18 +118,32 @@ interazioni di gravità media o bassa (`INTERAZIONE_GRAVITA_MEDIA`, `_BASSA`); r
 tabella interazioni su un `food_id` assente dal database;
 principi attivi assenti dalla tabella; terapia non dichiarata; pasto assente su tutto il
 piano; livello parziale o fuori catalogo; catalogo assente (livello verificato solo come
-uniforme); collaudo saltato. I totali sottostimati per gap si stampano nel report.
+uniforme); collaudo saltato; avviso del livello rinforzato (`VALUTARE_LIVELLO_RINFORZATO`,
+PASSO 6). I totali sottostimati per gap si stampano nel report.
 
 Ogni rilievo porta un CODICE stabile: la suite congela `(passo, codice)`, non la prosa.
 
 **Micronutrienti — giudizio settimanale (principio 8).** I valori di micronutrienti del
 singolo giorno restano stampati senza allarme; il PASSO 2 riporta gli estremi dei
 micronutrienti per giorno come informazione, non come verdetto.
+`DISTRIBUZIONE_CONCENTRATA` (PASSO 3) riguarda SOLO il calcio (`NUTRIENTI_DISTRIBUZIONE`):
+presente in meno di 3 giorni, su un piano di almeno 6. «Presente» = almeno il 30% del LARN
+nel giorno (`SOGLIA_PRESENZA_PCT`), nei giorni a scelta nello scenario MINIMO; confronto
+arrotondato a 6 decimali. `MEDIA_SOTTO_LARN` guarda invece lo scenario MASSIMO.
 
-**PASSO 6, due verifiche distinte:**
+**PASSO 6, tre verifiche distinte:**
 - (a) colazione e spuntino identici su tutti i giorni strutturati;
 - (b) a quale livello appartengono, confrontandoli con `colazioni_spuntini.csv`: intercetta
   una colazione standard con uno spuntino rinforzato, che la (a) lascia passare.
+- (c) avviso `VALUTARE_LIVELLO_RINFORZATO`, mai bloccante: media settimanale del calcio
+  sotto l'80% del LARN (`SOGLIA_MEDIA_RINFORZATO_PCT`, scenario minimo nei giorni a scelta)
+  OPPURE calcio presente in meno di 3 giorni su almeno 6. Tace se colazione e spuntino
+  presenti nel piano sono tutti `rinforzata_calcio`, anche parziale o con alternative su
+  misura accanto alle rinforzate (caso già bloccato da `LIVELLO_MISTO`); il secondo
+  spuntino non conta; un pasto interamente fuori catalogo non conta come rinforzato.
+  Catalogo assente o disallineato: l'avviso compare con una nota. Limite: senza
+  `larn_calcio_mg` nel target né l'avviso né `DISTRIBUZIONE_CONCENTRATA` girano, senza
+  rilievo (`LARN_ASSENTI` scatta solo se mancano tutti i LARN).
 Alternative costruite su misura: non è un errore, si segnalano come fuori catalogo e il
 livello non è verificabile.
 Il secondo spuntino (`spuntino2`) segue le regole dello spuntino, solo se il piano lo
@@ -143,7 +157,7 @@ pasti; il rilievo resta nel report con il motivo. Livello misto e catalogo disal
 restano bloccanti anche con la deroga.
 
 ### regressione.py
-Suite sui 26 casi golden in `golden/`: un comando, pass/fail per caso. Si riesegue **dopo
+Suite sui 44 casi golden in `golden/`: un comando, pass/fail per caso. Si riesegue **dopo
 ogni modifica** al motore o al database, e comunque prima di qualsiasi uso clinico.
 - Nei casi `pipeline` la suite ripete la sequenza di `pipeline.main()`: un controllo nuovo
   va in una funzione chiamata da entrambi (come `controlla_pasti_ammessi`), altrimenti la
@@ -307,10 +321,31 @@ python3 genera_zona_piano.py --autotest --template TEMPLATE_..._v5.py
   titolo di piatto,
   se un `food_id` non ha nome paziente, se i giorni di `piano.csv` non coincidono con quelli
   dichiarati, o se un pasto mescola alimenti fissi e alternative.
-- `--autotest` genera il caso golden 03 con metadati fittizi e verifica: kcal uguali al
-  calcolatore, motore grafico identico al template, PDF senza segnaposto, abbinamento
-  risolto in lettere, fermo su metadato mancante. Scrive solo in una cartella temporanea:
-  non sporca i checksum.
+- **Si ferma sui segnaposto nei testi del paziente** (`_testo_paziente`): obiettivo,
+  criterio di rivalutazione, avvertenze, intestazione (nome, età, condizione), indicazioni
+  del giorno libero, titoli dei piatti. Fermo se il valore non è testo, se è vuoto o fatto
+  solo di spazi e simboli, se il campo INTERO è un segnaposto («non concordato» e varianti,
+  «da concordare/definire», «N/D», «N/A», «n.d.» minuscolo, «TBD»…) o un testo d'esempio
+  del template v5 o dello schema di M2 («Nome Cognome», «XX kg», «XX anni», «Da rivalutare
+  dopo N settimane», «Indicare qui allergie…», «titolo approvato»). Passano frasi vere con
+  le stesse parole, sigle e nomi brevi («NA», «Nan», «N.D.», «Gravidanza alla XX
+  settimana», «46,XX», «Non note»). `abbinamento_spuntino` = «non concordato» resta ammesso
+  (scritto esattamente così): non finisce nel PDF. «Non concordato» ferma invece anche
+  `versione_piano`. Elenco dei testi d'esempio CHIUSO: i titoli d'esempio della zona dati
+  del template v5 («Nome piatto pranzo», «Colazione dolce 1», «Spuntino 1», «Pasto libero o
+  indicazioni»…) passano.
+- Fermo, invece di un errore Python, se `giorni`, `intestazione`,
+  `indicazioni_giorno_libero` o `titoli_piatti` non sono oggetti; `versione_piano`, se
+  c'è, deve essere un numero con o senza «v»/«versione» davanti, anche con lettera finale
+  («v3», «3», «versione 3», «2b»), altrimenti fermo («vN», «3 bis», «v1,0»). Se manca, la
+  nota del PDF esce «versione » vuota.
+- `--autotest` (82 controlli) genera il caso golden 03 con metadati fittizi e verifica:
+  kcal uguali al calcolatore, motore grafico identico al template, PDF senza segnaposto,
+  abbinamento risolto in lettere, fermo su metadato mancante, su ogni segnaposto e testo
+  d'esempio, su tipi e versione non validi; passaggio di nomi, sigle e frasi legittime.
+  Richiede il template v5 (fuori da `motore-calcolo/`) e `pdftotext`; NON lo esegue né il
+  collaudo né la regressione: va lanciato a mano dopo ogni modifica allo script. Scrive in
+  una cartella temporanea (non sporca i checksum, ma la lascia in /tmp).
 
 ### larn.py + larn.csv — riferimenti per sesso, età e condizione
 `larn.csv`: `gruppo, sesso, eta_min, eta_max, condizione, larn_* (8 colonne), nota`.
@@ -387,6 +422,23 @@ validato).
   bloccante `ECCEZIONE_ETICHETTA_NON_VALIDA`.
 - **26_eccezione_somma_esattamente_100** — etichetta con somma esattamente 100 g: passa
   (confine della soglia di plausibilità).
+- **27-32, distribuzione del calcio** (`DISTRIBUZIONE_CONCENTRATA`, piani da 5-6 giorni):
+  27 calcio al 29,8% in 4 giorni su 6, rilievo (soglia del 30%); 28 presente in esattamente
+  3 giorni (30,65%), nessun rilievo; 29 spuntino a scelta, presente solo nello scenario
+  massimo, rilievo (conta il minimo); 30 media adeguata (87%) ma concentrata, rilievo senza
+  `MEDIA_SOTTO_LARN`; 31 giorno esattamente al 30,0% del LARN 950, presente; 32 piano di 5
+  giorni, nessun rilievo (minimo 6 giorni).
+- **33-44, avviso del livello rinforzato** (`VALUTARE_LIVELLO_RINFORZATO`): 33 media al
+  79,9%, avviso; 34 all'80,03%, nessun avviso; 35 media sotto l'80% solo nello scenario
+  minimo, avviso (e nessun `MEDIA_SOTTO_LARN`, che guarda il massimo); 36 livello
+  rinforzato già scelto, nessun avviso; 37 presente in esattamente 3 giorni con media
+  adeguata, nessun avviso; 38 piano di 5 giorni, nessun avviso; 39 solo la colazione
+  rinforzata, avviso (più il blocco `LIVELLO_INCOERENTE_TRA_PASTI`); 40 piano senza
+  spuntino con colazione rinforzata, nessun avviso; 41 media esattamente all'80,0%, nessun
+  avviso; 42 secondo spuntino standard, nessun avviso (non conta), resta il blocco; 43
+  colazione fuori catalogo, avviso; 44 rinforzato parziale, nessun avviso.
+  Limite dichiarato (31 e 41): l'arrotondamento a 6 decimali dei confronti non è protetto da
+  nessun caso.
 
 **Tipi di caso.** `fisso` e `scelta_multipla` si deducono dal piano (presenza di
 `gruppo_scelta`). `pipeline` è l'unico DICHIARATO, da un `pipeline.json` nella cartella del
@@ -627,11 +679,12 @@ Il motore è validato contro un piano reale già consegnato (P01, lunedì: -4,56
 correzione della regola sui legumi), oggi `caso_01_base`: la validazione è ripetibile. È
 utilizzabile su pazienti reali alle condizioni del principio 7.
 
-**Validazione sul campo ancora aperta (FASE 5):** orchestratore e protocollo struttura
-pasti sono validati su paziente fittizio e su casi reali, `tdee.py` solo sul paziente
-fittizio; il primo ha già fatto
-emergere due errori di processo. Il flusso del 21/10/2026 (motore sciolto, salvataggio con
-commit, accoppiamenti) non è ancora passato da un caso reale. Criterio di chiusura: tre
+**Validazione sul campo ancora aperta (FASE 5):** l'orchestratore è passato da casi reali
+(il primo ha fatto emergere due errori di processo); il protocollo struttura pasti e
+`tdee.py` solo dal paziente fittizio: nessun paziente reale ha ancora attraversato per
+intero il protocollo. Il flusso del 21-22/10/2026 (motore sciolto, salvataggio con commit,
+accoppiamenti, distribuzione del calcio, avviso del livello rinforzato, fermi sui
+segnaposto) non è ancora passato da un caso reale. Criterio di chiusura: tre
 pazienti reali consecutivi senza errori di processo. Ogni caso reale è
 anche un collaudo: cosa il motore ha intercettato da solo, cosa ha richiesto un intervento
 manuale, cosa è sfuggito. Quello che sfugge diventa un caso golden.

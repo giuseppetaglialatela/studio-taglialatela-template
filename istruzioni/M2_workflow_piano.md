@@ -2,8 +2,9 @@
 
 Modulo operativo: si carica quando si compone, si modifica o si valuta un piano.
 Dipende da **M1**: nessun passo è eseguibile senza il motore collaudato.
-Ultima modifica: 21/10/2026 notte (versione asciutta: motivazioni, episodi e date in
-`istruzioni/archivio/M2-motivazioni.md`, che non si carica).
+Ultima modifica: 22/10/2026 (distribuzione del solo calcio; avviso del livello rinforzato;
+fermi di `genera_zona_piano.py` sui segnaposto). Motivazioni, episodi e date in
+`istruzioni/archivio/M2-motivazioni.md`, che non si carica.
 
 Rimandi: motore, CSV, gap, fonti → **M1** · PDF del piano e documento di spiegazione →
 **M3** · fascicolo e Tabella Vincoli (PASSO 0) → **M4** · ampliamento del database →
@@ -89,11 +90,19 @@ resta nel report ma non blocca.
 **Livello rinforzato.** `colazioni_spuntini.csv` (M1) ha due livelli, `standard` e
 `rinforzata_calcio`. Il passaggio al rinforzato è **una sola decisione per l'intero piano
 settimanale** (tutti i giorni strutturati), mai per il singolo giorno critico.
-- **DA DECIDERE — criterio del passaggio.** Finché non è deciso vale il criterio storico
-  («anche un solo giorno sotto l'80% LARN di calcio»), e la scelta va esposta al
-  nutrizionista. Alternative: **(a)** media settimanale del calcio sotto l'80% LARN,
-  coerente con il principio 8; **(b)** calcio concentrato su meno di 3 giorni su 6,
-  coerente con l'argomento della saturazione (circa 500 mg per assunzione).
+- **Quando valutarlo.** La pipeline dà l'avviso `VALUTARE_LIVELLO_RINFORZATO` (PASSO 6,
+  mai bloccante: la scelta resta del nutrizionista) se **(a)** la media settimanale del
+  calcio è sotto l'80% del LARN, oppure **(b)** il calcio è presente (almeno il 30% del
+  LARN nel giorno) in meno di 3 giorni, su un piano di almeno 6 giorni. Nei giorni a
+  scelta conta lo scenario MINIMO. Un solo giorno sotto l'80% non basta più.
+- L'avviso tace se colazione e spuntino, quelli presenti nel piano, sono tutti del
+  livello `rinforzata_calcio`, anche parziale (o rinforzati con alternative su misura
+  accanto, caso già bloccato da `LIVELLO_MISTO`); il secondo spuntino non conta. Con il
+  catalogo assente o disallineato l'avviso compare con una nota: il livello va verificato
+  a mano. **Senza il LARN del calcio in `target.csv` né l'avviso né
+  `DISTRIBUZIONE_CONCENTRATA` girano, e nessun rilievo lo dice**: verificare che ci sia.
+- `MEDIA_SOTTO_LARN` (PASSO 3) guarda invece lo scenario MASSIMO (carenza anche nel caso
+  migliore): le due letture sono diverse per scelta.
 - Prima di passare al rinforzato, verificare che il calcio sotto soglia non sia marcato
   ⛔ TOTALE SOTTOSTIMATO: la carenza può essere apparente.
 - NON si abbina la colazione di un livello con lo spuntino dell'altro: il PASSO 6 della
@@ -189,12 +198,13 @@ Calcio, ferro, vitamina D, folati (B9), vitamina B12, zinco, magnesio, vitamina 
   correggono uno per uno: un micronutriente concentrato su pochi giorni (tipicamente la
   vitamina D con il pesce grasso) è basso sul giorno e adeguato sulla settimana, ed è
   normale.
-- ⚠ anche se un micronutriente critico compare in **meno di 3 giorni su 6 o 7**, pur con
-  media adeguata: è l'unico caso in cui la distribuzione conta di per sé. Il motore
-  (`DISTRIBUZIONE_CONCENTRATA`, piani da almeno 6 giorni) conta come presente un valore
-  maggiore di zero, tracce comprese, e nei giorni a scelta basta che lo sia in almeno uno
-  scenario: la sua assenza NON esclude la concentrazione, che si valuta sui valori per
-  giorno.
+- ⚠ anche se il **calcio** è presente in **meno di 3 giorni**, su un piano di almeno 6
+  giorni, pur con media adeguata (`DISTRIBUZIONE_CONCENTRATA`): è l'unico caso in cui la
+  distribuzione conta di per sé, per la saturazione dell'assorbimento (circa 500 mg per
+  assunzione). «Presente» = almeno il 30% del LARN nel giorno; nei giorni a scelta conta lo
+  scenario MINIMO. Vale SOLO per il calcio: gli altri micronutrienti concentrati su pochi
+  giorni (vitamina D) non danno rilievo. Sotto i 6 giorni il motore non controlla: la
+  distribuzione si guarda a mano sui valori per giorno.
 - **Distingui carenza da gap:** un nutriente marcato ⛔ TOTALE SOTTOSTIMATO sotto soglia
   NON è una carenza accertata. Riporta il flag con il numero e le voci che lo causano;
   nessuna correzione del piano né integrazione su un nutriente sottostimato prima di aver
@@ -292,7 +302,9 @@ né con fretta dichiarata né con un piano identico a uno precedente.
 - la conferma che il paziente non è in terapia, se la pipeline ha dato
   `TERAPIA_NON_DICHIARATA` (PASSO 4);
 - l'attenzione `LIVELLO_INCOERENTE_IN_DEROGA`, se presente, con la decisione del
-  nutrizionista (sezione 2).
+  nutrizionista (sezione 2);
+- l'avviso `VALUTARE_LIVELLO_RINFORZATO`, se presente, con il motivo che lo ha fatto
+  scattare: la scelta del livello è del nutrizionista, una sola per il piano (sezione 2).
 
 **Dopo l'approvazione — `metadati_piano_vN.json` (obbligatorio).** Prima di chiudere la
 chat A si scrive questo file, con lo stesso numero di versione del `piano.csv` approvato, e
@@ -343,10 +355,25 @@ si salva su Drive nella cartella del paziente accanto al CSV. È ciò che legge 
   `avvertenze_box` e, se c'è il giorno libero, `indicazioni_giorno_libero`. Usa anche
   `versione_piano` e `abbinamento_spuntino` ma NON si ferma se mancano: vanno scritti
   sempre. Gli altri campi li legge la chat B. Nessun campo si inventa in chat B.
+- Si ferma anche su un **segnaposto nei testi del paziente** (obiettivo, criterio,
+  avvertenze, intestazione, indicazioni del giorno libero, titoli): valore non testo; vuoto
+  o solo simboli; campo intero uguale a un segnaposto («non concordato» e varianti, «da
+  concordare/definire», «N/D», «N/A», «n.d.» minuscolo, «TBD»…) o a uno di questi testi
+  d'esempio: «Nome Cognome», «XX kg», «XX anni», «Da rivalutare dopo N settimane»,
+  «Indicare qui allergie…», «titolo approvato». Elenco chiuso: i titoli d'esempio della
+  zona dati del template («Nome piatto pranzo», «Colazione dolce 1», «Spuntino 1»,
+  «Pasto libero o indicazioni»…) NON sono intercettati e si controllano a vista. Passano le
+  frasi vere che contengono le stesse parole e sigle o nomi brevi («NA», «N.D.»). Si
+  ferma se `giorni`, `intestazione`, `indicazioni_giorno_libero` o `titoli_piatti` non
+  sono oggetti, e se `versione_piano` non è un numero, con o senza «v» o «versione»
+  davanti, anche con lettera finale (`"v3"`, `"2b"`); se manca, la nota del PDF esce
+  «versione » vuota: va scritta sempre.
 - Testi già nel registro impersonale del documento di spiegazione (M3).
 - Campo lasciato vuoto per scelta del nutrizionista: `"non concordato"`, mai null. NON vale
-  per `obiettivo_intestazione`, `criterio_rivalutazione` e `avvertenze_box`, che finiscono
-  nel PDF del paziente: si chiedono al PASSO 6 (le avvertenze senza allergie si scrivono
+  per nessun testo che finisce nel PDF del paziente (obiettivo, criterio, avvertenze,
+  intestazione, indicazioni del giorno libero, titoli) né per `versione_piano`: lo script
+  si ferma. In `abbinamento_spuntino` si scrive esattamente `"non concordato"` (minuscolo,
+  senza punto). Obiettivo, criterio e avvertenze si chiedono al PASSO 6 (le avvertenze senza allergie si scrivono
   «Nessuna allergia dichiarata.»).
 
 ### PASSO 7 — GENERAZIONE PDF (solo dopo approvazione)
