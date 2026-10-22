@@ -41,8 +41,12 @@ ricaricano**: tutto ciò che serve sta nei metadati del piano e nel motore.
    archiviare (sezione 5).
 5. Se nei metadati manca un campo necessario (titolo, obiettivo, criterio) o contiene
    un segnaposto, ci si ferma e lo si chiede: non si decide in chat B. Il documento di
-   spiegazione NON passa da `genera_zona_piano.py`: obiettivo e criterio vi si
-   controllano a mano, con la stessa regola.
+   spiegazione NON passa da `genera_zona_piano.py`. Obiettivo e criterio sono già
+   protetti, perché il PDF del piano, generato prima dagli stessi metadati, si ferma
+   su un loro segnaposto. Fino al controllo automatico (in sviluppo) si verificano a
+   vista: nessun testo d'esempio del template rimasto («testo placeholder»), nessun
+   segnaposto in `regole_operative`, `scelte_principali`, `limiti_noti` e
+   `da_escludere`.
 
 **Due spuntini nello stesso giorno (dal 30/09/2026).** Il secondo spuntino ha il suo
 valore di pasto, `spuntino2`: non si forza più dentro un unico gruppo `spuntino`.
