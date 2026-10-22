@@ -41,9 +41,13 @@
     [
       6,
       "LIVELLO_FUORI_CATALOGO"
+    ],
+    [
+      6,
+      "VALUTARE_LIVELLO_RINFORZATO"
     ]
   ],
   "exit_code": 0,
   "descrizione": "Piano di 6 giorni: calcio al 42,6% LARN nei giorni 1 e 4, al 29,8% (298,4 mg su 1000) negli altri quattro, mai a zero. Deve comparire DISTRIBUZIONE_CONCENTRATA (presente in 2 giorni su 6). Protegge la regola del 22/10/2026: presente = almeno il 30% del LARN nel giorno; con la regola precedente (> 0) il rilievo non compariva. I giorni poveri sono appena sotto il confine: con una soglia al 29,8% o meno il caso diventa rosso.",
-  "riferimento": "Costruito il 22/10/2026, giorni poveri riavvicinati al confine dopo la revisione indipendente. Giornata base: colazione pane integrale 70 g + mela 200 g; spuntino mela 100 g; pranzo pasta integrale 80 g + pomodori 100 g + olio 13 g; cena merluzzo 140 g + patate 180 g + fagiolini 200 g + pane integrale 30 g + olio 13 g (calcio 202,2 mg). Colazione e spuntino identici tutta la settimana (struttura uniforme). Giorno ricco: pasta 60 g + parmigiano 20 g (426,2 mg). Giorni 2, 3, 5, 6: base + parmigiano 8,3 g. Target kcal sulla mediana dei giorni; macro arrotondati dalla media e corretti perche' la somma sia 100. Nessun giorno fuori tolleranza. LARN calcio 1000 mg."
+  "riferimento": "Costruito il 22/10/2026, giorni poveri riavvicinati al confine dopo la revisione indipendente. Giornata base: colazione pane integrale 70 g + mela 200 g; spuntino mela 100 g; pranzo pasta integrale 80 g + pomodori 100 g + olio 13 g; cena merluzzo 140 g + patate 180 g + fagiolini 200 g + pane integrale 30 g + olio 13 g (calcio 202,2 mg). Colazione e spuntino identici tutta la settimana (struttura uniforme). Giorno ricco: pasta 60 g + parmigiano 20 g (426,2 mg). Giorni 2, 3, 5, 6: base + parmigiano 8,3 g. Target kcal sulla mediana dei giorni; macro arrotondati dalla media e corretti perche' la somma sia 100. Nessun giorno fuori tolleranza. LARN calcio 1000 mg. Atteso rigenerato il 22/10/2026 con l'avviso del livello rinforzato (PASSO 6): unica differenza verificata, la comparsa dell'attenzione VALUTARE_LIVELLO_RINFORZATO (piano di prova povero di calcio). Bloccanti ed exit code invariati."
 }

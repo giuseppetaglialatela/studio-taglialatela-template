@@ -143,7 +143,8 @@ def esegui_caso_pipeline(nome_caso):
             # deve restare allineato alla sequenza di pipeline.main(): un passo
             # aggiunto li' e non qui passa inosservato alla suite (18/09/2026)
             pl.verifica_settimanale(rilievi, dati, intervalli, target)
-            pl.passo_3_micronutrienti(rilievi, dati, intervalli, target, sottostime, db)
+            esito_calcio = pl.passo_3_micronutrienti(rilievi, dati, intervalli, target,
+                                                     sottostime, db)
             pl.passo_4_coerenza(rilievi, db, target, piano, gap, sottostime,
                                 righe_estese)
             pl.passo_5_interazioni(rilievi, piano, db,
@@ -151,7 +152,7 @@ def esegui_caso_pipeline(nome_caso):
                                    percorso_opzionale("interazioni"),
                                    percorso_opzionale("orari"))
             pl.passo_6_livello_unico(rilievi, righe_estese, db,
-                                     opzioni.get("deroga_struttura"))
+                                     opzioni.get("deroga_struttura"), esito_calcio)
 
     dati_rilievi = rilievi.come_dati()
     return {

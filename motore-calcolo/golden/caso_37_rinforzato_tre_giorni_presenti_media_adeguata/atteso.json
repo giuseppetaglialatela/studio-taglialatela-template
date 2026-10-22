@@ -1,0 +1,65 @@
+{
+  "tipo": "pipeline",
+  "bloccanti": [],
+  "attenzioni": [
+    [
+      1,
+      "MACRO_FUORI_TOLLERANZA"
+    ],
+    [
+      1,
+      "MACRO_FUORI_TOLLERANZA"
+    ],
+    [
+      1,
+      "MACRO_FUORI_TOLLERANZA"
+    ],
+    [
+      1,
+      "MACRO_FUORI_TOLLERANZA"
+    ],
+    [
+      1,
+      "MACRO_FUORI_TOLLERANZA"
+    ],
+    [
+      1,
+      "MACRO_FUORI_TOLLERANZA"
+    ],
+    [
+      1,
+      "MACRO_FUORI_TOLLERANZA"
+    ],
+    [
+      1,
+      "MACRO_FUORI_TOLLERANZA"
+    ],
+    [
+      1,
+      "MACRO_FUORI_TOLLERANZA"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      4,
+      "ATWATER_SEGNALATO"
+    ],
+    [
+      5,
+      "TERAPIA_NON_DICHIARATA"
+    ],
+    [
+      6,
+      "LIVELLO_FUORI_CATALOGO"
+    ],
+    [
+      6,
+      "LIVELLO_FUORI_CATALOGO"
+    ]
+  ],
+  "exit_code": 0,
+  "descrizione": "Calcio presente (>= 30% LARN) in esattamente 3 giorni su 6, media adeguata (oltre l'80%). NESSUN avviso del livello rinforzato e nessuna DISTRIBUZIONE_CONCENTRATA. Protegge il «meno di 3 giorni» dell'avviso: diventa rosso se diventa «3 o meno».",
+  "riferimento": "Costruito il 22/10/2026 su indicazione della revisione indipendente. Giorni 1, 3, 5 ricchi, 2, 4, 6 poveri. Stesse giornate del caso 30: giorni ricchi (pranzo pasta integrale 30 g + rucola 200 g + pomodori 100 g + parmigiano 110 g; cena alici 140 g + fagiolini 200 g + pane integrale 30 g + olio 13 g; 1931,8 mg) e giorni poveri (giornata base + parmigiano 6 g; 271,7 mg). LARN calcio 950 mg. Target kcal sulla mediana, macro arrotondati dalla media e corretti perche' la somma sia 100. Attenzioni giornaliere di kcal e macro attese (settimana sbilanciata), non bloccanti."
+}

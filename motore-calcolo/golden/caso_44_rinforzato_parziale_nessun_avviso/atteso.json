@@ -1,0 +1,37 @@
+{
+  "tipo": "pipeline",
+  "bloccanti": [],
+  "attenzioni": [
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      4,
+      "ATWATER_SEGNALATO"
+    ],
+    [
+      5,
+      "TERAPIA_NON_DICHIARATA"
+    ],
+    [
+      6,
+      "LIVELLO_PARZIALE"
+    ],
+    [
+      6,
+      "LIVELLO_PARZIALE"
+    ]
+  ],
+  "exit_code": 0,
+  "descrizione": "Livello rinforzata_calcio PARZIALE: colazione solo Sr1, spuntino solo SPrA (attenzioni LIVELLO_PARZIALE). Media del calcio al 66,1% (627,8 mg). Il livello rinforzato, anche parziale, e' gia' scelto: NESSUN avviso. Diventa rosso se il parziale non conta come rinforzato.",
+  "riferimento": "Costruito il 22/10/2026 su indicazione della revisione indipendente. Pranzo pasta integrale 80 g + pomodori 100 g + olio 13 g; cena merluzzo 140 g + patate 180 g + fagiolini 200 g + pane integrale 30 g + olio 13 g. Sei giorni identici. LARN calcio 950 mg. Target kcal sulla mediana degli scenari, macro arrotondati dalla media e corretti perche' la somma sia 100."
+}

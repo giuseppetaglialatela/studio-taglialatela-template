@@ -1,0 +1,45 @@
+{
+  "tipo": "pipeline",
+  "bloccanti": [],
+  "attenzioni": [
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      4,
+      "ATWATER_SEGNALATO"
+    ],
+    [
+      5,
+      "TERAPIA_NON_DICHIARATA"
+    ],
+    [
+      6,
+      "LIVELLO_FUORI_CATALOGO"
+    ],
+    [
+      6,
+      "LIVELLO_FUORI_CATALOGO"
+    ],
+    [
+      6,
+      "VALUTARE_LIVELLO_RINFORZATO"
+    ]
+  ],
+  "exit_code": 0,
+  "descrizione": "Media settimanale del calcio al 79,9% del LARN 950 (759,15 mg), sei giorni identici: deve comparire VALUTARE_LIVELLO_RINFORZATO (avviso non bloccante, decisione del 22/10/2026). Confine inferiore del criterio della media all'80%; insieme al caso 34 protegge la soglia.",
+  "riferimento": "Costruito il 22/10/2026. Giornata: colazione pane integrale 70 g + mela 200 g; spuntino mela 100 g (fuori catalogo, livello non identificato); pranzo pasta integrale + pomodori 100 g + olio 13 g + parmigiano; cena merluzzo 140 g + patate 180 g + fagiolini 200 g + pane integrale 30 g + olio 13 g. Sei giorni identici. LARN calcio 950 mg (adulti 18-64), valore reale. Target kcal sulla mediana, macro arrotondati dalla media e corretti perche' la somma sia 100. Pasta 40 g, parmigiano 49,4 g."
+}

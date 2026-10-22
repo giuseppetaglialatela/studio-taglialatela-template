@@ -54,9 +54,13 @@
     [
       6,
       "LIVELLO_FUORI_CATALOGO"
+    ],
+    [
+      6,
+      "VALUTARE_LIVELLO_RINFORZATO"
     ]
   ],
   "exit_code": 1,
   "descrizione": "Accoppiamenti vietati (21/10/2026): latte+yogurt in colazione solo nello scenario A, pollo+merluzzo a cena. Atteso: 2 ACCOPPIAMENTO_VIETATO al PASSO 4. Controllo negativo: yogurt (A) e latte (B) alternative dello stesso spuntino NON devono scattare.",
-  "riferimento": "decisione del nutrizionista del 21/10/2026: si segnala, non blocca"
+  "riferimento": "decisione del nutrizionista del 21/10/2026: si segnala, non blocca Atteso rigenerato il 22/10/2026 con l'avviso del livello rinforzato (PASSO 6): unica differenza verificata, la comparsa dell'attenzione VALUTARE_LIVELLO_RINFORZATO (piano di prova povero di calcio). Bloccanti ed exit code invariati."
 }

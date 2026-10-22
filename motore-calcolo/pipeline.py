@@ -47,6 +47,7 @@ in cui l'errore reale si era prodotto.
 """
 
 import argparse
+import math
 import os
 import subprocess
 import sys
@@ -537,6 +538,12 @@ def verifica_settimanale(rilievi, dati_giorni, intervalli, target):
 SOGLIA_PRESENZA_PCT = 30.0
 NUTRIENTI_DISTRIBUZIONE = {"calcio_mg"}
 
+# Avviso del livello rinforzato (decisione del 22/10/2026): si propone di
+# valutarlo se la media settimanale del calcio e' sotto questa quota del LARN
+# OPPURE se il calcio e' presente in meno di 3 giorni su almeno 6. Solo avviso,
+# mai blocco: la decisione resta del nutrizionista al PASSO 6.
+SOGLIA_MEDIA_RINFORZATO_PCT = 80.0
+
 
 def passo_3_micronutrienti(rilievi, dati_giorni, intervalli, target,
                            sottostime, db):
@@ -544,11 +551,12 @@ def passo_3_micronutrienti(rilievi, dati_giorni, intervalli, target,
 
     micro_presenti = [(n, c) for n, c in MICRONUTRIENTI_LARN.items()
                       if c in target and target[c]]
+    esito_calcio = None
     if not micro_presenti:
         print("\n  Nessun riferimento LARN nei target: confronto non eseguibile.")
         rilievi.segnala(3, "LARN_ASSENTI", "target privo di riferimenti LARN: i micronutrienti "
                            "non sono confrontati con alcuna soglia")
-        return
+        return esito_calcio
 
     giorni = sorted(dati_giorni)
     accumulo = {n: [] for n, _ in micro_presenti}
@@ -645,6 +653,11 @@ def passo_3_micronutrienti(rilievi, dati_giorni, intervalli, target,
         # la vitamina D, concentrata per natura in pesce e uova, il rilievo
         # scatterebbe in circa 6 settimane su 10 (misura sulla libreria,
         # 22/10/2026) senza motivo clinico.
+        if nutriente == "calcio_mg":
+            esito_calcio = {"media_min_pct": p_min, "giorni": len(giorni),
+                            "giorni_presenti": giorni_con_presenza[nutriente],
+                            "sottostimato": nutriente in sottostime}
+
         if (nutriente in NUTRIENTI_DISTRIBUZIONE and len(giorni) >= 6
                 and giorni_con_presenza[nutriente] < 3):
             rilievi.segnala(3, "DISTRIBUZIONE_CONCENTRATA", f"{nutriente}: presente "
@@ -653,6 +666,8 @@ def passo_3_micronutrienti(rilievi, dati_giorni, intervalli, target,
                                f"{giorni_con_presenza[nutriente]} giorni su "
                                f"{len(giorni)} - la media puo' essere adeguata "
                                f"ma la distribuzione no")
+
+    return esito_calcio
 
 
 # --------------------------------------------------------------------------
@@ -899,7 +914,7 @@ def descrivi_firma(firma, db):
     return " | ".join(f"[{k}] {', '.join(v)}" for k, v in sorted(opzioni.items()))
 
 
-def passo_6_livello_unico(rilievi, righe_estese, db, deroga):
+def passo_6_livello_unico(rilievi, righe_estese, db, deroga, esito_calcio=None):
     titolo(6, "LIVELLO UNICO DI COLAZIONE E SPUNTINO SU TUTTO IL PIANO")
     print("\n  La scelta tra livello standard e livello rinforzato e' UNA SOLA")
     print("  DECISIONE PER L'INTERO PIANO, mai giorno per giorno. Le 4")
@@ -970,7 +985,8 @@ def passo_6_livello_unico(rilievi, righe_estese, db, deroga):
         else:
             rilievi.blocca(6, "STRUTTURA_NON_UNIFORME", messaggio)
 
-    _identifica_livelli(rilievi, per_giorno, db, deroga)
+    livelli = _identifica_livelli(rilievi, per_giorno, db, deroga)
+    avviso_livello_rinforzato(rilievi, esito_calcio, livelli)
 
 
 def firme_alternative(righe_giorno, pasto):
@@ -1010,7 +1026,7 @@ def _identifica_livelli(rilievi, per_giorno, db, deroga):
                         "colazioni_spuntini.csv non disponibile: il livello "
                         "(standard vs rinforzata_calcio) non e' stato "
                         "identificato, solo verificato come uniforme")
-        return
+        return None
 
     mancanti = struttura_pasti.food_id_mancanti(catalogo, db)
     if mancanti:
@@ -1019,7 +1035,7 @@ def _identifica_livelli(rilievi, per_giorno, db, deroga):
         rilievi.blocca(6, "CATALOGO_DISALLINEATO",
                        f"colazioni_spuntini.csv referenzia food_id assenti dal "
                        f"database: {elenco}")
-        return
+        return None
 
     esiti = {}
     tutte = [r for righe in per_giorno.values() for r in righe]
@@ -1081,6 +1097,62 @@ def _identifica_livelli(rilievi, per_giorno, db, deroga):
         livello = next(iter(set(livelli.values())))
         print(f"\n    Colazione, spuntino e secondo spuntino sono tutti del "
               f"livello {livello}.")
+
+    # livello per pasto PRESENTE nel piano (None = fuori catalogo)
+    return {p: liv for p, (liv, _) in esiti.items()}
+
+
+def avviso_livello_rinforzato(rilievi, esito_calcio, livelli):
+    """Propone di VALUTARE il livello rinforzato (mai blocca, mai decide).
+
+    `livelli`: livello per ogni pasto presente nel piano (None se fuori
+    catalogo), oppure None se il catalogo non permette di identificarlo
+    (l'avviso compare e lo dice).
+
+    Criteri (decisione del 22/10/2026), basta uno dei due:
+    - media settimanale del calcio sotto SOGLIA_MEDIA_RINFORZATO_PCT del LARN,
+      nello scenario MINIMO se ci sono giorni a scelta (stessa logica di
+      protezione della presenza: vale qualunque cosa il paziente scelga);
+    - calcio presente (>= SOGLIA_PRESENZA_PCT del LARN) in meno di 3 giorni,
+      su un piano di almeno 6 giorni.
+    Il vecchio criterio «anche un solo giorno sotto l'80%» non esiste piu'.
+    Nessun avviso solo se colazione e spuntino, quelli presenti nel piano, sono
+    tutti del livello rinforzata_calcio (anche parziale): il livello e' una sola
+    scelta per tutto il piano, e uno spuntino rinforzato con una colazione
+    standard non e' «piano rinforzato». Il secondo spuntino non conta: e' una
+    scelta indipendente (M2).
+    """
+    if not esito_calcio:
+        return
+    protocollo = [p for p in ("colazione", "spuntino") if p in (livelli or {})]
+    if protocollo and all(livelli[p] == "rinforzata_calcio" for p in protocollo):
+        print(f"\n    {' e '.join(protocollo).capitalize()}: gia' del livello "
+              f"rinforzata_calcio, nessun avviso.")
+        return
+    motivi = []
+    # arrotondamento a 6 decimali: una media esattamente all'80% non e' «sotto»
+    # per un errore di virgola mobile; percentuale stampata troncata al decimo,
+    # perche' 79,95% non compaia come «80,0% (sotto 80%)»
+    if round(esito_calcio["media_min_pct"], 6) < SOGLIA_MEDIA_RINFORZATO_PCT:
+        motivi.append(f"media settimanale del calcio al "
+                      f"{math.floor(round(esito_calcio['media_min_pct'], 6) * 10) / 10:.1f}% del LARN (sotto "
+                      f"{SOGLIA_MEDIA_RINFORZATO_PCT:.0f}%; nei giorni a scelta, scenario minimo)")
+    if esito_calcio["giorni"] >= 6 and esito_calcio["giorni_presenti"] < 3:
+        motivi.append(f"calcio presente (>= {SOGLIA_PRESENZA_PCT:.0f}% LARN) in "
+                      f"soli {esito_calcio['giorni_presenti']} giorni su "
+                      f"{esito_calcio['giorni']}")
+    if not motivi:
+        return
+    nota = (" Il calcio e' marcato SOTTOSTIMATO: verificare prima il gap, "
+            "la carenza puo' essere apparente." if esito_calcio["sottostimato"] else "")
+    if livelli is None:
+        nota += (" Livello del piano non identificato (catalogo colazioni_spuntini.csv "
+                 "assente o disallineato): verificare se e' gia' rinforzato.")
+    print(f"\n    ⚠️ Valutare il livello rinforzato: {'; '.join(motivi)}.")
+    rilievi.segnala(6, "VALUTARE_LIVELLO_RINFORZATO",
+                    f"valutare il livello rinforzata_calcio per colazione e "
+                    f"spuntino: {'; '.join(motivi)}. Avviso, non blocco: la "
+                    f"scelta e' del nutrizionista, per l'intero piano.{nota}")
 
 
 # --------------------------------------------------------------------------
@@ -1171,13 +1243,13 @@ def main():
     dati_giorni = passo_1_calcolo(rilievi, piano, db, target, giorni_con_scelte)
     intervalli = passo_2_scenari(rilievi, righe_estese, db, target)
     verifica_settimanale(rilievi, dati_giorni, intervalli, target)
-    passo_3_micronutrienti(rilievi, dati_giorni, intervalli, target,
+    esito_calcio = passo_3_micronutrienti(rilievi, dati_giorni, intervalli, target,
                            sottostime, db)
     passo_4_coerenza(rilievi, db, target, piano, gap, sottostime,
                      righe_estese)
     passo_5_interazioni(rilievi, piano, db, args.farmaci, args.interazioni,
                         args.orari)
-    passo_6_livello_unico(rilievi, righe_estese, db, args.deroga)
+    passo_6_livello_unico(rilievi, righe_estese, db, args.deroga, esito_calcio)
 
     return verdetto(rilievi)
 

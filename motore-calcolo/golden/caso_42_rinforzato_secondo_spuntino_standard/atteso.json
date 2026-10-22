@@ -1,0 +1,34 @@
+{
+  "tipo": "pipeline",
+  "bloccanti": [
+    [
+      6,
+      "LIVELLO_INCOERENTE_TRA_PASTI"
+    ]
+  ],
+  "attenzioni": [
+    [
+      3,
+      "MEDIA_SOTTO_LARN_CON_GAP"
+    ],
+    [
+      4,
+      "ATWATER_SEGNALATO"
+    ],
+    [
+      4,
+      "FORMATO_CONFEZIONE_NON_RISPETTATO"
+    ],
+    [
+      4,
+      "FORMATO_CONFEZIONE_NON_RISPETTATO"
+    ],
+    [
+      5,
+      "TERAPIA_NON_DICHIARATA"
+    ]
+  ],
+  "exit_code": 1,
+  "descrizione": "Colazione e spuntino del livello rinforzata_calcio, secondo spuntino standard (SPA, SPB): media minima del calcio al 75,8%. Il secondo spuntino e' una scelta indipendente (M2) e non conta per l'avviso: NESSUN VALUTARE_LIVELLO_RINFORZATO. Il piano resta bloccato da LIVELLO_INCOERENTE_TRA_PASTI (exit 1), che riconosce lo spuntino2 standard. Diventa rosso se l'avviso considera tutti i pasti.",
+  "riferimento": "Costruito il 22/10/2026 su indicazione della revisione indipendente. Pranzo pasta integrale 80 g + pomodori 100 g + olio 13 g; cena merluzzo 140 g + patate 180 g + fagiolini 200 g + pane integrale 30 g + olio 13 g; colazione, spuntino e spuntino2 dal catalogo colazioni_spuntini.csv. Sei giorni identici. LARN calcio 950 mg. Target 1560 kcal (mediana degli scenari), 20/38/42. Attenzioni attese FORMATO_CONFEZIONE_NON_RISPETTATO (yogurt intero 150 g e 180 g del catalogo)."
+}

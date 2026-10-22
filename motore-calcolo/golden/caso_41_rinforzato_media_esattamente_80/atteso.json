@@ -1,0 +1,37 @@
+{
+  "tipo": "pipeline",
+  "bloccanti": [],
+  "attenzioni": [
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      4,
+      "ATWATER_SEGNALATO"
+    ],
+    [
+      4,
+      "FORMATO_CONFEZIONE_NON_RISPETTATO"
+    ],
+    [
+      5,
+      "TERAPIA_NON_DICHIARATA"
+    ],
+    [
+      6,
+      "LIVELLO_FUORI_CATALOGO"
+    ],
+    [
+      6,
+      "LIVELLO_FUORI_CATALOGO"
+    ]
+  ],
+  "exit_code": 0,
+  "descrizione": "Sei giorni identici con il calcio esattamente all'80,0% del LARN 950 (760,0 mg, somma esatta anche in virgola mobile). «Sotto l'80%» e' stretto: NESSUN avviso. Diventa rosso se il confronto diventa «minore o uguale». L'arrotondamento a 6 decimali del confronto NON e' protetto: nessuna combinazione provata il 22/10/2026 produce una media a 79,9999...%.",
+  "riferimento": "Costruito il 22/10/2026 su indicazione della revisione indipendente. Colazione pane integrale 70 g + mela 200 g; spuntino mela 100 g (fuori catalogo); pranzo pasta integrale 40 g + pomodori 100 g + olio 13 g + parmigiano 40 g + yogurt parz. scremato 91,5 g; cena come gli altri casi. Target 1226 kcal, 21/47/32. Attenzione attesa FORMATO_CONFEZIONE_NON_RISPETTATO (yogurt 91,5 g)."
+}

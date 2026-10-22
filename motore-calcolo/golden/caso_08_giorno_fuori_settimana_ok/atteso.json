@@ -61,9 +61,13 @@
     [
       6,
       "PASTO_ASSENTE_SU_TUTTO_IL_PIANO"
+    ],
+    [
+      6,
+      "VALUTARE_LIVELLO_RINFORZATO"
     ]
   ],
   "exit_code": 0,
   "descrizione": "Piano a 2 giorni senza scelte: giorno 1 a -6.96% kcal (FUORI dal +/-5%), giorno 2 a +3.46% (dentro), media settimanale -1.75% (dentro). Il giorno fuori deve comparire come ATTENZIONE (PASSO 1 KCAL_FUORI_TOLLERANZA), NON come bloccante: kcal e macro si giudicano sulla media settimanale. exit_code 0. Protegge la modifica del 18/09/2026.",
-  "riferimento": "Generato il 18/09/2026: grammi del giorno 2 = giorno 1 x 1,1075 (stessi alimenti, stesse % macro); target kcal = kcal giorno 1 / 0,93. Scarti calcolati dal motore e verificati eseguendo la pipeline prima di congelare l'atteso."
+  "riferimento": "Generato il 18/09/2026: grammi del giorno 2 = giorno 1 x 1,1075 (stessi alimenti, stesse % macro); target kcal = kcal giorno 1 / 0,93. Scarti calcolati dal motore e verificati eseguendo la pipeline prima di congelare l'atteso. Atteso rigenerato il 22/10/2026 con l'avviso del livello rinforzato (PASSO 6): unica differenza verificata, la comparsa dell'attenzione VALUTARE_LIVELLO_RINFORZATO (piano di prova povero di calcio). Bloccanti ed exit code invariati."
 }
