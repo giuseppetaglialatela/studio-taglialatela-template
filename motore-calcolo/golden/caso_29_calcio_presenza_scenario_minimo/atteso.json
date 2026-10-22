@@ -1,0 +1,41 @@
+{
+  "tipo": "pipeline",
+  "bloccanti": [],
+  "attenzioni": [
+    [
+      3,
+      "DISTRIBUZIONE_CONCENTRATA"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      4,
+      "ATWATER_SEGNALATO"
+    ],
+    [
+      5,
+      "TERAPIA_NON_DICHIARATA"
+    ],
+    [
+      6,
+      "LIVELLO_FUORI_CATALOGO"
+    ],
+    [
+      6,
+      "LIVELLO_FUORI_CATALOGO"
+    ]
+  ],
+  "exit_code": 0,
+  "descrizione": "Piano di 6 giorni con lo spuntino a scelta tutti i giorni (yogurt 250 g OPPURE mela 245 g). Nei giorni 2, 3, 5, 6 il calcio e' al 49,8% LARN nello scenario massimo, al 35,3% sulla media dei due scenari, al 20,8% nel minimo. Il giorno conta sullo scenario MINIMO (decisione del 22/10/2026: il rilievo protegge il paziente qualunque cosa scelga), quindi il calcio e' presente solo nei giorni 1 e 4 e DISTRIBUZIONE_CONCENTRATA deve comparire. Diventa rosso se si conta il massimo o la media degli scenari.",
+  "riferimento": "Costruito il 22/10/2026, rifatto dopo la revisione indipendente perche' distinguesse anche il minimo dalla media degli scenari. Giornata base: colazione pane integrale 70 g + mela 200 g; spuntino mela 100 g; pranzo pasta integrale 80 g + pomodori 100 g + olio 13 g; cena merluzzo 140 g + patate 180 g + fagiolini 200 g + pane integrale 30 g + olio 13 g (calcio 202,2 mg). Colazione e spuntino identici tutta la settimana (struttura uniforme). Giorno ricco: pasta 60 g + parmigiano 20 g (426,2 mg). Spuntino sostituito dal gruppo S1 (A yogurt parz. scremato 250 g, B mela 245 g, a parita' di kcal). Giorni 1 e 4 ricchi, gli altri base. Target 1228 kcal (mediana degli scenari), 20/54/26: nessun giorno ne' scenario fuori tolleranza."
+}

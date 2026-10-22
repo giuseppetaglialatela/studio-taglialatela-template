@@ -1,0 +1,41 @@
+{
+  "tipo": "pipeline",
+  "bloccanti": [],
+  "attenzioni": [
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      4,
+      "ATWATER_SEGNALATO"
+    ],
+    [
+      5,
+      "TERAPIA_NON_DICHIARATA"
+    ],
+    [
+      6,
+      "LIVELLO_FUORI_CATALOGO"
+    ],
+    [
+      6,
+      "LIVELLO_FUORI_CATALOGO"
+    ]
+  ],
+  "exit_code": 0,
+  "descrizione": "I primi 5 giorni del caso 27 (calcio presente in 2 giorni su 5). Il controllo di distribuzione vale solo su piani da almeno 6 giorni: DISTRIBUZIONE_CONCENTRATA NON deve comparire. Diventa rosso se il minimo di giorni scende a 5.",
+  "riferimento": "Costruito il 22/10/2026 su indicazione della revisione indipendente. Giornata base: colazione pane integrale 70 g + mela 200 g; spuntino mela 100 g; pranzo pasta integrale 80 g + pomodori 100 g + olio 13 g; cena merluzzo 140 g + patate 180 g + fagiolini 200 g + pane integrale 30 g + olio 13 g (calcio 202,2 mg). Colazione e spuntino identici tutta la settimana (struttura uniforme). Giorno ricco: pasta 60 g + parmigiano 20 g (426,2 mg). Giorni 2, 3, 5: base + parmigiano 8,3 g. Target kcal sulla mediana dei giorni; macro arrotondati dalla media e corretti perche' la somma sia 100."
+}

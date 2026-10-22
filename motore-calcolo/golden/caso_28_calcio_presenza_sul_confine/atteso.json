@@ -1,0 +1,45 @@
+{
+  "tipo": "pipeline",
+  "bloccanti": [],
+  "attenzioni": [
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      4,
+      "ATWATER_SEGNALATO"
+    ],
+    [
+      5,
+      "TERAPIA_NON_DICHIARATA"
+    ],
+    [
+      6,
+      "LIVELLO_FUORI_CATALOGO"
+    ],
+    [
+      6,
+      "LIVELLO_FUORI_CATALOGO"
+    ]
+  ],
+  "exit_code": 0,
+  "descrizione": "Piano di 6 giorni con il calcio presente (>= 30% LARN) in esattamente 3 giorni: 1 e 4 (43%) e 2 (306,51 mg, 30,65%: appena sopra). Il giorno 5 (294,9 mg, 29,49%) e' appena sotto e non conta. NON deve comparire DISTRIBUZIONE_CONCENTRATA. Confine superiore della soglia del 22/10/2026: con una soglia al 31% il caso diventa rosso.",
+  "riferimento": "Costruito il 22/10/2026. Giornata base: colazione pane integrale 70 g + mela 200 g; spuntino mela 100 g; pranzo pasta integrale 80 g + pomodori 100 g + olio 13 g; cena merluzzo 140 g + patate 180 g + fagiolini 200 g + pane integrale 30 g + olio 13 g (calcio 202,2 mg). Colazione e spuntino identici tutta la settimana, perche' la sola variabile sia il calcio del pranzo (parmigiano). Giorno ricco: pasta 60 g + parmigiano 20 g (426,2 mg). LARN calcio 1000 mg, valore reale. Target sulla mediana delle kcal e sui macro tarati perche' nessun giorno e nessuno scenario esca di tolleranza (verificato: zero rilievi di tolleranza). Giorno 2: base + parmigiano 9 g; giorno 5: base + parmigiano 8 g; giorni 3 e 6: base. Target 1176 kcal, 19/56/25."
+}

@@ -532,6 +532,12 @@ def verifica_settimanale(rilievi, dati_giorni, intervalli, target):
 # PASSO 3 - micronutrienti per giorno e media settimanale
 # --------------------------------------------------------------------------
 
+# Controllo di distribuzione (principio 8 del nucleo): un nutriente e'
+# «presente» in un giorno se raggiunge almeno questa quota del LARN.
+SOGLIA_PRESENZA_PCT = 30.0
+NUTRIENTI_DISTRIBUZIONE = {"calcio_mg"}
+
+
 def passo_3_micronutrienti(rilievi, dati_giorni, intervalli, target,
                            sottostime, db):
     titolo(3, "MICRONUTRIENTI - PER GIORNO E MEDIA SETTIMANALE")
@@ -548,6 +554,15 @@ def passo_3_micronutrienti(rilievi, dati_giorni, intervalli, target,
     accumulo = {n: [] for n, _ in micro_presenti}
     giorni_con_presenza = {n: 0 for n, _ in micro_presenti}
 
+    def presente(valore, larn):
+        # «presente» = almeno SOGLIA_PRESENZA_PCT del LARN nel giorno
+        # (decisione del nutrizionista, 22/10/2026). Prima bastava > 0, e il
+        # controllo scattava solo con il nutriente a zero in piu' giorni.
+        # Arrotondamento a 6 decimali: un valore esattamente sulla soglia non
+        # deve diventare «assente» per l'ordine delle somme in virgola mobile
+        # (stesso motivo del caso golden 26).
+        return round(valore, 6) >= round(larn * SOGLIA_PRESENZA_PCT / 100, 6)
+
     for giorno in giorni:
         print(f"\n  --- GIORNO {giorno} ---")
         if giorno in intervalli:
@@ -558,7 +573,10 @@ def passo_3_micronutrienti(rilievi, dati_giorni, intervalli, target,
                 larn = target[chiave]
                 vmin, vmax = minimi[nutriente], massimi[nutriente]
                 accumulo[nutriente].append((vmin, vmax))
-                if vmax > 0:
+                # giorno a scelta: conta lo scenario MINIMO, perche' il rilievo
+                # deve proteggere il paziente qualunque alternativa scelga
+                # (22/10/2026; prima contava il massimo)
+                if presente(vmin, larn):
                     giorni_con_presenza[nutriente] += 1
                 flag = ""
                 if nutriente in sottostime:
@@ -572,7 +590,7 @@ def passo_3_micronutrienti(rilievi, dati_giorni, intervalli, target,
                 larn = target[chiave]
                 v = tot[nutriente]
                 accumulo[nutriente].append((v, v))
-                if v > 0:
+                if presente(v, larn):
                     giorni_con_presenza[nutriente] += 1
                 pct = v / larn * 100
                 flag = ""
@@ -622,8 +640,16 @@ def passo_3_micronutrienti(rilievi, dati_giorni, intervalli, target,
         # l'assorbimento satura intorno ai 500 mg per singola assunzione,
         # quindi una media raggiunta concentrando tutto in pochi giorni non e'
         # equivalente alla stessa media distribuita.
-        if len(giorni) >= 6 and giorni_con_presenza[nutriente] < 3:
-            rilievi.segnala(3, "DISTRIBUZIONE_CONCENTRATA", f"{nutriente}: presente in soli "
+        # Solo per i nutrienti di NUTRIENTI_DISTRIBUZIONE (oggi il calcio):
+        # la saturazione dell'assorbimento e' specifica del calcio, mentre per
+        # la vitamina D, concentrata per natura in pesce e uova, il rilievo
+        # scatterebbe in circa 6 settimane su 10 (misura sulla libreria,
+        # 22/10/2026) senza motivo clinico.
+        if (nutriente in NUTRIENTI_DISTRIBUZIONE and len(giorni) >= 6
+                and giorni_con_presenza[nutriente] < 3):
+            rilievi.segnala(3, "DISTRIBUZIONE_CONCENTRATA", f"{nutriente}: presente "
+                               f"(>= {SOGLIA_PRESENZA_PCT:.0f}% LARN, scenario "
+                               f"minimo nei giorni a scelta) in soli "
                                f"{giorni_con_presenza[nutriente]} giorni su "
                                f"{len(giorni)} - la media puo' essere adeguata "
                                f"ma la distribuzione no")
