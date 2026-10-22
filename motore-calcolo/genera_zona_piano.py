@@ -46,7 +46,7 @@ USO
 
   python3 genera_zona_piano.py --autotest --template TEMPLATE_..._v5.py
 """
-import argparse, csv, datetime, json, os, subprocess, sys, tempfile
+import argparse, csv, datetime, json, os, re, subprocess, sys, tempfile, unicodedata
 
 QUI = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, QUI)
@@ -117,6 +117,100 @@ def _campo(meta, chiave):
     return meta[chiave]
 
 
+# Testi che finiscono nel PDF del paziente: devono essere testo vero. «non
+# concordato» e' ammesso negli altri metadati (M2), qui no; lo stesso vale per
+# ogni altro segnaposto («da concordare», «N/D», «—», «?»...), per un campo di
+# soli spazi e per un valore che non e' testo. Prima la regola viveva solo nel
+# testo di M2 e lo script stampava «Obiettivo: non concordato» (22/10/2026).
+# Il controllo riguarda il campo INTERO: una frase che contiene le stesse
+# parole («obiettivo non concordato con il cardiologo») passa.
+CAMPI_PAZIENTE = ("obiettivo_intestazione", "criterio_rivalutazione", "avvertenze_box")
+# il campo INTERO coincide con un segnaposto (dopo la normalizzazione)
+_SEGNAPOSTO = re.compile(
+    r"non (ancora )?((e|è|e') )?(stat[oa] )?concordat[oaie]( ancora)?|nonconcordat[oaie]"
+    r"|da (concordar(e|si)|definir(e|si)|stabilir(e|si)|decider(e|si)|compilare"
+    r"|valutare|inserire|completare)"
+    r"|non (ancora )?(definit[oaie]|applicabil[ei]|disponibil[ei]|indicat[oaie])"
+    r"|in attesa"
+    r"|n ?/ ?[da]|tbd|tba|tbc|to ?do|null|none|nil|undefined"
+    # segnaposto numerici del template («XX kg», «XX anni»): solo da soli o con
+    # un'unita', perche' «XX settimana» o «46,XX» sono testi clinici veri
+    r"|x+ (kg|anni|mesi|g|kcal|cm)|x{2,}")
+# «n.d.» e «n.a.» solo in minuscolo: «N.D.» puo' essere un paio di iniziali
+_SIGLA_MINUSCOLA = re.compile(r"n\. ?[da]\.?")
+# testi di esempio della zona dati del template v5 (errore di copia e incolla)
+_TESTI_TEMPLATE = re.compile(
+    r"nome cognome|descrizione (della )?condizione clinica"
+    r"|da rivalutare dopo [nx] sett(imane)?"
+    r"|indicare qui allergie( accertate( e qualsiasi esclusione obbligatoria)?)?"
+    r"|titolo approvato")  # «titolo approvato»: valore d'esempio dello schema in M2
+_INVISIBILI = dict.fromkeys(map(ord, "\u00ad\u200b\u200c\u200d\u2060\ufeff"))
+_INVISIBILI.update({0x2019: "'", 0x2018: "'"})  # apostrofo tipografico
+_BORDI = " ,;:!?…'\"«»()[]{}*~#•.-–—−‐‒―/\\_"
+
+
+def _testo_paziente(valore, dove):
+    """Un testo che finisce nel PDF del paziente deve essere testo vero.
+
+    Si ferma (Fermo, mai crash) se il valore non e' una stringa, se e' vuoto o
+    fatto solo di spazi e simboli, se coincide con un testo di esempio del
+    template («Nome Cognome», «XX kg») o con un segnaposto
+    (_SEGNAPOSTO, sul campo intero). Sigle e nomi brevi («NA», «Nan», «N.D.»)
+    passano: sono ammessi come iniziali, nomi o sigle cliniche.
+    """
+    if not isinstance(valore, str):
+        raise Fermo(f"metadati: '{dove}' finisce nel PDF del paziente e deve essere "
+                    f"un testo, non {type(valore).__name__} ({valore!r})")
+    grezzo = unicodedata.normalize("NFKC", valore).translate(_INVISIBILI).strip()
+    norm = re.sub(r"\s+", " ", grezzo.lower()).strip(_BORDI).strip()
+    piatto = re.sub(r"[\s.\-–—−‐‒―_]+", " ", norm).strip()
+    if (not any(c.isalnum() for c in norm)
+            or _TESTI_TEMPLATE.fullmatch(piatto)
+            or _SEGNAPOSTO.fullmatch(piatto)
+            or _SIGLA_MINUSCOLA.fullmatch(grezzo.strip(" ,;:!?()[]{}«»\"'"))):
+        raise Fermo(f"metadati: '{dove}' vale «{valore}», ma finisce nel PDF del "
+                    f"paziente: serve il testo vero, da chiedere al PASSO 6 e "
+                    f"scrivere in chat A (M2)")
+    return valore
+
+
+_VERSIONE = re.compile(r"\s*(?:v|versione)?\s*\.?\s*([0-9]+(?:\.[0-9]+)*[a-z]?)\s*\.?\s*",
+                       re.IGNORECASE)
+
+
+def _versione(meta):
+    """Numero di versione per le note dell'intestazione del PDF.
+
+    Facoltativa (lo script non si ferma se manca). Se c'e', il formato e' fisso:
+    un intero, oppure un numero con o senza «v»/«versione» davanti («v3», «3»,
+    «versione 2», «v1.0», «2b»). Qualunque altra forma ferma lo script: meglio
+    di qualunque pulizia, che su forme impreviste stampava testo spezzato
+    («versione 2» usciva «ersione 2»).
+    """
+    v = meta.get("versione_piano", "")
+    if v == "":
+        return ""
+    if isinstance(v, int) and not isinstance(v, bool):
+        return str(v)
+    m = _VERSIONE.fullmatch(v) if isinstance(v, str) else None
+    if not m:
+        raise Fermo(f"metadati: 'versione_piano' vale «{v}»: formato atteso «v3», "
+                    f"«3» o «versione 3»")
+    return m.group(1)
+
+
+def _oggetto(meta, chiave):
+    valore = _campo(meta, chiave)
+    if not isinstance(valore, dict):
+        raise Fermo(f"metadati: '{chiave}' deve essere un oggetto con le sue voci, "
+                    f"non {type(valore).__name__} ({valore!r})")
+    return valore
+
+
+def _campo_paziente(meta, chiave):
+    return _testo_paziente(_campo(meta, chiave), chiave)
+
+
 # ─── costruzione dei pasti ────────────────────────────────────────
 def _dettaglio(righe, nomi):
     parti = []
@@ -140,7 +234,7 @@ def _kcal_righe(righe, db):
 def _titolo(titoli, giorno, pasto, opzione):
     for k in (f"{giorno}|{pasto}|{opzione}", f"*|{pasto}|{opzione}"):
         if k in titoli:
-            return titoli[k]
+            return _testo_paziente(titoli[k], f"titoli_piatti[{k}]")
     raise Fermo(f"metadati: manca il titolo del piatto '{giorno}|{pasto}|{opzione}'")
 
 
@@ -212,13 +306,13 @@ def _range_giorno(kc_col, kc_spu, fissi, abbin):
 
 # ─── costruzione della zona dati ──────────────────────────────────
 def costruisci_dati(piano, db, nomi, target, meta, orari, mese):
-    giorni_meta = _campo(meta, "giorni")
+    giorni_meta = _oggetto(meta, "giorni")
     lavorativi = _campo(giorni_meta, "lavorativi") if isinstance(giorni_meta, dict) else None
     libero = giorni_meta.get("libero")
-    titoli = _campo(meta, "titoli_piatti")
-    inte = _campo(meta, "intestazione")
+    titoli = _oggetto(meta, "titoli_piatti")
+    inte = _oggetto(meta, "intestazione")
     for k in ("nome", "eta", "condizione"):
-        _campo(inte, k)
+        _testo_paziente(_campo(inte, k), f"intestazione.{k}")
     tdee = float(_campo(meta, "tdee_confermato_kcal"))
     kcal_target = float(target["kcal_target"])
     abbin = _abbinamenti(meta)
@@ -305,16 +399,16 @@ def costruisci_dati(piano, db, nomi, target, meta, orari, mese):
 
     # giorno libero
     if libero:
-        ind = _campo(meta, "indicazioni_giorno_libero")
+        ind = _oggetto(meta, "indicazioni_giorno_libero")
         rng = _campo(giorni_meta, "range_kcal_libero")
         if alt_col is None or alt_spu is None:
             raise Fermo("giorno libero: servono colazione e spuntino a scelta nei giorni "
                         "strutturati (decisione del 19/09/2026)")
         per_pasto_lib = {
             "colazione": ("colazione", "COLAZIONE", alt_col, None, None, None),
-            "pranzo": ("pranzo", "PRANZO", "Pasto libero", _campo(ind, "pranzo"), None, None),
+            "pranzo": ("pranzo", "PRANZO", "Pasto libero", _testo_paziente(_campo(ind, "pranzo"), "indicazioni_giorno_libero.pranzo"), None, None),
             "spuntino": ("spuntino", "SPUNTINO", alt_spu, None, None, None),
-            "cena": ("cena", "CENA", "Pasto libero", _campo(ind, "cena"), None, None),
+            "cena": ("cena", "CENA", "Pasto libero", _testo_paziente(_campo(ind, "cena"), "indicazioni_giorno_libero.cena"), None, None),
         }
         # secondo spuntino: come lo spuntino, lo stesso dei giorni strutturati
         per_pasto_lib.update(altri_lib)
@@ -340,11 +434,11 @@ def costruisci_dati(piano, db, nomi, target, meta, orari, mese):
     n_strut = len(num_giorni)
     note = (f"Struttura su {n_strut + (1 if libero else 0)} giorni"
             + (f" ({n_strut} + 1 libero)" if libero else "")
-            + f" · {n_pasti} pasti · versione {str(meta.get('versione_piano', '')).lstrip('v')}")
+            + f" · {n_pasti} pasti · versione {_versione(meta)}")
     paziente = {"nome": inte["nome"], "eta": inte["eta"], "condizione": inte["condizione"],
-                "obiettivo": _campo(meta, "obiettivo_intestazione"), "note_piano": note,
-                "mese": mese, "rivalutare": _campo(meta, "criterio_rivalutazione")}
-    box = {"target": box_t, "allergie": "🚫  " + _campo(meta, "avvertenze_box")}
+                "obiettivo": _campo_paziente(meta, "obiettivo_intestazione"), "note_piano": note,
+                "mese": mese, "rivalutare": _campo_paziente(meta, "criterio_rivalutazione")}
+    box = {"target": box_t, "allergie": "🚫  " + _campo_paziente(meta, "avvertenze_box")}
     return paziente, box, alt_col, alt_spu, giorni_out
 
 
@@ -498,6 +592,125 @@ def autotest(template_p):
         esiti.append(("metadato mancante ferma lo script", False))
     except Fermo as e:
         esiti.append((f"metadato mancante ferma lo script ({e})", True))
+    # 6) segnaposto, spazi o non-testo in un campo che va nel PDF -> fermo, e
+    #    per il motivo giusto (il messaggio nomina il campo e chiede il testo)
+    base_meta = dict(meta, avvertenze_box="Nessuna allergia dichiarata (collaudo).")
+
+    def prova_meta(m):
+        with open(mp, "w", encoding="utf-8") as f:
+            json.dump(m, f)
+        genera(os.path.join(caso, "piano.csv"), os.path.join(caso, "target.csv"), mp,
+               template_p, py, pdf, mese="x", alimenti_p=os.path.join(QUI, "alimenti.csv"))
+
+    def deve_fermarsi(etichetta, m, campo):
+        try:
+            prova_meta(m)
+            esiti.append((etichetta + " ferma lo script", False))
+        except Fermo as e:
+            esiti.append((etichetta + " ferma lo script", f"'{campo}'" in str(e)
+                          and "manca il campo" not in str(e)))
+        except Exception as e:  # un crash non e' un fermo: va contato come KO
+            esiti.append((f"{etichetta}: crash {type(e).__name__} invece del fermo", False))
+
+    def con(chiave, sotto, valore):
+        return dict(base_meta, **{chiave: dict(base_meta[chiave], **{sotto: valore})})
+
+    for campo in CAMPI_PAZIENTE:
+        for scritto in ("non concordato", " Non concordata. ", "da concordare!", "N/D",
+                        "\u2014", "   ", ["non concordato"], "non e' stato concordato",
+                        "non\u00adconcordato", "\uff2e\uff2f\uff2e \uff23\uff2f\uff2e\uff23\uff2f\uff32\uff24\uff21\uff34\uff2f",
+                        "n.d.", "\u2022"):
+            deve_fermarsi(f"'{campo}' = {scritto!r}", dict(base_meta, **{campo: scritto}), campo)
+    # testi di esempio del template v5
+    deve_fermarsi("obiettivo = 'XX kg' (template)",
+                  dict(base_meta, obiettivo_intestazione="XX kg"), "obiettivo_intestazione")
+    deve_fermarsi("criterio = 'Da rivalutare dopo N settimane' (template)",
+                  dict(base_meta, criterio_rivalutazione="Da rivalutare dopo N settimane"),
+                  "criterio_rivalutazione")
+    deve_fermarsi("avvertenze = testo di esempio del template",
+                  dict(base_meta, avvertenze_box="Indicare qui allergie accertate e qualsiasi "
+                                                 "esclusione obbligatoria."), "avvertenze_box")
+    deve_fermarsi("intestazione.nome = 'Nome Cognome' (template)",
+                  con("intestazione", "nome", "Nome Cognome"), "intestazione.nome")
+    deve_fermarsi("intestazione.eta = 'XX anni' (template)",
+                  con("intestazione", "eta", "XX anni"), "intestazione.eta")
+    deve_fermarsi("intestazione.condizione = 'Descrizione condizione clinica' (template)",
+                  con("intestazione", "condizione", "Descrizione condizione clinica"),
+                  "intestazione.condizione")
+    deve_fermarsi("intestazione.eta = 'n.d.'", con("intestazione", "eta", "n.d."),
+                  "intestazione.eta")
+    deve_fermarsi("indicazioni_giorno_libero.pranzo = 'da definire'",
+                  con("indicazioni_giorno_libero", "pranzo", "da definire"),
+                  "indicazioni_giorno_libero.pranzo")
+    deve_fermarsi("indicazioni_giorno_libero.cena = '?'",
+                  con("indicazioni_giorno_libero", "cena", "?"),
+                  "indicazioni_giorno_libero.cena")
+    deve_fermarsi("titolo del pranzo = 'non concordato'",
+                  con("titoli_piatti", "1|pranzo|", "non concordato"),
+                  "titoli_piatti[1|pranzo|]")
+    deve_fermarsi("titolo con * della colazione A = '\u2014'",
+                  con("titoli_piatti", "*|colazione|A", "\u2014"),
+                  "titoli_piatti[*|colazione|A]")
+    deve_fermarsi("titolo = 'titolo approvato' (schema di M2)",
+                  con("titoli_piatti", "1|cena|", "titolo approvato"), "titoli_piatti[1|cena|]")
+    for scritto in ("vers. 2", "v N/D", "v?", "vN1", "versione", "v2 bozza", "2bb",
+                    "v\uff12", True):
+        deve_fermarsi(f"versione_piano = {scritto!r}",
+                      dict(base_meta, versione_piano=scritto), "versione_piano")
+    attese = {"v3": "3", "V3": "3", "versione 2": "2", "Versione 2": "2", "v1.0": "1.0",
+              "2b": "2b", 2: "2"}
+    ottenute = {}
+    for k in attese:
+        try:
+            ottenute[k] = _versione({"versione_piano": k})
+        except Exception as e:  # una forma ammessa respinta e' un KO, non un crash
+            ottenute[k] = f"{type(e).__name__}: {e}"
+    esiti.append((f"versione stampata nel PDF ({len(attese)} forme ammesse)"
+                  + ("" if ottenute == attese else f": {ottenute}"), ottenute == attese))
+    deve_fermarsi("versione_piano = 'non concordato'",
+                  dict(base_meta, versione_piano="non concordato"), "versione_piano")
+    for campo, scritto in (("obiettivo_intestazione", "xx kg"), ("avvertenze_box", "+"),
+                           ("criterio_rivalutazione", "non e\u2019 stato concordato"),
+                           ("avvertenze_box", "(n.d.)"),
+                           ("criterio_rivalutazione", "Da rivalutare dopo X settimane"),
+                           ("versione_piano", "v."), ("versione_piano", "vN"),
+                           ("obiettivo_intestazione", "XXX"),
+                           ("criterio_rivalutazione", "Da rivalutare dopo N sett."),
+                           ("avvertenze_box", "Indicare qui allergie")):
+        deve_fermarsi(f"'{campo}' = {scritto!r}", dict(base_meta, **{campo: scritto}), campo)
+    deve_fermarsi("intestazione.condizione = 'Descrizione della condizione clinica'",
+                  con("intestazione", "condizione", "Descrizione della condizione clinica"),
+                  "intestazione.condizione")
+    deve_fermarsi("giorni scritti come testo", dict(base_meta, giorni="lun"), "giorni")
+    deve_fermarsi("intestazione scritta come testo",
+                  dict(base_meta, intestazione="Paziente Fittizio, 40 anni"), "intestazione")
+    deve_fermarsi("indicazioni_giorno_libero scritte come testo",
+                  dict(base_meta, indicazioni_giorno_libero="a piacere"),
+                  "indicazioni_giorno_libero")
+    deve_fermarsi("titoli_piatti scritti come testo",
+                  dict(base_meta, titoli_piatti="*|colazione|A"), "titoli_piatti")
+    # nomi, sigle e frasi legittime: passano
+    legittimi = ["Nan", "Na", "N.D.", "ND", "NAFLD", "Nadia Xu", "9 anni",
+                 "Obiettivo non concordato con il cardiologo", "Da definire con il cardiologo",
+                 "Nessuna allergia dichiarata.", "Nefropatia diabetica (ND)",
+                 "Gravidanza alla XX settimana", "Cariotipo 46,XX", "Non note",
+                 "Allergie non pervenute", "Via XX Settembre",
+                 "Indicare qui allergie: nichel", "Ignoto", "Sconosciute"]
+    respinti = []
+    for v in legittimi:
+        try:
+            _testo_paziente(v, "prova")
+        except Fermo:
+            respinti.append(v)
+    esiti.append((f"nomi, sigle e frasi legittime passano ({len(legittimi)} valori)"
+                  + (f": respinti {respinti}" if respinti else ""), not respinti))
+    # 7) una frase vera che contiene le stesse parole NON si ferma
+    try:
+        prova_meta(dict(base_meta, obiettivo_intestazione="Obiettivo non concordato con il cardiologo",
+                        abbinamento_spuntino="non concordato"))
+        esiti.append(("frase vera con 'non concordato' e abbinamento non concordato: PDF generato", True))
+    except Fermo as e:
+        esiti.append((f"frase vera con 'non concordato': fermo inatteso ({e})", False))
     print("AUTOTEST genera_zona_piano.py")
     for m, ok in esiti:
         print(f"  [{'OK ' if ok else 'KO '}] {m}")
