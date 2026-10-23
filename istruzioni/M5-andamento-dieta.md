@@ -140,7 +140,9 @@ della sezione 2. In questo caso ci si ferma qui: niente PDF alla prima pesata.
 **5. Valida con `pdftoppm`** — anteprima visiva obbligatoria prima di consegnare.
 
 **6. Salva su Drive il JSON aggiornato con il numero di versione successivo**, nella
-cartella del paziente, insieme al PDF. Il connettore non sovrascrive: un nome già
+cartella del paziente, a fine conversazione. Il PDF NON lo carica Claude (nucleo, sezione
+7): lo consegna in chat con il nome esatto e il link della cartella, e lo carica il
+nutrizionista. Il connettore non sovrascrive: un nome già
 esistente crea un duplicato. Segnala quale versione è la corrente e come distinguere
 la vecchia (nome e dimensione); la si sposta nel cestino (`trash_file`) solo su richiesta
 del nutrizionista, ed è comunque differibile.

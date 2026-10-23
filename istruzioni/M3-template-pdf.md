@@ -268,7 +268,11 @@ Word".
 
 Destinazione su Drive: `Andamento Dieta Pazienti > [Cognome Nome]`. Se la cartella
 del paziente non esiste, va creata: un piano generato e non archiviato è un piano
-che esiste solo nella conversazione in cui è nato.
+che esiste solo nella conversazione in cui è nato. **I PDF e il `.py` non li carica
+Claude** (nucleo, sezione 7: il connettore consuma molti token e non sovrascrive): si
+consegnano in chat e li carica il nutrizionista, con il nome esatto e il link della
+cartella. Claude scrive su Drive solo i file piccoli che non esistono altrove (JSON),
+e solo a fine conversazione.
 
 **Limite del connettore Drive.** Non esiste sovrascrittura: caricare un file con un
 nome già presente crea un duplicato. Quando aggiorni un file già su Drive, indica al
