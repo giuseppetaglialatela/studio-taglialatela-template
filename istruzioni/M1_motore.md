@@ -20,8 +20,15 @@ collaudo e regressione:
 ```
 rm -rf /tmp/motore && mkdir /tmp/motore && cd /tmp/motore && curl -sfL https://codeload.github.com/giuseppetaglialatela/studio-taglialatela-template/tar.gz/refs/heads/main | tar xz --strip-components=2 studio-taglialatela-template-main/motore-calcolo && python3 collaudo.py && python3 regressione.py
 ```
+**Ripiego**, se il comando fallisce perché `codeload.github.com` è bloccato dalla sessione
+(errore 403: dipende dalla sessione, non dal motore), stesso risultato con `git clone`:
+```
+rm -rf /tmp/motore /tmp/repo-motore && git clone --depth 1 -q https://github.com/giuseppetaglialatela/studio-taglialatela-template /tmp/repo-motore && cp -r /tmp/repo-motore/motore-calcolo /tmp/motore && rm -rf /tmp/repo-motore && cd /tmp/motore && python3 collaudo.py && python3 regressione.py
+```
 Poi si lavora in `/tmp/motore`. Nessun calcolo su paziente prima dell'esito positivo
-(principio 7). Il download è pubblico: non serve il repository collegato.
+(principio 7). Il download è pubblico: non serve il repository collegato. Il motore si
+esegue con `python3` normale dalla sua cartella, **mai con `python3 -I`** (modalità
+isolata): i moduli non si importano e il collaudo fallisce senza motivo.
 `cache.zip`, `BDA_alimenti.xlsx` e `crea_cache.zip` servono solo per ampliare il database
 (M6), ma arrivano con lo stesso comando e il collaudo li verifica.
 
@@ -54,7 +61,9 @@ Otto controlli:
 6. ogni `food_id` di `alimenti.csv` ha un nome paziente in `nomi_paziente.csv`, senza
    duplicati né righe orfane
 7. `formati_confezione.csv` e `scambi_frutta.csv`: ogni `food_id` esiste in
-   `alimenti.csv`, unità e tolleranze valide
+   `alimenti.csv`, unità e tolleranze valide; ogni alternativa del catalogo
+   `colazioni_spuntini.csv` rispetta i formati di confezione (la libreria `moduli_*.csv`
+   non è controllata: ha 29 blocchi fuori formato, 32 violazioni, in attesa di decisione)
 8. ogni `food_id` ha un ruolo ammesso in `ruoli_alimenti.csv`; le regole di
    `accoppiamenti_vietati.csv` usano voci valide (ruoli o `food_id`); nessun blocco della
    libreria (`moduli_pasto.csv`, `moduli_colazione.csv`) contiene un accoppiamento vietato
@@ -391,8 +400,14 @@ validato).
 - **10_giorno_oltre_limite_sicurezza** — giorno a -11,98% con media dentro: bloccante
   `GIORNO_KCAL_OLTRE_LIMITE_SICUREZZA`, exit 1.
 - **11_formati_confezione_violati** — fiocchi di latte 100 g (vaschette 200/400):
-  attenzione `FORMATO_CONFEZIONE_NON_RISPETTATO`, non bloccante. I casi 05-07 la
-  contengono anch'essi, perché i loro input di test non seguono i formati commerciali.
+  attenzione `FORMATO_CONFEZIONE_NON_RISPETTATO`, non bloccante. Altri casi la contengono
+  anch'essi, perché i loro input di test non seguono i formati commerciali. Dal 23/10/2026
+  i casi 06, 13, 36, 39, 42, 43 usano il catalogo ai formati (grammi aggiornati nei loro
+  piani; caso 42 con LARN calcio 1100 per tenere la media minima sotto l'80%); i casi 12 e
+  14 hanno ancora i grammi vecchi, irrilevanti per ciò che proteggono (12 confronta solo i
+  totali, 14 si ferma al PASSO 1). Limite: i casi «nessun avviso perché…» (36, 42, 44)
+  proteggono la regola solo se la media minima del calcio resta sotto l'80%, e la suite
+  non lo verifica.
 - **12_cinque_pasti** — un giorno a 5 pasti; totali congelati pasto per pasto, secondo
   spuntino compreso (verificati a mano da `alimenti.csv`).
 - **13_secondo_spuntino_non_uniforme** — secondo spuntino solo nel giorno 1: unico
@@ -553,7 +568,10 @@ Catalogo di 4 colazioni + 2 spuntini per livello: `standard` (S1/S2/D1/D2 + SPA/
 `rinforzata_calcio` (Sr1/Sr2/Dr1/Dr2 + SPrA/SPrB). Si legge con `python3
 struttura_pasti.py`. La scelta tra standard e rinforzato è UNA SOLA DECISIONE PER L'INTERO
 PIANO SETTIMANALE, mai giorno per giorno (dettaglio in M2). Non si riempie di alternative:
-quelle stanno nella libreria.
+quelle stanno nella libreria. Grammi nei formati di confezione (controllo 7 del collaudo;
+dal 23/10/2026: S1 uova 104 g, S2 fiocchi 200 g + pane 45 g, D2 e SPA yogurt 125 g, SPrB
+yogurt 250 g + nocciole 5 g). Il riconoscimento del livello confronta i grammi esatti: un
+piano composto con il catalogo precedente risulta fuori catalogo.
 
 **Libreria degli accoppiamenti** — `moduli_pasto.csv` (127 blocchi pranzo/cena) e
 `moduli_colazione.csv` (55 blocchi colazione | spuntino), schema

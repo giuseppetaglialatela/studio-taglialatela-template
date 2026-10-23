@@ -16,7 +16,8 @@ CONTROLLI:
   4) Esecuzione di una giornata golden, confrontata al risultato atteso
   5) Integrita' byte per byte dei file del motore contro SHA256SUMS
   6) Ogni food_id ha un nome per il paziente (nomi_paziente.csv)
-  7) Formati confezione e scambi frutta coerenti con il database
+  7) Formati confezione e scambi frutta coerenti con il database; catalogo
+     colazioni/spuntini nei formati di confezione (23/10/2026)
   8) Ogni food_id ha un ruolo (ruoli_alimenti.csv), le regole di
      accoppiamenti_vietati.csv sono valide e la libreria dei blocchi non
      contiene accoppiamenti vietati (21/10/2026)
@@ -232,18 +233,34 @@ def controllo_6_nomi_paziente():
 
 def controllo_7_formati():
     """formati_confezione.csv e scambi_frutta.csv: food_id esistenti nel
-    database, unita' e tolleranze valide."""
+    database, unita' e tolleranze valide; catalogo colazioni_spuntini.csv nei
+    formati di confezione (23/10/2026)."""
     try:
         sys.path.insert(0, BASE)
         import formati
         with open(os.path.join(BASE, "alimenti.csv"), newline="", encoding="utf-8") as f:
             ids = {r["food_id"] for r in csv.DictReader(f)}
         problemi = formati.valida_file(ids)
+        # Il catalogo colazioni_spuntini.csv deve rispettare i formati di
+        # confezione: un'alternativa standard fuori formato fa scattare
+        # FORMATO_CONFEZIONE_NON_RISPETTATO su ogni piano che la usa (rilievo
+        # del primo piano reale, 23/10/2026). La libreria (moduli_*.csv) non e'
+        # controllata qui: le sue violazioni attendono una decisione clinica.
+        import struttura_pasti
+        tabella = formati.carica_formati()
+        for alt in struttura_pasti.carica_catalogo():
+            righe = [{"food_id": fid, "grammi": g, "giorno": alt["alternativa_id"],
+                      "pasto": ""} for fid, g in alt["ingredienti"]]
+            for v in formati.controlla_piano(righe, tabella):
+                problemi.append(f"colazioni_spuntini.csv: {alt['alternativa_id']} "
+                                f"{v['nome']} {v['grammi']:g} g fuori formato "
+                                f"(ammesse {v['ammesse']})")
     except Exception as e:
         return False, f"controllo formati non eseguibile: {e}"
     if problemi:
         return False, "; ".join(problemi)
-    return True, "formati e scambi frutta coerenti con alimenti.csv"
+    return True, ("formati e scambi frutta coerenti con alimenti.csv; "
+                  "catalogo colazioni/spuntini nei formati di confezione")
 
 
 def controllo_8_accoppiamenti():

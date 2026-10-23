@@ -23,8 +23,8 @@ giorno,pasto,food_id,grammi,gruppo_scelta,opzione
 1,colazione,406,80,C1,D
 1,spuntino,1726,20,S1,A
 1,spuntino,008540,15,S1,A
-1,spuntino,150010,180,S1,B
-1,spuntino,511,10,S1,B
+1,spuntino,150010,250,S1,B
+1,spuntino,511,5,S1,B
 2,pranzo,60091,80,,
 2,pranzo,391,100,,
 2,pranzo,702901,13,,
@@ -49,8 +49,8 @@ giorno,pasto,food_id,grammi,gruppo_scelta,opzione
 2,colazione,406,80,C1,D
 2,spuntino,1726,20,S1,A
 2,spuntino,008540,15,S1,A
-2,spuntino,150010,180,S1,B
-2,spuntino,511,10,S1,B
+2,spuntino,150010,250,S1,B
+2,spuntino,511,5,S1,B
 3,pranzo,60091,80,,
 3,pranzo,391,100,,
 3,pranzo,702901,13,,
@@ -75,8 +75,8 @@ giorno,pasto,food_id,grammi,gruppo_scelta,opzione
 3,colazione,406,80,C1,D
 3,spuntino,1726,20,S1,A
 3,spuntino,008540,15,S1,A
-3,spuntino,150010,180,S1,B
-3,spuntino,511,10,S1,B
+3,spuntino,150010,250,S1,B
+3,spuntino,511,5,S1,B
 4,pranzo,60091,80,,
 4,pranzo,391,100,,
 4,pranzo,702901,13,,
@@ -101,8 +101,8 @@ giorno,pasto,food_id,grammi,gruppo_scelta,opzione
 4,colazione,406,80,C1,D
 4,spuntino,1726,20,S1,A
 4,spuntino,008540,15,S1,A
-4,spuntino,150010,180,S1,B
-4,spuntino,511,10,S1,B
+4,spuntino,150010,250,S1,B
+4,spuntino,511,5,S1,B
 5,pranzo,60091,80,,
 5,pranzo,391,100,,
 5,pranzo,702901,13,,
@@ -127,8 +127,8 @@ giorno,pasto,food_id,grammi,gruppo_scelta,opzione
 5,colazione,406,80,C1,D
 5,spuntino,1726,20,S1,A
 5,spuntino,008540,15,S1,A
-5,spuntino,150010,180,S1,B
-5,spuntino,511,10,S1,B
+5,spuntino,150010,250,S1,B
+5,spuntino,511,5,S1,B
 6,pranzo,60091,80,,
 6,pranzo,391,100,,
 6,pranzo,702901,13,,
@@ -153,5 +153,5 @@ giorno,pasto,food_id,grammi,gruppo_scelta,opzione
 6,colazione,406,80,C1,D
 6,spuntino,1726,20,S1,A
 6,spuntino,008540,15,S1,A
-6,spuntino,150010,180,S1,B
-6,spuntino,511,10,S1,B
+6,spuntino,150010,250,S1,B
+6,spuntino,511,5,S1,B

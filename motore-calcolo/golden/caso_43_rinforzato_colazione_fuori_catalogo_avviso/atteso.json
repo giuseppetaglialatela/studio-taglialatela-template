@@ -19,10 +19,6 @@
       "ATWATER_SEGNALATO"
     ],
     [
-      4,
-      "FORMATO_CONFEZIONE_NON_RISPETTATO"
-    ],
-    [
       5,
       "TERAPIA_NON_DICHIARATA"
     ],
@@ -36,6 +32,6 @@
     ]
   ],
   "exit_code": 0,
-  "descrizione": "Colazione fuori catalogo (pane integrale 70 g + mela 200 g), spuntino del livello rinforzata_calcio (SPrA, SPrB): media minima del calcio al 58,3% (554,1 mg). Un pasto del protocollo non riconosciuto rinforzato basta: deve comparire VALUTARE_LIVELLO_RINFORZATO. Diventa rosso se i pasti fuori catalogo vengono ignorati nel controllo (difetto D1 della revisione del 22/10/2026).",
-  "riferimento": "Costruito il 22/10/2026 su indicazione della revisione indipendente. Pranzo pasta integrale 80 g + pomodori 100 g + olio 13 g; cena merluzzo 140 g + patate 180 g + fagiolini 200 g + pane integrale 30 g + olio 13 g. Sei giorni identici. LARN calcio 950 mg. Target kcal sulla mediana degli scenari, macro arrotondati dalla media e corretti perche' la somma sia 100. Parmigiano 10 g a pranzo. Attenzione attesa FORMATO_CONFEZIONE_NON_RISPETTATO (yogurt intero 180 g di SPrB)."
+  "descrizione": "Colazione fuori catalogo (pane integrale 70 g + mela 200 g), spuntino del livello rinforzata_calcio (SPrA, SPrB): media minima del calcio al 61,3% (581,9 mg; catalogo ai formati di confezione dal 23/10/2026). Un pasto del protocollo non riconosciuto rinforzato basta: deve comparire VALUTARE_LIVELLO_RINFORZATO. Diventa rosso se i pasti fuori catalogo vengono ignorati nel controllo (difetto D1 della revisione del 22/10/2026).",
+  "riferimento": "Costruito il 22/10/2026 su indicazione della revisione indipendente. Pranzo pasta integrale 80 g + pomodori 100 g + olio 13 g; cena merluzzo 140 g + patate 180 g + fagiolini 200 g + pane integrale 30 g + olio 13 g. Sei giorni identici. LARN calcio 950 mg. Target kcal sulla mediana degli scenari del catalogo precedente, macro arrotondati dalla media e corretti perche' la somma sia 100. Parmigiano 10 g a pranzo. Atteso rigenerato il 23/10/2026 con il catalogo colazioni_spuntini.csv portato ai formati di confezione (S1 uova 104 g, S2 fiocchi 200 g + pane 45 g, D2 e SPA yogurt 125 g, SPrB yogurt 250 g + nocciole 5 g; grammi aggiornati anche nel piano di questo caso): unica differenza verificata, la scomparsa di FORMATO_CONFEZIONE_NON_RISPETTATO. Bloccanti ed exit code invariati."
 }

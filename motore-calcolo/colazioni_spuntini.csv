@@ -1,13 +1,13 @@
 alternativa_id,livello,tipo,ingredienti_food_id_grammi,nota
-S1,standard,salata,1800:120;000550:60;391:100;702901:5,
-S2,standard,salata,100015:150;000550:60;391:100;702901:5,
+S1,standard,salata,1800:104;000550:60;391:100;702901:5,
+S2,standard,salata,100015:200;000550:45;391:100;702901:5,
 D1,standard,dolce,135020:200;600009:45;406:100;510:10,
-D2,standard,dolce,150010:150;701307:35;8807:150;008540:10,
-SPA,standard,spuntino,150010:150;008540:15,
+D2,standard,dolce,150010:125;701307:35;8807:150;008540:10,
+SPA,standard,spuntino,150010:125;008540:15,
 SPB,standard,spuntino,008000:200;511:15,
 Sr1,rinforzata_calcio,salata,166810:100;000550:50;391:80;702901:5,ricotta di pecora
 Sr2,rinforzata_calcio,salata,100154_2:50;1726:25;391:60;702901:5,parmigiano
 Dr1,rinforzata_calcio,dolce,135020:250;600009:40;510:10,latte intero
 Dr2,rinforzata_calcio,dolce,8053:150;008540:15;406:80,yogurt greco
 SPrA,rinforzata_calcio,spuntino,1726:20;008540:15,parmigiano+mandorle
-SPrB,rinforzata_calcio,spuntino,150010:180;511:10,yogurt intero+nocciole
+SPrB,rinforzata_calcio,spuntino,150010:250;511:5,yogurt intero+nocciole

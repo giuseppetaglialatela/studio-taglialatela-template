@@ -11,15 +11,11 @@
       "ATWATER_SEGNALATO"
     ],
     [
-      4,
-      "FORMATO_CONFEZIONE_NON_RISPETTATO"
-    ],
-    [
       5,
       "TERAPIA_NON_DICHIARATA"
     ]
   ],
   "exit_code": 0,
-  "descrizione": "Colazione e spuntino del livello rinforzata_calcio del catalogo (Sr1, Sr2, Dr1, Dr2; SPrA, SPrB), con pranzo e cena poveri: media del calcio al 63% nello scenario minimo. Il piano usa gia' il livello rinforzato, quindi NESSUN avviso. Diventa rosso se l'avviso ignora il livello riconosciuto.",
-  "riferimento": "Costruito il 22/10/2026. Pranzo pasta integrale 80 g + pomodori 100 g + olio 13 g; cena merluzzo 140 g + patate 180 g + fagiolini 200 g + pane integrale 30 g + olio 13 g; colazione e spuntino dal catalogo colazioni_spuntini.csv, livello rinforzata_calcio completo. Sei giorni identici. LARN calcio 950 mg. Target 1376 kcal (mediana degli scenari), 20/40/40. Attenzione attesa FORMATO_CONFEZIONE_NON_RISPETTATO (yogurt intero 180 g dello spuntino SPrB del catalogo)."
+  "descrizione": "Colazione e spuntino del livello rinforzata_calcio del catalogo (Sr1, Sr2, Dr1, Dr2; SPrA, SPrB), con pranzo e cena poveri: media del calcio al 66,1% nello scenario minimo (catalogo ai formati di confezione dal 23/10/2026). Il piano usa gia' il livello rinforzato, quindi NESSUN avviso. Diventa rosso se l'avviso ignora il livello riconosciuto.",
+  "riferimento": "Costruito il 22/10/2026. Pranzo pasta integrale 80 g + pomodori 100 g + olio 13 g; cena merluzzo 140 g + patate 180 g + fagiolini 200 g + pane integrale 30 g + olio 13 g; colazione e spuntino dal catalogo colazioni_spuntini.csv, livello rinforzata_calcio completo. Sei giorni identici. LARN calcio 950 mg. Target 1376 kcal (mediana degli scenari del catalogo precedente; dal 23/10/2026 scarto -3,01% / +1,97%), 20/40/40. Atteso rigenerato il 23/10/2026 con il catalogo colazioni_spuntini.csv portato ai formati di confezione (S1 uova 104 g, S2 fiocchi 200 g + pane 45 g, D2 e SPA yogurt 125 g, SPrB yogurt 250 g + nocciole 5 g; grammi aggiornati anche nel piano di questo caso): unica differenza verificata, la scomparsa di FORMATO_CONFEZIONE_NON_RISPETTATO. Bloccanti ed exit code invariati."
 }

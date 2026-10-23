@@ -260,3 +260,16 @@ superano 100 senza errori, perché CREA esprime i carboidrati disponibili in equ
 di monosaccaridi (amido circa ×1,1); per questo la soglia non si estende al database. La
 revisione ha trovato che la somma in virgola mobile di un'etichetta esattamente a 100
 (95,9 + 3,9 + 0,2) dava 100,00000000000001 e la bloccava: confronto arrotondato, caso 26.
+
+## 23/10/2026 — catalogo ai formati di confezione
+Il primo piano reale ha mostrato FORMATO_CONFEZIONE_NON_RISPETTATO scattare sul catalogo
+standard stesso: 5 alternative fuori formato (S1 uova 120 g, S2 fiocchi 150 g, D2 e SPA
+yogurt 150 g, SPrB yogurt 180 g). Decisione del nutrizionista: grammi ai formati. S2 con
+pane ridotto da 60 a 45 g (395 kcal contro 371); SPrB a yogurt 250 g + nocciole 5 g (199
+kcal, calcio 320 mg), perché con yogurt 125 g + nocciole 10 g lo spuntino rinforzato (171
+mg) sarebbe stato più povero di calcio dello standard SPA (192 mg). Il collaudo ora ferma
+un catalogo fuori formato. La libreria ha 29 blocchi fuori formato, 32 violazioni (pelati,
+tonno, salmone, ceci, fagioli, uova, yogurt, fiocchi di latte): non controllata dal
+collaudo finché il nutrizionista non decide come trattarli.
+Ripiego d'avvio con git clone: nella chat clinica del 23/10 codeload.github.com era
+bloccato (403), nella sessione di consolidamento dello stesso giorno no.

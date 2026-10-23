@@ -16,19 +16,11 @@
       "ATWATER_SEGNALATO"
     ],
     [
-      4,
-      "FORMATO_CONFEZIONE_NON_RISPETTATO"
-    ],
-    [
-      4,
-      "FORMATO_CONFEZIONE_NON_RISPETTATO"
-    ],
-    [
       5,
       "TERAPIA_NON_DICHIARATA"
     ]
   ],
   "exit_code": 1,
-  "descrizione": "Colazione e spuntino del livello rinforzata_calcio, secondo spuntino standard (SPA, SPB): media minima del calcio al 75,8%. Il secondo spuntino e' una scelta indipendente (M2) e non conta per l'avviso: NESSUN VALUTARE_LIVELLO_RINFORZATO. Il piano resta bloccato da LIVELLO_INCOERENTE_TRA_PASTI (exit 1), che riconosce lo spuntino2 standard. Diventa rosso se l'avviso considera tutti i pasti.",
-  "riferimento": "Costruito il 22/10/2026 su indicazione della revisione indipendente. Pranzo pasta integrale 80 g + pomodori 100 g + olio 13 g; cena merluzzo 140 g + patate 180 g + fagiolini 200 g + pane integrale 30 g + olio 13 g; colazione, spuntino e spuntino2 dal catalogo colazioni_spuntini.csv. Sei giorni identici. LARN calcio 950 mg. Target 1560 kcal (mediana degli scenari), 20/38/42. Attenzioni attese FORMATO_CONFEZIONE_NON_RISPETTATO (yogurt intero 150 g e 180 g del catalogo)."
+  "descrizione": "Colazione e spuntino del livello rinforzata_calcio, secondo spuntino standard (SPA, SPB): media minima del calcio al 68% del LARN 1100 (748,3 mg; dal 23/10/2026). Il secondo spuntino e' una scelta indipendente (M2) e non conta per l'avviso: NESSUN VALUTARE_LIVELLO_RINFORZATO. Il piano resta bloccato da LIVELLO_INCOERENTE_TRA_PASTI (exit 1), che riconosce lo spuntino2 standard. Diventa rosso se l'avviso considera tutti i pasti.",
+  "riferimento": "Costruito il 22/10/2026 su indicazione della revisione indipendente. Pranzo pasta integrale 80 g + pomodori 100 g + olio 13 g; cena merluzzo 140 g + patate 180 g + fagiolini 200 g + pane integrale 30 g + olio 13 g; colazione, spuntino e spuntino2 dal catalogo colazioni_spuntini.csv. Sei giorni identici. LARN calcio 1100 mg dal 23/10/2026 (prima 950). Target 1560 kcal (mediana degli scenari del catalogo precedente; dal 23/10/2026 scarto -3,26% / +1,27%), 20/38/42. Atteso rigenerato il 23/10/2026 con il catalogo colazioni_spuntini.csv portato ai formati di confezione (S1 uova 104 g, S2 fiocchi 200 g + pane 45 g, D2 e SPA yogurt 125 g, SPrB yogurt 250 g + nocciole 5 g; grammi aggiornati anche nel piano di questo caso): unica differenza verificata, la scomparsa di FORMATO_CONFEZIONE_NON_RISPETTATO. LARN del calcio portato a 1100 mg perche' con il catalogo nuovo la media minima era salita al 78,8% di 950: il caso protegge la sua regola solo se la media minima resta sotto l'80%, e la suite congela i verdetti, non i numeri. Ora 68%. Bloccanti ed exit code invariati."
 }
