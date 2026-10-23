@@ -308,7 +308,7 @@ libero e una regola operativa sono finiti nei metadati senza essergli mai mostra
    Contiene i **testi del PDF** parola per parola (intestazione, obiettivo, criterio di
    rivalutazione, avvertenze, box target, indicazioni del giorno libero), i **contenuti
    del documento di spiegazione** (regole operative, scelte principali, limiti noti,
-   contenuti da escludere: campi da cui la chat B scrive la prosa, mostrati anche se
+   contenuti da escludere, terapia: campi da cui la chat B scrive la prosa, mostrati anche se
    vuoti), gli **altri campi** dei metadati (TDEE confermato, giorni, abbinamento,
    livello colazione…) e il **piano per esteso** (tutti i giorni, tutti i pasti e le
    alternative, con titolo, grammatura, nota di peso e kcal; le alternative uguali in
@@ -364,6 +364,7 @@ accanto al CSV. È ciò che legge la chat B
              "range_kcal_libero": [min, max]},
   "livello_colazione": "standard | rinforzata_calcio",
   "tdee_confermato_kcal": 0,
+  "terapia": "principi attivi confermati, oppure \"nessuna terapia (fonte, data)\"",
   "intestazione": {"nome": "...", "eta": "XX anni", "condizione": "..."},
   "avvertenze_box": "allergie ed esclusioni obbligatorie, o \"Nessuna allergia dichiarata.\"",
   "abbinamento_spuntino": {"<opzione colazione>": "<opzione spuntino>"},
@@ -382,6 +383,13 @@ accanto al CSV. È ciò che legge la chat B
 - Nessuna kcal, nessun grammo, nessun valore nutrizionale: i numeri li ricalcola il motore
   in chat B da `piano.csv` (principio 2). Sole eccezioni, perché DATI DI INGRESSO
   confermati dal nutrizionista: `tdee_confermato_kcal` e `range_kcal_libero`.
+- `terapia`: dal verdetto della pipeline al PASSO 6, i principi attivi confermati al
+  PASSO 4, oppure «nessuna terapia» con la fonte di `TERAPIA_DICHIARATA_ASSENTE` (es.
+  «nessuna terapia (Form A del 23/10/2026)»). È l'unica fonte della chat B per la
+  sezione 2 del documento di spiegazione quando manca il fascicolo: senza, la chat B non
+  scrive nulla sulla terapia (M3). Campo assente, vuoto, «non concordato» o non testo
+  (0, false) = nessuna informazione, con lo stesso effetto: mai letto come «nessun
+  farmaco».
 - `titoli_piatti`: per un pasto fisso l'opzione è vuota (`"3|pranzo|"`); colazione,
   spuntino e secondo spuntino, uguali tutti i giorni, possono usare `*` al posto del
   giorno (`"*|colazione|A"`, `"*|spuntino2|A"`). L'opzione è quella della colonna
@@ -431,8 +439,9 @@ ricarica questo modulo.
 ### PASSO 8 — DOCUMENTO DI SPIEGAZIONE
 Default per ogni piano consegnato, subito dopo il PDF (M3). Usa solo le scelte approvate
 al PASSO 6 e scritte nei metadati: nessun contenuto clinico nuovo, nessun nuovo giro di
-approvazione dei calcoli. Un'imprecisione rispetto al piano approvato si segnala e si
-corregge prima di consegnare.
+approvazione dei calcoli, ma il testo intero si approva prima della consegna (M3,
+sezione 3). Un'imprecisione rispetto al piano approvato si segnala e si corregge prima di
+consegnare.
 
 ### PASSO 9 — RITORNO SULLA SUITE
 Un errore emerso che il motore NON ha intercettato da solo diventa una proposta di nuovo

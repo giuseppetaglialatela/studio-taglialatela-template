@@ -353,6 +353,11 @@ python3 genera_zona_piano.py --autotest --template TEMPLATE_..._v5.py
   `impronta_approvata` manca o non coincide: piano, testi o valori cambiati dopo
   l'approvazione. L'impronta comprende le kcal (una voce del database corretta dopo
   l'approvazione ferma il PDF) e gli orari (`--orari` va passato come all'anteprima).
+- **Impronte e versioni dello script:** l'impronta dipende dal testo dell'anteprima, quindi
+  una modifica alla sua forma la cambia per tutti i metadati (23/10/2026 sera: aggiunta la
+  riga `terapia`). Un'impronta approvata con una versione precedente ferma il PDF:
+  si rigenera l'anteprima e la si fa riapprovare. Il commit che cambia l'anteprima lo
+  dichiara.
 - **`--verifica-impronta`:** solo il controllo, senza PDF (non si combina con `--anteprima`
   né con le opzioni del PDF: errore); si lancia in chat B prima del
   documento di spiegazione (M3), che non passa dallo script.

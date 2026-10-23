@@ -4,7 +4,8 @@
 ║   TEMPLATE SPIEGAZIONE DIETA — Studio Nutrizionale Taglialatela          ║
 ║   Dott. Giuseppe Taglialatela — Consulente in Nutrizione                 ║
 ╠══════════════════════════════════════════════════════════════════════════╣
-║  Versione: 1.0 | Creato: 27/07/2026                                      ║
+║  Versione: 1.1 | Creato: 27/07/2026 | 23/10/2026: elenchi «•» (prima «●»,║
+║  assente da Helvetica: stampava NO GLYPH) — autorizzata dal nutrizionista║
 ║  Accompagna il PDF del piano alimentare (documento informativo).        ║
 ║                                                                          ║
 ║  ISTRUZIONI D'USO                                                        ║
@@ -130,7 +131,7 @@ def genera_documento(output_path):
             story.append(Paragraph(p, STY_PARAGRAFO))
         if bullets:
             items = [ListItem(Paragraph(b, STY_BULLET), leftIndent=14) for b in bullets]
-            story.append(ListFlowable(items, bulletType="bullet", start="●",
+            story.append(ListFlowable(items, bulletType="bullet", start="•",
                                        leftIndent=10, spaceBefore=2, spaceAfter=10))
 
     story.append(HRFlowable(width="100%", thickness=0.6, color=colors.HexColor("#D8D8D8"),

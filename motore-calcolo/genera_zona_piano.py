@@ -513,6 +513,7 @@ ETICHETTE_CAMPI = {
     "scelte_principali": "Scelte principali (documento di spiegazione)",
     "limiti_noti": "Limiti noti (documento di spiegazione)",
     "da_escludere": "Da escludere dal documento di spiegazione",
+    "terapia": "Terapia (sezione 2 del documento di spiegazione)",
     "abbinamento_spuntino": "Abbinamento colazione → spuntino (opzioni di piano.csv)",
     "livello_colazione": "Livello colazione",
     "differenze_da_versione_precedente": "Differenze dalla versione precedente",
@@ -549,7 +550,8 @@ def _md_campo(L, nome, v, vuoto="(nessuna voce)"):
 
 # campi del documento di spiegazione: si mostrano sempre, anche vuoti, perche'
 # il nutrizionista veda anche un'assenza (revisione del 23/10/2026)
-CAMPI_SPIEGAZIONE = ("regole_operative", "scelte_principali", "limiti_noti", "da_escludere")
+CAMPI_SPIEGAZIONE = ("regole_operative", "scelte_principali", "limiti_noti", "da_escludere",
+                     "terapia")
 
 
 def _alternative_comuni(giorni):
@@ -589,7 +591,8 @@ def testo_anteprima(dati, meta):
         for k in sorted(ind, key=lambda k: (k != "pranzo", k != "cena", k)):
             L.append(f"- **Giorno libero, {k}:** {_md_valore(ind[k])}")
     L += ["", "## Contenuti del documento di spiegazione",
-          "(la chat B li scrive in prosa da questi campi, senza aggiungerne)", ""]
+          "(la chat B scrive la prosa da questi campi e dai dati di piano e fascicolo, "
+          "senza deduzioni cliniche; il testo si approva prima della consegna, M3)", ""]
     for k in CAMPI_SPIEGAZIONE:
         _md_campo(L, ETICHETTE_CAMPI[k].replace(" (documento di spiegazione)", ""), meta.get(k))
     L += ["", "## Altri campi dei metadati (non stampati per il paziente)", "",
@@ -1001,6 +1004,8 @@ def autotest(template_p):
     testo_vuoto = anteprima(piano_c, target_c, mp)[0]
     esiti.append(("campi del documento di spiegazione assenti mostrati come (nessuna voce)",
                   "- **Limiti noti:** (nessuna voce)" in testo_vuoto
+                  and "- **Terapia (sezione 2 del documento di spiegazione):** (nessuna voce)"
+                  in testo_vuoto
                   and "- **TDEE confermato:** 2040 kcal" in testo_vuoto))
     # alternative in testa solo se il pasto e' a scelta in TUTTI i giorni strutturati
     alt1, alt2 = [["T", "d", "k", None]], [["U", "e", "k", None]]

@@ -2,7 +2,7 @@
 
 Modulo operativo. Si carica **dopo l'approvazione dei calcoli**, per generare i due
 deliverable che il paziente riceve.
-Ultimo aggiornamento: 23/10/2026 (impronta dell'approvazione: il PDF si ferma se piano o testi sono cambiati, `--verifica-impronta` prima del documento di spiegazione, orari tra gli allegati; 22/10: fermo sui segnaposto nei testi del paziente; prima: 30/09/2026, secondo spuntino, fino a 5 pasti nel PDF). Presuppone **M2 già eseguito** (in chat A):
+Ultimo aggiornamento: 23/10/2026 (testo del documento di spiegazione approvato prima della consegna; template di spiegazione: elenchi puntati «•» al posto di «●», che il font non ha e stampava «NO GLYPH», unica modifica al motore grafico autorizzata dal nutrizionista; impronta dell'approvazione: il PDF si ferma se piano o testi sono cambiati, `--verifica-impronta` prima del documento di spiegazione, orari tra gli allegati; 22/10: fermo sui segnaposto nei testi del paziente; prima: 30/09/2026, secondo spuntino, fino a 5 pasti nel PDF). Presuppone **M2 già eseguito** (in chat A):
 copre i suoi PASSO 7 e PASSO 8 e non si esegue prima. **In chat B M2 e M1 non si
 ricaricano**: tutto ciò che serve sta nei metadati del piano e nel motore.
 
@@ -50,14 +50,17 @@ ricaricano**: tutto ciò che serve sta nei metadati del piano e nel motore.
    spiegazione NON passa da `genera_zona_piano.py`: PRIMA di scriverlo si riesegue
    `python3 genera_zona_piano.py --verifica-impronta --piano ... --target ...
    --metadati ... [--orari ...]` (stessi file del PDF), perché un campo cambiato dopo il
-   PDF non lo fermerebbe nessuno. Il documento si scrive solo dai campi approvati
-   (`regole_operative`, `scelte_principali`, `limiti_noti`, `da_escludere`): la prosa è
-   della chat B, i contenuti no. Obiettivo e criterio sono già
+   PDF non lo fermerebbe nessuno. Il documento si scrive dai campi approvati
+   (`regole_operative`, `scelte_principali`, `limiti_noti`, `da_escludere`, `terapia`)
+   e dai dati di piano e fascicolo, senza deduzioni cliniche (sezione 3): la prosa è
+   della chat B, i contenuti no, e il testo intero passa dall'approvazione del
+   nutrizionista prima della consegna (sezione 3, «Quando generarlo»). Obiettivo e
+   criterio sono già
    protetti, perché il PDF del piano, generato prima dagli stessi metadati, si ferma
    su un loro segnaposto. Fino al controllo automatico (in sviluppo) si verificano a
    vista: nessun testo d'esempio del template rimasto («testo placeholder»), nessun
-   segnaposto in `regole_operative`, `scelte_principali`, `limiti_noti` e
-   `da_escludere`.
+   segnaposto in `regole_operative`, `scelte_principali`, `limiti_noti`,
+   `da_escludere` e `terapia`.
 
 **Due spuntini nello stesso giorno (dal 30/09/2026).** Il secondo spuntino ha il suo
 valore di pasto, `spuntino2`: non si forza più dentro un unico gruppo `spuntino`.
@@ -92,7 +95,11 @@ Vale per entrambi i template di questo modulo.
 
 Non si tocca mai, per nessuna ragione: font, colori, emoji, layout, header, footer,
 barra legenda, linee separatrici, numero di pagina.
-Si modifica **esclusivamente la zona dati**.
+Si modifica **esclusivamente la zona dati**. Unica via per cambiare il motore grafico: un
+difetto dimostrato, la decisione esplicita del nutrizionista, il collaudo e il numero di
+versione alzato nell'intestazione del template (stesso nome di file). Unico caso finora:
+template di spiegazione 1.1 (23/10/2026), elenchi puntati «•» al posto di «●», che
+Helvetica non contiene e stampava «NO GLYPH» in verticale.
 
 **Niente improvvisazione di layout.** Se un template non si trova — né su GitHub né
 su Drive — fermati e segnalalo. Non ricostruire un layout alternativo: un PDF che
@@ -196,7 +203,15 @@ ogni piano consegnato**. Spiega al paziente il perché delle scelte del piano: n
 introduce contenuti clinici nuovi, riusa solo le scelte già approvate al PASSO 6.
 **Fonte dei contenuti:** i campi `regole_operative`, `scelte_principali`,
 `limiti_noti`, `obiettivo_intestazione`, `criterio_rivalutazione` e `da_escludere`
-di `metadati_piano_vN.json`. Non si recuperano testi dalle chat precedenti.
+di `metadati_piano_vN.json`, più `terapia` per la sezione 2. Non si recuperano testi
+dalle chat precedenti. Tutte le sezioni possono usare dati di `piano_vN.csv` e del
+fascicolo (quadro di partenza, contesto di vita, turni, mensa). **Mai deduzioni
+cliniche:** un dato clinico che non sta in questi file non entra (es. «nessun farmaco in
+terapia» solo se lo dice il campo `terapia` dei metadati o il fascicolo; `terapia`
+vuota o «non concordato» = nessuna informazione; se `terapia` e fascicolo non coincidono
+ci si ferma e si chiede). Spiegazioni
+pratiche ed esempi non clinici (`[dedotto]`) sono ammessi, ma passano dall'approvazione
+del testo («Quando generarlo»).
 
 ### Registro obbligatorio
 
@@ -233,9 +248,21 @@ Si adattano i contenuti, non la struttura.
 ### Quando generarlo
 
 Subito dopo il PDF del piano, **nella stessa consegna**. Non richiede un nuovo giro
-di approvazione dei calcoli — usa solo scelte già approvate — ma il nutrizionista lo
-rivede comunque prima dell'invio al paziente, in particolare su tono e accuratezza
-del contenuto esplicativo.
+di approvazione dei calcoli, ma **il testo si approva prima della consegna** (decisione
+del 23/10/2026: nel primo piano reale la chat B aveva aggiunto sette contenuti non
+approvati, tra cui «nessun farmaco in terapia» dedotto, e tre frasi inventate):
+1. si genera il PDF e se ne estrae il testo intero:
+   `pdftotext -layout CognomeNome_spiegazione_vN.pdf -`;
+2. lo si presenta COSÌ COM'È, non riassunto, con accanto a ogni frase che non viene dai
+   campi dei metadati la sua fonte: `[piano]`, `[fascicolo]` o `[dedotto]`. Una
+   deduzione clinica si toglie PRIMA di presentare il testo; le altre `[dedotto]`
+   (es. un esempio pratico) restano solo se il nutrizionista le approva;
+3. il PDF si consegna solo dopo l'approvazione esplicita del testo; ogni correzione
+   produce un nuovo PDF, una nuova anteprima visiva (sezione 4) e un nuovo testo da
+   approvare: si approva sempre l'ultimo PDF.
+Il PDF del documento approvato è il riferimento: un contenuto nuovo aggiunto in questa
+fase (es. una regola operativa dettata dal nutrizionista) non torna nei metadati né
+nell'impronta del piano, che restano quelli del PASSO 6.
 
 Se qualcosa nel testo esplicativo risulta impreciso rispetto al piano approvato,
 segnalalo e correggi prima di consegnare: è il documento in cui un'imprecisione
