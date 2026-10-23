@@ -306,8 +306,22 @@ ampliamento (M6, passo 8); non è nel collaudo perché richiede un file opzional
 Stima il TDEE (Mifflin-St Jeor + PAL) e propone un `target.csv` di partenza da peso,
 altezza, età, sesso e livello di attività. La copia su Drive è archivio e non si usa.
 Testato solo contro P00, paziente fittizio (2040 kcal, coincidente):
-`python3 tdee.py` rifà il confronto e fallisce con `assert` se la formula cambia. Il valore
-è SEMPRE da confermare dal nutrizionista: il modulo propone, non decide.
+`python3 tdee.py --autotest` rifà il confronto e fallisce con `assert` se la formula cambia.
+Il valore è SEMPRE da confermare dal nutrizionista: il modulo propone, non decide.
+```
+python3 tdee.py --peso 80 --altezza 175 --eta 39 --sesso M --attivita leggero
+python3 tdee.py ... --piano deficit_lieve --proteine 25 --carboidrati 45 --grassi 30
+    --fibra 30 [--condizione menopausa] [--tdee-confermato 2300] [--out target_proposto.csv]
+```
+`--attivita` usa le chiavi di `PAL`, le stesse di `livello_attivita_dichiarato` del Form A.
+Senza uno dei cinque dati si ferma e li elenca (mai default); senza argomenti non esegue
+più la demo (fino al 23/10/2026 `--help` stampava il caso P00). Con `--piano` servono
+le tre percentuali (somma 100) e la fibra; `--tdee-confermato` calcola il target sul TDEE
+già confermato invece che sulla stima; `--condizione` (LARN) vale solo con `--piano` e si
+controlla prima di stampare. Si ferma su peso fuori 30-300 kg, altezza fuori 120-220 cm,
+età fuori 18-100 anni (Mifflin-St Jeor è validata sugli adulti) e TDEE confermato fuori
+800-6.000 kcal; una stima fuori campo dà un avviso, e con `--piano` serve `--tdee-confermato`. `--out` scrive un `target.csv` leggibile da `carica_target` e non
+sovrascrive un file esistente: è una proposta, si usa dopo la conferma.
 `proponi_target_csv` legge i LARN da `larn.csv` tramite `larn.py` e **si ferma con errore
 se sesso ed età non sono passati** (nucleo, sezione 6). Il parametro `larn={...}`
 sovrascrive singoli valori solo con motivazione clinica.

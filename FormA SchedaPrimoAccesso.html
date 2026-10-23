@@ -131,6 +131,17 @@ footer{text-align:center;font-size:12px;color:var(--grigio);padding:0 20px 30px;
 
 <label for="peso_obiettivo">Hai un peso che vorresti raggiungere?</label>
 <input type="number" id="peso_obiettivo" inputmode="decimal" step="0.1" min="30" max="300">
+
+<label>Quanto ti muovi in una settimana tipo? *</label>
+<div class="hint">Conta insieme il lavoro e lo sport. Serve a stimare quanta energia consumi.</div>
+<div class="chips">
+  <label class="chip"><input type="radio" name="attivita" value="sedentario"><span>Poco: lavoro seduto e niente sport</span></label>
+  <label class="chip"><input type="radio" name="attivita" value="leggero"><span>Leggero: lavoro in piedi o sport 1-3 volte a settimana</span></label>
+  <label class="chip"><input type="radio" name="attivita" value="moderato"><span>Moderato: sport 3-5 volte a settimana</span></label>
+  <label class="chip"><input type="radio" name="attivita" value="intenso"><span>Intenso: allenamento quasi tutti i giorni</span></label>
+  <label class="chip"><input type="radio" name="attivita" value="molto_intenso"><span>Molto intenso: lavoro fisico pesante o due allenamenti al giorno</span></label>
+</div>
+<div class="err" id="e_attivita">Campo obbligatorio</div>
 </fieldset>
 
 <!-- ══════ SEZIONE 3 ══════ -->
@@ -453,6 +464,7 @@ function obbligatori(){
   controlla('e_nome', !!val('nome'), 'Campo obbligatorio');
   controlla('e_nascita', !!val('nascita'), 'Campo obbligatorio');
   controlla('e_sesso', !!radio('sesso'), 'Campo obbligatorio');
+  controlla('e_attivita', !!radio('attivita'), 'Campo obbligatorio');
 
   // --- plausibilita' delle misure ---
   const h = Number(val('altezza')), p = Number(val('peso')), v = Number(val('vita'));
@@ -521,7 +533,10 @@ function raccogli(){
       altezza_cm: num(val('altezza')), peso_iniziale_kg: num(val('peso')),
       circ_vita_iniziale_cm: num(val('vita')),
       peso_obiettivo_desiderato_kg: num(val('peso_obiettivo')),
-      peso_obiettivo_concordato_kg: null
+      peso_obiettivo_concordato_kg: null,
+      // valori = chiavi di PAL in motore-calcolo/tdee.py; dichiarato dal paziente,
+      // il TDEE resta da confermare dal nutrizionista
+      livello_attivita_dichiarato: radio('attivita')
     },
     sez3_quadro_clinico: {
       patologie: checks('pat'), patologie_altro: val('pat_altro'),
@@ -590,6 +605,8 @@ function testo(d){
     riga('BMI', (a.peso_iniziale_kg / Math.pow(a.altezza_cm / 100, 2)).toFixed(1));
   riga('Circonferenza vita', a.circ_vita_iniziale_cm ? a.circ_vita_iniziale_cm + ' cm' : null);
   riga('Peso desiderato', a.peso_obiettivo_desiderato_kg ? a.peso_obiettivo_desiderato_kg + ' kg' : null);
+  riga('Attività', a.livello_attivita_dichiarato
+       ? `${etichetta('attivita', a.livello_attivita_dichiarato)} [${a.livello_attivita_dichiarato}]` : null);
   L.push('');
   L.push('*Salute*');
   riga('Condizioni', etichette('pat', c.patologie)); riga('Altro', c.patologie_altro);

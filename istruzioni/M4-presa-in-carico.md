@@ -111,7 +111,11 @@ non va riletto al PASSO 0, e in caso di divergenza valgono queste.
 **Sez2 — antropometria → Livello 1.**
 Alimenta TDEE e target. Peso desiderato e tempi dichiarati sono il *target* del
 piano, non un vincolo di sicurezza: se irrealistici si segnalano e si discutono, non
-si applicano in automatico.
+si applicano in automatico. `livello_attivita_dichiarato` (dal 23/10/2026, obbligatorio
+nel Form A) usa le chiavi di `tdee.py` (`sedentario`, `leggero`, `moderato`, `intenso`,
+`molto_intenso`) e va passato così alla proposta di TDEE; è una dichiarazione del
+paziente: il TDEE resta da confermare (nucleo, punto di decisione 1). Fascicoli
+precedenti senza il campo: si chiede, come dato mancante (sezione 6).
 
 **Sez3 — quadro clinico → Livello 0 o 1, secondo il rischio.**
 Le condizioni con impatto diretto diventano vincoli di composizione e di struttura
@@ -134,7 +138,17 @@ conferma prima di escludere alimenti che il paziente non ha davvero rifiutato.
 
 **Sez6 — contesto di vita → Livello 2.**
 Il piano si adatta a tempo di cucina, chi cucina, piatto separato sì/no, orari —
-senza mai violare i Livelli 0 e 1.
+senza mai violare i Livelli 0 e 1. `pranzo_lavoro` (dal 23/10/2026) dice in quali
+giorni il paziente lavora fuori casa (`giorni`: `lun`…`dom`, oppure `da_casa`), dove
+pranza in quei giorni (`dove`: `casa`, `porta_da_casa`, `mensa`, `bar`, `salta`) e se ha
+`frigo` e `microonde` (vero/falso): fissa i pranzi di quei giorni (es. panino, piatto
+freddo, niente da riscaldare senza microonde, niente deperibili senza frigo) PRIMA di
+comporli, non al PASSO 6. È il vincolo che nel primo piano reale ha fatto rifare tre
+pranzi. Prevale sulla griglia «dove mangi», che distingue solo feriale e weekend; se le
+due si contraddicono, il form lo scrive tra i vincoli derivati e si chiede. Vale `null` se il paziente non lavora o non ha risposto
+sugli orari; dentro, `null` o lista vuota = domanda saltata. Campo assente (fascicolo
+precedente) o saltato, con un paziente che lavora fuori casa: si chiede nelle domande in
+blocco. Con turni o orari variabili i giorni sono quelli più frequenti: si verificano.
 
 **Sez7 — storia e obiettivi → contesto comunicativo.**
 Non diventa vincolo di menu. Vedi la sezione seguente.

@@ -280,6 +280,36 @@ da qui dipende se il piano sarà mangiabile o no.</div>
   <label class="chip"><input type="radio" name="lavoro" value="variabile"><span>Variabili</span></label>
   <label class="chip"><input type="radio" name="lavoro" value="non_lavoro"><span>Non lavoro</span></label>
 </div>
+<div class="sub hidden" id="sub_lavoro">
+  <label>In quali giorni lavori fuori casa?</label>
+  <div class="hint">Se cambiano di settimana in settimana, segna quelli più frequenti.</div>
+  <div class="chips">
+    <label class="chip"><input type="checkbox" name="giorni_lav" value="lun"><span>Lun</span></label>
+    <label class="chip"><input type="checkbox" name="giorni_lav" value="mar"><span>Mar</span></label>
+    <label class="chip"><input type="checkbox" name="giorni_lav" value="mer"><span>Mer</span></label>
+    <label class="chip"><input type="checkbox" name="giorni_lav" value="gio"><span>Gio</span></label>
+    <label class="chip"><input type="checkbox" name="giorni_lav" value="ven"><span>Ven</span></label>
+    <label class="chip"><input type="checkbox" name="giorni_lav" value="sab"><span>Sab</span></label>
+    <label class="chip"><input type="checkbox" name="giorni_lav" value="dom"><span>Dom</span></label>
+    <label class="chip"><input type="checkbox" name="giorni_lav" value="da_casa" id="lav_da_casa"><span>Lavoro da casa</span></label>
+  </div>
+  <div id="sub_fuori">
+  <label>In quei giorni, a pranzo:</label>
+  <div class="chips">
+    <label class="chip"><input type="radio" name="pranzo_lav" value="casa"><span>Torno a casa</span></label>
+    <label class="chip"><input type="radio" name="pranzo_lav" value="porta_da_casa"><span>Lo porto da casa</span></label>
+    <label class="chip"><input type="radio" name="pranzo_lav" value="mensa"><span>Mensa</span></label>
+    <label class="chip"><input type="radio" name="pranzo_lav" value="bar"><span>Bar o panino comprato</span></label>
+    <label class="chip"><input type="radio" name="pranzo_lav" value="salta"><span>Lo salto</span></label>
+  </div>
+  <label>Sul posto di lavoro hai</label>
+  <div class="chips">
+    <label class="chip"><input type="checkbox" name="attrezz" value="frigo"><span>Un frigo</span></label>
+    <label class="chip"><input type="checkbox" name="attrezz" value="microonde"><span>Un microonde</span></label>
+    <label class="chip"><input type="checkbox" name="attrezz" value="nessuno" id="attrezz_nessuno"><span>Nessuno dei due</span></label>
+  </div>
+  </div>
+</div>
 
 <label>Quanto puoi spendere per la spesa</label>
 <div class="hint">Serve solo a scegliere ingredienti sostenibili per te. Nessuna cifra.</div>
@@ -468,6 +498,20 @@ document.querySelectorAll('input[name=all]').forEach(c => c.addEventListener('ch
 $('int_lattosio').addEventListener('change', e => mostra('sub_lattosio', e.target.checked));
 document.querySelectorAll('input[name=cucina_per]').forEach(r =>
   r.addEventListener('change', e => mostra('sub_altri', e.target.value === 'anche_altri')));
+document.querySelectorAll('input[name=lavoro]').forEach(r =>
+  r.addEventListener('change', e => mostra('sub_lavoro', e.target.value !== 'non_lavoro')));
+/* chi lavora da casa non ha un pranzo "al lavoro": niente domande su pranzo e attrezzature */
+$('lav_da_casa').addEventListener('change', e => mostra('sub_fuori', !e.target.checked));
+document.querySelectorAll('input[name=giorni_lav]').forEach(c => c.addEventListener('change',
+  () => mostra('sub_fuori', !$('lav_da_casa').checked)));
+/* "Nessuno dei due" e "Lavoro da casa" escludono le altre voci del loro gruppo */
+[['attrezz_nessuno', 'attrezz'], ['lav_da_casa', 'giorni_lav']].forEach(([id, gruppo]) => {
+  const n = $(id);
+  n.addEventListener('change', () => { if (n.checked)
+    document.querySelectorAll(`input[name="${gruppo}"]`).forEach(c => { if (c !== n) c.checked = false; }); });
+  document.querySelectorAll(`input[name="${gruppo}"]`).forEach(c => { if (c !== n)
+    c.addEventListener('change', () => { if (c.checked) n.checked = false; }); });
+});
 document.querySelectorAll('input[name=diete]').forEach(r =>
   r.addEventListener('change', e => mostra('sub_diete', e.target.value !== 'mai')));
 
@@ -529,6 +573,21 @@ function raccogli(){
     vincoli.push("Porta almeno un pasto da casa nel feriale: servono opzioni trasportabili.");
   if (radio('tempo_f') === 'meno_15')
     vincoli.push("Meno di 15 minuti per cucinare nel feriale: ricette rapide o preparazioni anticipate.");
+  const lavora = radio('lavoro') !== null && radio('lavoro') !== 'non_lavoro';
+  const daCasa = lavora && checks('giorni_lav').includes('da_casa');
+  const pranzoFuori = lavora && !daCasa;    // pranzo e attrezzature contano solo qui
+  const attrezz = pranzoFuori ? checks('attrezz') : [];
+  const pranzoLav = pranzoFuori ? radio('pranzo_lav') : null;
+  if (pranzoLav === 'porta_da_casa' && attrezz.length && !attrezz.includes('frigo'))
+    vincoli.push("Pranzo portato al lavoro senza frigo: solo alimenti che reggono fuori frigo fino al pranzo.");
+  if (pranzoLav === 'porta_da_casa' && attrezz.length && !attrezz.includes('microonde'))
+    vincoli.push("Pranzo portato al lavoro senza microonde: piatti da mangiare freddi, niente da riscaldare.");
+  // la griglia distingue solo feriale/weekend: se contraddice il pranzo dei giorni di
+  // lavoro lo dice il form, non la memoria di chi legge (revisione del 23/10/2026)
+  if (pranzoLav && dove.feriale.pranzo && dove.feriale.pranzo !== pranzoLav)
+    vincoli.push("Pranzo: la griglia «dove mangi» e il pranzo nei giorni di lavoro non coincidono, chiedere quale vale e in quali giorni.");
+  if (['bar', 'mensa'].includes(pranzoLav))
+    vincoli.push("Pranzo al lavoro comprato o in mensa: il piano indica scelte, non ricette, in quei giorni.");
   if (radio('lavoro') === 'turni' || radio('lavoro') === 'notturno')
     vincoli.push("Turnista: il piano va costruito per fasce, non per orari fissi.");
   if (radio('spesa') === 'contenuta')
@@ -578,6 +637,12 @@ function raccogli(){
                 tempo_disponibile_feriale: radio('tempo_f'), tempo_disponibile_weekend: radio('tempo_w'),
                 abilita_cucina_1_5: num(radio('abilita')) },
       orario_lavoro: radio('lavoro'), fascia_spesa: radio('spesa'),
+      // giorni con pranzo fuori casa per lavoro e attrezzature: il primo piano reale
+      // (23/10/2026) li ha scoperti solo all'approvazione
+      // null = non lavora o non ha risposto sugli orari; dentro, null e [] = domanda saltata
+      pranzo_lavoro: lavora ? { giorni: checks('giorni_lav'), dove: pranzoLav,
+                                frigo: attrezz.length ? attrezz.includes('frigo') : null,
+                                microonde: attrezz.length ? attrezz.includes('microonde') : null } : null,
       _derivato_pasti_fuori_casa_settimana: fuoriSett
     },
     sez7_storia_obiettivi: {
@@ -656,6 +721,14 @@ function testo(d){
   riga('Tempo per cucinare, weekend', etichetta('tempo_w', c.cucina.tempo_disponibile_weekend));
   riga('Abilità in cucina', c.cucina.abilita_cucina_1_5 ? c.cucina.abilita_cucina_1_5 + '/5' : null);
   riga('Orari di lavoro', etichetta('lavoro', c.orario_lavoro)); riga('Spesa', etichetta('spesa', c.fascia_spesa));
+  const pl = c.pranzo_lavoro;
+  if (pl) {
+    if (pl.giorni.includes('da_casa')) riga('Lavoro', 'da casa');
+    else riga('Giorni di lavoro fuori casa', etichette('giorni_lav', pl.giorni));
+    riga('Pranzo nei giorni di lavoro', etichetta('pranzo_lav', pl.dove));
+    riga('Al lavoro', pl.frigo === null ? null
+         : ([pl.frigo ? 'frigo' : null, pl.microonde ? 'microonde' : null].filter(Boolean).join(' e ') || 'né frigo né microonde'));
+  }
   L.push('');
   L.push('*Storia e obiettivi*');
   riga('Diete precedenti', etichetta('diete', s.diete_precedenti)); riga('Esito', etichetta('esito', s.esito_precedente));
