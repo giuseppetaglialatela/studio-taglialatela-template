@@ -332,3 +332,7 @@ specifica il macinato magro.
   rappresenti: con la voce magra un hamburger qualsiasi è sottostimato di circa 70-110 kcal
   ogni 100 g (USDA 85/15 e 80/20 crudi: 215 e 254 kcal, contro 145). Per questo il piano deve dire
   «magro», e il paziente comprarlo magro.
+- **Con la pasta:** ammesso (decisione del 23/10/2026). 101120 resta FUORI dalla regola
+  A05 di `accoppiamenti_vietati.csv` («carne rossa o maiale con la pasta»), che vieta
+  invece vitellone, filetto, vitello e maiale: non è una svista da correggere per
+  coerenza.
