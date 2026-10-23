@@ -17,14 +17,15 @@ ricaricano**: tutto ciò che serve sta nei metadati del piano e nel motore.
 2. Motore: un solo comando scarica la cartella del motore ed esegue collaudo e
    regressione:
    ```
-   rm -rf /tmp/motore && mkdir /tmp/motore && cd /tmp/motore && curl -sfL https://codeload.github.com/giuseppetaglialatela/studio-taglialatela-template/tar.gz/refs/heads/main | tar xz --strip-components=2 studio-taglialatela-template-main/motore-calcolo && python3 collaudo.py && python3 regressione.py
+   rm -rf /tmp/motore /tmp/repo-motore && mkdir /tmp/motore && cd /tmp/motore && { curl -sfL https://codeload.github.com/giuseppetaglialatela/studio-taglialatela-template/tar.gz/refs/heads/main | tar xz --strip-components=2 studio-taglialatela-template-main/motore-calcolo || { echo "codeload non disponibile: ripiego con git clone"; cd /tmp && rm -rf /tmp/motore && git clone --depth 1 -q https://github.com/giuseppetaglialatela/studio-taglialatela-template /tmp/repo-motore && cp -r /tmp/repo-motore/motore-calcolo /tmp/motore && rm -rf /tmp/repo-motore && cd /tmp/motore; }; } && python3 collaudo.py && python3 regressione.py
    ```
    (è lo stesso comando di M1, sezione 1: non serve caricare M1). Il collaudo completo dura meno di un secondo: si
    esegue intero, come in ogni sessione (principio 7).
 3. Verifica del CSV: leggibile e coerente con le `differenze_da_versione_precedente`
    dichiarate nei metadati. Non si scaricano versioni precedenti per confronto.
-   Si riesegue anche il controllo formati (M1, sezione `formati.py`): deve stampare
-   `[]`, altrimenti si segnala al nutrizionista prima di generare.
+   Il controllo formati NON si ripete in chat B: i rilievi si dichiarano e si approvano
+   al PASSO 6 (pipeline), e l'impronta garantisce che il piano è quello approvato. Un
+   piano senza impronta si ferma al punto 4 e torna al PASSO 6.
 4. Kcal per pasto e per alternativa: dal motore (`calcolatore.calcola_riga`), mai
    scritte a mano e mai prese da riassunti.
    **Strumento:** `genera_zona_piano.py`, nella cartella del motore, compila la zona
@@ -33,8 +34,8 @@ ricaricano**: tutto ciò che serve sta nei metadati del piano e nel motore.
    ```
    python3 genera_zona_piano.py --piano piano_vN.csv --target target.csv
        --metadati metadati_piano_vN.json --template TEMPLATE_..._v5.py
-       --orari orari_pasti.csv --out-py piano_Cognome_vN.py
-       --out-pdf piano_Cognome_vN.pdf
+       --orari orari_pasti.csv --out-py CognomeNome_piano_vN.py
+       --out-pdf CognomeNome_piano_vN.pdf
        [--eccezione-etichetta voci.csv --nomi-eccezione nomi.csv]
    ```
    Se si ferma, stampa quale campo o titolo manca o contiene un segnaposto («non
@@ -276,7 +277,14 @@ Da fare per ogni piano consegnato:
 Entrambi sono un'eccezione alla regola generale "gli altri documenti importanti in
 Word".
 
-Destinazione su Drive: `Andamento Dieta Pazienti > [Cognome Nome]`. Se la cartella
+Destinazione su Drive: `Andamento Dieta Pazienti > [Cognome Nome]`. Nomi dei file con
+la stessa convenzione di Drive (M5): `CognomeNome_piano_vN.pdf`, `CognomeNome_piano_vN.py`,
+`CognomeNome_spiegazione_vN.pdf` (es. `RossiMario_piano_v2.pdf`), con lo stesso numero di
+versione di `piano_vN.csv` e dei metadati; stessa radice `CognomeNome_` dei file di M5. Il
+template di spiegazione prende il nome d'uscita come primo argomento:
+`python3 TEMPLATE_SpiegazioneDieta_StudioTaglialatela_v1.py CognomeNome_spiegazione_vN.pdf`
+(senza argomento scrive `spiegazione_dieta.pdf`). Andamento (M5) e scheda di allenamento
+(M8) hanno ancora convenzioni proprie, già in uso su Drive: non si cambiano qui. Se la cartella
 del paziente non esiste, va creata: un piano generato e non archiviato è un piano
 che esiste solo nella conversazione in cui è nato. **I PDF e il `.py` non li carica
 Claude** (nucleo, sezione 7: il connettore consuma molti token e non sovrascrive): si

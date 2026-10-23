@@ -41,7 +41,7 @@ Struttura a 5 posti (30/09/2026):
 USO
   python3 genera_zona_piano.py --piano piano_vN.csv --target target.csv
       --metadati metadati_piano_vN.json --template TEMPLATE_..._v5.py
-      --out-py piano_Cognome_vN.py --out-pdf piano_Cognome_vN.pdf
+      --out-py CognomeNome_piano_vN.py --out-pdf CognomeNome_piano_vN.pdf
       [--orari orari_pasti.csv] [--mese "Settembre 2026"]
 
   python3 genera_zona_piano.py --anteprima --piano piano_vN.csv --target target.csv

@@ -19,13 +19,12 @@ NON copre: composizione del piano (M2), ampliamento del database (M6).
 pulita l'intera cartella `motore-calcolo` (codice, dati, casi golden, cache) ed esegue
 collaudo e regressione:
 ```
-rm -rf /tmp/motore && mkdir /tmp/motore && cd /tmp/motore && curl -sfL https://codeload.github.com/giuseppetaglialatela/studio-taglialatela-template/tar.gz/refs/heads/main | tar xz --strip-components=2 studio-taglialatela-template-main/motore-calcolo && python3 collaudo.py && python3 regressione.py
+rm -rf /tmp/motore /tmp/repo-motore && mkdir /tmp/motore && cd /tmp/motore && { curl -sfL https://codeload.github.com/giuseppetaglialatela/studio-taglialatela-template/tar.gz/refs/heads/main | tar xz --strip-components=2 studio-taglialatela-template-main/motore-calcolo || { echo "codeload non disponibile: ripiego con git clone"; cd /tmp && rm -rf /tmp/motore && git clone --depth 1 -q https://github.com/giuseppetaglialatela/studio-taglialatela-template /tmp/repo-motore && cp -r /tmp/repo-motore/motore-calcolo /tmp/motore && rm -rf /tmp/repo-motore && cd /tmp/motore; }; } && python3 collaudo.py && python3 regressione.py
 ```
-**Ripiego**, se il comando fallisce perché `codeload.github.com` è bloccato dalla sessione
-(errore 403: dipende dalla sessione, non dal motore), stesso risultato con `git clone`:
-```
-rm -rf /tmp/motore /tmp/repo-motore && git clone --depth 1 -q https://github.com/giuseppetaglialatela/studio-taglialatela-template /tmp/repo-motore && cp -r /tmp/repo-motore/motore-calcolo /tmp/motore && rm -rf /tmp/repo-motore && cd /tmp/motore && python3 collaudo.py && python3 regressione.py
-```
+Il ripiego con `git clone` è DENTRO il comando: se `codeload.github.com` è bloccato dalla
+sessione (errore 403, che `curl -sf` nasconde: compare come «gzip: stdin: unexpected end
+of file»), scatta da solo e stampa «codeload non disponibile: ripiego con git clone». Stesso
+risultato; provato in entrambi i rami il 23/10/2026.
 Poi si lavora in `/tmp/motore`. Nessun calcolo su paziente prima dell'esito positivo
 (principio 7). Il download è pubblico: non serve il repository collegato. Il motore si
 esegue con `python3` normale dalla sua cartella, **mai con `python3 -I`** (modalità
@@ -220,7 +219,8 @@ Regola anti-spreco (nucleo, sezione 5). Legge `formati_confezione.csv` e
 grammi siano una confezione intera o un multiplo (fino a 6) entro la tolleranza. Esito:
 `FORMATO_CONFEZIONE_NON_RISPETTATO`, **non bloccante**. Funzioni: `carica_formati`,
 `carica_scambi_frutta`, `controlla_piano(piano, formati)`, `quantita_valida`. Controllo
-senza pipeline (chat B), stampa `[]` se tutto è a formato:
+manuale fuori pipeline (la chat B non lo usa: l'impronta copre il piano approvato), stampa
+`[]` se tutto è a formato:
 `python3 -c "import csv,formati; print(formati.controlla_piano(list(csv.DictReader(open('piano_vN.csv'))), formati.carica_formati()))"`
 
 ### coerenza.py
@@ -333,7 +333,7 @@ Compila la zona dati del template piano v5 (M3) e genera il PDF. Legge `piano.cs
 ```
 python3 genera_zona_piano.py --piano piano_vN.csv --target target.csv
     --metadati metadati_piano_vN.json --template TEMPLATE_..._v5.py
-    --out-py piano_Cognome_vN.py --out-pdf piano_Cognome_vN.pdf
+    --out-py CognomeNome_piano_vN.py --out-pdf CognomeNome_piano_vN.pdf
     [--orari orari_pasti.csv] [--mese "Settembre 2026"]
     [--eccezione-etichetta voci.csv --nomi-eccezione nomi.csv]
 python3 genera_zona_piano.py --anteprima --piano piano_vN.csv --target target.csv
