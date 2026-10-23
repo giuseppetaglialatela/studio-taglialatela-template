@@ -15,10 +15,6 @@
       "MEDIA_SOTTO_LARN"
     ],
     [
-      4,
-      "ATWATER_SEGNALATO"
-    ],
-    [
       5,
       "TERAPIA_NON_DICHIARATA"
     ],
@@ -33,5 +29,5 @@
   ],
   "exit_code": 0,
   "descrizione": "Media settimanale del calcio all'80,03% del LARN 950 (760,31 mg), sei giorni identici: NESSUN avviso del livello rinforzato. Confine superiore del criterio della media.",
-  "riferimento": "Costruito il 22/10/2026. Giornata: colazione pane integrale 70 g + mela 200 g; spuntino mela 100 g (fuori catalogo, livello non identificato); pranzo pasta integrale + pomodori 100 g + olio 13 g + parmigiano; cena merluzzo 140 g + patate 180 g + fagiolini 200 g + pane integrale 30 g + olio 13 g. Sei giorni identici. LARN calcio 950 mg (adulti 18-64), valore reale. Target kcal sulla mediana, macro arrotondati dalla media e corretti perche' la somma sia 100. Pasta 40 g, parmigiano 49,5 g."
+  "riferimento": "Costruito il 22/10/2026. Giornata: colazione pane integrale 70 g + mela 200 g; spuntino mela 100 g (fuori catalogo, livello non identificato); pranzo pasta integrale + pomodori 100 g + olio 13 g + parmigiano; cena merluzzo 140 g + patate 180 g + fagiolini 200 g + pane integrale 30 g + olio 13 g. Sei giorni identici. LARN calcio 950 mg (adulti 18-64), valore reale. Target kcal sulla mediana, macro arrotondati dalla media e corretti perche' la somma sia 100. Pasta 40 g, parmigiano 49,5 g. Atteso rigenerato il 23/10/2026: il cross-check Atwater della pipeline guarda solo gli alimenti del piano e non segnala i falsi positivi verificati (l'intero database lo controlla il collaudo, controllo 9); unica differenza verificata, la scomparsa di ATWATER_SEGNALATO."
 }

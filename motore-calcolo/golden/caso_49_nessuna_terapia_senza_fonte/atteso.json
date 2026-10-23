@@ -1,0 +1,18 @@
+{
+  "tipo": "pipeline",
+  "bloccanti": [
+    [
+      5,
+      "TERAPIA_CONTRADDITTORIA"
+    ]
+  ],
+  "attenzioni": [
+    [
+      3,
+      "MEDIA_SOTTO_LARN_CON_GAP"
+    ]
+  ],
+  "exit_code": 1,
+  "descrizione": "Il piano del caso 36 con nessuna_terapia a stringa vuota: dichiarare l'assenza di terapia senza la fonte della verifica non vale. Deve comparire il bloccante TERAPIA_CONTRADDITTORIA (exit 1) e NON TERAPIA_DICHIARATA_ASSENTE; il resto uguale al caso 36 senza TERAPIA_NON_DICHIARATA. Diventa rosso se la fonte vuota viene accettata.",
+  "riferimento": "Costruito il 23/10/2026 dal caso 36 su indicazione della revisione indipendente (secondo giro)."
+}

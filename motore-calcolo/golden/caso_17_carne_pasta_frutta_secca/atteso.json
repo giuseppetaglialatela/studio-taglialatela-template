@@ -56,10 +56,6 @@
       "ACCOPPIAMENTO_VIETATO"
     ],
     [
-      4,
-      "ATWATER_SEGNALATO"
-    ],
-    [
       5,
       "TERAPIA_NON_DICHIARATA"
     ],
@@ -78,5 +74,5 @@
   ],
   "exit_code": 1,
   "descrizione": "Carne rossa con la pasta e frutta secca mista (21/10/2026): pasta+vitellone a pranzo (A05) e noci+nocciole nello stesso spuntino (A06). Atteso: 2 ACCOPPIAMENTO_VIETATO al PASSO 4. Controlli negativi: pasta integrale con pollo a cena; mandorle a colazione e noci allo spuntino (pasti diversi) NON devono scattare.",
-  "riferimento": " Atteso rigenerato il 22/10/2026 con l'avviso del livello rinforzato (PASSO 6): unica differenza verificata, la comparsa dell'attenzione VALUTARE_LIVELLO_RINFORZATO (piano di prova povero di calcio). Bloccanti ed exit code invariati."
+  "riferimento": " Atteso rigenerato il 22/10/2026 con l'avviso del livello rinforzato (PASSO 6): unica differenza verificata, la comparsa dell'attenzione VALUTARE_LIVELLO_RINFORZATO (piano di prova povero di calcio). Bloccanti ed exit code invariati. Atteso rigenerato il 23/10/2026: il cross-check Atwater della pipeline guarda solo gli alimenti del piano e non segnala i falsi positivi verificati (l'intero database lo controlla il collaudo, controllo 9); unica differenza verificata, la scomparsa di ATWATER_SEGNALATO."
 }

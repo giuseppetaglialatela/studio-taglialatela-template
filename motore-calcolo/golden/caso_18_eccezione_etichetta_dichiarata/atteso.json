@@ -16,10 +16,6 @@
     ],
     [
       4,
-      "ATWATER_SEGNALATO"
-    ],
-    [
-      4,
       "FORMATO_CONFEZIONE_NON_RISPETTATO"
     ],
     [
@@ -41,5 +37,5 @@
   ],
   "exit_code": 0,
   "descrizione": "Piano del caso 01 con una voce da etichetta (ETI_TEST, fittizia) passata con --eccezione-etichetta. Deve comparire l'attenzione ALIMENTO_FUORI_DATABASE_SU_RICHIESTA (PASSO 1), nessun blocco legato all'eccezione; i micronutrienti a zero della voce sono trattati come gap (calcio 20 mg dichiarato resta un dato). Protegge la decisione del 21/10/2026: l'etichetta passa solo su richiesta e non entra nel database.",
-  "riferimento": "Creato il 21/10/2026; verdetto controllato a mano sul report della pipeline prima di congelare l'atteso; verificato al contrario togliendo il controllo dal codice. Atteso rigenerato il 22/10/2026 con l'avviso del livello rinforzato (PASSO 6): unica differenza verificata, la comparsa dell'attenzione VALUTARE_LIVELLO_RINFORZATO (piano di prova povero di calcio). Bloccanti ed exit code invariati."
+  "riferimento": "Creato il 21/10/2026; verdetto controllato a mano sul report della pipeline prima di congelare l'atteso; verificato al contrario togliendo il controllo dal codice. Atteso rigenerato il 22/10/2026 con l'avviso del livello rinforzato (PASSO 6): unica differenza verificata, la comparsa dell'attenzione VALUTARE_LIVELLO_RINFORZATO (piano di prova povero di calcio). Bloccanti ed exit code invariati. Atteso rigenerato il 23/10/2026: il cross-check Atwater della pipeline guarda solo gli alimenti del piano e non segnala i falsi positivi verificati (l'intero database lo controlla il collaudo, controllo 9); unica differenza verificata, la scomparsa di ATWATER_SEGNALATO."
 }

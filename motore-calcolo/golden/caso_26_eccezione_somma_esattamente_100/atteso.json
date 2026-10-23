@@ -16,10 +16,6 @@
     ],
     [
       4,
-      "ATWATER_SEGNALATO"
-    ],
-    [
-      4,
       "FORMATO_CONFEZIONE_NON_RISPETTATO"
     ],
     [
@@ -41,5 +37,5 @@
   ],
   "exit_code": 0,
   "descrizione": "Confine della soglia di plausibilita': voce da etichetta con proteine 0 + carboidrati 0,2 + grassi 95,9 + fibra 3,9 = esattamente 100 g per 100 g. Deve PASSARE (attenzione ALIMENTO_FUORI_DATABASE_SU_RICHIESTA, nessun ECCEZIONE_ETICHETTA_NON_VALIDA). Senza arrotondamento la somma in virgola mobile vale 100,00000000000001 e un'etichetta valida veniva bloccata.",
-  "riferimento": "21/10/2026, dalla revisione indipendente; verificato al contrario togliendo l'arrotondamento. Atteso rigenerato il 22/10/2026 con l'avviso del livello rinforzato (PASSO 6): unica differenza verificata, la comparsa dell'attenzione VALUTARE_LIVELLO_RINFORZATO (piano di prova povero di calcio). Bloccanti ed exit code invariati."
+  "riferimento": "21/10/2026, dalla revisione indipendente; verificato al contrario togliendo l'arrotondamento. Atteso rigenerato il 22/10/2026 con l'avviso del livello rinforzato (PASSO 6): unica differenza verificata, la comparsa dell'attenzione VALUTARE_LIVELLO_RINFORZATO (piano di prova povero di calcio). Bloccanti ed exit code invariati. Atteso rigenerato il 23/10/2026: il cross-check Atwater della pipeline guarda solo gli alimenti del piano e non segnala i falsi positivi verificati (l'intero database lo controlla il collaudo, controllo 9); unica differenza verificata, la scomparsa di ATWATER_SEGNALATO."
 }

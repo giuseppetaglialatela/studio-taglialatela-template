@@ -1,0 +1,17 @@
+{
+  "tipo": "pipeline",
+  "bloccanti": [],
+  "attenzioni": [
+    [
+      3,
+      "MEDIA_SOTTO_LARN_CON_GAP"
+    ],
+    [
+      5,
+      "TERAPIA_NON_DICHIARATA"
+    ]
+  ],
+  "exit_code": 0,
+  "descrizione": "Il piano del caso 36 con aglio 5 g a cena tutti i giorni: l'aglio e' un falso positivo Atwater verificato (coerenza.ATWATER_FALSI_POSITIVI_NOTI), quindi NON deve comparire ATWATER_SEGNALATO, nemmeno se l'alimento e' nel piano. Diventa rosso se la pipeline torna a segnalare i falsi positivi noti.",
+  "riferimento": "Costruito il 23/10/2026 dal caso 36 aggiungendo 6 righe di aglio (005000, 5 g, cena)."
+}

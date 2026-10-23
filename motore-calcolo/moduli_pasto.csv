@@ -1,7 +1,7 @@
 modulo_id,nome,categoria,tag,ingredienti_food_id_grammi
 M02,Riso + salmone + verdura,pranzo,"halal_ok,pesce",500010:90;700405:150;349:200;702901:8
 M03,Pasta + legumi + verdura,pranzo,"mensa_ok,halal_ok,vegetariano,legumi",000800:90;4005:180;345:150;702901:12
-M04,Couscous + uova + verdura,pranzo,"mensa_ok,halal_ok,vegetariano",888013:90;1800:120;336:150;702901:10
+M04,Couscous + uova + verdura,pranzo,"mensa_ok,halal_ok,vegetariano",888013:90;1800:104;336:150;702901:10
 M05,Farro + legumi + verdura,pranzo,"halal_ok,vegetariano,legumi",8603:90;4505:150;5080:150;702901:12
 M06,Pollo + cereale + verdura,cena,"halal_ok,carne",106500:150;500010:70;345:180;702901:12
 M07,Pesce bianco + patate + verdura,cena,"halal_ok,pesce",1313:180;381:250;101:180;702901:12
@@ -11,17 +11,17 @@ M10,Tonno fresco + patate + insalata,cena,"halal_ok,pesce,pratico",1325:150;381:
 M11,Pasta e ceci,pranzo,"mensa_ok,halal_ok,vegetariano,legumi",60091:80;4005:90;391:100;345:180;702901:13
 M12,Merluzzo con patate e fagiolini,cena,"halal_ok,pesce",1313:140;381:180;101:200;000550:30;702901:13
 M13,Sgombro al forno con insalata,cena,"halal_ok,pesce",1321:110;391:200;000550:85;702901:9
-M14,Farro con tonno e verdure,pranzo,"halal_ok,pesce,pratico",8603:80;1515:70;349:100;391:80;345:150;702901:12
+M14,Farro con tonno e verdure,pranzo,"halal_ok,pesce,pratico",8603:70;1515:92;349:100;391:80;345:150;702901:12
 M15,Pollo con verdure grigliate (no cereale),cena,"halal_ok,carne",106500:120;336:180;331:70;000550:90;702901:13
 M16,Farro con ceci e peperoni,pranzo,"halal_ok,vegetariano,legumi",8603:95;4005:90;349:100;336:100;702901:13
 M17,Orata al cartoccio con zucchine,cena,"halal_ok,pesce",8734:145;349:200;000550:85;702901:12
 M18,Insalata di farro con gamberi e rucola,pranzo,"halal_ok,pesce,pratico",8603:70;1309:130;700169:60;391:80;702901:12
 M19,Bresaola con carciofi e pane,cena,"halal_ok,pratico",100061:100;005120:150;000550:60;702901:13
 M20,"Insalata di polpo, patate e sedano",pranzo,"halal_ok,pesce,pratico",127150:180;381:180;343:60;391:120;702901:13
-M21,Frittata con spinaci e pane integrale,cena,"halal_ok,vegetariano",1800:120;345:100;391:80;000550:70;702901:10
+M21,Frittata con spinaci e pane integrale,cena,"halal_ok,vegetariano",1800:104;345:100;391:80;000550:70;702901:10
 M22,Cous cous con gamberi e peperoni,pranzo,"halal_ok,pesce,pratico",888013:70;1309:150;336:150;391:100;349:100;702901:13
 M23,Riso basmati freddo con ceci e peperoni,pranzo,"halal_ok,vegetariano,legumi,pratico",000130:85;4005:85;336:120;345:90;391:80;702901:13
-M24,Insalata di riso basmati con uova sode e asparagi,pranzo,"halal_ok,vegetariano,pratico",000130:75;1800:130;304:150;391:150;336:60;702901:12
+M24,Insalata di riso basmati con uova sode e asparagi,pranzo,"halal_ok,vegetariano,pratico",000130:75;1800:104;304:150;391:150;336:60;702901:12
 M25,Insalatona con tonno,pranzo,"halal_ok,pesce,pratico",1515:208;331:80;391:150;30097:150;702901:10
 M26,Frittata al forno con zucchine e prosciutto cotto,cena,"mensa_ok,carne",182010:105;1800:52;349:150;9007:60;30097:130;331:80;312:100;702901:14
 M27,Insalatona con fiocchi di latte e pollo,pranzo,"halal_ok,carne,pratico",100015:200;106500:80;30097:60;331:80;336:120;312:100;702901:10
@@ -56,9 +56,9 @@ M55,"Insalata di riso con tacchino, cetrioli, pomodori e carote",pranzo,"halal_o
 M56,Pesce spada con patate e insalata,cena,"halal_ok,pesce",100110_2:180;381:250;331:100;391:100;702901:20;100154_2:80
 M57,Couscous con piselli e zucchine,pranzo,"halal_ok,vegetariano,legumi",888013:130;103:150;349:150;702901:15;1726:25
 M58,Vitello con insalata e pane,cena,"halal_ok,carne",101520:160;331:100;391:100;702901:15;100154_2:130
-M59,"Insalata di farro, ceci e tonno",pranzo,"halal_ok,legumi,pesce,pratico",8603:70;1515:80;004010:50;391:150;702901:10
+M59,"Insalata di farro, ceci e tonno",pranzo,"halal_ok,legumi,pesce,pratico",8603:45;1515:52;004010:145;391:150;702901:10
 M60,Panino di segale con prosciutto crudo e robiola,pranzo,"carne,pratico",30097:80;8711:60;100030:30;331:50
-M61,"Insalatona con uova sode, ceci e verdure",pranzo,"halal_ok,vegetariano,legumi,pratico",1800:104;004010:60;331:200;702901:10
+M61,"Insalatona con uovo sodo, ceci e verdure",pranzo,"halal_ok,vegetariano,legumi,pratico",1800:52;004010:145;331:200;702901:10
 M62,"Bowl di polpo, farro e rucola",pranzo,"halal_ok,pesce,pratico",127150:150;8603:60;700169:80;391:80;702901:10
 M63,"Bowl di gamberi, riso integrale e zucchine",pranzo,"halal_ok,pesce,pratico",1309:150;500010:60;349:200;702901:10
 M64,Insalatona di pollo e avocado,pranzo,"halal_ok,carne,pratico",106500:150;999692:60;331:150;391:80;702901:5
@@ -76,15 +76,15 @@ M75,Calamari saltati con piselli e finocchi,cena,"halal_ok,legumi,pesce",1304:20
 M76,Spaghetti integrali con frutti di mare,cena,"halal_ok,pesce",60091:60;1328:200;702901:10
 M77,"Riso integrale, Ceci lessati, Carote e Parmigiano",pranzo,"halal_ok,vegetariano,legumi",500010:45;4005:120;312:100;1726:15;702901:6
 M78,"Sgombro, Patate e Fagiolini",cena,"halal_ok,pesce",1321:120;381:120;101:100;702901:4
-M79,"Pasta integrale, Salmone in scatola, Pomodori da insalata e Parmigiano",pranzo,"halal_ok,pesce",60091:55;1510:75;391:100;1726:15;702901:10
+M79,"Pasta integrale, Salmone in scatola e Pomodori da insalata",pranzo,"halal_ok,pesce",60091:50;1510:135;391:100;702901:7
 M80,"Quinoa, Tonno in scatola al naturale e Fagiolini",pranzo,"halal_ok,pesce,pratico",889001:45;1515:90;101:100;702901:6
 M82,"Orzo perlato, Petto di pollo e Peperoni",pranzo,"halal_ok,carne",000090:55;106500:110;336:100;702901:8
 M83,"Branzino, Patate e Finocchio",cena,"halal_ok,pesce",123200:170;381:180;324:100;702901:8
-M84,"Pasta, Tonno in scatola al naturale, Pomodori pelati, Olive nere e Rucola",pranzo,"mensa_ok,halal_ok,pesce",000800:80;1515:80;392:150;702901:10;592:15;700169:50
+M84,"Pasta, Tonno in scatola al naturale, Pomodori pelati, Olive nere e Rucola",pranzo,"mensa_ok,halal_ok,pesce",000800:80;1515:92;392:150;702901:10;592:15;700169:50
 M85,"Scorfano, Patate, Broccoli e Parmigiano",cena,"halal_ok,pesce",122900:200;381:160;309:200;702901:14;1726:15
 M86,"Petto di pollo, Pane, Zucchine e Carote",pranzo,"mensa_ok,halal_ok,carne",106500:170;100154_2:70;349:200;312:100;702901:10
 M87,"Sgombro, Patate, Finocchio e Feta",cena,"halal_ok,pesce",1321:160;381:230;324:150;702901:5;805080:25
-M88,"Ceci in scatola, Pane e Spinaci",pranzo,"halal_ok,vegetariano,legumi,pratico",004010:215;100154_2:70;345:150;702901:12
+M88,"Ceci in scatola, Pane e Spinaci",pranzo,"halal_ok,vegetariano,legumi,pratico",004010:240;100154_2:70;345:150;702901:12
 M89,"Petto di tacchino, Radicchio rosso, Patate e Parmigiano",cena,"mensa_ok,halal_ok,carne",8697:180;339:150;381:150;702901:15;1726:10
 M90,"Pasta, Gamberi, Peperoni e Pomodori pelati",pranzo,"halal_ok,pesce",000800:80;1309:150;336:150;392:100;702901:15
 M91,"Vitellone magro, Lattuga, Pane e Feta",cena,"halal_ok,carne",8520:170;331:200;100154_2:50;805080:30;702901:12
@@ -104,7 +104,7 @@ M104,"Riso, Carote, Prosciutto cotto e Parmigiano",pranzo,"mensa_ok,carne",00010
 M105,"Filetto di vitello, Melanzane, Pomodori pelati, Pane e Parmigiano",cena,"halal_ok,carne",101520:90;334:150;392:100;702901:35;100154_2:110;1726:10
 M106,Insalata di riso con uovo,pranzo,"halal_ok,vegetariano,pratico",500010:95;1800:52;391:100;336:80;008820:20;702901:13
 M107,Pasta con salmone e pomodorini,pranzo,"halal_ok,pesce",60091:80;700405:100;391:150;702901:10
-M108,Riso con fagioli e tonno,pranzo,"halal_ok,legumi,pesce,pratico",500010:90;004210:90;1515:40;391:80;700169:30;008820:20;702901:12
+M108,Riso con fagioli e tonno,pranzo,"halal_ok,legumi,pesce,pratico",500010:75;004210:145;1515:46;391:80;700169:30;008820:20;702901:10
 M109,Sardine al forno con patate,cena,"halal_ok,pesce",122800:125;331:200;381:150;000550:25;702901:12
 M110,Pasta con gamberi e zucchine,pranzo,"halal_ok,pesce",60091:100;1309:85;349:150;391:80;702901:13
 M111,Manzo magro con verdure grigliate,cena,"halal_ok,carne",8520:105;349:250;000550:90;702901:12
@@ -114,7 +114,7 @@ M114,Pasta integrale al pomodoro con sarde,pranzo,"halal_ok,pesce",60091:75;1228
 M115,Merluzzo con asparagi e pane integrale,cena,"mensa_ok,halal_ok,pesce",1313:200;304:150;000550:40;702901:8
 M116,Mozzarella di bufala e pomodori,cena,"halal_ok,vegetariano,pratico",11796:150;391:250;702901:10
 M117,Alici al forno con pomodorini,cena,"halal_ok,pesce",1300:200;391:100;702901:10;000570:15
-M118,Insalata di pasta integrale con tonno e olive,pranzo,"mensa_ok,halal_ok,pesce,pratico",60091:75;1515:80;592:20;391:100;702901:10
+M118,Insalata di pasta integrale con tonno e olive,pranzo,"mensa_ok,halal_ok,pesce,pratico",60091:75;1515:92;592:20;391:100;702901:10
 M119,Vitello al limone con caponata,cena,"halal_ok,carne",101520:180;334:180;391:80;777010:10;702901:10
 M120,Farro freddo con sgombro e rucola,pranzo,"halal_ok,pesce,pratico",8603:70;1321:100;391:150;700169:50;702901:10
 M121,Riso integrale con ceci e spinaci,pranzo,"mensa_ok,halal_ok,vegetariano,legumi",500010:70;4005:150;345:200;702901:10
@@ -124,5 +124,5 @@ M124,Pasta con pomodorini e parmigiano,pranzo,"mensa_ok,halal_ok,vegetariano",00
 M125,Pesce bianco al vapore e verdure,cena,"mensa_ok,halal_ok,pesce",1313:150;336:200;702901:10;100154_2:30
 M126,Bresaola e insalata,cena,"halal_ok,carne,pratico",100061:80;331:150;702901:10;100154_2:30
 M127,"Insalata di patate, pomodori, olive e tonno",pranzo,"halal_ok,pesce,pratico",381:220;391:150;592:15;1515:100;702901:10
-M128,Salmone in scatola e verdure,cena,"halal_ok,pesce,pratico",1510:120;349:200;702901:10;100154_2:30
-M129,Cous cous freddo con ceci e feta,pranzo,"halal_ok,vegetariano,legumi,pratico",888013:70;004010:50;805080:30;391:150;702901:10
+M128,Salmone in scatola e verdure,cena,"halal_ok,pesce,pratico",1510:135;349:200;702901:10;100154_2:30
+M129,Cous cous freddo con ceci e feta,pranzo,"halal_ok,vegetariano,legumi,pratico",888013:40;004010:145;805080:30;391:150;702901:10

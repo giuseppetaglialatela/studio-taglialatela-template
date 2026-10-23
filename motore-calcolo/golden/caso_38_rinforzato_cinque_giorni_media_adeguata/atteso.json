@@ -55,10 +55,6 @@
       "MEDIA_SOTTO_LARN"
     ],
     [
-      4,
-      "ATWATER_SEGNALATO"
-    ],
-    [
       5,
       "TERAPIA_NON_DICHIARATA"
     ],
@@ -73,5 +69,5 @@
   ],
   "exit_code": 0,
   "descrizione": "Piano di 5 giorni, calcio presente in 2, media adeguata (oltre l'80%). Il criterio della presenza vale solo da 6 giorni: NESSUN avviso. Diventa rosso se il minimo di giorni dell'avviso scende a 5.",
-  "riferimento": "Costruito il 22/10/2026 su indicazione della revisione indipendente. Giorni 1 e 4 ricchi, 2, 3, 5 poveri. Stesse giornate del caso 30: giorni ricchi (pranzo pasta integrale 30 g + rucola 200 g + pomodori 100 g + parmigiano 110 g; cena alici 140 g + fagiolini 200 g + pane integrale 30 g + olio 13 g; 1931,8 mg) e giorni poveri (giornata base + parmigiano 6 g; 271,7 mg). LARN calcio 950 mg. Target kcal sulla mediana, macro arrotondati dalla media e corretti perche' la somma sia 100. Attenzioni giornaliere di kcal e macro attese (settimana sbilanciata), non bloccanti."
+  "riferimento": "Costruito il 22/10/2026 su indicazione della revisione indipendente. Giorni 1 e 4 ricchi, 2, 3, 5 poveri. Stesse giornate del caso 30: giorni ricchi (pranzo pasta integrale 30 g + rucola 200 g + pomodori 100 g + parmigiano 110 g; cena alici 140 g + fagiolini 200 g + pane integrale 30 g + olio 13 g; 1931,8 mg) e giorni poveri (giornata base + parmigiano 6 g; 271,7 mg). LARN calcio 950 mg. Target kcal sulla mediana, macro arrotondati dalla media e corretti perche' la somma sia 100. Attenzioni giornaliere di kcal e macro attese (settimana sbilanciata), non bloccanti. Atteso rigenerato il 23/10/2026: il cross-check Atwater della pipeline guarda solo gli alimenti del piano e non segnala i falsi positivi verificati (l'intero database lo controlla il collaudo, controllo 9); unica differenza verificata, la scomparsa di ATWATER_SEGNALATO."
 }

@@ -16,10 +16,6 @@
       "MEDIA_SOTTO_LARN_CON_GAP"
     ],
     [
-      4,
-      "ATWATER_SEGNALATO"
-    ],
-    [
       5,
       "TERAPIA_NON_DICHIARATA"
     ],
@@ -30,5 +26,5 @@
   ],
   "exit_code": 1,
   "descrizione": "Colazione del livello rinforzata_calcio (Sr1, Sr2, Dr1, Dr2), spuntino standard (SPA, SPB): non e' un piano rinforzato. Deve comparire VALUTARE_LIVELLO_RINFORZATO (media minima del calcio sotto l'80%) insieme al blocco LIVELLO_INCOERENTE_TRA_PASTI (exit 1). Diventa rosso se l'avviso tace guardando la sola colazione.",
-  "riferimento": "Costruito il 22/10/2026 su indicazione della revisione indipendente. Pranzo pasta integrale 80 g + pomodori 100 g + olio 13 g; cena merluzzo 140 g + patate 180 g + fagiolini 200 g + pane integrale 30 g + olio 13 g; colazione (ed eventuale spuntino) dal catalogo colazioni_spuntini.csv. Sei giorni identici. LARN calcio 950 mg. Target kcal sulla mediana degli scenari del catalogo precedente, macro arrotondati dalla media e corretti perche' la somma sia 100. Atteso rigenerato il 23/10/2026 con il catalogo colazioni_spuntini.csv portato ai formati di confezione (S1 uova 104 g, S2 fiocchi 200 g + pane 45 g, D2 e SPA yogurt 125 g, SPrB yogurt 250 g + nocciole 5 g; grammi aggiornati anche nel piano di questo caso): unica differenza verificata, la scomparsa di FORMATO_CONFEZIONE_NON_RISPETTATO. Bloccanti ed exit code invariati."
+  "riferimento": "Costruito il 22/10/2026 su indicazione della revisione indipendente. Pranzo pasta integrale 80 g + pomodori 100 g + olio 13 g; cena merluzzo 140 g + patate 180 g + fagiolini 200 g + pane integrale 30 g + olio 13 g; colazione (ed eventuale spuntino) dal catalogo colazioni_spuntini.csv. Sei giorni identici. LARN calcio 950 mg. Target kcal sulla mediana degli scenari del catalogo precedente, macro arrotondati dalla media e corretti perche' la somma sia 100. Atteso rigenerato il 23/10/2026 con il catalogo colazioni_spuntini.csv portato ai formati di confezione (S1 uova 104 g, S2 fiocchi 200 g + pane 45 g, D2 e SPA yogurt 125 g, SPrB yogurt 250 g + nocciole 5 g; grammi aggiornati anche nel piano di questo caso): unica differenza verificata, la scomparsa di FORMATO_CONFEZIONE_NON_RISPETTATO. Bloccanti ed exit code invariati. Atteso rigenerato il 23/10/2026: il cross-check Atwater della pipeline guarda solo gli alimenti del piano e non segnala i falsi positivi verificati (l'intero database lo controlla il collaudo, controllo 9); unica differenza verificata, la scomparsa di ATWATER_SEGNALATO."
 }

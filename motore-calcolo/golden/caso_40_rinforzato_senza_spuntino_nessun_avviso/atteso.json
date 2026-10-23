@@ -15,10 +15,6 @@
       "MEDIA_SOTTO_LARN_CON_GAP"
     ],
     [
-      4,
-      "ATWATER_SEGNALATO"
-    ],
-    [
       5,
       "TERAPIA_NON_DICHIARATA"
     ],
@@ -29,5 +25,5 @@
   ],
   "exit_code": 0,
   "descrizione": "Piano a 3 pasti, senza spuntino, con la colazione del livello rinforzata_calcio completo: il piano usa il livello rinforzato per tutti i pasti del protocollo presenti, quindi NESSUN avviso, anche con la media minima del calcio al 37,9% (360 mg). Diventa rosso se l'avviso pretende uno spuntino rinforzato che il piano non ha. Attenzione attesa PASTO_ASSENTE_SU_TUTTO_IL_PIANO.",
-  "riferimento": "Costruito il 22/10/2026 su indicazione della revisione indipendente. Pranzo pasta integrale 80 g + pomodori 100 g + olio 13 g; cena merluzzo 140 g + patate 180 g + fagiolini 200 g + pane integrale 30 g + olio 13 g; colazione (ed eventuale spuntino) dal catalogo colazioni_spuntini.csv. Sei giorni identici. LARN calcio 950 mg. Target kcal sulla mediana degli scenari, macro arrotondati dalla media e corretti perche' la somma sia 100."
+  "riferimento": "Costruito il 22/10/2026 su indicazione della revisione indipendente. Pranzo pasta integrale 80 g + pomodori 100 g + olio 13 g; cena merluzzo 140 g + patate 180 g + fagiolini 200 g + pane integrale 30 g + olio 13 g; colazione (ed eventuale spuntino) dal catalogo colazioni_spuntini.csv. Sei giorni identici. LARN calcio 950 mg. Target kcal sulla mediana degli scenari, macro arrotondati dalla media e corretti perche' la somma sia 100. Atteso rigenerato il 23/10/2026: il cross-check Atwater della pipeline guarda solo gli alimenti del piano e non segnala i falsi positivi verificati (l'intero database lo controlla il collaudo, controllo 9); unica differenza verificata, la scomparsa di ATWATER_SEGNALATO."
 }

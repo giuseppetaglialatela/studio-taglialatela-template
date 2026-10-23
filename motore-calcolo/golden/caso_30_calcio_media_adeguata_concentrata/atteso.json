@@ -75,10 +75,6 @@
       "MEDIA_SOTTO_LARN"
     ],
     [
-      4,
-      "ATWATER_SEGNALATO"
-    ],
-    [
       5,
       "TERAPIA_NON_DICHIARATA"
     ],
@@ -97,5 +93,5 @@
   ],
   "exit_code": 0,
   "descrizione": "Il caso per cui il controllo esiste: media settimanale del calcio ADEGUATA (87% del LARN 950) ma concentrata in 2 giorni su 6 (1932 mg), con gli altri quattro al 28,6% (271,7 mg). Deve comparire DISTRIBUZIONE_CONCENTRATA e NON MEDIA_SOTTO_LARN sul calcio. Diventa rosso se il rilievo viene legato a una media bassa.",
-  "riferimento": "Costruito il 22/10/2026 su indicazione della revisione indipendente. Giorni poveri = giornata base + parmigiano 6 g. Giorni ricchi: stessa colazione e spuntino; pranzo pasta integrale 30 g + rucola 200 g + pomodori 100 g + parmigiano 110 g; cena alici fresche 140 g + fagiolini 200 g + pane integrale 30 g + olio 13 g. LARN calcio 950 mg (adulti 18-64), valore reale. Target 1187 kcal (mediana dei giorni), 21/49/30: macro arrotondati dalla media e corretti perche' la somma sia 100. Una settimana cosi' sbilanciata non puo' avere tutti i giorni in tolleranza: le attenzioni KCAL_FUORI_TOLLERANZA (+5,7%) e MACRO_FUORI_TOLLERANZA giornaliere sono attese e non bloccanti; la media settimanale e' in tolleranza (exit 0). Atteso rigenerato il 22/10/2026 con l'avviso del livello rinforzato (PASSO 6): unica differenza verificata, la comparsa dell'attenzione VALUTARE_LIVELLO_RINFORZATO (piano di prova povero di calcio). Bloccanti ed exit code invariati."
+  "riferimento": "Costruito il 22/10/2026 su indicazione della revisione indipendente. Giorni poveri = giornata base + parmigiano 6 g. Giorni ricchi: stessa colazione e spuntino; pranzo pasta integrale 30 g + rucola 200 g + pomodori 100 g + parmigiano 110 g; cena alici fresche 140 g + fagiolini 200 g + pane integrale 30 g + olio 13 g. LARN calcio 950 mg (adulti 18-64), valore reale. Target 1187 kcal (mediana dei giorni), 21/49/30: macro arrotondati dalla media e corretti perche' la somma sia 100. Una settimana cosi' sbilanciata non puo' avere tutti i giorni in tolleranza: le attenzioni KCAL_FUORI_TOLLERANZA (+5,7%) e MACRO_FUORI_TOLLERANZA giornaliere sono attese e non bloccanti; la media settimanale e' in tolleranza (exit 0). Atteso rigenerato il 22/10/2026 con l'avviso del livello rinforzato (PASSO 6): unica differenza verificata, la comparsa dell'attenzione VALUTARE_LIVELLO_RINFORZATO (piano di prova povero di calcio). Bloccanti ed exit code invariati. Atteso rigenerato il 23/10/2026: il cross-check Atwater della pipeline guarda solo gli alimenti del piano e non segnala i falsi positivi verificati (l'intero database lo controlla il collaudo, controllo 9); unica differenza verificata, la scomparsa di ATWATER_SEGNALATO."
 }

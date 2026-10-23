@@ -1,0 +1,74 @@
+{
+  "tipo": "pipeline",
+  "bloccanti": [
+    [
+      5,
+      "INTERAZIONE_GRAVITA_ALTA"
+    ],
+    [
+      5,
+      "INTERAZIONE_GRAVITA_ALTA"
+    ],
+    [
+      5,
+      "INTERAZIONE_GRAVITA_NON_RICONOSCIUTA"
+    ],
+    [
+      5,
+      "INTERAZIONE_NUTRIENTE_NON_RICONOSCIUTO"
+    ],
+    [
+      5,
+      "INTERAZIONE_TIPO_NON_RICONOSCIUTO"
+    ],
+    [
+      5,
+      "TERAPIA_CONTRADDITTORIA"
+    ]
+  ],
+  "attenzioni": [
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      4,
+      "FORMATO_CONFEZIONE_NON_RISPETTATO"
+    ],
+    [
+      5,
+      "INTERAZIONE_FOOD_ID_ASSENTE"
+    ],
+    [
+      5,
+      "INTERAZIONE_GRAVITA_BASSA"
+    ],
+    [
+      5,
+      "INTERAZIONE_GRAVITA_MEDIA"
+    ],
+    [
+      5,
+      "INTERAZIONE_GRAVITA_MEDIA"
+    ],
+    [
+      6,
+      "LIVELLO_FUORI_CATALOGO"
+    ],
+    [
+      6,
+      "LIVELLO_FUORI_CATALOGO"
+    ],
+    [
+      6,
+      "VALUTARE_LIVELLO_RINFORZATO"
+    ]
+  ],
+  "exit_code": 1,
+  "descrizione": "Il piano del caso 20 con i suoi file di terapia E l'opzione nessuna_terapia: dichiarazione contraddittoria, deve comparire il bloccante TERAPIA_CONTRADDITTORIA (exit 1) e i file si valutano comunque: tutti i verdetti del caso 20 restano, comprese le interazioni di gravita' alta. Diventa rosso se l'opzione nasconde una terapia passata con i file o i suoi rilievi.",
+  "riferimento": "Costruito il 23/10/2026 dal caso 20 (stessi piano, target, farmaci, interazioni, orari)."
+}

@@ -150,7 +150,8 @@ def esegui_caso_pipeline(nome_caso):
             pl.passo_5_interazioni(rilievi, piano, db,
                                    percorso_opzionale("farmaci"),
                                    percorso_opzionale("interazioni"),
-                                   percorso_opzionale("orari"))
+                                   percorso_opzionale("orari"),
+                                   opzioni.get("nessuna_terapia"))
             pl.passo_6_livello_unico(rilievi, righe_estese, db,
                                      opzioni.get("deroga_struttura"), esito_calcio)
 
@@ -495,8 +496,17 @@ def modo_verifica():
                 print(f"        {s}")
             falliti += 1
 
+    # Riga di comando (23/10/2026): i casi chiamano i passi della pipeline
+    # direttamente e non vedono il passaggio delle opzioni da argparse a main().
+    # Un'esecuzione reale di pipeline.py lo verifica per --nessuna-terapia.
+    ok_cli, msg_cli = verifica_riga_di_comando()
+    print(f"\n  [{'OK ' if ok_cli else 'XX '}] riga di comando di pipeline.py: {msg_cli}")
+    if not ok_cli:
+        falliti += 1
+
     print("\n" + "=" * 60)
-    print(f"RISULTATO: {passati} passati, {falliti} falliti su {len(casi)} casi")
+    print(f"RISULTATO: {passati} passati, {len(casi) - passati} falliti su {len(casi)} casi; "
+          f"controllo della riga di comando {'superato' if ok_cli else 'FALLITO'}")
     if falliti:
         print("SUITE ROSSA - non usare il motore su un paziente.")
         print("Capire la causa PRIMA di rigenerare qualunque atteso.json.")
@@ -504,6 +514,34 @@ def modo_verifica():
         print("SUITE VERDE - il motore calcola come da riferimento.")
     print("=" * 60)
     return 1 if falliti else 0
+
+
+def verifica_riga_di_comando():
+    """pipeline.py eseguito davvero sul caso 45 con --nessuna-terapia: nel
+    verdetto deve comparire TERAPIA_DICHIARATA_ASSENTE con la fonte e non
+    TERAPIA_NON_DICHIARATA."""
+    import subprocess
+    cartella = os.path.join(GOLDEN_DIR, "caso_45_nessuna_terapia_dichiarata")
+    fonte = "prova riga di comando"
+    try:
+        esito = subprocess.run(
+            [sys.executable, os.path.join(BASE, "pipeline.py"),
+             "--piano", os.path.join(cartella, "piano.csv"),
+             "--target", os.path.join(cartella, "target.csv"),
+             "--nessuna-terapia", fonte, "--salta-collaudo"],
+            capture_output=True, text=True, timeout=60)
+    except Exception as e:
+        return False, f"esecuzione non riuscita: {e}"
+    out = esito.stdout
+    # solo il verdetto: la fonte e' stampata anche nel corpo del PASSO 5
+    out = out[out.rfind("VERDETTO"):] if "VERDETTO" in out else ""
+    if not out:
+        return False, "il report non contiene il VERDETTO"
+    if "TERAPIA_NON_DICHIARATA" in out:
+        return False, "--nessuna-terapia non arriva al PASSO 5 (compare TERAPIA_NON_DICHIARATA)"
+    if "TERAPIA_DICHIARATA_ASSENTE" not in out or fonte not in out:
+        return False, "nel verdetto manca TERAPIA_DICHIARATA_ASSENTE con la fonte"
+    return True, "--nessuna-terapia arriva al PASSO 5 e la fonte compare nel verdetto"
 
 
 if __name__ == "__main__":

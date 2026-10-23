@@ -1,0 +1,17 @@
+{
+  "tipo": "pipeline",
+  "bloccanti": [],
+  "attenzioni": [
+    [
+      3,
+      "MEDIA_SOTTO_LARN_CON_GAP"
+    ],
+    [
+      5,
+      "TERAPIA_DICHIARATA_ASSENTE"
+    ]
+  ],
+  "exit_code": 0,
+  "descrizione": "Il piano del caso 36 eseguito con nessuna_terapia (opzione --nessuna-terapia \"fonte\", 23/10/2026): il nutrizionista dichiara di aver verificato che il paziente non assume farmaci, e da dove. Al posto di TERAPIA_NON_DICHIARATA compare l'attenzione TERAPIA_DICHIARATA_ASSENTE con la fonte; tutti gli altri verdetti uguali al caso 36. Diventa rosso se l'opzione viene ignorata.",
+  "riferimento": "Costruito il 23/10/2026 dal caso 36 (stessi piano e target), su rilievo del primo piano reale: l'attenzione compariva anche a terapia gia' verificata assente."
+}

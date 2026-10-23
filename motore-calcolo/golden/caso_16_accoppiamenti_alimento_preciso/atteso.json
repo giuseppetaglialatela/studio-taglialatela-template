@@ -48,10 +48,6 @@
       "ACCOPPIAMENTO_VIETATO"
     ],
     [
-      4,
-      "ATWATER_SEGNALATO"
-    ],
-    [
       5,
       "TERAPIA_NON_DICHIARATA"
     ],
@@ -66,5 +62,5 @@
   ],
   "exit_code": 1,
   "descrizione": "Accoppiamenti su alimento preciso (21/10/2026): a pranzo pasta+merluzzo (A04) e parmigiano+mozzarella (A03). Atteso: 2 ACCOPPIAMENTO_VIETATO al PASSO 4. Controllo negativo a cena: pasta integrale con alici e un solo formaggio NON devono scattare.",
-  "riferimento": ""
+  "riferimento": " Atteso rigenerato il 23/10/2026: il cross-check Atwater della pipeline guarda solo gli alimenti del piano e non segnala i falsi positivi verificati (l'intero database lo controlla il collaudo, controllo 9); unica differenza verificata, la scomparsa di ATWATER_SEGNALATO."
 }

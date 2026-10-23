@@ -53,6 +53,29 @@ SOGLIA_ATWATER_KCAL_ASSOLUTA = 8.0  # FASE 0.2: tarata - vedi nota sotto
 # segnalati, vanno verificati uno a uno - non si alza la soglia per farli
 # sparire senza aver prima escluso l'errore di trascrizione.
 
+# Falsi positivi verificati (dati di fonte corretti, scarto dovuto a fibra,
+# polioli o arrotondamenti della fonte): la pipeline non li segnala piu' nel
+# piano, il collaudo (controllo 9) fallisce se sul database compare un'anomalia
+# che non e' qui, o se una voce di qui non e' piu' anomala (23/10/2026).
+# Un alimento si aggiunge SOLO dopo aver escluso l'errore di trascrizione.
+# food_id: (nome, scarto percentuale atteso). Con uno scarto diverso da quello
+# atteso di oltre ATWATER_MARGINE_NOTI_PUNTI il dato e' cambiato: non e' piu'
+# il falso positivo verificato, si tratta come un segnalato nuovo.
+ATWATER_FALSI_POSITIVI_NOTI = {
+    "005000": ("Aglio", -15.5),
+    "005120": ("Carciofi", -31.5),
+    "9600_1": ("Semi di lino secchi", -15.7),
+}
+ATWATER_MARGINE_NOTI_PUNTI = 1.0
+
+
+def falso_positivo_noto(anomalia):
+    """True se l'anomalia e' un falso positivo verificato con lo scarto atteso."""
+    voce = ATWATER_FALSI_POSITIVI_NOTI.get(anomalia["food_id"])
+    if voce is None or anomalia["scarto_pct"] is None:
+        return False
+    return abs(anomalia["scarto_pct"] - voce[1]) <= ATWATER_MARGINE_NOTI_PUNTI
+
 MICRO = ["calcio_mg", "ferro_mg", "vitamina_d_ug", "folati_ug",
          "vitamina_b12_ug", "zinco_mg", "magnesio_mg", "vitamina_c_mg"]
 

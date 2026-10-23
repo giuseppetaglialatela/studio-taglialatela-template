@@ -107,7 +107,6 @@ voce generica al posto di quella specifica, marcala come proxy e dichiarala.
 
 ```
 python3 cerca_crea.py verifica   # kcal, macro e fibra delle righe CREA = cache
-python3 coerenza.py          # sull'INTERO database, non solo sulle righe nuove
 # aggiorna EXPECTED_ALIMENTI_COUNT in collaudo.py
 python3 collaudo.py --genera-checksums
 python3 collaudo.py
@@ -118,10 +117,14 @@ Se il numero di alimenti caricati non è quello atteso, è un errore di formato
 nel CSV.
 
 **9. Riporta quattro cose:** quanti alimenti aggiunti e quali; quali non trovati
-e perché; quali flag e se sono reali o falsi positivi noti; quali righe sono
+e perché; quali flag e se sono reali o falsi positivi noti (un'anomalia Atwater nuova
+ferma il collaudo, controllo 9, che guarda l'intero database: esclusa la trascrizione
+errata, l'alimento va in `coerenza.ATWATER_FALSI_POSITIVI_NOTI` con il suo scarto, poi di
+nuovo `--genera-checksums` e collaudo); quali righe sono
 state aggiunte a gap.csv. Poi salva con un commit (M1, sezione 1, «Come si salva una
 modifica»): `alimenti.csv`, `collaudo.py` (conteggio atteso), `nomi_paziente.csv`,
-`ruoli_alimenti.csv` e `SHA256SUMS` vanno nello STESSO commit, altrimenti il collaudo
+`ruoli_alimenti.csv`, `coerenza.py` se è cambiato l'elenco dei falsi positivi, e
+`SHA256SUMS` vanno nello STESSO commit, altrimenti il collaudo
 fallisce alla sessione dopo.
 
 ---

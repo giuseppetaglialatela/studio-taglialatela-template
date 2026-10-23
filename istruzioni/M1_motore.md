@@ -1,9 +1,10 @@
 # M1 — MOTORE DI CALCOLO
 
 Modulo operativo (principio 6). Dipendenze: nessuna. Ne dipendono M2 e M6.
-Ultima modifica: 22/10/2026 (distribuzione del solo calcio, «presente» = 30% LARN, scenario
-minimo; avviso `VALUTARE_LIVELLO_RINFORZATO`; fermi di `genera_zona_piano.py` sui
-segnaposto; casi golden 27-44). Motivazioni, episodi e date in
+Ultima modifica: 23/10/2026 (catalogo e libreria ai formati, condimenti a porzione libera;
+Atwater solo sul piano e controllo 9 del collaudo; `--nessuna-terapia`; ripiego d'avvio;
+casi golden 45-50). 22/10: distribuzione del calcio, avviso del livello rinforzato, fermi
+sui segnaposto. Motivazioni, episodi e date in
 `istruzioni/archivio/M1-motivazioni.md`, che non si carica.
 
 Copre: avvio della sessione, moduli software, casi golden, database e fonti, schema CSV e
@@ -50,7 +51,7 @@ di lavoro, riscarica e ricollauda prima di fidarti dei numeri.
 ## 2. MODULI SOFTWARE
 
 ### collaudo.py — certificato di inizio sessione
-Otto controlli:
+Nove controlli:
 1. presenza e integrità di tutti i CSV, incluso il numero di colonne per riga
    (`csv.DictReader` da solo NON lo segnala)
 2. righe di `alimenti.csv` contro `EXPECTED_ALIMENTI_COUNT`
@@ -62,12 +63,16 @@ Otto controlli:
    duplicati né righe orfane
 7. `formati_confezione.csv` e `scambi_frutta.csv`: ogni `food_id` esiste in
    `alimenti.csv`, unità e tolleranze valide; ogni alternativa del catalogo
-   `colazioni_spuntini.csv` rispetta i formati di confezione (la libreria `moduli_*.csv`
-   non è controllata: ha 29 blocchi fuori formato, 32 violazioni, in attesa di decisione)
+   `colazioni_spuntini.csv` e ogni blocco della libreria (`moduli_pasto.csv`,
+   `moduli_colazione.csv`) rispettano i formati di confezione
 8. ogni `food_id` ha un ruolo ammesso in `ruoli_alimenti.csv`; le regole di
    `accoppiamenti_vietati.csv` usano voci valide (ruoli o `food_id`); nessun blocco della
    libreria (`moduli_pasto.csv`, `moduli_colazione.csv`) contiene un accoppiamento vietato
    o un tag calcolato scritto a mano (vitD, calcio, leggero)
+9. cross-check Atwater sull'intero database: ogni anomalia deve essere un falso positivo
+   verificato (`coerenza.ATWATER_FALSI_POSITIVI_NOTI`: aglio, carciofi, semi di lino) e
+   ogni voce dell'elenco deve essere ancora anomala; la pipeline lo esegue solo sugli
+   alimenti del piano (sezione 8)
 
 Esce 0 (superato) o 1 (fallito). File opzionali (`cache.zip`, `BDA_alimenti.xlsx`,
 `crea_cache.zip`): se presenti si verificano come gli altri, se assenti il collaudo lo
@@ -101,6 +106,7 @@ ammesso (`PASTO_NON_AMMESSO`, es. `spuntino 2` con lo spazio).
 ```
 python3 pipeline.py --piano piano.csv --target target.csv
   [--farmaci f.csv --interazioni i.csv --orari o.csv]
+  [--nessuna-terapia "fonte della verifica"]
   [--deroga-struttura "motivo"] [--eccezione-etichetta voci.csv] [--salta-collaudo]
 ```
 Esce 0 senza rilievi bloccanti, 1 altrimenti; il report si stampa per intero in entrambi i
@@ -112,7 +118,9 @@ sconosciuto; valore di pasto non ammesso; file di eccezione etichetta non valido
 tutto l'intervallo, dallo stesso lato; **giorno o scenario oltre ±10% di kcal**; target incoerenti; file dei formati o
 degli accoppiamenti illeggibili o accoppiamenti non verificati; interazione di gravità ALTA;
 gravità, tipo o nutriente non riconosciuti nella tabella interazioni;
-orario di un pasto mancante; terapia dichiarata solo in parte; struttura pasti non uniforme;
+orario di un pasto mancante; terapia dichiarata solo in parte; assenza di terapia dichiarata
+(`--nessuna-terapia`) insieme a file di terapia, o senza fonte (`TERAPIA_CONTRADDITTORIA`: i
+file si valutano comunque e i loro rilievi restano); struttura pasti non uniforme;
 livelli colazione/spuntino misti o incoerenti tra pasti; catalogo disallineato.
 
 **Rilievi DA DICHIARARE** (non bloccano): eccezione etichetta dichiarata
@@ -121,11 +129,14 @@ fuori ±5 punti; scenario di scelta fuori tolleranza entro ±10%; estremi macro 
 (limiti di garanzia, non giornate componibili); un solo estremo della media settimanale
 di un macro fuori tolleranza; fibra sotto l'80% del target;
 micronutrienti sotto l'80% LARN *in media settimanale* (con o senza gap); target privo di
-LARN (micronutrienti non confrontati con niente); distribuzione concentrata; falsi positivi
-Atwater; micronutrienti tutti a zero; quantità fuori formato; accoppiamenti vietati;
+LARN (micronutrienti non confrontati con niente); distribuzione concentrata; anomalia
+Atwater di un alimento del piano che non è un falso positivo verificato (in pratica solo una
+voce da etichetta); micronutrienti tutti a zero; quantità fuori formato; accoppiamenti vietati;
 interazioni di gravità media o bassa (`INTERAZIONE_GRAVITA_MEDIA`, `_BASSA`); riga della
 tabella interazioni su un `food_id` assente dal database;
-principi attivi assenti dalla tabella; terapia non dichiarata; pasto assente su tutto il
+principi attivi assenti dalla tabella; terapia non dichiarata (né file né
+`--nessuna-terapia`); terapia dichiarata assente, con la fonte
+(`TERAPIA_DICHIARATA_ASSENTE`: è la traccia della verifica nel verdetto); pasto assente su tutto il
 piano; livello parziale o fuori catalogo; catalogo assente (livello verificato solo come
 uniforme); collaudo saltato; avviso del livello rinforzato (`VALUTARE_LIVELLO_RINFORZATO`,
 PASSO 6). I totali sottostimati per gap si stampano nel report.
@@ -166,8 +177,13 @@ pasti; il rilievo resta nel report con il motivo. Livello misto e catalogo disal
 restano bloccanti anche con la deroga.
 
 ### regressione.py
-Suite sui 44 casi golden in `golden/`: un comando, pass/fail per caso. Si riesegue **dopo
+Suite sui 50 casi golden in `golden/`: un comando, pass/fail per caso. Si riesegue **dopo
 ogni modifica** al motore o al database, e comunque prima di qualsiasi uso clinico.
+- Dopo i casi, la suite esegue davvero `pipeline.py` con `--nessuna-terapia` sul caso 45
+  e controlla che l'opzione arrivi al PASSO 5 e che la fonte compaia nel VERDETTO: i casi
+  chiamano i passi direttamente e non
+  vedrebbero un'opzione persa tra la riga di comando e `main()`. Vale solo per questa
+  opzione.
 - Nei casi `pipeline` la suite ripete la sequenza di `pipeline.main()`: un controllo nuovo
   va in una funzione chiamata da entrambi (come `controlla_pasti_ammessi`), altrimenti la
   suite non lo vede.
@@ -454,11 +470,22 @@ validato).
   colazione fuori catalogo, avviso; 44 rinforzato parziale, nessun avviso.
   Limite dichiarato (31 e 41): l'arrotondamento a 6 decimali dei confronti non è protetto da
   nessun caso.
+- **45_nessuna_terapia_dichiarata** — il piano del 36 con `nessuna_terapia` (la fonte):
+  `TERAPIA_NON_DICHIARATA` diventa `TERAPIA_DICHIARATA_ASSENTE`, il resto uguale al 36.
+- **46_nessuna_terapia_con_farmaci** — il piano del 20 con i suoi file di terapia e
+  `nessuna_terapia`: i verdetti del 20 più il bloccante `TERAPIA_CONTRADDITTORIA`.
+- **47_atwater_falso_positivo_noto_nel_piano** — il 36 con aglio 5 g a cena: nessun
+  `ATWATER_SEGNALATO`.
+- **48_atwater_etichetta_incoerente** — il 18 con la voce da etichetta a grassi 0,2 g (kcal
+  invariate, scarto -25,5%): `ATWATER_SEGNALATO`, il resto uguale al 18.
+- **49_nessuna_terapia_senza_fonte**, **50_nessuna_terapia_senza_fonte_con_farmaci** —
+  `nessuna_terapia` vuota (o solo spazi): bloccante `TERAPIA_CONTRADDITTORIA`; nel 50 i file
+  di terapia del caso 20 si valutano comunque e tutti i suoi verdetti restano.
 
 **Tipi di caso.** `fisso` e `scelta_multipla` si deducono dal piano (presenza di
 `gruppo_scelta`). `pipeline` è l'unico DICHIARATO, da un `pipeline.json` nella cartella del
 caso, che porta anche le opzioni di esecuzione (`deroga_struttura`, `farmaci`,
-`interazioni`, `orari`, `eccezione_etichetta`). I casi `pipeline`
+`interazioni`, `orari`, `eccezione_etichetta`, `nessuna_terapia`). I casi `pipeline`
 congelano i VERDETTI (passo, codice del rilievo, codice di uscita), non i numeri.
 
 **Limite di copertura.** I casi toccano solo gli alimenti dei rispettivi piani: una
@@ -679,10 +706,14 @@ analitici).
   e macro coincidono con la scheda CREA;
 - **SEMI DI LINO** (`9600_1`) — atteso -15,7%, scarto 70 kcal: BDA-IEO calcola l'energia
   «con fibra».
-Uno di questi con scarto diverso da quello atteso non è più il falso positivo noto: va
-verificato come un segnalato nuovo.
-Non correggere il dato: dichiara il falso positivo e prosegui. Un NUOVO segnalato dopo un
-ampliamento si verifica uno a uno: non si alza la soglia per farlo sparire.
+Dal 23/10/2026 l'elenco sta nel codice (`coerenza.ATWATER_FALSI_POSITIVI_NOTI`), con lo
+scarto atteso di ciascuno: la pipeline guarda solo gli alimenti del piano e non segnala
+questi tre; il collaudo (controllo 9) controlla l'intero database e si ferma su
+un'anomalia fuori elenco, su una voce dell'elenco non più anomala o su una voce con scarto
+lontano più di 1 punto da quello atteso. Uno di questi con scarto diverso da quello atteso
+non è più il falso positivo noto: va verificato come un segnalato nuovo. Un NUOVO segnalato dopo un ampliamento ferma il collaudo:
+si esclude l'errore di trascrizione, poi si aggiunge all'elenco nello stesso commit. Non
+si alza la soglia per farlo sparire, non si corregge il dato della fonte.
 
 **Sardine, riga unica 122800.** «Sarda fresca» (BDA 1319) NON esiste più come voce
 separata. Kcal e macro CREA; TUTTI i micronutrienti da INSA 882 «Sardinha gorda crua»

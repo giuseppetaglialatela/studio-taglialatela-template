@@ -2,8 +2,8 @@
 
 Modulo operativo: si carica quando si compone, si modifica o si valuta un piano.
 Dipende da **M1**: nessun passo è eseguibile senza il motore collaudato.
-Ultima modifica: 22/10/2026 (distribuzione del solo calcio; avviso del livello rinforzato;
-fermi di `genera_zona_piano.py` sui segnaposto). Motivazioni, episodi e date in
+Ultima modifica: 23/10/2026 (condimenti a porzione libera; `--nessuna-terapia`; 22/10:
+distribuzione del solo calcio, avviso del livello rinforzato, fermi sui segnaposto). Motivazioni, episodi e date in
 `istruzioni/archivio/M2-motivazioni.md`, che non si carica.
 
 Rimandi: motore, CSV, gap, fonti → **M1** · PDF del piano e documento di spiegazione →
@@ -26,11 +26,12 @@ dedurre dalla formulazione del piatto.
 
 **Formati di confezione — nessuno spreco.** Fonte: `formati_confezione.csv`, nella cartella
 del motore.
-1. **Monoporzione o deperibile una volta aperto** (yogurt, fiocchi di latte, scatolame,
-   uova): confezione intera o multiplo esatto del formato.
+1. **Monoporzione o deperibile una volta aperto** (yogurt, fiocchi di latte, scatolame
+   tranne i condimenti, uova): confezione intera o multiplo esatto del formato.
 2. **A peso al banco** (affettati, formaggi, carne, pesce, pane): qualsiasi grammatura.
 3. **Non deperibile o consumabile in famiglia** (pasta, riso, couscous, cereali, frutta
-   secca, gallette, cioccolato, latte, olive): porzione libera.
+   secca, gallette, cioccolato, latte, olive) e **condimenti, sempre** (olio, pomodori
+   pelati e passata, aceto…): porzione libera.
 Assente dal CSV = porzione libera. Il controllo E del PASSO 4 di `pipeline.py` SEGNALA (non
 blocca) le quantità fuori formato: si compone già a formato, e le segnalazioni residue si
 dichiarano al PASSO 6. Formato nuovo: stato `da_confermare` finché il nutrizionista non lo
@@ -237,7 +238,11 @@ Ogni criticità con ⚠️ e il **meccanismo**.
   (`farmaci_paziente.csv`, `interazioni.csv`, `orari_pasti.csv`), non solo annotata nella
   Tabella Vincoli. Senza nessun file il PASSO 5 della pipeline dà
   `TERAPIA_NON_DICHIARATA` (attenzione: va confermato che il paziente non sia in
-  terapia); con i file solo in parte blocca (`TERAPIA_INCOMPLETA`). L'assenza del file non
+  terapia); con i file solo in parte blocca (`TERAPIA_INCOMPLETA`). Verificato che il
+  paziente non assume farmaci, si esegue con `--nessuna-terapia "fonte"` (da dove viene la
+  verifica: colloquio, Form A, con la data): al posto di `TERAPIA_NON_DICHIARATA` il
+  verdetto riporta `TERAPIA_DICHIARATA_ASSENTE` con la fonte. Senza fonte, o insieme ai
+  file di terapia, blocca (`TERAPIA_CONTRADDITTORIA`). L'assenza del file non
   è l'assenza di terapia, e un'osservazione discorsiva non è una verifica: con una terapia
   dichiarata nel fascicolo, `TERAPIA_NON_DICHIARATA` vale come bloccante e il piano non si
   presenta finché i tre CSV non arrivano alla pipeline. Senza terapia, la conferma si
@@ -299,8 +304,8 @@ né con fretta dichiarata né con un piano identico a uno precedente.
 - le attenzioni `ACCOPPIAMENTO_VIETATO`: non bloccano, ma un accoppiamento vietato rimasto
   nel piano va motivato, non lasciato passare in silenzio;
 - l'eccezione etichetta, se usata (`ALIMENTO_FUORI_DATABASE_SU_RICHIESTA`);
-- la conferma che il paziente non è in terapia, se la pipeline ha dato
-  `TERAPIA_NON_DICHIARATA` (PASSO 4);
+- la conferma che il paziente non è in terapia, con la sua fonte
+  (`TERAPIA_DICHIARATA_ASSENTE`, oppure `TERAPIA_NON_DICHIARATA` da confermare) (PASSO 4);
 - l'attenzione `LIVELLO_INCOERENTE_IN_DEROGA`, se presente, con la decisione del
   nutrizionista (sezione 2);
 - l'avviso `VALUTARE_LIVELLO_RINFORZATO`, se presente, con il motivo che lo ha fatto

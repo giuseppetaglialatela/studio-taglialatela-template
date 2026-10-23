@@ -27,6 +27,7 @@ USO
                        --interazioni interazioni.csv
                        --orari orari_pasti.csv]
                       [--gap gap.csv]
+                      [--nessuna-terapia "fonte della verifica"]
                       [--deroga-struttura "motivo dichiarato"]
                       [--eccezione-etichetta voci_etichetta.csv]
                       [--salta-collaudo]
@@ -678,23 +679,32 @@ def passo_4_coerenza(rilievi, db, target, piano, gap, sottostime,
                      righe_estese=None):
     titolo(4, "COERENZA DEI DATI E GAP DICHIARATI")
 
-    anomalie = coerenza.check_atwater(db)
-    print(f"\n  A) Cross-check Atwater (allarme se > "
+    # Solo gli alimenti del piano (23/10/2026): l'intero database lo controlla
+    # il collaudo (controllo 9), che si ferma su ogni anomalia non verificata.
+    nel_piano = {r["food_id"] for r in piano} | {r["food_id"] for r in (righe_estese or [])}
+    anomalie = [a for a in coerenza.check_atwater(db) if a["food_id"] in nel_piano]
+    noti = [a for a in anomalie if coerenza.falso_positivo_noto(a)]
+    da_verificare = [a for a in anomalie if not coerenza.falso_positivo_noto(a)]
+    print(f"\n  A) Cross-check Atwater sugli alimenti del piano (allarme se > "
           f"{coerenza.SOGLIA_ATWATER_PCT}% E > "
           f"{coerenza.SOGLIA_ATWATER_KCAL_ASSOLUTA} kcal/100g):")
     if not anomalie:
-        print("     nessuna anomalia sul database.")
-    else:
-        for a in anomalie:
-            scarto = (f"{a['scarto_pct']:+.1f}% / {a['scarto_abs']:.2f} kcal"
-                      if a["scarto_pct"] is not None else "kcal a zero")
-            print(f"     ⚠️ {a['food_id']} - {a['nome']}: {scarto}")
+        print("     nessuna anomalia negli alimenti del piano.")
+    for a in noti:
+        print(f"     {a['food_id']} - {a['nome']}: falso positivo noto e verificato, "
+              f"nessun rilievo")
+    for a in da_verificare:
+        scarto = (f"{a['scarto_pct']:+.1f}% / {a['scarto_abs']:.2f} kcal"
+                  if a["scarto_pct"] is not None else "kcal a zero")
+        print(f"     ⚠️ {a['food_id']} - {a['nome']}: {scarto}")
+    if da_verificare:
         print("     Le kcal restano quelle della fonte: questo controllo dice")
         print("     dove verificare la trascrizione, non cosa correggere.")
-        rilievi.segnala(4, "ATWATER_SEGNALATO", f"{len(anomalie)} alimento/i segnalato/i dal "
-                           f"cross-check Atwater (falsi positivi noti e attesi: "
-                           f"aglio, carciofi, semi di lino - M1; ogni altro "
-                           f"nome va verificato)")
+        rilievi.segnala(4, "ATWATER_SEGNALATO", f"{len(da_verificare)} alimento/i del piano "
+                           f"segnalato/i dal cross-check Atwater, non tra i falsi "
+                           f"positivi verificati: "
+                           + ", ".join(a["nome"] for a in da_verificare)
+                           + " - verificare la trascrizione")
 
     problemi = coerenza.check_target(target)
     print(f"\n  B) Coerenza interna dei target:")
@@ -781,18 +791,43 @@ GRAVITA_AMMESSE = ("alta", "media", "bassa")
 
 
 def passo_5_interazioni(rilievi, piano, db, farmaci_path, interazioni_path,
-                        orari_path):
+                        orari_path, nessuna_terapia=None):
     titolo(5, "INTERAZIONI FARMACO-ALIMENTO")
 
     forniti = [p for p in (farmaci_path, interazioni_path, orari_path) if p]
+    # --nessuna-terapia "fonte" (23/10/2026): il nutrizionista dichiara di aver
+    # verificato che il paziente non assume farmaci, e da dove. La dichiarazione
+    # resta nel verdetto (attenzione, non blocca); insieme ai file di terapia e'
+    # una contraddizione: blocca, ma i file si valutano comunque, perche' le
+    # interazioni che contengono non spariscano dal report.
+    if nessuna_terapia is not None and not str(nessuna_terapia).strip():
+        rilievi.blocca(5, "TERAPIA_CONTRADDITTORIA", "--nessuna-terapia senza la fonte "
+                          "della verifica (es. \"colloquio 20/10, Form A\")")
+        if not forniti:
+            return
+        # con i file di terapia si prosegue: i loro rilievi non devono sparire
+    elif nessuna_terapia and forniti:
+        print("\n  ⛔ Dichiarata l'assenza di terapia MA passati file di terapia:")
+        print("  i file si valutano comunque, il piano resta bloccato.")
+        rilievi.blocca(5, "TERAPIA_CONTRADDITTORIA", f"dichiarata l'assenza di terapia "
+                          f"(--nessuna-terapia: {nessuna_terapia}) ma passati file di "
+                          f"terapia: chiarire quale delle due e' vera")
+    elif nessuna_terapia:
+        print(f"\n  TERAPIA DICHIARATA ASSENTE dal nutrizionista: {nessuna_terapia}")
+        print("  Nessun farmaco da incrociare.")
+        rilievi.segnala(5, "TERAPIA_DICHIARATA_ASSENTE", f"terapia dichiarata assente "
+                           f"dal nutrizionista ({nessuna_terapia}): nessuna interazione "
+                           f"da valutare")
+        return
     if not forniti:
         print("\n  Nessun file di terapia fornito.")
         print("  ATTENZIONE: l'assenza del file NON e' l'assenza di terapia.")
         print("  Se il paziente assume farmaci, questo passo va rieseguito")
-        print("  con --farmaci, --interazioni e --orari.")
+        print("  con --farmaci, --interazioni e --orari; se e' verificato che")
+        print("  non ne assume, con --nessuna-terapia \"fonte della verifica\".")
         rilievi.segnala(5, "TERAPIA_NON_DICHIARATA", "verifica interazioni non eseguita: nessun file di "
                            "terapia fornito. Confermare che il paziente non "
-                           "sia in terapia farmacologica.")
+                           "sia in terapia farmacologica (verificato, --nessuna-terapia \"fonte\").")
         return
 
     mancanti = [nome for nome, p in [("--farmaci", farmaci_path),
@@ -1202,6 +1237,12 @@ def main():
                     help="motivo clinico che autorizza una struttura pasti "
                          "non uniforme (PASSO 6): declassa il blocco ad "
                          "attenzione, ma il rilievo resta nel report")
+    ap.add_argument("--nessuna-terapia", dest="nessuna_terapia", default=None,
+                    metavar="FONTE",
+                    help="il nutrizionista ha verificato che il paziente non assume "
+                         "farmaci; FONTE = da dove (es. \"colloquio 20/10, Form A\"). "
+                         "Sostituisce TERAPIA_NON_DICHIARATA con "
+                         "TERAPIA_DICHIARATA_ASSENTE, che riporta la fonte")
     ap.add_argument("--salta-collaudo", action="store_true")
     ap.add_argument("--eccezione-etichetta", dest="eccezione_etichetta", default=None,
                     help="file con le sole voci da etichetta (colonne di alimenti.csv), "
@@ -1248,7 +1289,7 @@ def main():
     passo_4_coerenza(rilievi, db, target, piano, gap, sottostime,
                      righe_estese)
     passo_5_interazioni(rilievi, piano, db, args.farmaci, args.interazioni,
-                        args.orari)
+                        args.orari, args.nessuna_terapia)
     passo_6_livello_unico(rilievi, righe_estese, db, args.deroga, esito_calcio)
 
     return verdetto(rilievi)

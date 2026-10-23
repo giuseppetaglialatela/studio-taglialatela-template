@@ -17,10 +17,12 @@ CONTROLLI:
   5) Integrita' byte per byte dei file del motore contro SHA256SUMS
   6) Ogni food_id ha un nome per il paziente (nomi_paziente.csv)
   7) Formati confezione e scambi frutta coerenti con il database; catalogo
-     colazioni/spuntini nei formati di confezione (23/10/2026)
+     colazioni/spuntini e libreria nei formati di confezione (23/10/2026)
   8) Ogni food_id ha un ruolo (ruoli_alimenti.csv), le regole di
      accoppiamenti_vietati.csv sono valide e la libreria dei blocchi non
      contiene accoppiamenti vietati (21/10/2026)
+  9) Cross-check Atwater sull'intero database: solo falsi positivi verificati
+     (23/10/2026; la pipeline lo esegue solo sugli alimenti del piano)
 
 NOTA SUL VALORE ATTESO (punto 2):
   EXPECTED_ALIMENTI_COUNT va aggiornato ogni volta che il database cresce
@@ -233,34 +235,36 @@ def controllo_6_nomi_paziente():
 
 def controllo_7_formati():
     """formati_confezione.csv e scambi_frutta.csv: food_id esistenti nel
-    database, unita' e tolleranze valide; catalogo colazioni_spuntini.csv nei
-    formati di confezione (23/10/2026)."""
+    database, unita' e tolleranze valide; catalogo colazioni_spuntini.csv e
+    libreria dei blocchi nei formati di confezione (23/10/2026)."""
     try:
         sys.path.insert(0, BASE)
         import formati
         with open(os.path.join(BASE, "alimenti.csv"), newline="", encoding="utf-8") as f:
             ids = {r["food_id"] for r in csv.DictReader(f)}
         problemi = formati.valida_file(ids)
-        # Il catalogo colazioni_spuntini.csv deve rispettare i formati di
-        # confezione: un'alternativa standard fuori formato fa scattare
-        # FORMATO_CONFEZIONE_NON_RISPETTATO su ogni piano che la usa (rilievo
-        # del primo piano reale, 23/10/2026). La libreria (moduli_*.csv) non e'
-        # controllata qui: le sue violazioni attendono una decisione clinica.
-        import struttura_pasti
+        # Catalogo (colazioni_spuntini.csv) e libreria (moduli_pasto.csv,
+        # moduli_colazione.csv) devono rispettare i formati di confezione: un
+        # blocco fuori formato fa scattare FORMATO_CONFEZIONE_NON_RISPETTATO su
+        # ogni piano che lo usa (rilievo del primo piano reale, 23/10/2026).
+        import struttura_pasti, moduli_pasto
         tabella = formati.carica_formati()
-        for alt in struttura_pasti.carica_catalogo():
-            righe = [{"food_id": fid, "grammi": g, "giorno": alt["alternativa_id"],
-                      "pasto": ""} for fid, g in alt["ingredienti"]]
+        voci = [("colazioni_spuntini.csv", a["alternativa_id"], a["ingredienti"])
+                for a in struttura_pasti.carica_catalogo()]
+        voci += [("libreria", m["modulo_id"], m["ingredienti"])
+                 for m in moduli_pasto.carica_moduli()]
+        for dove, vid, ingredienti in voci:
+            righe = [{"food_id": fid, "grammi": g, "giorno": vid, "pasto": ""}
+                     for fid, g in ingredienti]
             for v in formati.controlla_piano(righe, tabella):
-                problemi.append(f"colazioni_spuntini.csv: {alt['alternativa_id']} "
-                                f"{v['nome']} {v['grammi']:g} g fuori formato "
-                                f"(ammesse {v['ammesse']})")
+                problemi.append(f"{dove}: {vid} {v['nome']} {v['grammi']:g} g fuori "
+                                f"formato (ammesse {v['ammesse']})")
     except Exception as e:
         return False, f"controllo formati non eseguibile: {e}"
     if problemi:
         return False, "; ".join(problemi)
     return True, ("formati e scambi frutta coerenti con alimenti.csv; "
-                  "catalogo colazioni/spuntini nei formati di confezione")
+                  "catalogo e libreria nei formati di confezione")
 
 
 def controllo_8_accoppiamenti():
@@ -286,6 +290,42 @@ def controllo_8_accoppiamenti():
         return False, "; ".join(problemi[:6]) + (" ..." if len(problemi) > 6 else "")
     return True, (f"{len(ids)} alimenti con ruolo, {n_regole} regole valide, "
                   f"libreria senza accoppiamenti vietati")
+
+
+def controllo_9_atwater():
+    """Cross-check Atwater sull'intero database (23/10/2026): la pipeline lo
+    esegue solo sugli alimenti del piano. Ogni anomalia deve essere un falso
+    positivo verificato (coerenza.ATWATER_FALSI_POSITIVI_NOTI), e ogni voce
+    dell'elenco deve essere ancora anomala: l'elenco resta esatto."""
+    try:
+        sys.path.insert(0, BASE)
+        import coerenza
+        from calcolatore import carica_alimenti
+        anomalie = coerenza.check_atwater(carica_alimenti(os.path.join(BASE, "alimenti.csv")))
+    except Exception as e:
+        return False, f"controllo Atwater non eseguibile: {e}"
+    noti = coerenza.ATWATER_FALSI_POSITIVI_NOTI
+    trovati = {a["food_id"] for a in anomalie}
+    problemi = []
+    for a in anomalie:
+        if coerenza.falso_positivo_noto(a):
+            continue
+        if a["food_id"] in noti:
+            reale = ("kcal a zero" if a["scarto_pct"] is None
+                     else f"{a['scarto_pct']:+.1f}%")
+            problemi.append(f"{a['food_id']} {a['nome']}: scarto Atwater "
+                            f"{reale} invece del {noti[a['food_id']][1]:+.1f}% "
+                            f"verificato: il dato e' cambiato, va riverificato")
+        else:
+            problemi.append(f"{a['food_id']} {a['nome']}: anomalia Atwater non verificata "
+                            f"(errore di trascrizione da escludere, poi elenco in coerenza.py)")
+    problemi += [f"{fid} {nome}: nell'elenco dei falsi positivi ma non piu' anomalo "
+                 f"(togliere dall'elenco)" for fid, (nome, _) in noti.items() if fid not in trovati]
+    if problemi:
+        return False, "; ".join(problemi)
+    return True, (f"{len(anomalie)} anomalie sul database, tutte falsi positivi "
+                  f"verificati con lo scarto atteso ("
+                  + ", ".join(n for n, _ in noti.values()) + ")")
 
 
 def _file_da_firmare():
@@ -469,6 +509,11 @@ def main():
 
     print("\n8) Ruoli e accoppiamenti vietati")
     ok, dettaglio = controllo_8_accoppiamenti()
+    print(f"   [{'OK ' if ok else 'XX '}] {dettaglio}")
+    tutto_ok = tutto_ok and ok
+
+    print("\n9) Cross-check Atwater sul database")
+    ok, dettaglio = controllo_9_atwater()
     print(f"   [{'OK ' if ok else 'XX '}] {dettaglio}")
     tutto_ok = tutto_ok and ok
 

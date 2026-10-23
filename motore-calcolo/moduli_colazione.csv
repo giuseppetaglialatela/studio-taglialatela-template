@@ -20,7 +20,7 @@ C18,Yogurt greco con mela,spuntino,"dolce,halal_ok,vegetariano",8053:150;8807:15
 C19,Gallette e cioccolato fondente,spuntino,"dolce,halal_ok,vegetariano",8077:20;203020:25
 C20,Yogurt greco con gallette,spuntino,"dolce,halal_ok,vegetariano",8077:20;8053:150
 C21,Frittata con pane di segale e kiwi,colazione,"salata,halal_ok,vegetariano",1800:104;182010:35;30097:40;429:130;702901:5
-C22,Yogurt greco con mandorle,spuntino,"dolce,halal_ok,vegetariano",8053:100;008540:15
+C22,Yogurt greco con mandorle,spuntino,"dolce,halal_ok,vegetariano",8053:125;008540:10
 C23,"Latte parzialmente scremato, Biscotti integrali, Mandorle e Banana",colazione,"dolce,halal_ok,vegetariano",135020:200;701307:25;008540:15;406:100
 C24,"Latte parzialmente scremato, Fragole, Mandorle e Gallette di riso",colazione,"dolce,halal_ok,vegetariano",135020:250;411:150;008540:20;8077:18
 C25,"Pane di segale, Fesa di tacchino affettata, Banana e Mandorle",colazione,"salata,halal_ok,carne",30097:60;106856:55;406:100;008540:10
@@ -32,25 +32,25 @@ C30,Gallette di riso e Bresaola,spuntino,"salata,halal_ok,carne",8077:18;100061:
 C31,Cioccolato fondente e Banana,spuntino,"dolce,halal_ok,vegetariano",203020:20;406:100
 C32,Yogurt greco 0% di grassi e Banana,spuntino,"dolce,halal_ok,vegetariano",150030:150;406:100
 C33,"Prosciutto crudo, Robiola, Pane, Pomodori da insalata e Kiwi",colazione,"salata,carne",8711:30;100030:15;100154_2:40;391:100;429:150
-C34,"Yogurt greco, Fiocchi d'avena e Kiwi",colazione,"dolce,halal_ok,vegetariano",8053:100;600009:30;429:150
+C34,"Yogurt greco, Fiocchi d'avena e Kiwi",colazione,"dolce,halal_ok,vegetariano",8053:125;600009:25;429:150
 C35,"Latte parzialmente scremato, Fiocchi d'avena e Kiwi",colazione,"dolce,halal_ok,vegetariano",135020:200;600009:40;429:150
-C36,"Fiocchi di latte magri, Mandorle e Mele",spuntino,"dolce,halal_ok,vegetariano",100015:100;008540:6;8807:100
+C36,Fiocchi di latte magri e Mele,spuntino,"dolce,halal_ok,vegetariano",100015:200;8807:50
 C38,"Pane, Ricotta vaccina e Olive verdi",colazione,"salata,halal_ok,vegetariano",100154_2:60;11793:50;008820:20;702901:5
 C39,Pane e Robiola,colazione,"salata,halal_ok,vegetariano",100154_2:60;100030:20;702901:10
 C40,Latte parzialmente scremato e Corn flakes,colazione,"dolce,halal_ok,vegetariano",135020:250;3020:50
 C41,"Pane, Cioccolato fondente e Ricotta vaccina",colazione,"dolce,halal_ok,vegetariano",100154_2:50;203020:20;11793:45
-C42,"Yogurt bianco intero, Gallette di riso e Miele",spuntino,"dolce,halal_ok,vegetariano",150010:150;8077:30;210010:30
+C42,"Yogurt bianco intero, Gallette di riso e Miele",spuntino,"dolce,halal_ok,vegetariano",150010:125;8077:30;210010:30
 C43,"Latte parzialmente scremato, Cioccolato fondente e Gallette di riso",spuntino,"dolce,halal_ok,vegetariano",135020:200;203020:30;8077:15
-C44,"Yogurt bianco, avena, frutta e frutta secca",colazione,"dolce,halal_ok,vegetariano",1631:150;600009:50;8807:150;008540:10
+C44,"Yogurt bianco, avena, frutta e frutta secca",colazione,"dolce,halal_ok,vegetariano",1631:125;600009:50;8807:150;008540:10
 C45,"Yogurt greco, avena, frutta e frutta secca",colazione,"dolce,halal_ok,vegetariano",8053:150;600009:40;8807:150;008540:8
 C46,"Yogurt, frutta e frutta secca",spuntino,"dolce,halal_ok,vegetariano",1631:125;8807:100;008540:10
-C47,Yogurt greco 0% con mela e noci,colazione,"dolce,halal_ok,vegetariano",150030:200;8807:150;510:15
-C48,Yogurt greco 0% con mela e mandorle,colazione,"dolce,halal_ok,vegetariano",150030:200;8807:150;008540:12
+C47,Yogurt greco 0% con mela e noci,colazione,"dolce,halal_ok,vegetariano",150030:150;8807:150;510:15
+C48,Yogurt greco 0% con mela e mandorle,colazione,"dolce,halal_ok,vegetariano",150030:150;8807:150;008540:15
 C49,Yogurt greco e cereali,colazione,"dolce,halal_ok,vegetariano",8053:150;600009:30;500021:80;9600_1:2
 C50,Fette biscottate con cacao,colazione,"dolce,halal_ok,vegetariano",001500:30;203500:10;203020:5;429:140
 C51,Mela e noci,spuntino,"dolce,halal_ok,vegetariano",8807:150;510:15
 C52,Latte scremato e corn flakes,colazione,"dolce,halal_ok,vegetariano",135030:200;3020:40
-C53,Yogurt greco magro e gallette,colazione,"dolce,halal_ok,vegetariano",150030:200;8077:24
-C54,Yogurt magro e gallette,spuntino,"dolce,halal_ok,vegetariano",152000:150;8077:16
-C55,Yogurt magro e bastoncini di verdura,spuntino,"salata,halal_ok,vegetariano",152000:150;312:100
-C56,Yogurt magro e popcorn,spuntino,"dolce,halal_ok,vegetariano",152000:150;3009:20
+C53,Yogurt greco magro e gallette,colazione,"dolce,halal_ok,vegetariano",150030:150;8077:32
+C54,Yogurt magro e gallette,spuntino,"dolce,halal_ok,vegetariano",152000:125;8077:16
+C55,Yogurt magro e bastoncini di verdura,spuntino,"salata,halal_ok,vegetariano",152000:125;312:100
+C56,Yogurt magro e popcorn,spuntino,"dolce,halal_ok,vegetariano",152000:125;3009:20

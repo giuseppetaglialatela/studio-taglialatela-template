@@ -19,10 +19,6 @@
       "MEDIA_SOTTO_LARN"
     ],
     [
-      4,
-      "ATWATER_SEGNALATO"
-    ],
-    [
       5,
       "TERAPIA_NON_DICHIARATA"
     ],
@@ -41,5 +37,5 @@
   ],
   "exit_code": 0,
   "descrizione": "I primi 5 giorni del caso 27 (calcio presente in 2 giorni su 5). Il controllo di distribuzione vale solo su piani da almeno 6 giorni: DISTRIBUZIONE_CONCENTRATA NON deve comparire. Diventa rosso se il minimo di giorni scende a 5.",
-  "riferimento": "Costruito il 22/10/2026 su indicazione della revisione indipendente. Giornata base: colazione pane integrale 70 g + mela 200 g; spuntino mela 100 g; pranzo pasta integrale 80 g + pomodori 100 g + olio 13 g; cena merluzzo 140 g + patate 180 g + fagiolini 200 g + pane integrale 30 g + olio 13 g (calcio 202,2 mg). Colazione e spuntino identici tutta la settimana (struttura uniforme). Giorno ricco: pasta 60 g + parmigiano 20 g (426,2 mg). Giorni 2, 3, 5: base + parmigiano 8,3 g. Target kcal sulla mediana dei giorni; macro arrotondati dalla media e corretti perche' la somma sia 100. Atteso rigenerato il 22/10/2026 con l'avviso del livello rinforzato (PASSO 6): unica differenza verificata, la comparsa dell'attenzione VALUTARE_LIVELLO_RINFORZATO (piano di prova povero di calcio). Bloccanti ed exit code invariati."
+  "riferimento": "Costruito il 22/10/2026 su indicazione della revisione indipendente. Giornata base: colazione pane integrale 70 g + mela 200 g; spuntino mela 100 g; pranzo pasta integrale 80 g + pomodori 100 g + olio 13 g; cena merluzzo 140 g + patate 180 g + fagiolini 200 g + pane integrale 30 g + olio 13 g (calcio 202,2 mg). Colazione e spuntino identici tutta la settimana (struttura uniforme). Giorno ricco: pasta 60 g + parmigiano 20 g (426,2 mg). Giorni 2, 3, 5: base + parmigiano 8,3 g. Target kcal sulla mediana dei giorni; macro arrotondati dalla media e corretti perche' la somma sia 100. Atteso rigenerato il 22/10/2026 con l'avviso del livello rinforzato (PASSO 6): unica differenza verificata, la comparsa dell'attenzione VALUTARE_LIVELLO_RINFORZATO (piano di prova povero di calcio). Bloccanti ed exit code invariati. Atteso rigenerato il 23/10/2026: il cross-check Atwater della pipeline guarda solo gli alimenti del piano e non segnala i falsi positivi verificati (l'intero database lo controlla il collaudo, controllo 9); unica differenza verificata, la scomparsa di ATWATER_SEGNALATO."
 }

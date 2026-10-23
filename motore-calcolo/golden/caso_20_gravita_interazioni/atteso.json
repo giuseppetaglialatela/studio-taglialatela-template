@@ -33,10 +33,6 @@
     ],
     [
       4,
-      "ATWATER_SEGNALATO"
-    ],
-    [
-      4,
       "FORMATO_CONFEZIONE_NON_RISPETTATO"
     ],
     [
@@ -70,5 +66,5 @@
   ],
   "exit_code": 1,
   "descrizione": "Tabella interazioni con valori scritti male o non standard: 'Alta' con la maiuscola deve BLOCCARE come INTERAZIONE_GRAVITA_ALTA; 'bassa' da' INTERAZIONE_GRAVITA_BASSA; 'Nutriente' con la maiuscola e gravita' media da' INTERAZIONE_GRAVITA_MEDIA; 'grave' blocca (INTERAZIONE_GRAVITA_NON_RICONOSCIUTA); il nutriente 'calcio' invece di calcio_mg blocca (INTERAZIONE_NUTRIENTE_NON_RICONOSCIUTO); il tipo 'alimento' blocca (INTERAZIONE_TIPO_NON_RICONOSCIUTO); un food_id inesistente da' l'attenzione INTERAZIONE_FOOD_ID_ASSENTE. Protegge la correzione del 21/10/2026: prima una gravita' diversa da 'alta' diventava 'media' e un tipo o un nutriente scritto male faceva sparire l'interazione in silenzio.",
-  "riferimento": "21/10/2026, dopo la revisione indipendente: verdetto controllato a mano prima di congelare l'atteso; verificato al contrario. Atteso rigenerato il 22/10/2026 con l'avviso del livello rinforzato (PASSO 6): unica differenza verificata, la comparsa dell'attenzione VALUTARE_LIVELLO_RINFORZATO (piano di prova povero di calcio). Bloccanti ed exit code invariati."
+  "riferimento": "21/10/2026, dopo la revisione indipendente: verdetto controllato a mano prima di congelare l'atteso; verificato al contrario. Atteso rigenerato il 22/10/2026 con l'avviso del livello rinforzato (PASSO 6): unica differenza verificata, la comparsa dell'attenzione VALUTARE_LIVELLO_RINFORZATO (piano di prova povero di calcio). Bloccanti ed exit code invariati. Atteso rigenerato il 23/10/2026: il cross-check Atwater della pipeline guarda solo gli alimenti del piano e non segnala i falsi positivi verificati (l'intero database lo controlla il collaudo, controllo 9); unica differenza verificata, la scomparsa di ATWATER_SEGNALATO."
 }

@@ -1,0 +1,45 @@
+{
+  "tipo": "pipeline",
+  "bloccanti": [],
+  "attenzioni": [
+    [
+      1,
+      "ALIMENTO_FUORI_DATABASE_SU_RICHIESTA"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN_CON_GAP"
+    ],
+    [
+      4,
+      "ATWATER_SEGNALATO"
+    ],
+    [
+      4,
+      "FORMATO_CONFEZIONE_NON_RISPETTATO"
+    ],
+    [
+      5,
+      "TERAPIA_NON_DICHIARATA"
+    ],
+    [
+      6,
+      "LIVELLO_FUORI_CATALOGO"
+    ],
+    [
+      6,
+      "LIVELLO_FUORI_CATALOGO"
+    ],
+    [
+      6,
+      "VALUTARE_LIVELLO_RINFORZATO"
+    ]
+  ],
+  "exit_code": 0,
+  "descrizione": "Il caso 18 con la voce da etichetta a grassi 0,2 g invece di 1,2 (kcal 40 dichiarate; 29,8 kcal con 4/4/9, scarto -25,5% e 10,2 kcal, oltre entrambe le soglie): l'alimento e' nel piano e non e' un falso positivo verificato, quindi deve comparire ATWATER_SEGNALATO, con tutti gli altri verdetti uguali al caso 18. Protegge il controllo Atwater sugli alimenti del piano: diventa rosso se il cross-check sparisce dalla pipeline o non guarda le voci da etichetta.",
+  "riferimento": "Costruito il 23/10/2026 dal caso 18 cambiando solo grassi_g in voci_etichetta.csv (kcal invariate; i grassi scendono di 1 g per 100 g di voce, i verdetti restano quelli del caso 18). Il database ufficiale non ha anomalie non verificate (collaudo, controllo 9): la voce da etichetta e' l'unico modo di avere un'anomalia nel piano."
+}

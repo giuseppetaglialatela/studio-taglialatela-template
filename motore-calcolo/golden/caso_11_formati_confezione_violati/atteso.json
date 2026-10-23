@@ -8,10 +8,6 @@
     ],
     [
       4,
-      "ATWATER_SEGNALATO"
-    ],
-    [
-      4,
       "FORMATO_CONFEZIONE_NON_RISPETTATO"
     ],
     [
@@ -29,5 +25,5 @@
   ],
   "exit_code": 0,
   "descrizione": "Verifica del controllo formati confezione (PASSO 4, sotto-controllo E). Il piano contiene fiocchi di latte magro da 100 g, che non e' una vaschetta intera (200 o 400 g): il motore deve emettere l'attenzione FORMATO_CONFEZIONE_NON_RISPETTATO senza bloccare. Nessun altro rilievo diverso da quelli del caso di origine.",
-  "riferimento": "Creato il 29/09/2026 come copia di caso_07 (stessi input). Atteso generato dopo verifica a mano: l'unica differenza rispetto a caso_07 e' la descrizione; l'attenzione sui formati compare in entrambi perche' l'input e' lo stesso."
+  "riferimento": "Creato il 29/09/2026 come copia di caso_07 (stessi input). Atteso generato dopo verifica a mano: l'unica differenza rispetto a caso_07 e' la descrizione; l'attenzione sui formati compare in entrambi perche' l'input e' lo stesso. Atteso rigenerato il 23/10/2026: il cross-check Atwater della pipeline guarda solo gli alimenti del piano e non segnala i falsi positivi verificati (l'intero database lo controlla il collaudo, controllo 9); unica differenza verificata, la scomparsa di ATWATER_SEGNALATO."
 }

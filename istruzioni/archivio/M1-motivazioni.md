@@ -273,3 +273,41 @@ tonno, salmone, ceci, fagioli, uova, yogurt, fiocchi di latte): non controllata 
 collaudo finché il nutrizionista non decide come trattarli.
 Ripiego d'avvio con git clone: nella chat clinica del 23/10 codeload.github.com era
 bloccato (403), nella sessione di consolidamento dello stesso giorno no.
+
+## 23/10/2026 — libreria ai formati, condimenti liberi, Atwater solo sul piano, nessuna terapia
+Decisione del nutrizionista: i condimenti sono sempre a porzione libera (pomodori pelati
+tolti da `formati_confezione.csv`, anche dove nella libreria fanno da porzione di verdura:
+M84, M90, M95, M103, M105, M114). Il resto della libreria ai formati. Come è stato fatto
+davvero (descrizione delle scelte, non una regola generale; revisione indipendente, due
+giri): uova al formato più vicino, 104 g (due uova), anche dove sono l'unica proteina
+(M04, M21, M24: 156 g sarebbero tre uova); tonno come unica proteina al formato più grande
+(M14, 92 g), negli altri blocchi al più vicino; legumi in scatola a scatola intera (145 g),
+non sostituiti da legumi da cuocere perché i blocchi sono «pratico», facendo posto con
+meno cereale e, in M59 e M61, con meno tonno o uova (tonno 80→52, uova 104→52); yogurt al
+vasetto singolo più vicino (125 o 150 g), mai al doppio; compensazione con un altro
+ingrediente quando le kcal si spostavano oltre il 10%, e in qualche blocco anche sotto
+(M14, M79, M108). Unica eccezione oltre il 10%: C36, i fiocchi di latte non si vendono
+sotto 200 g. Il nutrizionista può rivedere ogni blocco: sono composizioni di partenza,
+le grammature si adattano nel piano. Prima → dopo (kcal, proteine g, calcio mg):
+- M04 607→587, P 28,6→26,6; M21 450→430 (diventa «leggero»); M24 643→610: uova a 104 g.
+- M14 544→531, P 36,6→40,7: tonno 70→92 g (due scatolette), farro 80→70.
+- M59 503→492, P 35,4→31,1: ceci 50→145 g (scatola), tonno 80→52, farro 70→45.
+- M61 334→361: ceci 60→145 g, uova 104→52 (nome «uovo sodo»).
+- M129 502→499: ceci 50→145 g, couscous 70→40.
+- M79 492→506, P 29,4→36,3, calcio 256→120: salmone 75→135 g, pasta 55→50, olio 10→7,
+  senza parmigiano (nome aggiornato). M128 429→458 (perde «leggero»): salmone 120→135.
+- M84 528→540, M118 487→499: tonno 80→92. M88 587→615: ceci 215→240.
+- M108 587→571: fagioli 90→145, tonno 40→46, riso 90→75, olio 12→10.
+- C22 209→207: yogurt greco 100→125, mandorle 15→10. C34 295→306: yogurt greco 100→125,
+  avena 30→25. C36 197→252 (+28%): fiocchi 100→200, mela 100→50, senza mandorle (nome
+  aggiornato). C42 301→284, C44 373→363, C54 113→104, C55 93→84, C56 136→127: yogurt
+  150→125. C47 273→248 (-9,3%), C48 243→237 (mandorle 12→15), C53 190→194 (gallette
+  24→32): yogurt greco 0% 200→150, proteine da circa 20 a 16-17 g.
+Il collaudo ora controlla anche la libreria.
+Atwater e terapia, scelte delegate a Claude («la cosa migliore»): la pipeline guarda solo
+gli alimenti del piano e non segnala i tre falsi positivi verificati; il collaudo controlla
+l'intero database contro l'elenco in codice, con lo scarto atteso di ciascuno (±1 punto).
+Prima un segnalato nuovo si perdeva tra i noti in ogni report. `--nessuna-terapia
+"fonte"`: la verifica va dichiarata con la sua fonte, come una deroga; resta nel verdetto
+come `TERAPIA_DICHIARATA_ASSENTE`; insieme ai file di terapia blocca, ma i file si valutano
+comunque, perché un blocco per contraddizione non nasconda interazioni di gravità alta.
