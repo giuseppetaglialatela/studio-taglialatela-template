@@ -2,7 +2,7 @@
 
 Modulo operativo: si carica quando si compone, si modifica o si valuta un piano.
 Dipende da **M1**: nessun passo è eseguibile senza il motore collaudato.
-Ultima modifica: 23/10/2026 (condimenti a porzione libera; `--nessuna-terapia`; 22/10:
+Ultima modifica: 23/10/2026 (PASSO 6 con anteprima completa e impronta, metadati in bozza prima dell'approvazione, un giorno chiuso = una riga in chat; condimenti a porzione libera; `--nessuna-terapia`; 22/10:
 distribuzione del solo calcio, avviso del livello rinforzato, fermi sui segnaposto). Motivazioni, episodi e date in
 `istruzioni/archivio/M2-motivazioni.md`, che non si carica.
 
@@ -287,19 +287,56 @@ reale, non massima (un rifiuto generico del «pesce» può riguardare solo quell
 chiedi la portata prima di escludere alimenti che il paziente non ha davvero rifiutato.
 
 ### PASSO 6 — PRESENTAZIONE PER APPROVAZIONE
-TUTTI i dati in tabella, con analisi esplicita di punti di forza e criticità. **Attendi
+Tutti i dati, in verdetto e anteprima, con analisi esplicita di punti di forza e criticità. **Attendi
 approvazione esplicita.** Se `pipeline.py` esce con codice 1 il piano NON è presentabile:
 risolvi i bloccanti e riesegui.
 
 È il **gate** del nucleo: uno solo per piano, non uno per giorno. Nessun PDF prima di qui,
 né con fretta dichiarata né con un piano identico a uno precedente.
 
-**Nella stessa tabella, non in un secondo giro:**
-- il titolo di ogni piatto come comparirà nel PDF;
-- l'obiettivo in intestazione e il criterio di rivalutazione; se il fascicolo non li ha
-  (es. `peso_obiettivo_concordato` = null) si chiedono QUI: la chat B non li inventa mai;
-- le regole operative da spiegare al paziente (sostituzioni, regola verdure, scambio
-  frutta, pesci in rotazione) e i contenuti da escludere dal documento di spiegazione;
+**Cosa si presenta, in un solo messaggio** (primo piano reale, 23/10/2026: il
+nutrizionista ha dovuto chiedere le grammature prima di approvare, e testi del giorno
+libero e una regola operativa sono finiti nei metadati senza essergli mai mostrati):
+1. verdetto e rilievi di `pipeline.py`, con punti di forza, criticità e l'elenco qui sotto;
+2. l'**anteprima INTERA**, copiata così come la stampa lo script, senza riassunti né
+   riformattazioni:
+   ```
+   python3 genera_zona_piano.py --anteprima --piano piano_vN.csv --target target.csv
+       --metadati metadati_piano_vN.json [--orari orari_pasti.csv]
+       [--eccezione-etichetta voci.csv --nomi-eccezione nomi.csv]
+   ```
+   Contiene i **testi del PDF** parola per parola (intestazione, obiettivo, criterio di
+   rivalutazione, avvertenze, box target, indicazioni del giorno libero), i **contenuti
+   del documento di spiegazione** (regole operative, scelte principali, limiti noti,
+   contenuti da escludere: campi da cui la chat B scrive la prosa, mostrati anche se
+   vuoti), gli **altri campi** dei metadati (TDEE confermato, giorni, abbinamento,
+   livello colazione…) e il **piano per esteso** (tutti i giorni, tutti i pasti e le
+   alternative, con titolo, grammatura, nota di peso e kcal; le alternative uguali in
+   tutti i giorni si scrivono una volta in testa). Per questo i metadati si scrivono IN
+   BOZZA PRIMA del PASSO 6, con tutti i testi: il nutrizionista li corregge
+   sull'anteprima, non dopo. L'anteprima si FERMA se obiettivo, criterio o avvertenze
+   mancano o sono segnaposto: si chiedono PRIMA, nelle domande in blocco all'apertura
+   (nucleo, sezione 4), con i titoli dei piatti proposti. Se il piano usa
+   `orari_pasti.csv`, l'anteprima va generata con `--orari`: gli orari compaiono nei
+   pasti e cambiano l'impronta;
+3. l'**impronta** stampata in fondo all'anteprima.
+
+Ogni correzione chiesta (grammatura, titolo, testo) si fa in `piano.csv` o nei metadati,
+poi si rieseguono pipeline e anteprima e si ripresenta l'anteprima con la nuova impronta:
+si approva sempre l'ultima mostrata. **Dopo l'approvazione esplicita** si aggiunge ai
+metadati `"impronta_approvata": "<impronta dell'anteprima approvata>"`. Da lì piano e
+testi non si toccano: `genera_zona_piano.py` in chat B ricalcola l'impronta e si ferma se
+manca o non coincide. Un testo per il paziente aggiunto dopo l'approvazione è una nuova
+anteprima da approvare, mai una scrittura diretta nei metadati. Fuori dall'impronta solo i
+riferimenti `drive` e il mese del PDF; dentro anche le kcal, quindi una voce del database
+corretta tra approvazione e PDF ferma la chat B e l'anteprima si fa riapprovare. Limite:
+l'impronta ferma la svista, non un'impronta rigenerata senza approvazione; il gate resta
+una regola di questo modulo.
+
+**Nel verdetto, nello stesso messaggio, non in un secondo giro:**
+- obiettivo in intestazione e criterio di rivalutazione: se il fascicolo non li ha
+  (es. `peso_obiettivo_concordato` = null) si sono chiesti nelle domande in blocco
+  all'apertura e sono nella bozza dei metadati; la chat B non li inventa mai;
 - le attenzioni `FORMATO_CONFEZIONE_NON_RISPETTATO`, con la motivazione;
 - le attenzioni `ACCOPPIAMENTO_VIETATO`: non bloccano, ma un accoppiamento vietato rimasto
   nel piano va motivato, non lasciato passare in silenzio;
@@ -311,9 +348,11 @@ né con fretta dichiarata né con un piano identico a uno precedente.
 - l'avviso `VALUTARE_LIVELLO_RINFORZATO`, se presente, con il motivo che lo ha fatto
   scattare: la scelta del livello è del nutrizionista, una sola per il piano (sezione 2).
 
-**Dopo l'approvazione — `metadati_piano_vN.json` (obbligatorio).** Prima di chiudere la
-chat A si scrive questo file, con lo stesso numero di versione del `piano.csv` approvato, e
-si salva su Drive nella cartella del paziente accanto al CSV. È ciò che legge la chat B
+**`metadati_piano_vN.json` (obbligatorio): bozza prima del PASSO 6, impronta dopo.** Si
+scrive in bozza prima della presentazione (l'anteprima lo legge), si completa con
+`impronta_approvata` dopo l'approvazione, con lo stesso numero di versione del
+`piano.csv` approvato, e a fine chat A si salva su Drive nella cartella del paziente
+accanto al CSV. È ciò che legge la chat B
 (M3): le istruzioni di passaggio rimandano al file invece di riassumerlo.
 
 ```json
@@ -336,7 +375,8 @@ si salva su Drive nella cartella del paziente accanto al CSV. È ciò che legge 
   "scelte_principali": ["decisione + motivo in una riga", "..."],
   "limiti_noti": ["senza percentuali", "..."],
   "da_escludere": ["...", "..."],
-  "differenze_da_versione_precedente": ["riga/pasto modificato", "..."]
+  "differenze_da_versione_precedente": ["riga/pasto modificato", "..."],
+  "impronta_approvata": "impronta dell'anteprima approvata (12 caratteri)"
 }
 ```
 - Nessuna kcal, nessun grammo, nessun valore nutrizionale: i numeri li ricalcola il motore
@@ -353,11 +393,14 @@ si salva su Drive nella cartella del paziente accanto al CSV. È ciò che legge 
 - Giorno libero: stesse colazioni e spuntini dei giorni strutturati, secondo spuntino
   compreso se il piano lo ha; in `indicazioni_giorno_libero` solo pranzo e cena.
 - Piano con eccezione etichetta: il file delle voci e quello dei loro nomi paziente vanno
-  in `drive.altri_file`, perché la chat B li chiede allegati.
+  in `drive.altri_file`, perché la chat B li chiede allegati. Lo stesso per
+  `orari_pasti.csv`, se il piano lo usa: senza, il PDF esce senza orari o si ferma
+  sull'impronta.
 - `genera_zona_piano.py` (M1) si ferma se mancano `giorni` (con `lavorativi`, e
   `range_kcal_libero` se c'è il giorno libero), `titoli_piatti`, `intestazione` (nome, età,
   condizione), `tdee_confermato_kcal`, `obiettivo_intestazione`, `criterio_rivalutazione`,
-  `avvertenze_box` e, se c'è il giorno libero, `indicazioni_giorno_libero`. Usa anche
+  `avvertenze_box`, `impronta_approvata` (o se non coincide con l'anteprima di oggi) e,
+  se c'è il giorno libero, `indicazioni_giorno_libero`. Usa anche
   `versione_piano` e `abbinamento_spuntino` ma NON si ferma se mancano: vanno scritti
   sempre. Gli altri campi li legge la chat B. Nessun campo si inventa in chat B.
 - Si ferma anche su un **segnaposto nei testi del paziente** (obiettivo, criterio,
@@ -378,7 +421,7 @@ si salva su Drive nella cartella del paziente accanto al CSV. È ciò che legge 
   per nessun testo che finisce nel PDF del paziente (obiettivo, criterio, avvertenze,
   intestazione, indicazioni del giorno libero, titoli) né per `versione_piano`: lo script
   si ferma. In `abbinamento_spuntino` si scrive esattamente `"non concordato"` (minuscolo,
-  senza punto). Obiettivo, criterio e avvertenze si chiedono al PASSO 6 (le avvertenze senza allergie si scrivono
+  senza punto). Obiettivo, criterio e avvertenze si chiedono nelle domande in blocco, prima dell'anteprima del PASSO 6 (le avvertenze senza allergie si scrivono
   «Nessuna allergia dichiarata.»).
 
 ### PASSO 7 — GENERAZIONE PDF (solo dopo approvazione)
@@ -410,5 +453,11 @@ manuale: è il materiale della validazione sul campo.
 - Il numero di pasti non si scrive da nessuna parte: si conta dai dati (intestazione del
   PDF compresa).
 - Composizione **un giorno per volta**, non sei giorni in blocco: si chiude il giorno
-  (pranzo e cena fissati, scenari colazione/spuntino verificati) prima di aprire il
-  successivo.
+  (pranzo e cena fissati, scenari colazione/spuntino verificati con `pipeline.py` sul
+  piano fino a quel giorno) prima di aprire il successivo. Ogni giorno chiuso si mostra
+  in chat in una riga, PRIMA di comporre il successivo: piatti di pranzo e cena, kcal
+  min–max degli scenari con lo scarto dal target, rilievi del giorno. Non è
+  un'approvazione (il gate resta uno, al PASSO 6) e non si aspetta risposta: serve al
+  nutrizionista per correggere la rotta subito. Nel primo piano reale (23/10/2026) la
+  regola c'era ma i giorni 2-6 sono stati composti in blocco, perché il ritmo non era
+  visibile.

@@ -1,7 +1,7 @@
 # M1 — MOTORE DI CALCOLO
 
 Modulo operativo (principio 6). Dipendenze: nessuna. Ne dipendono M2 e M6.
-Ultima modifica: 23/10/2026 (catalogo e libreria ai formati, condimenti a porzione libera;
+Ultima modifica: 23/10/2026 (anteprima del PASSO 6 e impronta dell'approvazione in `genera_zona_piano.py`; catalogo e libreria ai formati, condimenti a porzione libera;
 Atwater solo sul piano e controllo 9 del collaudo; `--nessuna-terapia`; ripiego d'avvio;
 casi golden 45-50). 22/10: distribuzione del calcio, avviso del livello rinforzato, fermi
 sui segnaposto. Motivazioni, episodi e date in
@@ -322,8 +322,26 @@ python3 genera_zona_piano.py --piano piano_vN.csv --target target.csv
     --out-py piano_Cognome_vN.py --out-pdf piano_Cognome_vN.pdf
     [--orari orari_pasti.csv] [--mese "Settembre 2026"]
     [--eccezione-etichetta voci.csv --nomi-eccezione nomi.csv]
+python3 genera_zona_piano.py --anteprima --piano piano_vN.csv --target target.csv
+    --metadati metadati_piano_vN.json [--orari ...] [--out-anteprima anteprima.md]
+python3 genera_zona_piano.py --verifica-impronta --piano ... --target ... --metadati ...
 python3 genera_zona_piano.py --autotest --template TEMPLATE_..._v5.py
 ```
+- **`--anteprima` (PASSO 6, M2):** senza template e senza PDF, stampa i testi del PDF parola
+  per parola, i campi del documento di spiegazione (anche vuoti), gli altri campi di primo
+  livello dei metadati salvo `drive` e `impronta_approvata` (con il TDEE confermato in
+  chiaro), e il piano per esteso: giorni, pasti, alternative con titolo, grammatura, nota
+  di peso e kcal; le alternative di un pasto a scelta in tutti i giorni strutturati, sempre
+  uguali, si scrivono una volta in testa. In fondo l'impronta (SHA-256 dell'anteprima, 12
+  caratteri; JSON annidato con chiavi ordinate, quindi indipendente dal loro ordine).
+  Sottochiavi non usate dentro `giorni` o `intestazione` si mostrano; quelle che il PDF
+  non legge non lo cambiano. La generazione del PDF ricalcola l'impronta e si ferma se
+  `impronta_approvata` manca o non coincide: piano, testi o valori cambiati dopo
+  l'approvazione. L'impronta comprende le kcal (una voce del database corretta dopo
+  l'approvazione ferma il PDF) e gli orari (`--orari` va passato come all'anteprima).
+- **`--verifica-impronta`:** solo il controllo, senza PDF (non si combina con `--anteprima`
+  né con le opzioni del PDF: errore); si lancia in chat B prima del
+  documento di spiegazione (M3), che non passa dallo script.
 - Kcal da `calcola_riga`, arrotondate alle 10 con la tilde. Totale del giorno = intervallo
   min–max sulle combinazioni colazione×spuntino ammesse dall'abbinamento; ogni altro pasto a
   scelta (es. secondo spuntino) entra con la sua alternativa minima e massima, come scelta
@@ -364,13 +382,18 @@ python3 genera_zona_piano.py --autotest --template TEMPLATE_..._v5.py
   c'è, deve essere un numero con o senza «v»/«versione» davanti, anche con lettera finale
   («v3», «3», «versione 3», «2b»), altrimenti fermo («vN», «3 bis», «v1,0»). Se manca, la
   nota del PDF esce «versione » vuota.
-- `--autotest` (82 controlli) genera il caso golden 03 con metadati fittizi e verifica:
+- `--autotest` (96 controlli) genera il caso golden 03 con metadati fittizi e verifica:
   kcal uguali al calcolatore, motore grafico identico al template, PDF senza segnaposto,
   abbinamento risolto in lettere, fermo su metadato mancante, su ogni segnaposto e testo
-  d'esempio, su tipi e versione non validi; passaggio di nomi, sigle e frasi legittime.
+  d'esempio, su tipi e versione non validi; passaggio di nomi, sigle e frasi legittime;
+  anteprima ripetibile e completa; fermo senza impronta e su titolo, regola operativa,
+  giorno libero o grammatura cambiati dopo l'approvazione; impronta invariata se cambia
+  solo `drive` o l'ordine delle chiavi del JSON; `--verifica-impronta` che passa e che
+  ferma; campi del documento di spiegazione vuoti mostrati.
   Richiede il template v5 (fuori da `motore-calcolo/`) e `pdftotext`; NON lo esegue né il
   collaudo né la regressione: va lanciato a mano dopo ogni modifica allo script. Scrive in
-  una cartella temporanea (non sporca i checksum, ma la lascia in /tmp).
+  una cartella temporanea e la cancella; restano in /tmp le cartelle che il template v5
+  crea a ogni PDF (riga 218, motore grafico congelato: non si tocca).
 
 ### larn.py + larn.csv — riferimenti per sesso, età e condizione
 `larn.csv`: `gruppo, sesso, eta_min, eta_max, condizione, larn_* (8 colonne), nota`.
