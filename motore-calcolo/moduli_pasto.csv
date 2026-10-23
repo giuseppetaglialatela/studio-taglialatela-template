@@ -126,3 +126,5 @@ M126,Bresaola e insalata,cena,"halal_ok,carne,pratico",100061:80;331:150;702901:
 M127,"Insalata di patate, pomodori, olive e tonno",pranzo,"halal_ok,pesce,pratico",381:220;391:150;592:15;1515:100;702901:10
 M128,Salmone in scatola e verdure,cena,"halal_ok,pesce,pratico",1510:135;349:200;702901:10;100154_2:30
 M129,Cous cous freddo con ceci e feta,pranzo,"halal_ok,vegetariano,legumi,pratico",888013:40;004010:145;805080:30;391:150;702901:10
+M130,"Panino con prosciutto crudo, mozzarella e pomodoro",pranzo,"carne,pratico",100154_2:130;8711:70;1718:100;391:100;331:30
+M131,Sardine con peperoni e pane di segale,cena,"halal_ok,pesce",122800:150;336:150;30097:140;702901:10

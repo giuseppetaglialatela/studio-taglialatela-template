@@ -48,7 +48,7 @@ import sys
 BASE = os.path.dirname(os.path.abspath(__file__))
 
 # --- valore da aggiornare manualmente quando il database cresce ---
-EXPECTED_ALIMENTI_COUNT = 143
+EXPECTED_ALIMENTI_COUNT = 144
 
 # File coperti dai checksum ma NON necessari a ogni sessione. Se presenti
 # vengono verificati come tutti gli altri; se assenti, il collaudo lo dice e

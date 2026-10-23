@@ -190,6 +190,16 @@ precisi: 1 uovo = 52 g, 1 albume = 35 g, limite inferiore degli intervalli, peso
 gruppo sulla prima verdura nominata, primo alimento nelle alternative «o»; esclusi
 i blocchi con hamburger, primo sale e trippa.
 
+**23/10/2026** — dal primo piano reale con il nuovo flusso (approvato il 23/10, solo
+`food_id` e grammi): M130 panino con
+prosciutto crudo, mozzarella e pomodoro · M131 sardine con peperoni e pane di segale.
+Non entrati perché il nucleo c'è già: panino con pollo e verdure grigliate (= M86, pollo e
+pane), spuntino yogurt greco 0% e banana (= C32) e panino con bresaola, pomodoro e
+parmigiano (= M67, che differisce solo per il pane di segale: un pane diverso non fa un
+blocco nuovo). Con il macinato magro (sezione 8) i
+blocchi con hamburger di P03 esclusi sopra sarebbero ricostruibili, ma servono i
+grammi dal piano originale.
+
 **21/10/2026 sera** — dai PDF allegati: P01 (v2 salmone) · P06 (v5) · P07
 (v2) · P04 Blocchi nuovi M106-M129 e C44-C56. P13 (PDF v8) era già tutto
 in libreria. Aggiunti al database, su decisione del nutrizionista, gli ingredienti che
@@ -302,3 +312,23 @@ Dal piano P09. Restano scritti qui perché siano verificabili in seguito.
   `formati_confezione.csv` (da confermare prima dell'uso nei piani).
 - **Ravanelli (005670) e fuso con pelle (106400):** presenti in cache CREA, non aggiunti
   (criterio Key Foods: nessun piano li richiede).
+
+## 8. MACINATO DI MANZO — 23/10/2026
+
+Dal primo piano reale (decisione 3: ingredienti mancanti si aggiungono). Né CREA né
+BDA-IEO hanno macinato o hamburger crudi (CREA ha solo hamburger da fast food cotti, es.
+119050: inutilizzabili con la regola dei pesi a crudo); USDA sì (per quota di grasso), ma la gerarchia
+esclude le kcal USDA. Decisione del nutrizionista: **una sola voce magra**, e nei piani si
+specifica il macinato magro.
+
+- **Macinato di manzo magro (101120):** kcal, macro e minerali da CREA «Bovino adulto o
+  vitellone, tagli anteriori, crudo» (145 kcal, 7,0 g di grassi), da cui in macelleria si
+  fa di solito il macinato (fonte marcata `proxy macinato`). Vitamina D, folati e B12 da
+  BDA-IEO 8522 «vitellone, tagli di carne semigrassa», calcolata da un insieme di tagli
+  che comprende gli anteriori (`proxy semigrassa`); scartate 8661 e 8664 (folati 50 µg,
+  fuori linea con le altre voci bovine) e 8520 (magro senza grasso visibile).
+- **Hamburger:** si compone con questa voce, con il nome del piatto che dice «di macinato
+  magro». Un hamburger da banco ha il 15-20% di grassi e non c'è una voce che lo
+  rappresenti: con la voce magra un hamburger qualsiasi è sottostimato di circa 70-110 kcal
+  ogni 100 g (USDA 85/15 e 80/20 crudi: 215 e 254 kcal, contro 145). Per questo il piano deve dire
+  «magro», e il paziente comprarlo magro.

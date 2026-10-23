@@ -523,7 +523,7 @@ diventa un nuovo caso golden.
 
 ## 4. DATABASE ALIMENTI E GERARCHIA FONTI
 
-**Stato:** 143 alimenti verificati e tracciati alla fonte; il numero vincolante è
+**Stato:** 144 alimenti verificati e tracciati alla fonte; il numero vincolante è
 `EXPECTED_ALIMENTI_COUNT` in `collaudo.py`. Conformità kcal/macro/fibra a CREA:
 `python3 cerca_crea.py verifica`.
 
@@ -623,7 +623,7 @@ dal 23/10/2026: S1 uova 104 g, S2 fiocchi 200 g + pane 45 g, D2 e SPA yogurt 125
 yogurt 250 g + nocciole 5 g). Il riconoscimento del livello confronta i grammi esatti: un
 piano composto con il catalogo precedente risulta fuori catalogo.
 
-**Libreria degli accoppiamenti** — `moduli_pasto.csv` (127 blocchi pranzo/cena) e
+**Libreria degli accoppiamenti** — `moduli_pasto.csv` (129 blocchi pranzo/cena) e
 `moduli_colazione.csv` (55 blocchi colazione | spuntino), schema
 `modulo_id, nome, categoria, tag, ingredienti_food_id_grammi`.
 - **Tag scritti nel file**, pranzo/cena: halal_ok · mensa_ok · vegetariano · legumi ·
