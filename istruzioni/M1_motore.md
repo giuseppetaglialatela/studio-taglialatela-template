@@ -36,23 +36,73 @@ isolata): i moduli non si importano e il collaudo fallisce senza motivo.
 reintrodurre zip né copie parallele.
 
 **Salvare una modifica.** La salva Claude con un commit, dalle sessioni del progetto di
-consolidamento con il repository collegato: `git clone`, modifica, collaudo e regressione,
-commit e push, poi comando d'avvio e nuovo collaudo. Il nutrizionista non carica niente a
+consolidamento con il repository collegato: `git clone`, poi SUBITO
+`git config core.hooksPath .githooks` (controllo privacy, sotto), modifica, collaudo e
+regressione, commit e push, poi comando d'avvio e nuovo collaudo. Il nutrizionista non carica niente a
 mano. `git log` è il registro delle versioni; ogni modifica è annullabile.
 Ripiego solo senza collegamento: caricamento manuale dalla pagina di upload della
 cartella, poi verifica delle impronte.
 
 **Nessun paziente nel repository, nemmeno per nome (obbligo di legge, GDPR).** Il
 repository è PUBBLICO: un nome accanto a un piano o a una diagnosi è un dato sanitario
-esposto. I pazienti si citano solo con il codice neutro `P01`, `P02`… (`P00` = paziente
-fittizio); la corrispondenza codice → nome sta SOLO su Drive, in
-`Studio Nutrizionale Taglialatela > codici_pazienti_repository`. Prima di OGNI commit,
-oltre a `git status` (che vede i file, non il contenuto): elencare le cartelle di
-`Andamento Dieta Pazienti` su Drive e cercarne nome e cognome nel diff
-(`git diff --cached | grep -i -E "cognome1|cognome2|..."`), più i nomi della tabella dei
-codici; un riscontro ferma il commit. Il 24/10/2026 sono stati trovati nel repository nomi
-di 15 pazienti reali e del paziente fittizio, entrati dal 30/07/2026 con le istruzioni caricate a mano e poi con commit
-di Claude (anche il 23/10): la regola c'era, il controllo sul contenuto no.
+esposto. I pazienti si citano solo con il codice `P01`, `P02`… (`P00` = paziente fittizio);
+la corrispondenza codice → nome sta SOLO su Drive
+(`Studio Nutrizionale Taglialatela > codici_pazienti_repository.txt`); un paziente nuovo
+prende lì il codice successivo, mai il nome nel repository. Il controllo è nel codice,
+`strumenti/controllo_privacy.py`. Guarda il contenuto dei file (anche dentro zip, xlsx,
+.gz, .bz2 e .xz, UTF-16 anche senza BOM, sequenze leggibili dei binari), i nomi dei file
+(rinomine e cambi di tipo compresi) e i messaggi di commit (righe con `#` comprese). Prima
+di cercare toglie i caratteri invisibili e riporta all'alfabeto latino le lettere
+cirilliche, greche e armene identiche e quelle come «ø» e «ı». Due livelli:
+- **elenco dei pazienti** (`--nomi FILE`), il livello che conta: ogni nome e cognome,
+  riconosciuto anche attaccato, con trattini bassi, apostrofi tipografici, accenti o in
+  maiuscolo; nome e cognome insieme in qualunque forma e ordine. Un nome di battesimo da
+  solo non conta (non identifica e coincide con quello del titolare). Un cognome che è una
+  parola comune si segna `~` nell'elenco (`P05 = ~Cognome Nome`): da solo conta allora con
+  l'iniziale maiuscola o in un nome di file o in un dato, non in minuscolo nella prosa.
+  L'elenco sta FUORI dal repository e si prepara a ogni sessione da Drive: le
+  cartelle di `Andamento Dieta Pazienti` più la tabella dei codici, un paziente per riga
+  (`P03 = Cognome Nome`); `!Nome Cognome` cerca solo il nome completo, per i cognomi
+  uguali a quello dello studio;
+- **dizionario** (nel repository, nomi italiani in ROT13): «Nome Cognome», «Cognome Nome»,
+  «Nome C.», «paziente / piano / caso + Cognome», «CognomeNome» attaccati, nomi non ambigui
+  da soli, parole tutte maiuscole. Non vale per `editoria/`, per i file dentro gli archivi
+  e per i binari, che citano autori o contengono testo casuale: lì solo l'elenco.
+
+Eccezioni in `strumenti/privacy_consentiti.txt`: solo nomi interi (titolare, autori delle
+fonti), almeno due parole vere di due o più lettere, solo lettere, particelle come «di» e
+«de» escluse; si tolgono solo come frase intera, a confini di parola, e valgono SOLO per il
+dizionario, mai contro l'elenco: un'eccezione uguale al nome di un paziente non lo nasconde. Il blocco prima del
+commit legge le eccezioni IN STAGE, GitHub quelle dell'ultimo commit caricato. `--autotest` verifica entrambi i livelli, con
+esempi inventati scritti in ROT13.
+
+**Dove gira.**
+- **Prima di ogni commit**, nelle sessioni di Claude: dopo ogni `git clone`, una volta,
+  `git config core.hooksPath .githooks`; poi `export PRIVACY_NOMI=/percorso/elenco.txt`
+  (fuori dal repository). I blocchi `pre-commit` e `commit-msg` si fermano senza elenco e
+  su ogni nome trovato. Un falso allarme si risolve riformulando o con un'eccezione
+  motivata; `--no-verify` è vietato.
+- **Su GitHub, a ogni caricamento**, anche fatto a mano dal sito: l'azione
+  `controllo-privacy` controlla OGNI commit del caricamento, merge compresi; su un ramo
+  nuovo o dopo un push forzato, l'intera cronologia. Il log è pubblico: stampa commit,
+  tipo di oggetto e riga, mai il nome né il percorso del file. Se fallisce GitHub manda
+  un'email al titolare: il nome va tolto subito, cronologia compresa. Senza il segreto
+  `NOMI_PAZIENTI` (un nome per riga) su GitHub vale solo il dizionario: archivi, binari ed
+  `editoria/` lì NON sono controllati, e l'azione lo segnala con un avviso.
+
+**Limiti dichiarati.** Del solo dizionario: «N. Cognome», «Cognome N.», un cognome da solo
+fuori contesto, nomi stranieri, nome e cognome tutti minuscoli. Per questo l'elenco è
+obbligatorio nel blocco prima del commit. Dell'elenco: un nome di battesimo da solo; un
+cognome segnato `~` in minuscolo nella prosa; un cognome che coincide con un nome di
+battesimo del dizionario, da solo; il testo dentro PDF compressi, immagini e archivi `.7z`.
+
+Il 24/10/2026 sono stati trovati nomi di 15 pazienti reali e del paziente fittizio, entrati
+dal 30/07/2026 con le istruzioni caricate a mano e poi con commit di Claude (anche il 23/10):
+la regola c'era, il controllo sul contenuto no. Tolti dai file e dall'intera cronologia,
+riscritta due volte il 24/10 (la seconda per una forma attaccata sfuggita alla prima); i
+codici dei commit precedenti non valgono più. Su GitHub restano consultabili per un tempo
+non noto le pagine dei vecchi commit, solo per chi ne conosce il codice: il titolare ha
+scelto di non chiederne la rimozione al supporto.
 
 **Sessioni lunghe.** La copia estratta all'avvio invecchia in silenzio: oltre una giornata
 di lavoro, riscarica e ricollauda prima di fidarti dei numeri.

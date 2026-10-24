@@ -1,0 +1,33 @@
+# Controllo privacy a ogni caricamento, anche quelli fatti a mano dal sito di GitHub:
+# OGNI commit del caricamento (contenuto, nomi dei file, messaggi), non solo l'ultimo.
+# Ramo nuovo o push forzato: l'intera cronologia. Merge compresi.
+# Se fallisce, GitHub manda un'email al titolare: il nome va tolto SUBITO, cronologia
+# compresa (M1). Il log e' pubblico: stampa commit, tipo di oggetto e riga, MAI il nome
+# trovato e MAI il percorso del file (anche il percorso puo' contenere il nome).
+# Senza il segreto NOMI_PAZIENTI (Settings > Secrets and variables > Actions, un nome per
+# riga, mai nel repository) qui vale solo il dizionario: archivi zip/xlsx, binari ed
+# editoria/ NON sono controllati su GitHub.
+name: controllo-privacy
+on: [push, pull_request]
+jobs:
+  privacy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Nomi di persona in ogni commit del caricamento
+        env:
+          NOMI_PAZIENTI: ${{ secrets.NOMI_PAZIENTI }}
+          PRIMA: ${{ github.event.before || github.event.pull_request.base.sha }}
+          DOPO: ${{ github.sha }}
+        run: |
+          python3 strumenti/controllo_privacy.py --autotest > /dev/null || { echo "autotest fallito"; exit 1; }
+          ARG=""
+          if [ -n "$NOMI_PAZIENTI" ]; then
+            printf '%s\n' "$NOMI_PAZIENTI" > "$RUNNER_TEMP/nomi.txt"
+            ARG="--nomi $RUNNER_TEMP/nomi.txt"
+          else
+            echo "::warning::segreto NOMI_PAZIENTI assente: solo dizionario (archivi, binari ed editoria non controllati)"
+          fi
+          python3 strumenti/controllo_privacy.py --intervallo "${PRIMA:-0}..$DOPO" --senza-testo $ARG

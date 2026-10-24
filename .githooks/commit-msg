@@ -1,0 +1,7 @@
+#!/bin/sh
+# Controllo privacy sul messaggio di commit (M1): stesso elenco del pre-commit.
+if [ -z "$PRIVACY_NOMI" ]; then
+  echo "CONTROLLO PRIVACY NON ESEGUITO: manca PRIVACY_NOMI (vedi .githooks/pre-commit)."
+  exit 1
+fi
+exec python3 strumenti/controllo_privacy.py --messaggio "$1" --nomi "$PRIVACY_NOMI"

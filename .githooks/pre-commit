@@ -1,0 +1,11 @@
+#!/bin/sh
+# Controllo privacy sui file in stage (M1). Attivazione, una volta per clone:
+#   git config core.hooksPath .githooks
+# L'elenco dei pazienti e' OBBLIGATORIO e sta FUORI dal repository (da Drive):
+#   export PRIVACY_NOMI=/percorso/elenco_pazienti.txt
+if [ -z "$PRIVACY_NOMI" ]; then
+  echo "CONTROLLO PRIVACY NON ESEGUITO: manca PRIVACY_NOMI (elenco dei pazienti da Drive,"
+  echo "fuori dal repository). Senza elenco un cognome da solo sfugge: commit fermato (M1)."
+  exit 1
+fi
+exec python3 strumenti/controllo_privacy.py --staged --nomi "$PRIVACY_NOMI"

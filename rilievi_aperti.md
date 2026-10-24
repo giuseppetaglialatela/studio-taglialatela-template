@@ -143,7 +143,7 @@ elenchi di documenti in periodi lunghi. Entrambe le cose sono vietate da FORMATO
 in MD. **I quattro controlli del PASSO 8 sono passati puliti**: verificano
 marcatori, stato delle fonti, copertura degli obiettivi e bibliografia, cioè
 l'apparato, e nessuno guarda la forma prescritta dal formato. Il difetto è stato
-rilevato da Giuseppe alla lettura, non da un controllo, e ha richiesto una
+rilevato dal nutrizionista alla lettura, non da un controllo, e ha richiesto una
 sessione di riscrittura a testo già chiuso.
 
 **Dove.** MC, PASSO 8, come quinto controllo. La lista delle prescrizioni da

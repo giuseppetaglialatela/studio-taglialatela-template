@@ -1,0 +1,10 @@
+# Nomi di persona AMMESSI nel repository: solo nomi pubblici, mai pazienti.
+# Un nome INTERO per riga (almeno due parole vere, niente particelle da sole).
+# Valgono solo per il dizionario, mai contro l'elenco dei pazienti (lo impone il codice).
+# titolare dello studio (nome professionale pubblico)
+Giuseppe Taglialatela
+# nome inventato usato come valore legittimo nell'autotest di genera_zona_piano.py
+Nadia Xu
+# autori citati come fonti (schede BDA-IEO, bibliografia di editoria)
+Fiori Federica
+Salvatore Crisafulli
