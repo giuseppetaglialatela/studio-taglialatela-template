@@ -201,7 +201,7 @@ blocchi con hamburger di P03 esclusi sopra sarebbero ricostruibili, ma servono i
 grammi dal piano originale.
 
 **21/10/2026 sera** — dai PDF allegati: P01 (v2 salmone) · P06 (v5) · P07
-(v2) · P04 Blocchi nuovi M106-M129 e C44-C56. P13 (PDF v8) era già tutto
+(v2) · P04. Blocchi nuovi M106-M129 e C44-C56. P13 (PDF v8) era già tutto
 in libreria. Aggiunti al database, su decisione del nutrizionista, gli ingredienti che
 impedivano di inserire tre pasti: crema di nocciole e cacao (CREA 203500, usata anche per la
 variante «fondente 70%+», proxy), pangrattato (CREA 000570, usato anche per il pangrattato

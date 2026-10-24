@@ -98,7 +98,7 @@ def autotest():
     # Verifica con il paziente fittizio P00 (36 anni, M, 180cm, 75kg, sedentario)
     r = proponi_tdee(75, 180, 36, "M", "sedentario")
     print("TDEE proposto:", r)
-    assert abs(r["tdee_stimato_kcal"] - 2040) < 1, "Non coincide col TDEE gia' approvato per P00"
+    assert abs(r["tdee_stimato_kcal"] - 2040) < 1, "Non coincide col TDEE gia' approvato per il paziente fittizio P00"
     t = proponi_target_csv(r["tdee_stimato_kcal"], "mantenimento", 22, 48, 30, 30,
                            sesso="M", eta_anni=36)
     print("Target proposto:", t)
@@ -109,7 +109,7 @@ def autotest():
         print("OK: senza sesso ed eta' il modulo si ferma invece di usare default.")
     else:
         raise AssertionError("avrebbe dovuto fermarsi senza sesso ed eta'")
-    print("\nVerifica OK: coincide con il TDEE 2040 kcal gia' confermato manualmente per P00.")
+    print("\nVerifica OK: coincide con il TDEE 2040 kcal gia' confermato manualmente per il paziente fittizio P00.")
     return 0
 
 

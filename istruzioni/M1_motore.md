@@ -42,6 +42,18 @@ mano. `git log` è il registro delle versioni; ogni modifica è annullabile.
 Ripiego solo senza collegamento: caricamento manuale dalla pagina di upload della
 cartella, poi verifica delle impronte.
 
+**Nessun paziente nel repository, nemmeno per nome (obbligo di legge, GDPR).** Il
+repository è PUBBLICO: un nome accanto a un piano o a una diagnosi è un dato sanitario
+esposto. I pazienti si citano solo con il codice neutro `P01`, `P02`… (`P00` = paziente
+fittizio); la corrispondenza codice → nome sta SOLO su Drive, in
+`Studio Nutrizionale Taglialatela > codici_pazienti_repository`. Prima di OGNI commit,
+oltre a `git status` (che vede i file, non il contenuto): elencare le cartelle di
+`Andamento Dieta Pazienti` su Drive e cercarne nome e cognome nel diff
+(`git diff --cached | grep -i -E "cognome1|cognome2|..."`), più i nomi della tabella dei
+codici; un riscontro ferma il commit. Il 24/10/2026 sono stati trovati nel repository nomi
+di 15 pazienti reali e del paziente fittizio, entrati dal 30/07/2026 con le istruzioni caricate a mano e poi con commit
+di Claude (anche il 23/10): la regola c'era, il controllo sul contenuto no.
+
 **Sessioni lunghe.** La copia estratta all'avvio invecchia in silenzio: oltre una giornata
 di lavoro, riscarica e ricollauda prima di fidarti dei numeri.
 
@@ -305,7 +317,7 @@ ampliamento (M6, passo 8); non è nel collaudo perché richiede un file opzional
 ### tdee.py
 Stima il TDEE (Mifflin-St Jeor + PAL) e propone un `target.csv` di partenza da peso,
 altezza, età, sesso e livello di attività. La copia su Drive è archivio e non si usa.
-Testato solo contro P00, paziente fittizio (2040 kcal, coincidente):
+Testato solo contro il paziente fittizio P00 (2040 kcal, coincidente):
 `python3 tdee.py --autotest` rifà il confronto e fallisce con `assert` se la formula cambia.
 Il valore è SEMPRE da confermare dal nutrizionista: il modulo propone, non decide.
 ```
@@ -315,7 +327,7 @@ python3 tdee.py ... --piano deficit_lieve --proteine 25 --carboidrati 45 --grass
 ```
 `--attivita` usa le chiavi di `PAL`, le stesse di `livello_attivita_dichiarato` del Form A.
 Senza uno dei cinque dati si ferma e li elenca (mai default); senza argomenti non esegue
-più la demo (fino al 23/10/2026 `--help` stampava il caso P00). Con `--piano` servono
+più la demo (fino al 23/10/2026 `--help` stampava il caso del paziente fittizio P00). Con `--piano` servono
 le tre percentuali (somma 100) e la fibra; `--tdee-confermato` calcola il target sul TDEE
 già confermato invece che sulla stima; `--condizione` (LARN) vale solo con `--piano` e si
 controlla prima di stampare. Si ferma su peso fuori 30-300 kg, altezza fuori 120-220 cm,
