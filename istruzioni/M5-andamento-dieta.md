@@ -5,8 +5,8 @@ peso di un paziente. **Non dipende da M1 né da M2**: non calcola nulla di
 nutrizionale, legge un JSON e produce un PDF. È il modulo più autonomo del sistema
 e può essere caricato da solo.
 
-Ultima modifica: 27/09/2026 (template v3.2 con misura di riferimento; pagina 3 ad
-personam; report dalla seconda pesata; rilievi aperti).
+Ultima modifica: 19/10/2026 (template v3.3: direzione "aumento", altre
+circonferenze, vita con sola misura di partenza) · precedente 27/09/2026 (v3.2).
 
 **TRIGGER** — qualsiasi frase del tipo:
 "aggiorna il peso di [paziente]" · "nuova pesata [nome]" · "[nome] pesa [X] kg" ·
@@ -22,8 +22,9 @@ Raw: `https://raw.githubusercontent.com/giuseppetaglialatela/studio-taglialatela
 Si scarica con `bash` + `curl`, come i moduli. Gli stub su Drive
 (`_Template/`, v1-v2-v3) sono resti non funzionanti: non vanno usati.
 
-**Riferimento di misura: 30.863 byte, versione 3.2 del 27/09/2026** (l'intestazione
-del file dichiara la versione). Un file di poche centinaia di byte è uno stub e va
+**Riferimento di misura: 36.922 byte, versione 3.3 del 19/10/2026** (l'intestazione
+del file dichiara la versione). Il nome del file resta `..._v3.py`: cambia solo
+la versione interna. Un file di poche centinaia di byte è uno stub e va
 trattato come template mancante.
 
 > **RISCRITTURA del 20/09/2026.** Il motore grafico originale era andato perso: su
@@ -33,6 +34,13 @@ trattato come template mancante.
 > nuovi e approvati dal nutrizionista il 20/09/2026.
 > **v3.2 del 27/09/2026:** pagina 3 ad personam, KPI corretto alla prima pesata,
 > asse del grafico corretto con una sola pesata, due refusi.
+> **v3.3 del 19/10/2026** (richiesta del nutrizionista, primo caso: paziente in
+> aumento di massa muscolare): campo `direzione`, testi dedicati all'aumento,
+> proiezione col segno corretto, tabella `altre_circonferenze`, box vita con il
+> segno giusto anche quando la vita sale, percentuale del KPI Variazione senza
+> segno invertito. Collaudo: tre casi di calo (dieta, farmaco, stabile) identici
+> alla v3.2 al pixel; casi di aumento con proiezione, stabile, senza obiettivo
+> (blocca), con farmaco (blocca).
 
 **Motore grafico congelato**, come per il template del piano (M3): font, colori,
 layout, header, footer, numero di pagina non si toccano mai. Si modificano solo i
@@ -59,9 +67,10 @@ Campi obbligatori per ogni nuovo paziente:
 | `data_inizio_dieta` | data di partenza del percorso |
 | `kcal_piano` | kcal del piano in corso |
 | `misurazioni` | `[{data, peso, etichetta}]` — una riga per pesata, ordine cronologico |
-| `circ_vita` | `{iniziale_cm, attuale_cm, data_attuale}` — oppure `null` |
-| `obiettivo_peso_kg` | oppure `null` |
-| `weight_floor_kg` | plateau minimo cautelativo — **obbligatorio, nessun default**: se manca, lo script si ferma. Il 96 che circolava era il valore di un singolo paziente |
+| `circ_vita` | `{iniziale_cm, attuale_cm, data_attuale}` — oppure `null`. Con la sola misura di partenza: `attuale_cm: null` e `data_iniziale` |
+| `obiettivo_peso_kg` | oppure `null` in calo — **obbligatorio in aumento**: è l'unico limite della curva |
+| `direzione` | `"calo"` (default se assente) o `"aumento"` |
+| `weight_floor_kg` | plateau minimo cautelativo — **obbligatorio in calo, nessun default**: se manca, lo script si ferma. Il 96 che circolava era il valore di un singolo paziente. In aumento non si scrive: non ha significato clinico |
 | `nota_glicemia` · `nota_urea` · `nota_extra` | stringa vuota `""` se non rilevanti |
 
 **Pagina 3 ad personam** (decisione del 20/09/2026): i consigli pratici e la frase
@@ -76,7 +85,9 @@ Se i due campi mancano, il template usa i testi generici che porta dentro. Sono 
 **ripiego**, non il comportamento voluto: vanno scritti sui vincoli e sugli ostacoli
 reali di quella persona, e riletti a ogni consegna.
 
-**Opzionali:** `strumento_riferimento` (riga sotto la cronologia),
+**Opzionali:** `altre_circonferenze` (`[{nome, iniziale_cm, attuale_cm}]`, tabella
+sotto il box vita: torace, braccio contratto/rilassato…), `strumento_riferimento`
+(riga sotto la cronologia),
 `tasso_fase1/2/3`, `banda_incertezza`, `settimane_proiezione`.
 
 **Formato date: `AAAA-MM-GG`. Formato numeri: punto decimale.** `120.65`, non
@@ -104,6 +115,13 @@ reali di quella persona, e riletti a ogni consegna.
   settimane il ritmo di poche pesate recenti, mentre nella realtà il calo rallenta.
   I tempi indicati sono quindi ottimistici. La curva si ferma comunque a
   `obiettivo_peso_kg`, se impostato, altrimenti a `weight_floor_kg`.
+- **Direzione "aumento"** (decisione del 19/10/2026): proiezione SOLO senza
+  farmaco (con farmaco lo script blocca), per regressione come sopra; compare solo
+  se la pendenza è positiva, altrimenti il PDF dice che il peso non è salito. La
+  curva e la banda si fermano a `obiettivo_peso_kg` dall'alto. Stesso limite noto:
+  l'aumento reale rallenta più della retta. Nei pazienti in aumento il dato da
+  leggere insieme al peso è la circonferenza vita: se sale in parallelo, la quota
+  di grasso cresce e il ritmo va rivisto.
 - **Soglie circonferenza vita:** automatiche dal campo `sesso`
   (M: 94 / 102 cm — F: 80 / 88 cm). Non si impostano a mano.
 - **Anteprima obbligatoria:** il PDF non viene mai consegnato senza anteprima
