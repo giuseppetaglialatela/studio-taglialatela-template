@@ -604,7 +604,7 @@ diventa un nuovo caso golden.
 
 ## 4. DATABASE ALIMENTI E GERARCHIA FONTI
 
-**Stato:** 144 alimenti verificati e tracciati alla fonte; il numero vincolante è
+**Stato:** 159 alimenti verificati e tracciati alla fonte; il numero vincolante è
 `EXPECTED_ALIMENTI_COUNT` in `collaudo.py`. Conformità kcal/macro/fibra a CREA:
 `python3 cerca_crea.py verifica`.
 
@@ -804,12 +804,14 @@ analitici).
 ## 8. CASI RISOLTI — non riaprire
 
 **Atwater, doppio criterio.** `coerenza.py` segnala solo se lo scarto supera **sia** il
-12% relativo **sia** 8 kcal/100 g in assoluto. Falsi positivi noti, attesi:
+12% relativo **sia** 8 kcal/100 g in assoluto. Falsi positivi noti, attesi (quattro):
 - **AGLIO** (`005000`) — atteso -15,5%, scarto 8,20 kcal: appena sopra soglia;
 - **CARCIOFI** (`005120`) — atteso -31,5%, scarto 10,4 kcal: Southgate conta la fibra; kcal
   e macro coincidono con la scheda CREA;
 - **SEMI DI LINO** (`9600_1`) — atteso -15,7%, scarto 70 kcal: BDA-IEO calcola l'energia
   «con fibra».
+- **CAVOLI DI BRUXELLES** (`005170`) — atteso -18,9%, scarto 8,9 kcal: Southgate conta i 5 g
+  di fibra; kcal e macro coincidono con la scheda CREA (28/10/2026).
 Dal 23/10/2026 l'elenco sta nel codice (`coerenza.ATWATER_FALSI_POSITIVI_NOTI`), con lo
 scarto atteso di ciascuno: la pipeline guarda solo gli alimenti del piano e non segnala
 questi tre; il collaudo (controllo 9) controlla l'intero database e si ferma su

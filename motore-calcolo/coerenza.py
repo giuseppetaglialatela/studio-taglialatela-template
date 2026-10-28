@@ -65,6 +65,7 @@ ATWATER_FALSI_POSITIVI_NOTI = {
     "005000": ("Aglio", -15.5),
     "005120": ("Carciofi", -31.5),
     "9600_1": ("Semi di lino secchi", -15.7),
+    "005170": ("Cavoli di Bruxelles crudi", -18.9),  # 28/10/2026: CREA Southgate conta i 5 g di fibra
 }
 ATWATER_MARGINE_NOTI_PUNTI = 1.0
 

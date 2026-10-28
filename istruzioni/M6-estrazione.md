@@ -336,3 +336,28 @@ specifica il macinato magro.
   A05 di `accoppiamenti_vietati.csv` («carne rossa o maiale con la pasta»), che vieta
   invece vitellone, filetto, vitello e maiale: non è una svista da correggere per
   coerenza.
+
+## 9. VERDURE DI STAGIONE — 28/10/2026
+
+Ampliamento su richiesta esplicita del nutrizionista (oltre le 150 voci): 15 verdure
+autunno-invernali, pesi a crudo e netti della parte edibile (nota «pulite» in
+`nomi_paziente.csv`). CREA per kcal, macro, fibra e i minerali che pubblica; BDA-IEO per
+folati e zinco mancanti; magnesio da USDA (derivazione controllata, nessuno zero presunto).
+Catalogna (100171_1) e songino (19072_1) non sono in CREA: tutto da BDA-IEO, magnesio USDA.
+
+Decisioni del nutrizionista:
+- **Zinco del cavolo broccolo verde ramoso (005180):** 0,6 mg da BDA 314_1 invece di 2,35 di
+  CREA (origine B, metodica non dichiarata), fuori linea di 4-6 volte con BDA e con USDA
+  170379 (0,41 su 33 campioni).
+- **Folati della cicoria di campo (005240) e da taglio (005230):** 110 µg da USDA 169992
+  «chicory greens» (proxy, dato debole: 0 campioni). BDA 319_1 e 320_1 (16 e 12 µg) citano
+  Holland 1991, dove «chicory» è la cicoria belga (witloof, 14 µg): specie sbagliata.
+- **Esclusi:** cavolo nero (assente da CREA e BDA, USDA non può dare le kcal), puntarelle
+  (assenti ovunque), topinambur (CREA solo bollito), pinoli e pesto (il pesto è un sugo
+  pronto: eventuali valori da etichetta solo con l'eccezione per singolo piano, M1 sez. 4,
+  mai in `alimenti.csv`). Verza non necessaria.
+
+Dati deboli: magnesio di cicorie, catalogna e cardi da un solo campione USDA (le tre cicorie
+usano la stessa voce 169992); magnesio del songino senza campioni. Zinco delle cime di rapa
+0,2 mg da BDA per gerarchia, contro 0,77 misurato da USDA 170381. Nuovo falso positivo
+Atwater: cavoli di Bruxelles (M1 sez. 8).
