@@ -136,13 +136,23 @@ def esegui_caso_pipeline(nome_caso):
 
     # l'output a video non serve alla suite: conta il verdetto, non la prosa
     # un controllo d'ingresso che ferma (sopra) salta tutti i passi, come in main()
+    # giornate realmente componibili (tappa 1, 29/10/2026), con l'eventuale
+    # abbinamento colazione -> spuntino dei metadati del caso
+    abbin = None
+    if not fermo and percorso_opzionale("metadati"):
+        with open(percorso_opzionale("metadati"), encoding="utf-8") as fh:
+            abbin = pl.mod_comb.carica_abbinamento(_json.load(fh))
+    combos = None
+    if not fermo:
+        combos = pl.calcola_combinazioni(rilievi, righe_estese, db, abbin)
+        fermo = combos is None
     with redirect_stdout(io.StringIO()):
         if not fermo:
             dati = pl.passo_1_calcolo(rilievi, piano, db, target, giorni_con_scelte)
-            intervalli = pl.passo_2_scenari(rilievi, righe_estese, db, target)
+            intervalli = pl.passo_2_scenari(rilievi, righe_estese, db, target, combos, abbin)
             # deve restare allineato alla sequenza di pipeline.main(): un passo
             # aggiunto li' e non qui passa inosservato alla suite (18/09/2026)
-            pl.verifica_settimanale(rilievi, dati, intervalli, target)
+            pl.verifica_settimanale(rilievi, dati, intervalli, target, combos)
             esito_calcio = pl.passo_3_micronutrienti(rilievi, dati, intervalli, target,
                                                      sottostime, db)
             pl.passo_4_coerenza(rilievi, db, target, piano, gap, sottostime,
@@ -503,6 +513,23 @@ def modo_verifica():
     print(f"\n  [{'OK ' if ok_cli else 'XX '}] riga di comando di pipeline.py: {msg_cli}")
     if not ok_cli:
         falliti += 1
+    # --metadati (29/10/2026): l'abbinamento colazione -> spuntino deve
+    # arrivare da argparse al calcolo delle giornate componibili
+    ok_meta, msg_meta = verifica_riga_di_comando_metadati()
+    print(f"\n  [{'OK ' if ok_meta else 'XX '}] riga di comando di pipeline.py: {msg_meta}")
+    if not ok_meta:
+        falliti += 1
+        ok_cli = False
+    # Calcolo esatto dei pasti a scelta (tappa 1, 29/10/2026): giorno e
+    # settimana confrontati con la forza bruta su casi casuali a seme fisso
+    import combinazioni
+    n_auto, diff_auto = combinazioni.autotest()
+    ok_auto = diff_auto == 0
+    print(f"\n  [{'OK ' if ok_auto else 'XX '}] pasti a scelta, calcolo esatto contro forza "
+          f"bruta: {n_auto} casi casuali, {diff_auto} differenze")
+    if not ok_auto:
+        falliti += 1
+        ok_cli = False
 
     print("\n" + "=" * 60)
     print(f"RISULTATO: {passati} passati, {len(casi) - passati} falliti su {len(casi)} casi; "
@@ -542,6 +569,28 @@ def verifica_riga_di_comando():
     if "TERAPIA_DICHIARATA_ASSENTE" not in out or fonte not in out:
         return False, "nel verdetto manca TERAPIA_DICHIARATA_ASSENTE con la fonte"
     return True, "--nessuna-terapia arriva al PASSO 5 e la fonte compare nel verdetto"
+
+
+def verifica_riga_di_comando_metadati():
+    """pipeline.py eseguito davvero sul caso 52 con e senza --metadati: con
+    l'abbinamento le giornate componibili sono 7 e la giornata a -6,26 punti
+    (S2 + SPrA) sparisce; senza, sono 8 e compare."""
+    import subprocess
+    cartella = os.path.join(GOLDEN_DIR, "caso_52_abbinamento_restringe_giornate")
+    base = [sys.executable, os.path.join(BASE, "pipeline.py"),
+            "--piano", os.path.join(cartella, "piano.csv"),
+            "--target", os.path.join(cartella, "target.csv"), "--salta-collaudo"]
+    try:
+        con = subprocess.run(base + ["--metadati", os.path.join(cartella, "metadati.json")],
+                             capture_output=True, text=True, timeout=120).stdout
+        senza = subprocess.run(base, capture_output=True, text=True, timeout=120).stdout
+    except (OSError, subprocess.SubprocessError) as e:
+        return False, f"--metadati: esecuzione non riuscita ({e})"
+    if "giornate realmente componibili: 7" not in con or "SCENARIO_MACRO_FUORI_TOLLERANZA" in con:
+        return False, "--metadati non arriva al calcolo delle giornate componibili"
+    if "giornate realmente componibili: 8" not in senza or "SCENARIO_MACRO_FUORI_TOLLERANZA" not in senza:
+        return False, "senza --metadati le giornate componibili non sono tutte"
+    return True, "--metadati restringe le giornate all'abbinamento (7 su 8)"
 
 
 if __name__ == "__main__":

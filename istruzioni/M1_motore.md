@@ -152,8 +152,8 @@ finisce nei checksum e fa fallire il collaudo alla sessione dopo. Prima del comm
 Un comando, passi sempre nello stesso ordine, un report unico:
 0. collaudo (si ferma se fallisce)
 1. calcolo per pasto e per giorno
-2. scenari min/max dei pasti a scelta multipla, PRIMA di ogni riepilogo; poi verifica
-   settimanale di kcal e macro
+2. giornate realmente componibili dei pasti a scelta (`combinazioni.py`), PRIMA di ogni
+   riepilogo; poi verifica settimanale di kcal e macro sulle settimane reali
 3. micronutrienti per giorno e media settimanale, con flag LARN e gap
 4. coerenza dei dati e gap dichiarati; controlli E (formati) e F (accoppiamenti)
 5. interazioni farmaco-alimento
@@ -169,14 +169,18 @@ python3 pipeline.py --piano piano.csv --target target.csv
   [--farmaci f.csv --interazioni i.csv --orari o.csv]
   [--nessuna-terapia "fonte della verifica"]
   [--deroga-struttura "motivo"] [--eccezione-etichetta voci.csv] [--salta-collaudo]
+  [--metadati metadati_piano_vN.json]
 ```
+Con `--metadati` l'abbinamento colazione → spuntino restringe le giornate componibili,
+come nell'anteprima; senza, valgono tutte le combinazioni (prudente).
 Esce 0 senza rilievi bloccanti, 1 altrimenti; il report si stampa per intero in entrambi i
 casi.
 
 **Rilievi BLOCCANTI** (piano non presentabile): collaudo fallito o assente; `food_id`
 sconosciuto; valore di pasto non ammesso; file di eccezione etichetta non valido; **media settimanale delle kcal** fuori tolleranza
-(basta un estremo dell'intervallo); **media settimanale di un macro** fuori tolleranza su
-tutto l'intervallo, dallo stesso lato; **giorno o scenario oltre ±10% di kcal**; target incoerenti; file dei formati o
+(basta un estremo dell'intervallo); **media settimanale di un macro** fuori tolleranza in
+ogni settimana componibile, dallo stesso lato; abbinamento dei metadati illeggibile o che
+esclude ogni giornata (`COMBINAZIONI_NON_CALCOLABILI`, `METADATI_NON_LEGGIBILI`); **giorno o scenario oltre ±10% di kcal**; target incoerenti; file dei formati o
 degli accoppiamenti illeggibili o accoppiamenti non verificati; interazione di gravità ALTA;
 gravità, tipo o nutriente non riconosciuti nella tabella interazioni;
 orario di un pasto mancante; terapia dichiarata solo in parte; assenza di terapia dichiarata
@@ -186,9 +190,9 @@ livelli colazione/spuntino misti o incoerenti tra pasti; catalogo disallineato.
 
 **Rilievi DA DICHIARARE** (non bloccano): eccezione etichetta dichiarata
 (`ALIMENTO_FUORI_DATABASE_SU_RICHIESTA`); giorno con kcal fuori ±5% (entro ±10%) o macro
-fuori ±5 punti; scenario di scelta fuori tolleranza entro ±10%; estremi macro degli scenari
-(limiti di garanzia, non giornate componibili); un solo estremo della media settimanale
-di un macro fuori tolleranza; fibra sotto l'80% del target;
+fuori ±5 punti; scenario di scelta fuori tolleranza entro ±10%; giornata reale con un macro
+fuori ±5 punti, nominata con le sue scelte; media settimanale di un macro fuori tolleranza
+solo in una parte delle settimane componibili, con la settimana reale peggiore; fibra sotto l'80% del target;
 micronutrienti sotto l'80% LARN *in media settimanale* (con o senza gap); target privo di
 LARN (micronutrienti non confrontati con niente); distribuzione concentrata; anomalia
 Atwater di un alimento del piano che non è un falso positivo verificato (in pratica solo una
@@ -291,11 +295,25 @@ micronutrienti tutti a zero: intercetta errori nei DATI prima che entrino nei pi
 entry point standalone: si importa.
 
 ### scelte_multiple.py
-Intervalli min/max per nutriente sui pasti a scelta: limiti garantiti, non una giornata
-realmente componibile. Distingue ciò che è sotto soglia anche nel caso migliore da ciò che
-dipende dalla scelta del paziente. Va eseguito per OGNI giorno subito dopo aver fissato
-pranzo e cena di quel giorno, mai a posteriori dopo una tabella con una sola combinazione
-«esemplare». `pipeline.py` lo fa da solo al PASSO 2.
+Lettura di `piano.csv` con `gruppo_scelta`/`opzione` e intervalli min/max per nutriente:
+ogni estremo è raggiungibile, non tutti nella stessa giornata. Vale per kcal e singoli
+nutrienti (somme), NON per le percentuali dei macro (rapporti): quelle le dà
+`combinazioni.py`.
+
+### combinazioni.py (tappa 1, 29/10/2026)
+Elenca per ogni giorno tutte le giornate realmente componibili (un'alternativa per gruppo:
+colazione × spuntino × secondo spuntino…, con l'abbinamento dei metadati se c'è) e ne
+legge kcal e percentuali dei macro: gli estremi sono giornate vere, con le scelte che le
+producono. La media settimanale di un macro è un rapporto di somme: massimo e minimo esatti
+con il metodo di Dinkelbach, che restituisce la settimana reale peggiore giorno per giorno.
+Prima si dividevano estremi presi nutriente per nutriente e una giornata reale poteva uscire
+dall'intervallo dichiarato (fino a 2,9 punti sui casi golden; piano reale v5: −9,3 reali
+contro −7,65 dichiarati). `--autotest` confronta giorno e settimana con la forza bruta su
+300 casi casuali a seme fisso (zero differenze; gira in `regressione.py`). Va guardato per
+OGNI giorno subito dopo aver fissato pranzo e cena di quel giorno, mai a posteriori dopo una
+tabella con una sola combinazione «esemplare». `pipeline.py` lo fa da solo al PASSO 2;
+l'anteprima riporta, solo per i piani con pasti a scelta, gli estremi di ogni giorno e della
+settimana (per i piani senza scelte l'anteprima, e l'impronta, sono quelle di prima).
 
 ### struttura_pasti.py
 Legge `colazioni_spuntini.csv` e riconosce il livello di un piano. `python3
@@ -508,7 +526,8 @@ validato).
 - **05_livelli_colazione_misti** — 2 giorni con colazioni diverse, entrambi dentro
   tolleranza su kcal e macro: fermato solo dalla regola strutturale del PASSO 6.
 - **06_livelli_incoerenti_tra_pasti** — colazioni standard con spuntini rinforzati, giorni
-  identici: solo il riconoscimento del livello vede l'incoerenza.
+  identici: solo il riconoscimento del livello vede l'incoerenza. Dal 29/10 anche la
+  giornata reale S2 + SPrA a −6,26 punti di carboidrati (prima dichiarata −4,69).
 - **07_micro_basso_giorno_ok_settimana** — calcio al 65% LARN il giorno 1, all'85% in
   media: nessun rilievo sul calcio (né giornaliero né settimanale), exit 0. Protegge il
   giudizio settimanale dei micronutrienti.
@@ -585,6 +604,13 @@ validato).
 - **49_nessuna_terapia_senza_fonte**, **50_nessuna_terapia_senza_fonte_con_farmaci** —
   `nessuna_terapia` vuota (o solo spazi): bloccante `TERAPIA_CONTRADDITTORIA`; nel 50 i file
   di terapia del caso 20 si valutano comunque e tutti i suoi verdetti restano.
+- **51_macro_scelte_giornate_reali** — 6 giorni diversi con colazione, spuntino e secondo
+  spuntino a scelta: il calcolo vecchio dichiara la media dei carboidrati in tolleranza
+  (−4,25), la settimana reale peggiore è a −5,74 (`SETTIMANA_MACRO_ESTREMO_FUORI`). Fallisce
+  con il motore precedente al 29/10/2026.
+- **52_abbinamento_restringe_giornate** — il caso 06 con l'abbinamento dei metadati (S2 solo
+  con SPrB): 7 giornate su 8, le attenzioni sui macro spariscono. `regressione.py` verifica
+  a parte che `--metadati` arrivi dalla riga di comando.
 
 **Tipi di caso.** `fisso` e `scelta_multipla` si deducono dal piano (presenza di
 `gruppo_scelta`). `pipeline` è l'unico DICHIARATO, da un `pipeline.json` nella cartella del

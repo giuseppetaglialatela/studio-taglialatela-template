@@ -62,9 +62,10 @@ import argparse, csv, datetime, json, os, re, subprocess, sys, tempfile, unicode
 
 QUI = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, QUI)
-from calcolatore import (carica_alimenti, carica_eccezioni_etichetta, carica_target, calcola_riga,
+from calcolatore import (entro_tolleranza, carica_alimenti, carica_eccezioni_etichetta, carica_target, calcola_riga,
                          PASTI_AMMESSI, ordine_pasti, pasti_non_ammessi)
 from scelte_multiple import carica_piano_esteso
+import combinazioni as mod_comb
 
 KCAL_PER_KG = 7700          # convenzione clinica decisa il 19/09/2026
 # Struttura a 5 posti (30/09/2026): elenco e ordine da calcolatore.py.
@@ -392,8 +393,15 @@ def costruisci_dati(piano, db, nomi, target, meta, orari, mese):
         tot = (f"Totale giornata: {_kcal(lo)}" if round(lo / 10) == round(hi / 10) else
                f"Totale giornata: ~{_migliaia(round(lo/10)*10)}–{_migliaia(round(hi/10)*10)} kcal "
                + motivo)
+        # giornate realmente componibili (tappa 1, 29/10/2026): solo per
+        # l'anteprima; la zona dati del PDF non le legge
+        try:
+            combos = mod_comb.combinazioni_giorno(righe_g, db, abbin)
+        except mod_comb.ErroreCombinazioni as e:
+            raise Fermo(str(e))
         giorni_out.append({"num": g, "nome": NOMI_GIORNO.get(sigla, sigla),
-                           "pasti": pasti_out, "totale": tot})
+                           "pasti": pasti_out, "totale": tot, "_combos": combos,
+                           "_target": target})
 
     # lettere dell'abbinamento: da opzione di piano.csv a lettera del PDF
     if abbin and alt_spu is not None:
@@ -627,7 +635,62 @@ def testo_anteprima(dati, meta):
             else:
                 L.append(f"- **{label}** {nome}: {det} ({kcal})")
         L.append(f"- {g['totale']}")
+        L += _md_macro_giorno(g)
+    L += _md_macro_settimana(giorni)
     return "\n".join(L) + "\n"
+
+
+def _punti(v):
+    return f"{v:+.2f}".replace(".", ",").replace("-", "−")
+
+
+def _md_macro_giorno(g):
+    """Giorno a scelta: per ogni macro la giornata reale piu' bassa e quella
+    piu' alta rispetto al target, con le scelte (tappa 1, 29/10/2026)."""
+    combos, target = g.get("_combos"), g.get("_target") or {}
+    if not combos or len(combos) < 2:
+        return []
+    _, _, macro = mod_comb.estremi_giorno(combos)
+    L = [f"- Giornate componibili: {len(combos)}. Macro sul target, giornata reale "
+         f"più bassa e più alta:"]
+    for nome, campo, _, chiave in mod_comb.MACRO:
+        if chiave not in target or campo not in macro:
+            continue
+        (lo, c_lo), (hi, c_hi) = macro[campo]
+        L.append(f"  - {nome}: {_punti(lo - target[chiave])} punti "
+                 f"({mod_comb.descrivi_scelte(c_lo)}) / {_punti(hi - target[chiave])} punti "
+                 f"({mod_comb.descrivi_scelte(c_hi)})")
+    return L
+
+
+def _md_macro_settimana(giorni):
+    """Media settimanale dei macro sulle settimane reali (Dinkelbach), solo se
+    il piano ha giorni a scelta: per i piani senza scelte l'anteprima, e quindi
+    l'impronta, resta quella di prima."""
+    strutt = [g for g in giorni if g.get("_combos")]
+    if not any(len(g["_combos"]) > 1 for g in strutt):
+        return []
+    target = strutt[0]["_target"]
+    sett = mod_comb.estremi_settimana([g["_combos"] for g in strutt])
+    L = ["", "## Media settimanale dei macro sulle settimane reali",
+         "(una scelta per ogni giorno a scelta; tolleranza ±5 punti sulla media)", ""]
+    for nome, campo, _, chiave in mod_comb.MACRO:
+        if chiave not in target or campo not in sett["macro"]:
+            continue
+        (lo, sc_lo), (hi, sc_hi) = sett["macro"][campo]
+        L.append(f"- **{nome}:** {_punti(lo - target[chiave])} / "
+                 f"{_punti(hi - target[chiave])} punti sul target "
+                 f"{target[chiave]:g}%".replace('.', ','))
+        for etich, v, sc in (("più bassa", lo, sc_lo), ("più alta", hi, sc_hi)):
+            fuori = not entro_tolleranza(v - target[chiave])
+            parti = [(g["num"], mod_comb.descrivi_scelte(g["_combos"][j]))
+                     for g, j in zip(strutt, sc) if len(g["_combos"]) > 1]
+            if len({s for _, s in parti}) == 1:
+                desc = f"ogni giorno a scelta {parti[0][1]}"
+            else:
+                desc = "; ".join(f"giorno {n} {s}" for n, s in parti)
+            L.append(f"  - settimana {etich}{' (FUORI TOLLERANZA)' if fuori else ''}: {desc}")
+    return L
 
 
 def impronta(testo):

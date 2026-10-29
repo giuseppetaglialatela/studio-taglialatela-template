@@ -48,6 +48,7 @@ in cui l'errore reale si era prodotto.
 """
 
 import argparse
+import json
 import math
 import os
 import subprocess
@@ -62,7 +63,8 @@ from calcolatore import (
     NUTRIENTI_PER_100G, MICRONUTRIENTI_LARN, TOLLERANZA_PCT,
     PASTI_AMMESSI, ordine_pasti, pasti_non_ammessi,
 )
-from scelte_multiple import carica_piano_esteso, calcola_intervallo_giorno
+from scelte_multiple import carica_piano_esteso
+import combinazioni as mod_comb
 import coerenza
 import formati as mod_formati
 import accoppiamenti as mod_accoppiamenti
@@ -331,11 +333,30 @@ def passo_1_calcolo(rilievi, piano, db, target, giorni_con_scelte):
 # PASSO 2 - scenari min/max colazione+spuntino, per OGNI giorno
 # --------------------------------------------------------------------------
 
-def passo_2_scenari(rilievi, righe_estese, db, target):
-    titolo(2, "SCENARI MIN/MAX DEI PASTI A SCELTA MULTIPLA")
+def calcola_combinazioni(rilievi, righe_estese, db, abbin):
+    """Tutte le giornate realmente componibili, per ogni giorno (tappa 1,
+    29/10/2026). None se il piano non le consente (bloccante)."""
+    per_giorno = defaultdict(list)
+    for r in righe_estese:
+        per_giorno[r["giorno"]].append(r)
+    try:
+        return {g: mod_comb.combinazioni_giorno(rr, db, abbin) for g, rr in per_giorno.items()}
+    except mod_comb.ErroreCombinazioni as e:
+        rilievi.blocca(2, "COMBINAZIONI_NON_CALCOLABILI", str(e))
+        return None
+
+
+def passo_2_scenari(rilievi, righe_estese, db, target, combos, abbin=None):
+    titolo(2, "SCENARI DEI PASTI A SCELTA MULTIPLA (GIORNATE REALI)")
     print("\n  Ordine non negoziabile: gli scenari si calcolano PRIMA di ogni")
     print("  riepilogo. Presentare una sola combinazione 'esemplare' e'")
     print("  l'errore che questo passo esiste per impedire.")
+    print("  Dal 29/10/2026 kcal e percentuali dei macro si leggono su TUTTE le")
+    print("  giornate realmente componibili (un'alternativa per gruppo): gli")
+    print("  estremi sono giornate vere, con le scelte che le producono.")
+    if abbin:
+        print("  Abbinamento colazione -> spuntino dei metadati applicato: "
+              + "; ".join(f"{c} -> {'/'.join(s)}" for c, s in abbin.items()))
 
     per_giorno = defaultdict(list)
     for r in righe_estese:
@@ -349,13 +370,19 @@ def passo_2_scenari(rilievi, righe_estese, db, target):
                   f"(valore unico, gia' valutato al PASSO 1).")
             continue
 
-        minimi, massimi, dettaglio = calcola_intervallo_giorno(righe, db)
+        minimi, massimi, macro = mod_comb.estremi_giorno(combos[giorno])
         intervalli[giorno] = (minimi, massimi)
+        c_kmin = min(combos[giorno], key=lambda c: c["tot"]["kcal_100g"])
+        c_kmax = max(combos[giorno], key=lambda c: c["tot"]["kcal_100g"])
 
         print(f"\n  --- GIORNO {giorno} ---")
-        for d in dettaglio:
-            print(f"    gruppo '{d['gruppo']}' ({d['pasto']}): "
-                  f"{d['n_opzioni']} alternative -> {', '.join(d['opzioni'])}")
+        _, gruppi = mod_comb.struttura_giorno(righe, db)
+        for (pasto, gruppo), opz in gruppi:
+            print(f"    gruppo '{gruppo}' ({pasto}): "
+                  f"{len(opz)} alternative -> {', '.join(o for o, _ in opz)}")
+        print(f"    giornate realmente componibili: {len(combos[giorno])}")
+        print(f"    kcal minime: {mod_comb.descrivi_scelte(c_kmin)}; "
+              f"massime: {mod_comb.descrivi_scelte(c_kmax)}")
 
         print(f"    kcal        {minimi['kcal_100g']:8.1f} - {massimi['kcal_100g']:.1f}")
         print(f"    Proteine    {minimi['proteine_g']:8.1f} - {massimi['proteine_g']:.1f} g")
@@ -389,26 +416,28 @@ def passo_2_scenari(rilievi, righe_estese, db, target):
                 continue
             campo = {"Proteine": "proteine_g", "Carboidrati": "carboidrati_g",
                      "Grassi": "grassi_g"}[nome]
-            # la % dipende sia dal nutriente sia dalle kcal: si valutano i due
-            # estremi realmente calcolabili come limiti, non una combinazione
-            estremi = []
-            for tot in (minimi, massimi):
-                if tot["kcal_100g"]:
-                    estremi.append(tot[campo] * kc / tot["kcal_100g"] * 100)
-            if not estremi:
+            # la % e' un rapporto: gli estremi si cercano tra le giornate
+            # reali, non dividendo minimi e massimi presi nutriente per
+            # nutriente (difetto corretto il 29/10/2026, tappa 1)
+            if campo not in macro:
                 continue
-            lo, hi = min(estremi), max(estremi)
+            (lo, c_lo), (hi, c_hi) = macro[campo]
             s_lo, s_hi = lo - target[chiave], hi - target[chiave]
             print(f"    {nome} {lo:.1f}% - {hi:.1f}% vs target "
                   f"{formatta_num(target[chiave])}% "
                   f"({s_lo:+.2f} / {s_hi:+.2f} punti)")
-            if not entro_tolleranza(s_lo) or not entro_tolleranza(s_hi):
+            print(f"      min: {mod_comb.descrivi_scelte(c_lo)}; "
+                  f"max: {mod_comb.descrivi_scelte(c_hi)}")
+            fuori = []
+            if not entro_tolleranza(s_lo):
+                fuori.append(f"{s_lo:+.2f} punti con {mod_comb.descrivi_scelte(c_lo)}")
+            if not entro_tolleranza(s_hi):
+                fuori.append(f"{s_hi:+.2f} punti con {mod_comb.descrivi_scelte(c_hi)}")
+            if fuori:
                 rilievi.segnala(2, "SCENARIO_MACRO_FUORI_TOLLERANZA", f"giorno {giorno}: {nome.lower()} esce di "
-                                   f"tolleranza a un estremo degli scenari "
-                                   f"({s_lo:+.2f} / {s_hi:+.2f} punti). "
-                                   f"Gli estremi sono limiti di garanzia, non "
-                                   f"una giornata componibile: verificare sul "
-                                   f"caso reale prima di correggere.")
+                                   f"tolleranza in una giornata reale: "
+                                   f"{'; '.join(fuori)}. Non bloccante: il "
+                                   f"giudizio si da' sulla media settimanale.")
 
         print(f"\n    micronutrienti (min - max vs LARN):")
         for nutriente, chiave in MICRONUTRIENTI_LARN.items():
@@ -426,9 +455,9 @@ def passo_2_scenari(rilievi, righe_estese, db, target):
             print(f"      {nutriente:<18} {vmin:8.1f} - {vmax:8.1f}  "
                   f"({pmin:.0f}% - {pmax:.0f}% LARN){flag}")
 
-        print("\n    NOTA: min e max sono calcolati per ogni nutriente")
-        print("    separatamente. Sono limiti garantiti, NON una giornata")
-        print("    realmente componibile. I micronutrienti qui sopra sono")
+        print("\n    NOTA: kcal e macro qui sopra sono giornate reali. Per i")
+        print("    micronutrienti min e max sono per nutriente: ciascuno e'")
+        print("    raggiungibile, non tutti nella stessa giornata. Sono")
         print("    informativi: il giudizio sull'adeguatezza si da' sulla")
         print("    media settimanale del PASSO 3, non sul singolo giorno.")
 
@@ -460,7 +489,20 @@ def controlla_limite_giorno(rilievi, passo, giorno, scarti):
                        f"({', '.join(f'{s:+.2f}%' for s in fuori)})")
 
 
-def verifica_settimanale(rilievi, dati_giorni, intervalli, target):
+def _descrivi_settimana(giorni, combos, indici):
+    parti = []
+    for g, j in zip(giorni, indici):
+        s = mod_comb.descrivi_scelte(combos[g][j])
+        if s:
+            parti.append((g, s))
+    if not parti:
+        return "nessuna scelta"
+    if len({s for _, s in parti}) == 1:
+        return f"ogni giorno a scelta {parti[0][1]}"
+    return "; ".join(f"g{g} {s}" for g, s in parti)
+
+
+def verifica_settimanale(rilievi, dati_giorni, intervalli, target, combos):
     print("\n  --- VERIFICA SETTIMANALE (media dei giorni del piano) ---")
     giorni = sorted(dati_giorni)
     if not giorni:
@@ -475,6 +517,8 @@ def verifica_settimanale(rilievi, dati_giorni, intervalli, target):
         massimi.append(mx)
     n = len(giorni)
     somma = lambda lista, campo: sum(t[campo] for t in lista)
+    sett = mod_comb.estremi_settimana([combos[g] for g in giorni])
+    giorni_scelta = any(len(combos[g]) > 1 for g in giorni)
     print(f"    giorni considerati: {n}")
     if "kcal_target" in target:
         kt = target["kcal_target"]
@@ -497,37 +541,47 @@ def verifica_settimanale(rilievi, dati_giorni, intervalli, target):
             ("Grassi", 9, "grassi_pct_target", "grassi_g")]:
         if chiave not in target:
             continue
-        estremi = []
-        for lista in (minimi, massimi):
-            kcal_tot = somma(lista, "kcal_100g")
-            if kcal_tot:
-                estremi.append(somma(lista, campo) * kc / kcal_tot * 100)
-        if not estremi:
+        # Media settimanale = rapporto di somme su una giornata reale per
+        # giorno: estremi esatti con il metodo di Dinkelbach (tappa 1,
+        # 29/10/2026). Prima si dividevano somme di minimi e di massimi presi
+        # nutriente per nutriente, e una settimana reale poteva uscire
+        # dall'intervallo dichiarato.
+        if campo not in sett["macro"]:
             continue
-        lo, hi = min(estremi), max(estremi)
+        (lo, sc_lo), (hi, sc_hi) = sett["macro"][campo]
         s_lo, s_hi = lo - target[chiave], hi - target[chiave]
         ok = entro_tolleranza(s_lo) and entro_tolleranza(s_hi)
         print(f"    {nome} media {lo:.1f}% - {hi:.1f}% vs target "
               f"{formatta_num(target[chiave])}% ({s_lo:+.2f} / {s_hi:+.2f} "
               f"punti) -> {'OK' if ok else 'FUORI TOLLERANZA'}")
-        # Gli estremi % dei macro NON sono una settimana componibile (min e
-        # max sono calcolati per nutriente): si blocca solo se l'INTERO
-        # intervallo garantito sta fuori tolleranza dallo stesso lato;
-        # se esce un solo estremo e' una segnalazione, come nel PASSO 2.
+        if giorni_scelta:
+            print(f"      min: {_descrivi_settimana(giorni, combos, sc_lo)}")
+            print(f"      max: {_descrivi_settimana(giorni, combos, sc_hi)}")
+        # Regola di blocco invariata (18/09/2026): si blocca se TUTTE le
+        # settimane componibili stanno fuori tolleranza dallo stesso lato;
+        # se ne esce solo una parte e' una segnalazione, con la settimana
+        # reale peggiore.
         tutto_fuori = ((not entro_tolleranza(s_lo)) and
                        (not entro_tolleranza(s_hi)) and
                        ((s_lo > 0) == (s_hi > 0)))
         if tutto_fuori:
             rilievi.blocca(2, "SETTIMANA_MACRO_FUORI_TOLLERANZA",
                            f"media settimanale {nome.lower()} fuori "
-                           f"tolleranza su tutto l'intervallo "
+                           f"tolleranza in ogni settimana componibile "
                            f"({s_lo:+.2f} / {s_hi:+.2f} punti)")
         elif not ok:
+            peggiori = []
+            if not entro_tolleranza(s_lo):
+                peggiori.append(f"{s_lo:+.2f} punti con "
+                                f"{_descrivi_settimana(giorni, combos, sc_lo)}")
+            if not entro_tolleranza(s_hi):
+                peggiori.append(f"{s_hi:+.2f} punti con "
+                                f"{_descrivi_settimana(giorni, combos, sc_hi)}")
             rilievi.segnala(2, "SETTIMANA_MACRO_ESTREMO_FUORI",
-                            f"media settimanale {nome.lower()}: un estremo "
-                            f"esce di tolleranza ({s_lo:+.2f} / {s_hi:+.2f} "
-                            f"punti). Limite di garanzia, non settimana "
-                            f"componibile: verificare sul caso reale.")
+                            f"media settimanale {nome.lower()}: una settimana "
+                            f"reale esce di tolleranza ({s_lo:+.2f} / {s_hi:+.2f} "
+                            f"punti); la peggiore: {'; '.join(peggiori)}. "
+                            f"Da dichiarare al PASSO 6.")
 
 
 # --------------------------------------------------------------------------
@@ -1243,6 +1297,10 @@ def main():
                          "farmaci; FONTE = da dove (es. \"colloquio 20/10, Form A\"). "
                          "Sostituisce TERAPIA_NON_DICHIARATA con "
                          "TERAPIA_DICHIARATA_ASSENTE, che riporta la fonte")
+    ap.add_argument("--metadati", default=None,
+                    help="metadati_piano_vN.json: se c'e', l'abbinamento colazione -> "
+                         "spuntino restringe le giornate componibili, come "
+                         "nell'anteprima. Senza: tutte le combinazioni (prudente)")
     ap.add_argument("--salta-collaudo", action="store_true")
     ap.add_argument("--eccezione-etichetta", dest="eccezione_etichetta", default=None,
                     help="file con le sole voci da etichetta (colonne di alimenti.csv), "
@@ -1281,9 +1339,22 @@ def main():
     sottostime = nutrienti_sottostimati(piano, gap)
     giorni_con_scelte = {r["giorno"] for r in righe_estese if r["gruppo_scelta"]}
 
+    abbin = None
+    if args.metadati:
+        try:
+            with open(args.metadati, encoding="utf-8") as fh:
+                abbin = mod_comb.carica_abbinamento(json.load(fh))
+        except (OSError, ValueError) as e:
+            rilievi.blocca(2, "METADATI_NON_LEGGIBILI",
+                           f"{args.metadati}: {e}")
+            return verdetto(rilievi)
+    combos = calcola_combinazioni(rilievi, righe_estese, db, abbin)
+    if combos is None:
+        return verdetto(rilievi)
+
     dati_giorni = passo_1_calcolo(rilievi, piano, db, target, giorni_con_scelte)
-    intervalli = passo_2_scenari(rilievi, righe_estese, db, target)
-    verifica_settimanale(rilievi, dati_giorni, intervalli, target)
+    intervalli = passo_2_scenari(rilievi, righe_estese, db, target, combos, abbin)
+    verifica_settimanale(rilievi, dati_giorni, intervalli, target, combos)
     esito_calcio = passo_3_micronutrienti(rilievi, dati_giorni, intervalli, target,
                            sottostime, db)
     passo_4_coerenza(rilievi, db, target, piano, gap, sottostime,

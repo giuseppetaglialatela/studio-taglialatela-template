@@ -162,7 +162,9 @@ scenario fuori tolleranza NON si corregge d'ufficio: si corregge solo se la corr
 naturale (porzione ragionevole, pasto che il paziente mangerebbe davvero); se servono
 porzioni fuori scala o accostamenti forzati, si lascia e si DICHIARA in tabella. Non si
 arriva al PASSO 6 avendo verificato una sola combinazione «esemplare» per giorno.
-`pipeline.py` lo fa da solo, al suo PASSO 2, prima di ogni riepilogo.
+`pipeline.py` lo fa da solo, al suo PASSO 2, prima di ogni riepilogo, su tutte le giornate
+realmente componibili (con `--metadati` rispetta l'abbinamento colazione → spuntino): una
+giornata o una settimana fuori tolleranza è nominata con le scelte che la producono.
 
 **Produci:**
 - kcal per ogni pasto e totale giornaliero, verificato pasto per pasto;
@@ -210,8 +212,8 @@ Calcio, ferro, vitamina D, folati (B9), vitamina B12, zinco, magnesio, vitamina 
   NON è una carenza accertata. Riporta il flag con il numero e le voci che lo causano;
   nessuna correzione del piano né integrazione su un nutriente sottostimato prima di aver
   verificato il gap.
-- Con pasti a scelta, riporta gli scenari MINIMO e MASSIMO già calcolati al PASSO 2, senza
-  ricalcolarli.
+- Con pasti a scelta, riporta le giornate e la settimana reali più lontane dal target, con
+  le scelte, come le danno pipeline (PASSO 2) e anteprima, senza ricalcolarle.
 - **Non inseguire i numeri con gli alimenti:** prima di aggiungere un alimento per chiudere
   un micronutriente, verifica che il deficit sia reale (media settimanale, non giorno; e
   non marcato sottostimato). Un accostamento sgradito che il paziente salta peggiora il

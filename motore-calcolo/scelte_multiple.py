@@ -28,6 +28,12 @@ strutturale e non dipende dalla scelta del paziente. Se invece la soglia e'
 superata solo nello scenario massimo, la copertura dipende da quale
 alternativa il paziente sceglie davvero - e va detto a lui, non dato per
 acquisito.
+
+LIMITE (29/10/2026, tappa 1): il metodo vale per kcal e singoli nutrienti, che
+sono somme. NON vale per le percentuali dei macro, che sono rapporti: dividere
+il minimo dei grammi per il minimo delle kcal non da' il minimo della
+percentuale. Percentuali giornaliere e settimanali si calcolano sulle giornate
+realmente componibili in combinazioni.py (pipeline e anteprima).
 """
 
 from collections import defaultdict

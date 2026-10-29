@@ -1,0 +1,26 @@
+{
+  "tipo": "pipeline",
+  "bloccanti": [
+    [
+      6,
+      "LIVELLO_INCOERENTE_TRA_PASTI"
+    ]
+  ],
+  "attenzioni": [
+    [
+      3,
+      "MEDIA_SOTTO_LARN_CON_GAP"
+    ],
+    [
+      5,
+      "TERAPIA_NON_DICHIARATA"
+    ],
+    [
+      6,
+      "VALUTARE_LIVELLO_RINFORZATO"
+    ]
+  ],
+  "exit_code": 1,
+  "descrizione": "Il piano e i target del caso 06 con l'abbinamento colazione -> spuntino nei metadati (S2 solo con SPrB, le altre colazioni con entrambi gli spuntini): le giornate componibili scendono da 8 a 7 e la giornata S2 + SPrA (carboidrati -6,26 punti) non e' piu' possibile. La peggiore diventa S1 + SPrA (-4,64): le attenzioni SCENARIO_MACRO_FUORI_TOLLERANZA e SETTIMANA_MACRO_ESTREMO_FUORI del caso 06 non devono comparire; il resto uguale al caso 06. Diventa rosso se la pipeline ignora l'abbinamento dei metadati, come prima del 29/10/2026 (l'anteprima lo usava gia').",
+  "riferimento": "Costruito il 29/10/2026 (tappa 1). Le 8 giornate del caso 06 elencate una per una: S1+SPrA -4,64; S1+SPrB -2,71; S2+SPrA -6,26; S2+SPrB -4,39; D1+SPrA -0,82; D1+SPrB +0,97; D2+SPrA -2,16; D2+SPrB -0,31 punti di carboidrati sul target 45%. Esclusa S2+SPrA, gli estremi sono -4,64 e +0,97, come riporta la pipeline. Il passaggio da riga di comando di --metadati e' verificato a parte in regressione.py."
+}

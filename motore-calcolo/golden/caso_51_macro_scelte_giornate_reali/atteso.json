@@ -1,0 +1,89 @@
+{
+  "tipo": "pipeline",
+  "bloccanti": [],
+  "attenzioni": [
+    [
+      2,
+      "SCENARIO_KCAL_FUORI_TOLLERANZA"
+    ],
+    [
+      2,
+      "SCENARIO_KCAL_FUORI_TOLLERANZA"
+    ],
+    [
+      2,
+      "SCENARIO_KCAL_FUORI_TOLLERANZA"
+    ],
+    [
+      2,
+      "SCENARIO_KCAL_FUORI_TOLLERANZA"
+    ],
+    [
+      2,
+      "SCENARIO_KCAL_FUORI_TOLLERANZA"
+    ],
+    [
+      2,
+      "SCENARIO_MACRO_FUORI_TOLLERANZA"
+    ],
+    [
+      2,
+      "SCENARIO_MACRO_FUORI_TOLLERANZA"
+    ],
+    [
+      2,
+      "SCENARIO_MACRO_FUORI_TOLLERANZA"
+    ],
+    [
+      2,
+      "SCENARIO_MACRO_FUORI_TOLLERANZA"
+    ],
+    [
+      2,
+      "SCENARIO_MACRO_FUORI_TOLLERANZA"
+    ],
+    [
+      2,
+      "SCENARIO_MACRO_FUORI_TOLLERANZA"
+    ],
+    [
+      2,
+      "SCENARIO_MACRO_FUORI_TOLLERANZA"
+    ],
+    [
+      2,
+      "SCENARIO_MACRO_FUORI_TOLLERANZA"
+    ],
+    [
+      2,
+      "SETTIMANA_MACRO_ESTREMO_FUORI"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN_CON_GAP"
+    ],
+    [
+      4,
+      "FORMATO_CONFEZIONE_NON_RISPETTATO"
+    ],
+    [
+      4,
+      "FORMATO_CONFEZIONE_NON_RISPETTATO"
+    ],
+    [
+      4,
+      "FORMATO_CONFEZIONE_NON_RISPETTATO"
+    ],
+    [
+      5,
+      "TERAPIA_DICHIARATA_ASSENTE"
+    ],
+    [
+      6,
+      "VALUTARE_LIVELLO_RINFORZATO"
+    ]
+  ],
+  "exit_code": 0,
+  "descrizione": "Piano di 6 giorni diversi tra loro (pranzi e cene presi dai casi golden), con colazione (S1, S2, D1, D2), spuntino (SPA, SPB) e secondo spuntino (A, B) a scelta: 16 giornate componibili al giorno. Target tarati (1708 kcal, 21/43/36) perche' il calcolo precedente al 29/10/2026 dichiarasse la media settimanale dei carboidrati in tolleranza (-4,25 punti, estremi presi nutriente per nutriente) mentre la settimana reale peggiore, colazione S2 + spuntino SPA + secondo spuntino A ogni giorno, sta a -5,74 punti. Deve comparire SETTIMANA_MACRO_ESTREMO_FUORI (attenzione, non blocco: la regola di blocco del 18/09/2026 resta invariata) e le attenzioni SCENARIO_MACRO_FUORI_TOLLERANZA dei giorni 1-6 con le giornate reali. Diventa rosso se le percentuali dei macro tornano a essere calcolate dagli estremi per nutriente: fallisce con il motore precedente e passa con quello nuovo (tappa 1).",
+  "riferimento": "Costruito il 29/10/2026 (tappa 1, calcolo esatto dei pasti a scelta) come ricostruzione fittizia, senza dati di pazienti, dello scarto visto sul piano reale v5 (-9,3 punti reali contro -7,65 dichiarati): qui 1,49 punti tra dichiarato e reale. Valori verificati contro il calcolo di tutte le 16^6 settimane una per una (forza bruta) e con l'esecuzione del motore precedente (commit b47a62a): media carboidrati 38,8%-47,1% (-4,25/+4,09, OK) prima, 37,3%-47,2% (-5,74/+4,24) dopo. Le attenzioni FORMATO_CONFEZIONE_NON_RISPETTATO vengono dai pasti dei casi golden riusati, non dal caso."
+}
