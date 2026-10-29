@@ -1,0 +1,21 @@
+{
+  "tipo": "pipeline",
+  "bloccanti": [],
+  "attenzioni": [
+    [
+      3,
+      "MEDIA_SOTTO_LARN_CON_GAP"
+    ],
+    [
+      5,
+      "TERAPIA_DICHIARATA_ASSENTE"
+    ],
+    [
+      6,
+      "ALIMENTI_DESIDERATI_MANCANTI"
+    ]
+  ],
+  "exit_code": 0,
+  "descrizione": "Il caso 45 con due alimenti desiderati, uno nel database (petto di pollo) e uno assente (hamburger: mancava davvero il 23/10/2026 e fu scoperto a piano finito). Deve comparire l'avviso ALIMENTI_DESIDERATI_MANCANTI, che non blocca (decisione del 30/10/2026): exit 0. Diventa rosso se un alimento mancante passa in silenzio o se l'avviso diventa un blocco.",
+  "riferimento": "Costruito il 30/10/2026 (tappa 2, disciplina nel codice) dal caso 45 (stessi piano e target, piano del caso 36); attesi scritti a mano."
+}

@@ -70,6 +70,7 @@ import formati as mod_formati
 import accoppiamenti as mod_accoppiamenti
 import struttura_pasti
 import interazioni as mod_interazioni
+import metadati_piano as mod_meta
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 # Ordine dei pasti: da calcolatore.ordine_pasti (unica fonte, 30/09/2026).
@@ -850,43 +851,62 @@ GRAVITA_AMMESSE = ("alta", "media", "bassa")
 
 
 def passo_5_interazioni(rilievi, piano, db, farmaci_path, interazioni_path,
-                        orari_path, nessuna_terapia=None):
+                        orari_path, nessuna_terapia=False, meta=None):
     titolo(5, "INTERAZIONI FARMACO-ALIMENTO")
 
     forniti = [p for p in (farmaci_path, interazioni_path, orari_path) if p]
-    # --nessuna-terapia "fonte" (23/10/2026): il nutrizionista dichiara di aver
-    # verificato che il paziente non assume farmaci, e da dove. La dichiarazione
-    # resta nel verdetto (attenzione, non blocca); insieme ai file di terapia e'
-    # una contraddizione: blocca, ma i file si valutano comunque, perche' le
-    # interazioni che contengono non spariscano dal report.
-    if nessuna_terapia is not None and not str(nessuna_terapia).strip():
-        rilievi.blocca(5, "TERAPIA_CONTRADDITTORIA", "--nessuna-terapia senza la fonte "
-                          "della verifica (es. \"colloquio 20/10, Form A\")")
-        if not forniti:
+    # «Nessuna terapia» (23/10/2026, conferma registrata dal 30/10/2026): vale
+    # solo con la formula fissa nel campo `terapia` dei metadati (metadati_piano.py).
+    # Il 28/10 la terapia era stata dedotta da una scheda; una fonte libera da riga
+    # di comando non distingueva la conferma del nutrizionista da una deduzione.
+    # Insieme ai file di terapia e' una contraddizione: blocca, ma i file si
+    # valutano comunque, perche' le interazioni che contengono non spariscano.
+    terapia_meta = meta.get("terapia") if isinstance(meta, dict) else None
+    if nessuna_terapia:
+        if isinstance(nessuna_terapia, str):
+            ok, motivo = False, ("dal 30/10/2026 la conferma non si scrive sulla riga di "
+                                 "comando: --nessuna-terapia (senza testo) con --metadati, "
+                                 "e nel campo 'terapia' la formula «"
+                                 + mod_meta.FORMULA_TERAPIA + "»")
+        elif meta is None:
+            ok, motivo = False, ("--nessuna-terapia richiede --metadati: la conferma sta nel "
+                                 "campo 'terapia', formula «" + mod_meta.FORMULA_TERAPIA + "»")
+        else:
+            ok, motivo = mod_meta.valida_nessuna_terapia(terapia_meta)
+        if not ok:
+            print(f"\n  ⛔ Assenza di terapia NON confermata: {motivo}")
+            rilievi.blocca(5, "TERAPIA_NON_CONFERMATA", f"assenza di terapia non "
+                              f"confermata: {motivo}")
+            if not forniti:
+                return
+        elif forniti:
+            print("\n  ⛔ Dichiarata l'assenza di terapia MA passati file di terapia:")
+            print("  i file si valutano comunque, il piano resta bloccato.")
+            rilievi.blocca(5, "TERAPIA_CONTRADDITTORIA", f"dichiarata l'assenza di terapia "
+                              f"({motivo}) ma passati file di terapia: chiarire quale "
+                              f"delle due e' vera")
+        else:
+            print(f"\n  TERAPIA DICHIARATA ASSENTE dal nutrizionista: {motivo}")
+            print("  Nessun farmaco da incrociare.")
+            rilievi.segnala(5, "TERAPIA_DICHIARATA_ASSENTE", f"terapia dichiarata assente "
+                               f"dal nutrizionista ({motivo}): nessuna interazione "
+                               f"da valutare")
             return
-        # con i file di terapia si prosegue: i loro rilievi non devono sparire
-    elif nessuna_terapia and forniti:
-        print("\n  ⛔ Dichiarata l'assenza di terapia MA passati file di terapia:")
-        print("  i file si valutano comunque, il piano resta bloccato.")
-        rilievi.blocca(5, "TERAPIA_CONTRADDITTORIA", f"dichiarata l'assenza di terapia "
-                          f"(--nessuna-terapia: {nessuna_terapia}) ma passati file di "
-                          f"terapia: chiarire quale delle due e' vera")
-    elif nessuna_terapia:
-        print(f"\n  TERAPIA DICHIARATA ASSENTE dal nutrizionista: {nessuna_terapia}")
-        print("  Nessun farmaco da incrociare.")
-        rilievi.segnala(5, "TERAPIA_DICHIARATA_ASSENTE", f"terapia dichiarata assente "
-                           f"dal nutrizionista ({nessuna_terapia}): nessuna interazione "
-                           f"da valutare")
-        return
+    elif forniti and mod_meta.dichiara_nessuna_terapia(terapia_meta):
+        print("\n  ⛔ I metadati dicono «nessuna terapia» MA sono passati file di terapia.")
+        rilievi.blocca(5, "TERAPIA_CONTRADDITTORIA", f"il campo 'terapia' dei metadati "
+                          f"dichiara l'assenza di terapia («{terapia_meta}») ma sono "
+                          f"passati file di terapia: chiarire quale delle due e' vera")
     if not forniti:
         print("\n  Nessun file di terapia fornito.")
         print("  ATTENZIONE: l'assenza del file NON e' l'assenza di terapia.")
         print("  Se il paziente assume farmaci, questo passo va rieseguito")
-        print("  con --farmaci, --interazioni e --orari; se e' verificato che")
-        print("  non ne assume, con --nessuna-terapia \"fonte della verifica\".")
+        print("  con --farmaci, --interazioni e --orari; se e' confermato che")
+        print("  non ne assume, con --nessuna-terapia e la formula nei metadati.")
         rilievi.segnala(5, "TERAPIA_NON_DICHIARATA", "verifica interazioni non eseguita: nessun file di "
                            "terapia fornito. Confermare che il paziente non "
-                           "sia in terapia farmacologica (verificato, --nessuna-terapia \"fonte\").")
+                           "sia in terapia farmacologica (--nessuna-terapia, formula nel "
+                           "campo 'terapia' dei metadati).")
         return
 
     mancanti = [nome for nome, p in [("--farmaci", farmaci_path),
@@ -1250,6 +1270,56 @@ def avviso_livello_rinforzato(rilievi, esito_calcio, livelli):
 
 
 # --------------------------------------------------------------------------
+# Metadati: assunzioni, alimenti desiderati, campo drive (30/10/2026)
+# --------------------------------------------------------------------------
+
+def controlla_metadati(rilievi, meta):
+    """Controlli sui metadati che non riguardano i numeri del piano. Girano solo
+    con --metadati; l'anteprima del PASSO 6 richiede comunque i campi
+    (genera_zona_piano.py), quindi non si arriva all'approvazione senza.
+    - assunzioni da confermare: BLOCCANO (decisione del 30/10/2026);
+    - alimenti desiderati assenti dal database: AVVISO (decisione del 30/10/2026);
+    - forma errata di un campo o testo libero in `drive`: blocca, perche' il
+      controllo non si puo' fare."""
+    if meta is None:
+        return
+    titolo(6, "METADATI: ASSUNZIONI, ALIMENTI DESIDERATI, RIFERIMENTI")
+    assunzioni, err = mod_meta.leggi_assunzioni(meta)
+    if err:
+        rilievi.blocca(6, "ASSUNZIONI_NON_VALIDE", err)
+    elif assunzioni is None:
+        print("\n  Campo 'assunzioni' assente: l'anteprima del PASSO 6 lo richiede.")
+    else:
+        aperte = [t for t, st in assunzioni if st != "confermata"]
+        print(f"\n  Assunzioni di composizione: {len(assunzioni)}, "
+              f"da confermare {len(aperte)}.")
+        if aperte:
+            rilievi.blocca(6, "ASSUNZIONE_NON_CONFERMATA",
+                           "assunzioni di composizione non confermate dal nutrizionista: "
+                           + "; ".join(f"«{t}»" for t in aperte)
+                           + ". Si chiedono (in blocco) e si aggiorna lo stato nei metadati")
+    desiderati, err = mod_meta.leggi_desiderati(meta)
+    if err:
+        rilievi.blocca(6, "ALIMENTI_DESIDERATI_NON_VALIDI", err)
+    elif desiderati is None:
+        print("  Campo 'alimenti_desiderati' assente: l'anteprima del PASSO 6 lo richiede.")
+    else:
+        esiti = mod_meta.confronta_desiderati(desiderati, mod_meta.carica_nomi_database())
+        mancanti = [n for n, f in esiti.items() if not f]
+        print(f"  Alimenti desiderati: {len(desiderati)}, assenti dal database "
+              f"{len(mancanti)}.")
+        if mancanti:
+            rilievi.segnala(6, "ALIMENTI_DESIDERATI_MANCANTI",
+                            "alimenti desiderati assenti dal database: "
+                            + ", ".join(mancanti)
+                            + ". Avviso, non blocco: si dichiarano al PASSO 6 (aggiunti "
+                              "con M6 o sostituiti)")
+    err = mod_meta.errore_drive(meta)
+    if err:
+        rilievi.blocca(6, "DRIVE_NON_VALIDO", err)
+
+
+# --------------------------------------------------------------------------
 # Verdetto finale
 # --------------------------------------------------------------------------
 
@@ -1283,6 +1353,65 @@ def verdetto(rilievi):
 # main
 # --------------------------------------------------------------------------
 
+def esegui(piano_p, target_p, gap_p=None, farmaci=None, interazioni=None, orari=None,
+           deroga=None, nessuna_terapia=False, metadati_p=None, salta_collaudo=False,
+           eccezione_etichetta=None):
+    """L'intera sequenza della pipeline, in ordine fisso. Restituisce
+    (rilievi, meta). Usata da main() e dalla suite di regressione: una sola
+    sequenza, cosi' un passo nuovo non puo' mancare in una delle due (trappola
+    del 29/10/2026, quando regressione.py ricostruiva main() a mano)."""
+    rilievi = Rilievi()
+    meta = None
+
+    passo_0_collaudo(rilievi, salta_collaudo)
+    if rilievi.bloccanti:
+        return rilievi, meta
+
+    db, eccezioni, fermo = carica_database(rilievi, eccezione_etichetta)
+    if fermo:
+        return rilievi, meta
+    piano = carica_piano(piano_p)
+    righe_estese = carica_piano_esteso(piano_p)
+    target = carica_target(target_p)
+    gap = carica_gap(gap_p or os.path.join(BASE, "gap.csv"))
+
+    if controlla_food_id(rilievi, piano, db, gap, eccezioni):
+        return rilievi, meta
+    if controlla_pasti_ammessi(rilievi, piano):
+        return rilievi, meta
+
+    sottostime = nutrienti_sottostimati(piano, gap)
+    giorni_con_scelte = {r["giorno"] for r in righe_estese if r["gruppo_scelta"]}
+
+    abbin = None
+    if metadati_p:
+        try:
+            with open(metadati_p, encoding="utf-8") as fh:
+                meta = json.load(fh)
+            if not isinstance(meta, dict):
+                raise ValueError("il file deve contenere un oggetto JSON")
+            abbin = mod_comb.carica_abbinamento(meta)
+        except (OSError, ValueError) as e:
+            meta = None
+            rilievi.blocca(2, "METADATI_NON_LEGGIBILI", f"{metadati_p}: {e}")
+            return rilievi, meta
+    combos = calcola_combinazioni(rilievi, righe_estese, db, abbin)
+    if combos is None:
+        return rilievi, meta
+
+    dati_giorni = passo_1_calcolo(rilievi, piano, db, target, giorni_con_scelte)
+    intervalli = passo_2_scenari(rilievi, righe_estese, db, target, combos, abbin)
+    verifica_settimanale(rilievi, dati_giorni, intervalli, target, combos)
+    esito_calcio = passo_3_micronutrienti(rilievi, dati_giorni, intervalli, target,
+                                          sottostime, db)
+    passo_4_coerenza(rilievi, db, target, piano, gap, sottostime, righe_estese)
+    passo_5_interazioni(rilievi, piano, db, farmaci, interazioni, orari,
+                        nessuna_terapia, meta)
+    passo_6_livello_unico(rilievi, righe_estese, db, deroga, esito_calcio)
+    controlla_metadati(rilievi, meta)
+    return rilievi, meta
+
+
 def main():
     ap = argparse.ArgumentParser(
         description="Orchestratore del motore di calcolo - FASE 3")
@@ -1296,16 +1425,18 @@ def main():
                     help="motivo clinico che autorizza una struttura pasti "
                          "non uniforme (PASSO 6): declassa il blocco ad "
                          "attenzione, ma il rilievo resta nel report")
-    ap.add_argument("--nessuna-terapia", dest="nessuna_terapia", default=None,
-                    metavar="FONTE",
-                    help="il nutrizionista ha verificato che il paziente non assume "
-                         "farmaci; FONTE = da dove (es. \"colloquio 20/10, Form A\"). "
-                         "Sostituisce TERAPIA_NON_DICHIARATA con "
-                         "TERAPIA_DICHIARATA_ASSENTE, che riporta la fonte")
+    ap.add_argument("--nessuna-terapia", dest="nessuna_terapia", nargs="?", const=True,
+                    default=False,
+                    help="il paziente non assume farmaci, confermato dal nutrizionista: "
+                         "richiede --metadati con il campo 'terapia' nella formula «"
+                         + mod_meta.FORMULA_TERAPIA.replace("%", "%%") + "»")
     ap.add_argument("--metadati", default=None,
-                    help="metadati_piano_vN.json: se c'e', l'abbinamento colazione -> "
-                         "spuntino restringe le giornate componibili, come "
-                         "nell'anteprima. Senza: tutte le combinazioni (prudente)")
+                    help="metadati_piano_vN.json: abbinamento colazione -> spuntino, "
+                         "terapia, assunzioni, alimenti desiderati. Obbligatorio per il "
+                         "verdetto che serve all'anteprima del PASSO 6")
+    ap.add_argument("--out-verdetto", dest="out_verdetto", default=None,
+                    help="scrive il verdetto (JSON) richiesto dall'anteprima del PASSO 6 "
+                         "e dal PDF: impronta dei dati valutati, bloccanti, attenzioni")
     ap.add_argument("--salta-collaudo", action="store_true")
     ap.add_argument("--eccezione-etichetta", dest="eccezione_etichetta", default=None,
                     help="file con le sole voci da etichetta (colonne di alimenti.csv), "
@@ -1321,54 +1452,17 @@ def main():
           + (f" + eccezione etichetta {args.eccezione_etichetta}"
              if args.eccezione_etichetta else ""))
 
-    rilievi = Rilievi()
-
-    passo_0_collaudo(rilievi, args.salta_collaudo)
-    if rilievi.bloccanti:
-        return verdetto(rilievi)
-
-    db, eccezioni, fermo = carica_database(rilievi, args.eccezione_etichetta)
-    if fermo:
-        return verdetto(rilievi)
-    piano = carica_piano(args.piano)
-    righe_estese = carica_piano_esteso(args.piano)
-    target = carica_target(args.target)
-    gap = carica_gap(args.gap)
-
-    if controlla_food_id(rilievi, piano, db, gap, eccezioni):
-        return verdetto(rilievi)
-
-    if controlla_pasti_ammessi(rilievi, piano):
-        return verdetto(rilievi)
-
-    sottostime = nutrienti_sottostimati(piano, gap)
-    giorni_con_scelte = {r["giorno"] for r in righe_estese if r["gruppo_scelta"]}
-
-    abbin = None
-    if args.metadati:
-        try:
-            with open(args.metadati, encoding="utf-8") as fh:
-                abbin = mod_comb.carica_abbinamento(json.load(fh))
-        except (OSError, ValueError) as e:
-            rilievi.blocca(2, "METADATI_NON_LEGGIBILI",
-                           f"{args.metadati}: {e}")
-            return verdetto(rilievi)
-    combos = calcola_combinazioni(rilievi, righe_estese, db, abbin)
-    if combos is None:
-        return verdetto(rilievi)
-
-    dati_giorni = passo_1_calcolo(rilievi, piano, db, target, giorni_con_scelte)
-    intervalli = passo_2_scenari(rilievi, righe_estese, db, target, combos, abbin)
-    verifica_settimanale(rilievi, dati_giorni, intervalli, target, combos)
-    esito_calcio = passo_3_micronutrienti(rilievi, dati_giorni, intervalli, target,
-                           sottostime, db)
-    passo_4_coerenza(rilievi, db, target, piano, gap, sottostime,
-                     righe_estese)
-    passo_5_interazioni(rilievi, piano, db, args.farmaci, args.interazioni,
-                        args.orari, args.nessuna_terapia)
-    passo_6_livello_unico(rilievi, righe_estese, db, args.deroga, esito_calcio)
-
-    return verdetto(rilievi)
+    rilievi, meta = esegui(args.piano, args.target, args.gap, args.farmaci,
+                           args.interazioni, args.orari, args.deroga,
+                           args.nessuna_terapia, args.metadati, args.salta_collaudo,
+                           args.eccezione_etichetta)
+    esito = verdetto(rilievi)
+    if args.out_verdetto:
+        mod_meta.scrivi_verdetto(args.out_verdetto, rilievi, args.piano, args.target, meta)
+        print(f"\n  Verdetto scritto in {args.out_verdetto}"
+              + ("" if meta is not None else
+                 " (SENZA metadati: l'anteprima del PASSO 6 non lo accetta)"))
+    return esito
 
 
 if __name__ == "__main__":

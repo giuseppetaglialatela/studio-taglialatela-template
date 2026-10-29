@@ -1,7 +1,11 @@
 # M1 — MOTORE DI CALCOLO
 
 Modulo operativo (principio 6). Dipendenze: nessuna. Ne dipendono M2 e M6.
-Ultima modifica: 23/10/2026 (anteprima del PASSO 6 e impronta dell'approvazione in `genera_zona_piano.py`; catalogo e libreria ai formati, condimenti a porzione libera;
+Ultima modifica: 30/10/2026 (tappa 2, disciplina nel codice: anteprima solo su un verdetto della
+pipeline senza bloccanti e scritta su file; conferma dell'assenza di terapia nei metadati;
+assunzioni e alimenti desiderati; `drive` solo riferimenti; `metadati_piano.py`,
+`genera_spiegazione.py`, `pipeline.esegui()`, controllo 10 del collaudo, casi 53-57).
+23/10/2026: anteprima del PASSO 6 e impronta dell'approvazione in `genera_zona_piano.py`; catalogo e libreria ai formati, condimenti a porzione libera;
 Atwater solo sul piano e controllo 9 del collaudo; `--nessuna-terapia`; ripiego d'avvio;
 casi golden 45-50). 22/10: distribuzione del calcio, avviso del livello rinforzato, fermi
 sui segnaposto. Motivazioni, episodi e date in
@@ -112,7 +116,7 @@ di lavoro, riscarica e ricollauda prima di fidarti dei numeri.
 ## 2. MODULI SOFTWARE
 
 ### collaudo.py — certificato di inizio sessione
-Nove controlli:
+Dieci controlli:
 1. presenza e integrità di tutti i CSV, incluso il numero di colonne per riga
    (`csv.DictReader` da solo NON lo segnala)
 2. righe di `alimenti.csv` contro `EXPECTED_ALIMENTI_COUNT`
@@ -134,6 +138,12 @@ Nove controlli:
    verificato (`coerenza.ATWATER_FALSI_POSITIVI_NOTI`: aglio, carciofi, semi di lino) e
    ogni voce dell'elenco deve essere ancora anomala; la pipeline lo esegue solo sugli
    alimenti del piano (sezione 8)
+10. controlli di disciplina: autotest di `metadati_piano.py` e di `genera_zona_piano.py`
+   (verdetto, anteprima, impronta, segnaposto) e, se c'è il suo template, di
+   `genera_spiegazione.py`. Con i template accanto alla cartella del motore (repository
+   clonato) gira intero, PDF compreso; con il solo motore del comando d'avvio gira senza
+   `.py` e PDF, che si verificano con `--template` (chat B). Dura meno di un secondo
+   senza template, circa 2 secondi con
 
 Esce 0 (superato) o 1 (fallito). File opzionali (`cache.zip`, `BDA_alimenti.xlsx`,
 `crea_cache.zip`): se presenti si verificano come gli altri, se assenti il collaudo lo
@@ -157,7 +167,12 @@ Un comando, passi sempre nello stesso ordine, un report unico:
 3. micronutrienti per giorno e media settimanale, con flag LARN e gap
 4. coerenza dei dati e gap dichiarati; controlli E (formati) e F (accoppiamenti)
 5. interazioni farmaco-alimento
-6. livello unico di colazione, spuntino e, se presente, secondo spuntino su tutto il piano
+6. livello unico di colazione, spuntino e, se presente, secondo spuntino su tutto il piano;
+   poi, con `--metadati`, i metadati: assunzioni, alimenti desiderati, `drive`
+
+La sequenza sta in `pipeline.esegui()`, chiamata sia da `main()` sia dalla suite: un passo
+nuovo non può mancare in una delle due (dal 30/10/2026; prima la suite la ricostruiva a
+mano).
 
 La pipeline usa SEMPRE il database ufficiale del motore, più le sole voci da etichetta
 dichiarate con `--eccezione-etichetta` (sezione 4): non accetta un altro `alimenti.csv`.
@@ -167,12 +182,22 @@ ammesso (`PASTO_NON_AMMESSO`, es. `spuntino 2` con lo spazio).
 ```
 python3 pipeline.py --piano piano.csv --target target.csv
   [--farmaci f.csv --interazioni i.csv --orari o.csv]
-  [--nessuna-terapia "fonte della verifica"]
+  [--nessuna-terapia]
   [--deroga-struttura "motivo"] [--eccezione-etichetta voci.csv] [--salta-collaudo]
-  [--metadati metadati_piano_vN.json]
+  [--metadati metadati_piano_vN.json] [--out-verdetto verdetto_vN.json]
 ```
 Con `--metadati` l'abbinamento colazione → spuntino restringe le giornate componibili,
-come nell'anteprima; senza, valgono tutte le combinazioni (prudente).
+come nell'anteprima; senza, valgono tutte le combinazioni (prudente). `--out-verdetto`
+scrive il verdetto che l'anteprima del PASSO 6 e il PDF richiedono (sezione
+`genera_zona_piano.py`): serve `--metadati`, e la pipeline deve girare con il collaudo.
+
+**Assenza di terapia (30/10/2026).** `--nessuna-terapia` non prende più un testo: la
+conferma sta nel campo `terapia` dei metadati, con la formula fissa
+`nessuna terapia, confermato dal nutrizionista il GG/MM/AAAA (fonte: colloquio | Form A |
+fascicolo)` (un dettaglio facoltativo dopo una virgola dentro la parentesi). Data valida e
+non futura. Senza `--metadati`, con un altro testo o con il vecchio uso
+`--nessuna-terapia "fonte"`: `TERAPIA_NON_CONFERMATA`, bloccante. Il 28/10 una terapia
+dedotta da una scheda era passata come verificata.
 Esce 0 senza rilievi bloccanti, 1 altrimenti; il report si stampa per intero in entrambi i
 casi.
 
@@ -183,10 +208,14 @@ ogni settimana componibile, dallo stesso lato; abbinamento dei metadati illeggib
 esclude ogni giornata (`COMBINAZIONI_NON_CALCOLABILI`, `METADATI_NON_LEGGIBILI`); **giorno o scenario oltre ±10% di kcal**; target incoerenti; file dei formati o
 degli accoppiamenti illeggibili o accoppiamenti non verificati; interazione di gravità ALTA;
 gravità, tipo o nutriente non riconosciuti nella tabella interazioni;
-orario di un pasto mancante; terapia dichiarata solo in parte; assenza di terapia dichiarata
-(`--nessuna-terapia`) insieme a file di terapia, o senza fonte (`TERAPIA_CONTRADDITTORIA`: i
-file si valutano comunque e i loro rilievi restano); struttura pasti non uniforme;
-livelli colazione/spuntino misti o incoerenti tra pasti; catalogo disallineato.
+orario di un pasto mancante; terapia dichiarata solo in parte; assenza di terapia non
+confermata (`TERAPIA_NON_CONFERMATA`); assenza di terapia, da opzione o dal campo `terapia`
+dei metadati, insieme a file di terapia (`TERAPIA_CONTRADDITTORIA`); in entrambi i casi i
+file si valutano comunque e i loro rilievi restano; struttura pasti non uniforme;
+livelli colazione/spuntino misti o incoerenti tra pasti; catalogo disallineato;
+assunzione di composizione da confermare (`ASSUNZIONE_NON_CONFERMATA`); campo `assunzioni`
+o `alimenti_desiderati` scritto male (`ASSUNZIONI_NON_VALIDE`,
+`ALIMENTI_DESIDERATI_NON_VALIDI`); testo libero in `drive` (`DRIVE_NON_VALIDO`).
 
 **Rilievi DA DICHIARARE** (non bloccano): eccezione etichetta dichiarata
 (`ALIMENTO_FUORI_DATABASE_SU_RICHIESTA`); giorno con kcal fuori ±5% (entro ±10%) o macro
@@ -202,8 +231,10 @@ voce da etichetta); micronutrienti tutti a zero; quantità fuori formato; accopp
 interazioni di gravità media o bassa (`INTERAZIONE_GRAVITA_MEDIA`, `_BASSA`); riga della
 tabella interazioni su un `food_id` assente dal database;
 principi attivi assenti dalla tabella; terapia non dichiarata (né file né
-`--nessuna-terapia`); terapia dichiarata assente, con la fonte
-(`TERAPIA_DICHIARATA_ASSENTE`: è la traccia della verifica nel verdetto); pasto assente su tutto il
+`--nessuna-terapia`); terapia dichiarata assente, con la conferma dei metadati
+(`TERAPIA_DICHIARATA_ASSENTE`: è la traccia della verifica nel verdetto); alimenti
+desiderati assenti dal database (`ALIMENTI_DESIDERATI_MANCANTI`, avviso per decisione del
+30/10/2026: si aggiungono con M6 o si sostituiscono); pasto assente su tutto il
 piano; livello parziale o fuori catalogo; catalogo assente (livello verificato solo come
 uniforme); collaudo saltato; avviso del livello rinforzato (`VALUTARE_LIVELLO_RINFORZATO`,
 PASSO 6). I totali sottostimati per gap si stampano nel report.
@@ -244,16 +275,15 @@ pasti; il rilievo resta nel report con il motivo. Livello misto e catalogo disal
 restano bloccanti anche con la deroga.
 
 ### regressione.py
-Suite sui 50 casi golden in `golden/`: un comando, pass/fail per caso. Si riesegue **dopo
+Suite sui 57 casi golden in `golden/`: un comando, pass/fail per caso. Si riesegue **dopo
 ogni modifica** al motore o al database, e comunque prima di qualsiasi uso clinico.
-- Dopo i casi, la suite esegue davvero `pipeline.py` con `--nessuna-terapia` sul caso 45
-  e controlla che l'opzione arrivi al PASSO 5 e che la fonte compaia nel VERDETTO: i casi
-  chiamano i passi direttamente e non
-  vedrebbero un'opzione persa tra la riga di comando e `main()`. Vale solo per questa
-  opzione.
-- Nei casi `pipeline` la suite ripete la sequenza di `pipeline.main()`: un controllo nuovo
-  va in una funzione chiamata da entrambi (come `controlla_pasti_ammessi`), altrimenti la
-  suite non lo vede.
+- Nei casi `pipeline` la suite chiama `pipeline.esegui()`, la stessa sequenza di
+  `main()` (opzioni in `pipeline.json`, metadati in `metadati.json` del caso).
+- Dopo i casi, esegue davvero la riga di comando: `pipeline.py --nessuna-terapia
+  --metadati --out-verdetto` sul caso 45 (conferma nel verdetto, verdetto scritto) e il
+  vecchio `--nessuna-terapia "testo"` (deve bloccare); `--metadati` sul caso 52; la catena
+  del PASSO 6, pipeline con il collaudo → verdetto → anteprima su file → impronta
+  verificata (circa 2 secondi in più); poi l'autotest del calcolo esatto dei pasti a scelta.
 - `python3 regressione.py --genera` rigenera gli attesi SOLO quando una modifica cambia
   intenzionalmente i risultati e il nuovo output è già stato verificato a mano. Mai per far
   passare una suite rossa senza averne capito il motivo.
@@ -410,23 +440,44 @@ sovrascrive singoli valori solo con motivazione clinica.
 
 ### genera_zona_piano.py — dal piano approvato al PDF
 Compila la zona dati del template piano v5 (M3) e genera il PDF. Legge `piano.csv`,
-`alimenti.csv`, `nomi_paziente.csv`, `target.csv`, `metadati_piano_vN.json` e, se passato,
-`orari_pasti.csv`.
+`alimenti.csv`, `nomi_paziente.csv`, `target.csv`, `metadati_piano_vN.json`, il verdetto
+della pipeline e, se passato, `orari_pasti.csv`.
 ```
 python3 genera_zona_piano.py --piano piano_vN.csv --target target.csv
-    --metadati metadati_piano_vN.json --template TEMPLATE_..._v5.py
+    --metadati metadati_piano_vN.json --verdetto verdetto_vN.json
+    --template TEMPLATE_..._v5.py
     --out-py CognomeNome_piano_vN.py --out-pdf CognomeNome_piano_vN.pdf
     [--orari orari_pasti.csv] [--mese "Settembre 2026"]
     [--eccezione-etichetta voci.csv --nomi-eccezione nomi.csv]
 python3 genera_zona_piano.py --anteprima --piano piano_vN.csv --target target.csv
-    --metadati metadati_piano_vN.json [--orari ...] [--out-anteprima anteprima.md]
+    --metadati metadati_piano_vN.json --verdetto verdetto_vN.json [--orari ...]
+    [--out-anteprima anteprima.md]
 python3 genera_zona_piano.py --verifica-impronta --piano ... --target ... --metadati ...
-python3 genera_zona_piano.py --autotest --template TEMPLATE_..._v5.py
+    --verdetto ...
+python3 genera_zona_piano.py --autotest [--template TEMPLATE_..._v5.py]
 ```
-- **`--anteprima` (PASSO 6, M2):** senza template e senza PDF, stampa i testi del PDF parola
-  per parola, i campi del documento di spiegazione (anche vuoti), gli altri campi di primo
+- **Verdetto obbligatorio (30/10/2026).** Anteprima, verifica e PDF richiedono `--verdetto`,
+  scritto da `pipeline.py --metadati ... --out-verdetto` sugli STESSI piano, target e
+  metadati (confronto sul contenuto, non sui byte: il passaggio da Drive non lo rompe;
+  fuori dal confronto solo `drive` e `impronta_approvata`). Si fermano se il verdetto
+  manca, se ha un bloccante (principio 1: prima si poteva approvare un piano che la
+  pipeline dichiarava non presentabile, verificato sul caso 52), se è stato prodotto con
+  `--salta-collaudo` o senza `--metadati`, o se piano, target o metadati sono cambiati dopo
+  la pipeline: si riesegue la pipeline, che dura meno di un secondo. Le attenzioni del
+  verdetto entrano nell'anteprima, quindi nell'impronta: si approvano insieme al piano. Il
+  verdetto è un file del piano: va in `drive.altri_file` e la chat B lo chiede allegato.
+- **Campi richiesti dal 30/10/2026** (`metadati_piano.py`): `assunzioni` (lista, anche
+  vuota; si ferma su una «da_confermare»), `alimenti_desiderati` (lista, anche vuota),
+  `drive` con soli riferimenti a file (chiavi `cartella_id`, `piano_csv`, `fascicolo`,
+  `metadati`, `verdetto`, `altri_file`; valori nomi di file con estensione o ID di Drive):
+  `drive` resta fuori dall'impronta, quindi non può contenere testo.
+- **`--anteprima` (PASSO 6, M2):** sempre su FILE, `anteprima_<versione>_<impronta>.md` o
+  `--out-anteprima`; in chat stampa solo nome del file e impronta (il 28/10 si era
+  approvato un estratto riportato in chat). Senza template e senza PDF, scrive i testi del PDF parola
+  per parola, i campi del documento di spiegazione (anche vuoti), assunzioni e alimenti
+  desiderati, gli altri campi di primo
   livello dei metadati salvo `drive` e `impronta_approvata` (con il TDEE confermato in
-  chiaro), e il piano per esteso: giorni, pasti, alternative con titolo, grammatura, nota
+  chiaro), il piano per esteso e, in fondo, il verdetto della pipeline con le attenzioni: giorni, pasti, alternative con titolo, grammatura, nota
   di peso e kcal; le alternative di un pasto a scelta in tutti i giorni strutturati, sempre
   uguali, si scrivono una volta in testa. In fondo l'impronta (SHA-256 dell'anteprima, 12
   caratteri; JSON annidato con chiavi ordinate, quindi indipendente dal loro ordine).
@@ -483,18 +534,56 @@ python3 genera_zona_piano.py --autotest --template TEMPLATE_..._v5.py
   c'è, deve essere un numero con o senza «v»/«versione» davanti, anche con lettera finale
   («v3», «3», «versione 3», «2b»), altrimenti fermo («vN», «3 bis», «v1,0»). Se manca, la
   nota del PDF esce «versione » vuota.
-- `--autotest` (96 controlli) genera il caso golden 03 con metadati fittizi e verifica:
+- `--autotest` (111 controlli con il template, 106 senza) usa il caso golden 03 con due
+  grammature cambiate e target sulle sue giornate (`_piano_di_collaudo`: il caso 03 ha
+  bloccanti propri e non arriverebbe all'anteprima), metadati fittizi e verdetti veri della
+  pipeline; verifica:
   kcal uguali al calcolatore, motore grafico identico al template, PDF senza segnaposto,
   abbinamento risolto in lettere, fermo su metadato mancante, su ogni segnaposto e testo
   d'esempio, su tipi e versione non validi; passaggio di nomi, sigle e frasi legittime;
   anteprima ripetibile e completa; fermo senza impronta e su titolo, regola operativa,
   giorno libero o grammatura cambiati dopo l'approvazione; impronta invariata se cambia
   solo `drive` o l'ordine delle chiavi del JSON; `--verifica-impronta` che passa e che
-  ferma; campi del documento di spiegazione vuoti mostrati.
-  Richiede il template v5 (fuori da `motore-calcolo/`) e `pdftotext`; NON lo esegue né il
-  collaudo né la regressione: va lanciato a mano dopo ogni modifica allo script. Scrive in
+  ferma; campi del documento di spiegazione vuoti mostrati; dal 30/10/2026 fermo senza
+  verdetto, con un bloccante, con collaudo saltato fuori dall'autotest, su dati cambiati
+  dopo la pipeline, su un'attenzione tolta dopo l'approvazione, su assunzioni aperte o
+  scritte male, su campi assenti, su testo in `drive`, e le prove al contrario sugli stessi
+  campi scritti bene. Gira nel collaudo (controllo 10): con il template v5 accanto alla
+  cartella del motore anche `.py` e PDF (serve `pdftotext`), senza solo il resto. Scrive in
   una cartella temporanea e la cancella; restano in /tmp le cartelle che il template v5
   crea a ogni PDF (riga 218, motore grafico congelato: non si tocca).
+
+### metadati_piano.py — controlli sui metadati e verdetto (30/10/2026)
+Usato da `pipeline.py` e `genera_zona_piano.py`: formula della conferma «nessuna terapia»
+(`valida_nessuna_terapia`), assunzioni, alimenti desiderati, campo `drive`, impronta dei
+dati e verdetto (`scrivi_verdetto`, `controlla_verdetto`). Da riga di comando, all'apertura
+della chat A:
+```
+python3 metadati_piano.py --desiderati "petto di pollo" zucchine hamburger
+python3 metadati_piano.py --metadati metadati_piano_vN.json
+```
+Per ogni alimento: presente (con i `food_id`) o ASSENTE dal database. Confronto a parola
+intera, singolare e plurale («zucchina» trova «Zucchine», «pasta» NON trova «pastorizzato»):
+nel dubbio un falso «assente», che si vede, piuttosto che un falso «presente», che nasconde
+un alimento mancante. Un nome generico trova più voci: si sceglie in composizione.
+`autotest()` (45 prove) gira nel collaudo.
+
+### genera_spiegazione.py — documento di spiegazione (30/10/2026)
+Genera il PDF del documento di spiegazione solo dopo i controlli: impronta approvata (come
+`--verifica-impronta`), motore grafico e intestazione dello studio identici al template,
+6 sezioni numerate 1-6 con almeno un paragrafo, nessun segnaposto o testo d'esempio
+(«testo placeholder», «XX», «N settimane», «Nome Cognome»…), nessuna parentesi quadra
+(etichette `[dedotto]`/`[piano]`/`[fascicolo]` o alternative del modello), nome del paziente
+assente dal corpo. Legge la zona dati senza eseguirla (`ast`).
+```
+python3 genera_spiegazione.py --py CognomeNome_spiegazione_vN.py
+    --template TEMPLATE_SpiegazioneDieta_StudioTaglialatela_v1.py
+    --piano piano_vN.csv --target target.csv --metadati metadati_piano_vN.json
+    --verdetto verdetto_vN.json [--orari ...] --out-pdf CognomeNome_spiegazione_vN.pdf
+python3 genera_spiegazione.py --autotest --template TEMPLATE_SpiegazioneDieta_..._v1.py
+```
+Limiti dichiarati: non giudica i contenuti né il registro oltre al nome (seconda persona e
+deduzioni cliniche restano all'approvazione del testo intero, M3).
 
 ### larn.py + larn.csv — riferimenti per sesso, età e condizione
 `larn.csv`: `gruppo, sesso, eta_min, eta_max, condizione, larn_* (8 colonne), nota`.

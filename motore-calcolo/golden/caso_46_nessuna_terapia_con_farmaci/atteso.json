@@ -69,6 +69,6 @@
     ]
   ],
   "exit_code": 1,
-  "descrizione": "Il piano del caso 20 con i suoi file di terapia E l'opzione nessuna_terapia: dichiarazione contraddittoria, deve comparire il bloccante TERAPIA_CONTRADDITTORIA (exit 1) e i file si valutano comunque: tutti i verdetti del caso 20 restano, comprese le interazioni di gravita' alta. Diventa rosso se l'opzione nasconde una terapia passata con i file o i suoi rilievi.",
-  "riferimento": "Costruito il 23/10/2026 dal caso 20 (stessi piano, target, farmaci, interazioni, orari)."
+  "descrizione": "Il piano del caso 20 con i suoi file di terapia E l'assenza di terapia confermata (formula nei metadati, --nessuna-terapia): dichiarazione contraddittoria, deve comparire il bloccante TERAPIA_CONTRADDITTORIA (exit 1) e i file si valutano comunque: tutti i verdetti del caso 20 restano, comprese le interazioni di gravita' alta. Diventa rosso se l'opzione nasconde una terapia passata con i file o i suoi rilievi.",
+  "riferimento": "Costruito il 23/10/2026 dal caso 20 (stessi piano, target, farmaci, interazioni, orari). Aggiornato il 30/10/2026 (tappa 2): la conferma dell'assenza di terapia sta nei metadati, con la formula fissa."
 }

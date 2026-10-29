@@ -1,0 +1,18 @@
+{
+  "tipo": "pipeline",
+  "bloccanti": [
+    [
+      5,
+      "TERAPIA_NON_CONFERMATA"
+    ]
+  ],
+  "attenzioni": [
+    [
+      3,
+      "MEDIA_SOTTO_LARN_CON_GAP"
+    ]
+  ],
+  "exit_code": 1,
+  "descrizione": "Il piano del caso 36 con --nessuna-terapia ma, nei metadati, un testo libero al posto della conferma registrata («nessuna terapia (Form A)»: il 28/10/2026 una terapia dedotta da una scheda era passata cosi'). Deve comparire il bloccante TERAPIA_NON_CONFERMATA (exit 1) e NON TERAPIA_DICHIARATA_ASSENTE; il resto uguale al caso 36 senza TERAPIA_NON_DICHIARATA. Diventa rosso se un testo qualsiasi viene accettato come conferma.",
+  "riferimento": "Costruito il 23/10/2026 dal caso 36 su indicazione della revisione indipendente (secondo giro). Rinominato e riscritto il 30/10/2026 (tappa 2): prima verificava la sola fonte vuota da riga di comando."
+}

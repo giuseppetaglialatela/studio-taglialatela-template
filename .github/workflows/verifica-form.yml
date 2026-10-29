@@ -1,0 +1,39 @@
+# Verifica delle pagine pubblicate dei form (tappa 2, 30/10/2026).
+# Le sessioni di Claude non raggiungono github.io: il controllo gira qui, su GitHub.
+# A ogni caricamento che tocca un form (e a mano, da Actions > verifica-form > Run
+# workflow) aspetta la pubblicazione e confronta, byte per byte, le pagine servite da
+# GitHub Pages con i file del repository; controlla anche che ci siano le domande
+# aggiunte il 23/10 (attivita' fisica nel Form A, pranzo nei giorni di lavoro nel
+# Form B). Se fallisce, GitHub manda un'email al titolare.
+name: verifica-form
+on:
+  push:
+    branches: [main]
+    paths:
+      - "Form*.html"
+      - ".github/workflows/verifica-form.yml"
+  workflow_dispatch:
+jobs:
+  form:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Pagine pubblicate uguali al repository
+        run: |
+          BASE="https://giuseppetaglialatela.github.io/studio-taglialatela-template"
+          controlla() {   # $1 file, $2 testo che deve esserci
+            f="$1"; url="$BASE/$(printf '%s' "$f" | sed 's/ /%20/g')"
+            grep -qF "$2" "$f" || { echo "::error::$f: nel repository manca «$2»"; return 1; }
+            for i in $(seq 1 20); do
+              curl -sfL "$url?v=$GITHUB_SHA" -o pubblicata.html && cmp -s pubblicata.html "$f" \
+                && { echo "OK  $f (tentativo $i)"; return 0; }
+              sleep 30
+            done
+            echo "::error::$f: la pagina pubblicata e' diversa dal repository dopo 10 minuti"
+            return 1
+          }
+          esito=0
+          controlla "FormA SchedaPrimoAccesso.html" 'name="attivita"' || esito=1
+          controlla "FormB SchedaAlimentare.html" "In quei giorni, a pranzo" || esito=1
+          controlla "FormC ControlloPeriodico.html" "<form" || esito=1
+          exit $esito

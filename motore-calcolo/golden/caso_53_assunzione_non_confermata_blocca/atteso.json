@@ -1,0 +1,22 @@
+{
+  "tipo": "pipeline",
+  "bloccanti": [
+    [
+      6,
+      "ASSUNZIONE_NON_CONFERMATA"
+    ]
+  ],
+  "attenzioni": [
+    [
+      3,
+      "MEDIA_SOTTO_LARN_CON_GAP"
+    ],
+    [
+      5,
+      "TERAPIA_DICHIARATA_ASSENTE"
+    ]
+  ],
+  "exit_code": 1,
+  "descrizione": "Il caso 45 con due assunzioni di composizione nei metadati, una confermata e una da confermare (il 28/10/2026 tre assunzioni non confermate, tra cui il pranzo a casa, hanno fatto rifare i pranzi di un piano reale). Deve comparire il bloccante ASSUNZIONE_NON_CONFERMATA (exit 1); il resto uguale al caso 45. Diventa rosso se un'assunzione da confermare arriva all'approvazione.",
+  "riferimento": "Costruito il 30/10/2026 (tappa 2, disciplina nel codice) dal caso 45 (stessi piano e target, piano del caso 36); attesi scritti a mano."
+}

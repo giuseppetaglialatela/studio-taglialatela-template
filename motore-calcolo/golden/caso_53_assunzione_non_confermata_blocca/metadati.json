@@ -1,0 +1,14 @@
+{
+  "terapia": "nessuna terapia, confermato dal nutrizionista il 23/10/2026 (fonte: colloquio)",
+  "alimenti_desiderati": [],
+  "assunzioni": [
+    {
+      "testo": "colazione a casa tutti i giorni",
+      "stato": "confermata"
+    },
+    {
+      "testo": "pranzo a casa nei giorni lavorativi",
+      "stato": "da_confermare"
+    }
+  ]
+}

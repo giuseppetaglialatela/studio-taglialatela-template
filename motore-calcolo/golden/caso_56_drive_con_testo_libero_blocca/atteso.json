@@ -1,0 +1,22 @@
+{
+  "tipo": "pipeline",
+  "bloccanti": [
+    [
+      6,
+      "DRIVE_NON_VALIDO"
+    ]
+  ],
+  "attenzioni": [
+    [
+      3,
+      "MEDIA_SOTTO_LARN_CON_GAP"
+    ],
+    [
+      5,
+      "TERAPIA_DICHIARATA_ASSENTE"
+    ]
+  ],
+  "exit_code": 1,
+  "descrizione": "Il caso 45 con una nota clinica scritta nel campo drive dei metadati, l'unico fuori dall'impronta approvata: passerebbe senza approvazione. Deve comparire il bloccante DRIVE_NON_VALIDO (exit 1). Diventa rosso se drive torna ad accettare testo libero.",
+  "riferimento": "Costruito il 30/10/2026 (tappa 2, disciplina nel codice) dal caso 45 (stessi piano e target, piano del caso 36); attesi scritti a mano."
+}

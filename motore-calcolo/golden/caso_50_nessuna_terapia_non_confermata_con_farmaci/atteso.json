@@ -23,7 +23,7 @@
     ],
     [
       5,
-      "TERAPIA_CONTRADDITTORIA"
+      "TERAPIA_NON_CONFERMATA"
     ]
   ],
   "attenzioni": [
@@ -69,6 +69,6 @@
     ]
   ],
   "exit_code": 1,
-  "descrizione": "Il piano del caso 20 con i suoi file di terapia e nessuna_terapia fatta di soli spazi: TERAPIA_CONTRADDITTORIA (exit 1) e i file si valutano comunque, quindi tutti i verdetti del caso 20 restano, comprese le due interazioni di gravita' alta. Diventa rosso se la fonte vuota fa saltare la valutazione dei file.",
-  "riferimento": "Costruito il 23/10/2026 dal caso 20 su indicazione della revisione indipendente (secondo giro)."
+  "descrizione": "Il piano del caso 20 con i suoi file di terapia, --nessuna-terapia e il campo 'terapia' dei metadati fatto di soli spazi: TERAPIA_NON_CONFERMATA (exit 1) e i file si valutano comunque, quindi tutti i verdetti del caso 20 restano, comprese le due interazioni di gravita' alta. Diventa rosso se la conferma mancante fa saltare la valutazione dei file.",
+  "riferimento": "Costruito il 23/10/2026 dal caso 20 su indicazione della revisione indipendente (secondo giro). Rinominato e riscritto il 30/10/2026 (tappa 2): prima la fonte vuota passava da riga di comando."
 }

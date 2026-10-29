@@ -1,0 +1,74 @@
+{
+  "tipo": "pipeline",
+  "bloccanti": [
+    [
+      5,
+      "INTERAZIONE_GRAVITA_ALTA"
+    ],
+    [
+      5,
+      "INTERAZIONE_GRAVITA_ALTA"
+    ],
+    [
+      5,
+      "INTERAZIONE_GRAVITA_NON_RICONOSCIUTA"
+    ],
+    [
+      5,
+      "INTERAZIONE_NUTRIENTE_NON_RICONOSCIUTO"
+    ],
+    [
+      5,
+      "INTERAZIONE_TIPO_NON_RICONOSCIUTO"
+    ],
+    [
+      5,
+      "TERAPIA_CONTRADDITTORIA"
+    ]
+  ],
+  "attenzioni": [
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      4,
+      "FORMATO_CONFEZIONE_NON_RISPETTATO"
+    ],
+    [
+      5,
+      "INTERAZIONE_FOOD_ID_ASSENTE"
+    ],
+    [
+      5,
+      "INTERAZIONE_GRAVITA_BASSA"
+    ],
+    [
+      5,
+      "INTERAZIONE_GRAVITA_MEDIA"
+    ],
+    [
+      5,
+      "INTERAZIONE_GRAVITA_MEDIA"
+    ],
+    [
+      6,
+      "LIVELLO_FUORI_CATALOGO"
+    ],
+    [
+      6,
+      "LIVELLO_FUORI_CATALOGO"
+    ],
+    [
+      6,
+      "VALUTARE_LIVELLO_RINFORZATO"
+    ]
+  ],
+  "exit_code": 1,
+  "descrizione": "Il caso 46 senza --nessuna-terapia: i metadati dichiarano l'assenza di terapia ma sono passati i file di terapia. Stessa contraddizione del caso 46, scoperta dai soli metadati: bloccante TERAPIA_CONTRADDITTORIA e tutti i verdetti dei file (exit 1). Diventa rosso se il campo 'terapia' dei metadati contraddice i file senza che il motore se ne accorga.",
+  "riferimento": "Costruito il 30/10/2026 (tappa 2, disciplina nel codice) dal caso 45 (stessi piano e target, piano del caso 36); attesi scritti a mano."
+}

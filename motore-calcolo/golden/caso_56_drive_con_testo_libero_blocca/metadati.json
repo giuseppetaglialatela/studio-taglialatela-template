@@ -1,0 +1,9 @@
+{
+  "terapia": "nessuna terapia, confermato dal nutrizionista il 23/10/2026 (fonte: colloquio)",
+  "assunzioni": [],
+  "alimenti_desiderati": [],
+  "drive": {
+    "piano_csv": "piano_v1.csv",
+    "nota": "assume un anticoagulante"
+  }
+}

@@ -66,6 +66,7 @@ from calcolatore import (entro_tolleranza, carica_alimenti, carica_eccezioni_eti
                          PASTI_AMMESSI, ordine_pasti, pasti_non_ammessi)
 from scelte_multiple import carica_piano_esteso
 import combinazioni as mod_comb
+import metadati_piano as mod_meta
 
 KCAL_PER_KG = 7700          # convenzione clinica decisa il 19/09/2026
 # Struttura a 5 posti (30/09/2026): elenco e ordine da calcolatore.py.
@@ -513,7 +514,8 @@ def componi_py(template_src, zona):
 CAMPI_FUORI_IMPRONTA = ("drive", "impronta_approvata")
 CAMPI_GIA_IN_ANTEPRIMA = ("versione_piano", "giorni", "tdee_confermato_kcal", "intestazione",
                           "avvertenze_box", "indicazioni_giorno_libero", "titoli_piatti",
-                          "obiettivo_intestazione", "criterio_rivalutazione")
+                          "obiettivo_intestazione", "criterio_rivalutazione",
+                          "assunzioni", "alimenti_desiderati")
 
 
 ETICHETTE_CAMPI = {
@@ -581,7 +583,7 @@ def _alternative_comuni(giorni):
     return comuni
 
 
-def testo_anteprima(dati, meta):
+def testo_anteprima(dati, meta, verdetto=None):
     """Tutto cio' che il nutrizionista approva al PASSO 6: i testi del PDF parola
     per parola, i campi da cui la chat B scrive il documento di spiegazione, gli
     altri campi dei metadati e il piano per esteso con le grammature. Restano
@@ -603,6 +605,16 @@ def testo_anteprima(dati, meta):
           "senza deduzioni cliniche; il testo si approva prima della consegna, M3)", ""]
     for k in CAMPI_SPIEGAZIONE:
         _md_campo(L, ETICHETTE_CAMPI[k].replace(" (documento di spiegazione)", ""), meta.get(k))
+    # assunzioni e alimenti desiderati (30/10/2026): si approvano qui, per esteso
+    L += ["", "## Assunzioni di composizione e alimenti desiderati", ""]
+    ass, _ = mod_meta.leggi_assunzioni(meta)
+    if ass:
+        for t, st in ass:
+            L.append(f"- **Assunzione:** {t} ({st.replace('_', ' ')})")
+    else:
+        L.append("- **Assunzioni:** nessuna")
+    des, _ = mod_meta.leggi_desiderati(meta)
+    L.append("- **Alimenti desiderati:** " + (", ".join(des) if des else "nessuno"))
     L += ["", "## Altri campi dei metadati (non stampati per il paziente)", "",
           f"- **TDEE confermato:** {_md_valore(meta.get('tdee_confermato_kcal'))} kcal"]
     inte = meta.get("intestazione")
@@ -637,6 +649,15 @@ def testo_anteprima(dati, meta):
         L.append(f"- {g['totale']}")
         L += _md_macro_giorno(g)
     L += _md_macro_settimana(giorni)
+    if verdetto is not None:
+        # verdetto della pipeline (30/10/2026): le attenzioni si approvano insieme al
+        # piano e fanno parte dell'impronta; con un bloccante l'anteprima non esiste
+        att = [a for a in verdetto.get("attenzioni", []) if a[1] != "COLLAUDO_SALTATO"]
+        L += ["", "## Verdetto della pipeline (approvato insieme al piano)", "",
+              f"- **Collaudo:** {verdetto.get('collaudo')}; **bloccanti:** nessuno; "
+              f"**da dichiarare:** {len(att)}"]
+        for passo, codice, msg in att:
+            L.append(f"- [PASSO {passo} · {codice}] {msg}")
     return "\n".join(L) + "\n"
 
 
@@ -698,8 +719,8 @@ def impronta(testo):
     return hashlib.sha256(testo.encode("utf-8")).hexdigest()[:12]
 
 
-def verifica_impronta(dati, meta):
-    calcolata = impronta(testo_anteprima(dati, meta))
+def verifica_impronta(dati, meta, verdetto=None):
+    calcolata = impronta(testo_anteprima(dati, meta, verdetto))
     attesa = meta.get("impronta_approvata")
     if attesa in (None, ""):
         raise Fermo("metadati: manca 'impronta_approvata'. Si ottiene al PASSO 6 con "
@@ -712,7 +733,7 @@ def verifica_impronta(dati, meta):
 
 
 def _prepara(piano_p, target_p, meta_p, alimenti_p=None, nomi_p=None, eccezione_p=None,
-             nomi_eccezione_p=None):
+             nomi_eccezione_p=None, verdetto_p=None, _collaudo_saltato_ok=False):
     db = carica_alimenti(alimenti_p or os.path.join(QUI, "alimenti.csv"))
     nomi = carica_nomi(nomi_p or os.path.join(QUI, "nomi_paziente.csv"))
     # voci da etichetta: solo su richiesta del nutrizionista, mai nel database
@@ -745,47 +766,125 @@ def _prepara(piano_p, target_p, meta_p, alimenti_p=None, nomi_p=None, eccezione_
         raise Fermo(f"metadati non leggibili ({meta_p}): {e}")
     if not isinstance(meta, dict):
         raise Fermo("metadati: il file deve contenere un oggetto JSON")
-    return db, nomi, piano, target, meta
+    controlla_metadati_disciplina(meta)
+    try:
+        verdetto = mod_meta.controlla_verdetto(verdetto_p, piano_p, target_p, meta,
+                                               accetta_collaudo_saltato=_collaudo_saltato_ok)
+    except mod_meta.VerdettoNonValido as e:
+        raise Fermo(f"verdetto: {e}")
+    return db, nomi, piano, target, meta, verdetto
+
+
+def controlla_metadati_disciplina(meta):
+    """Campi richiesti dall'anteprima dal 30/10/2026 (metadati_piano.py): drive con
+    soli riferimenti a file; assunzioni dichiarate (anche nessuna) e tutte
+    confermate; alimenti desiderati dichiarati (anche nessuno)."""
+    err = mod_meta.errore_drive(meta)
+    if err:
+        raise Fermo(f"metadati: {err}")
+    ass, err = mod_meta.leggi_assunzioni(meta)
+    if err:
+        raise Fermo(f"metadati: {err}")
+    if ass is None:
+        raise Fermo("metadati: manca il campo 'assunzioni' (lista delle assunzioni di "
+                    "composizione con il loro stato; [] se non ce ne sono). Va scritto in "
+                    "chat A (M2)")
+    aperte = [t for t, st in ass if st != "confermata"]
+    if aperte:
+        raise Fermo("metadati: assunzioni non confermate dal nutrizionista: "
+                    + "; ".join(f"«{t}»" for t in aperte) + ". Si chiedono prima "
+                    "dell'approvazione (M2)")
+    des, err = mod_meta.leggi_desiderati(meta)
+    if err:
+        raise Fermo(f"metadati: {err}")
+    if des is None:
+        raise Fermo("metadati: manca il campo 'alimenti_desiderati' (gli alimenti richiesti "
+                    "da paziente o nutrizionista, confrontati col database all'apertura; [] "
+                    "se nessuno). Va scritto in chat A (M2)")
 
 
 def anteprima(piano_p, target_p, meta_p, orari_p=None, **kw):
     """Testo dell'anteprima e sua impronta, senza template e senza PDF."""
-    db, nomi, piano, target, meta = _prepara(piano_p, target_p, meta_p, **kw)
+    db, nomi, piano, target, meta, ver = _prepara(piano_p, target_p, meta_p, **kw)
     dati = costruisci_dati(piano, db, nomi, target, meta, carica_orari(orari_p), "")
-    testo = testo_anteprima(dati, meta)
+    testo = testo_anteprima(dati, meta, ver)
     return testo, impronta(testo)
 
 
 def verifica(piano_p, target_p, meta_p, orari_p=None, **kw):
     """Solo il controllo dell'impronta, senza PDF: si lancia prima del documento
     di spiegazione (M3), che la chat B scrive dai metadati senza passare dallo script."""
-    db, nomi, piano, target, meta = _prepara(piano_p, target_p, meta_p, **kw)
+    db, nomi, piano, target, meta, ver = _prepara(piano_p, target_p, meta_p, **kw)
     dati = costruisci_dati(piano, db, nomi, target, meta, carica_orari(orari_p), "")
-    verifica_impronta(dati, meta)
+    verifica_impronta(dati, meta, ver)
     return meta["impronta_approvata"]
 
 
 def genera(piano_p, target_p, meta_p, template_p, out_py, out_pdf, orari_p=None,
            mese=None, alimenti_p=None, nomi_p=None, eccezione_p=None,
-           nomi_eccezione_p=None):
-    db, nomi, piano, target, meta = _prepara(piano_p, target_p, meta_p, alimenti_p, nomi_p,
-                                             eccezione_p, nomi_eccezione_p)
+           nomi_eccezione_p=None, verdetto_p=None, _collaudo_saltato_ok=False):
+    """Con template_p None fa tutti i controlli (metadati, verdetto, impronta) senza
+    scrivere il .py ne' il PDF: lo usa l'autotest nel collaudo, dove il template non
+    c'e' (il comando d'avvio scarica solo la cartella del motore)."""
+    db, nomi, piano, target, meta, ver = _prepara(piano_p, target_p, meta_p, alimenti_p,
+                                                  nomi_p, eccezione_p, nomi_eccezione_p,
+                                                  verdetto_p, _collaudo_saltato_ok)
     if mese is None:
         oggi = datetime.date.today()
         mese = f"{MESI[oggi.month - 1]} {oggi.year}"
     dati = costruisci_dati(piano, db, nomi, target, meta, carica_orari(orari_p), mese)
-    verifica_impronta(dati, meta)
+    verifica_impronta(dati, meta, ver)
+    if template_p is None:
+        return dati
     with open(template_p, encoding="utf-8") as f:
         src = f.read()
     with open(out_py, "w", encoding="utf-8") as f:
         f.write(componi_py(src, zona_dati_src(*dati)))
-    subprocess.run([sys.executable, out_py, out_pdf], check=True)
+    esito = subprocess.run([sys.executable, out_py, out_pdf], capture_output=True, text=True)
+    print(esito.stdout, end="")          # passa da sys.stdout: l'autotest lo puo' silenziare
+    if esito.returncode != 0:
+        print(esito.stderr, end="", file=sys.stderr)
+        raise subprocess.CalledProcessError(esito.returncode, esito.args, esito.stdout,
+                                            esito.stderr)
     return dati
 
 
 # ─── autotest su caso golden 03 ───────────────────────────────────
-def autotest(template_p):
+def _piano_di_collaudo(tmp):
+    """Il caso golden 03 con due grammature cambiate (pane della colazione A 100 g,
+    mela dello spuntino B 250 g) e target sulle sue giornate: senza bloccanti della
+    pipeline, perche' dal 30/10/2026 un piano bloccato non arriva all'anteprima.
+    Il caso 03 resta com'e' per la suite di regressione."""
     caso = os.path.join(QUI, "golden", "caso_03_scelta_colazione_spuntino")
+    with open(os.path.join(caso, "piano.csv"), newline="", encoding="utf-8") as f:
+        righe = list(csv.reader(f))
+    for r in righe:
+        if r[1:3] == ["colazione", "000550"]:
+            r[3] = "100"
+        if r[1:3] == ["spuntino", "8807"]:
+            r[3] = "250"
+    with open(os.path.join(caso, "target.csv"), newline="", encoding="utf-8") as f:
+        target = list(csv.reader(f))
+    nuovi = {"kcal_target": "1336", "proteine_pct_target": "29",
+             "carboidrati_pct_target": "40", "grassi_pct_target": "31"}
+    for r in target:
+        r[1] = nuovi.get(r[0], r[1])
+    piano_c, target_c = os.path.join(tmp, "piano.csv"), os.path.join(tmp, "target.csv")
+    for path, rr in ((piano_c, righe), (target_c, target)):
+        with open(path, "w", newline="", encoding="utf-8") as f:
+            csv.writer(f).writerows(rr)
+    return caso, piano_c, target_c
+
+
+def autotest(template_p=None):
+    """Con il template: tutti i controlli, PDF compreso. Senza (collaudo di inizio
+    sessione, dove il template non c'e'): i controlli su metadati, verdetto,
+    anteprima e impronta; quelli sul .py e sul PDF si dichiarano saltati."""
+    import io
+    from contextlib import redirect_stdout
+    import pipeline as mod_pipeline
+    tmp = tempfile.mkdtemp()
+    caso, piano_c, target_c = _piano_di_collaudo(tmp)
     meta = {
         "versione_piano": "v1",
         "giorni": {"lavorativi": ["lun"], "libero": "dom", "range_kcal_libero": [1600, 1900]},
@@ -801,64 +900,81 @@ def autotest(template_p):
                           "*|spuntino|A": "Spuntino A", "*|spuntino|B": "Spuntino B",
                           "1|pranzo|": "Pranzo di collaudo", "1|cena|": "Cena di collaudo"},
         "obiettivo_intestazione": "collaudo", "criterio_rivalutazione": "collaudo",
+        "terapia": "nessuna terapia, confermato dal nutrizionista il 23/10/2026 (fonte: colloquio)",
+        "assunzioni": [], "alimenti_desiderati": [],
     }
-    tmp = tempfile.mkdtemp()
     mp = os.path.join(tmp, "metadati.json")
-    piano_c, target_c = os.path.join(caso, "piano.csv"), os.path.join(caso, "target.csv")
+    vp = os.path.join(tmp, "verdetto.json")
+    # il collaudo non puo' rieseguire se stesso: verdetti prodotti senza collaudo,
+    # ammessi solo qui (la riga di comando non lo consente: verificato sotto)
+    KW = dict(verdetto_p=vp, _collaudo_saltato_ok=True)
+
+    def fai_verdetto(piano_p=piano_c, target_p=target_c, path=vp):
+        """La pipeline vera sui metadati scritti in mp, come in chat A."""
+        with redirect_stdout(io.StringIO()):
+            ril, m_letti = mod_pipeline.esegui(piano_p, target_p, metadati_p=mp,
+                                               salta_collaudo=True, nessuna_terapia=True)
+        return mod_meta.scrivi_verdetto(path, ril, piano_p, target_p, m_letti)
+
+    def scrivi_meta(m, piano_p=piano_c):
+        with open(mp, "w", encoding="utf-8") as f:
+            json.dump(m, f)
+        fai_verdetto(piano_p)
 
     def approva(m):
         """Scrive m, ne ricava l'anteprima e vi aggiunge l'impronta, come al PASSO 6."""
         m = {k: v for k, v in m.items() if k != "impronta_approvata"}
-        with open(mp, "w", encoding="utf-8") as f:
-            json.dump(m, f)
-        m["impronta_approvata"] = anteprima(piano_c, target_c, mp)[1]
-        with open(mp, "w", encoding="utf-8") as f:
-            json.dump(m, f)
+        scrivi_meta(m)
+        m["impronta_approvata"] = anteprima(piano_c, target_c, mp, **KW)[1]
+        scrivi_meta(m)
         return m
 
     meta = approva(meta)
     py, pdf = os.path.join(tmp, "piano.py"), os.path.join(tmp, "piano.pdf")
     esiti = []
-    paz, box, col, spu, giorni = genera(os.path.join(caso, "piano.csv"),
-                                        os.path.join(caso, "target.csv"), mp, template_p,
+    con_pdf = template_p is not None
+    paz, box, col, spu, giorni = genera(piano_c, target_c, mp, template_p,
                                         py, pdf, mese="Mese di collaudo",
-                                        alimenti_p=os.path.join(QUI, "alimenti.csv"))
-    # 1) kcal nel .py == calcolatore, pasto per pasto
-    db = carica_alimenti(os.path.join(QUI, "alimenti.csv"))
-    piano = carica_piano_esteso(os.path.join(caso, "piano.csv"))
-    attese = {}
-    for r in piano:
-        k = (r["pasto"], r["opzione"])
-        attese[k] = attese.get(k, 0) + calcola_riga(db[r["food_id"]], r["grammi"])["kcal_100g"]
-    ns = {}
-    exec(compile(open(py, encoding="utf-8").read().split("# ═══════════════════════════"
-                                                           "════════════════════════════════════════\n#  ═══ MOTORE")[0],
-                 py, "exec"), ns)
-    trovate = {("colazione", "A"): ns["COLAZIONI"][0][2], ("colazione", "B"): ns["COLAZIONI"][1][2],
-               ("spuntino", "A"): ns["SPUNTINI"][0][2], ("spuntino", "B"): ns["SPUNTINI"][1][2],
-               ("pranzo", ""): ns["GIORNI"][0]["pasti"][1][4], ("cena", ""): ns["GIORNI"][0]["pasti"][3][4]}
-    ok_k = all(trovate[k] == _kcal(v) for k, v in attese.items())
-    esiti.append(("kcal nel .py = calcolatore.calcola_riga (6 pasti/alternative)", ok_k))
-    # 2) motore grafico identico al template
-    t = open(template_p, encoding="utf-8").read()
-    g = open(py, encoding="utf-8").read()
-    esiti.append(("motore grafico identico al template",
-                  t[t.index(MARCA_FINE):] == g[g.index(MARCA_FINE):]))
-    # 3) PDF: 2 pagine (giorno 1 + libero), niente segnaposto X
-    txt = subprocess.run(["pdftotext", pdf, "-"], capture_output=True, text=True).stdout
-    pagine = txt.count("\f")
-    esiti.append((f"PDF generato, {pagine} pagine (attese 2)", pagine == 2))
-    esiti.append(("nessun segnaposto 'X' nel PDF", "XXX" not in txt and " Xg" not in txt))
-    # 4) abbinamento risolto in lettere
-    esiti.append(("abbinamento scritto sulle colazioni",
-                  ns["COLAZIONI"][0][3] == "da abbinare allo spuntino B"))
+                                        alimenti_p=os.path.join(QUI, "alimenti.csv"), **KW)
+    ns = None
+    if con_pdf:
+        # 1) kcal nel .py == calcolatore, pasto per pasto
+        db = carica_alimenti(os.path.join(QUI, "alimenti.csv"))
+        piano = carica_piano_esteso(piano_c)
+        attese = {}
+        for r in piano:
+            k = (r["pasto"], r["opzione"])
+            attese[k] = attese.get(k, 0) + calcola_riga(db[r["food_id"]], r["grammi"])["kcal_100g"]
+        ns = {}
+        exec(compile(open(py, encoding="utf-8").read().split("# ═══════════════════════════"
+                                                               "════════════════════════════════════════\n#  ═══ MOTORE")[0],
+                     py, "exec"), ns)
+        trovate = {("colazione", "A"): ns["COLAZIONI"][0][2], ("colazione", "B"): ns["COLAZIONI"][1][2],
+                   ("spuntino", "A"): ns["SPUNTINI"][0][2], ("spuntino", "B"): ns["SPUNTINI"][1][2],
+                   ("pranzo", ""): ns["GIORNI"][0]["pasti"][1][4], ("cena", ""): ns["GIORNI"][0]["pasti"][3][4]}
+        ok_k = all(trovate[k] == _kcal(v) for k, v in attese.items())
+        esiti.append(("kcal nel .py = calcolatore.calcola_riga (6 pasti/alternative)", ok_k))
+        # 2) motore grafico identico al template
+        t = open(template_p, encoding="utf-8").read()
+        g = open(py, encoding="utf-8").read()
+        esiti.append(("motore grafico identico al template",
+                      t[t.index(MARCA_FINE):] == g[g.index(MARCA_FINE):]))
+        # 3) PDF: 2 pagine (giorno 1 + libero), niente segnaposto X
+        txt = subprocess.run(["pdftotext", pdf, "-"], capture_output=True, text=True).stdout
+        pagine = txt.count("\f")
+        esiti.append((f"PDF generato, {pagine} pagine (attese 2)", pagine == 2))
+        esiti.append(("nessun segnaposto 'X' nel PDF", "XXX" not in txt and " Xg" not in txt))
+        # 4) abbinamento risolto in lettere
+        esiti.append(("abbinamento scritto sulle colazioni",
+                      ns["COLAZIONI"][0][3] == "da abbinare allo spuntino B"))
+    else:
+        esiti.append(("controlli tutti superati fino al PDF, senza scriverlo (template "
+                      "assente: .py e PDF verificati con --template)", True))
     # 5) metadato mancante -> fermo
     del meta["avvertenze_box"]
-    with open(mp, "w", encoding="utf-8") as f:
-        json.dump(meta, f)
+    scrivi_meta(meta)
     try:
-        genera(os.path.join(caso, "piano.csv"), os.path.join(caso, "target.csv"), mp,
-               template_p, py, pdf, mese="x")
+        genera(piano_c, target_c, mp, template_p, py, pdf, mese="x", **KW)
         esiti.append(("metadato mancante ferma lo script", False))
     except Fermo as e:
         esiti.append((f"metadato mancante ferma lo script ({e})", True))
@@ -870,10 +986,9 @@ def autotest(template_p):
         if approvato:
             approva(m)
         else:
-            with open(mp, "w", encoding="utf-8") as f:
-                json.dump(m, f)
-        genera(os.path.join(caso, "piano.csv"), os.path.join(caso, "target.csv"), mp,
-               template_p, py, pdf, mese="x", alimenti_p=os.path.join(QUI, "alimenti.csv"))
+            scrivi_meta(m)
+        genera(piano_c, target_c, mp, template_p, py, pdf, mese="x",
+               alimenti_p=os.path.join(QUI, "alimenti.csv"), **KW)
 
     def deve_fermarsi(etichetta, m, campo):
         try:
@@ -987,18 +1102,25 @@ def autotest(template_p):
     # 8) anteprima del PASSO 6 e impronta dell'approvazione (23/10/2026)
     regola = "Le verdure si possono scambiare a parita' di peso (collaudo)."
     approvato = approva(dict(base_meta, regole_operative=[regola]))
-    testo, imp = anteprima(piano_c, target_c, mp)
+    testo, imp = anteprima(piano_c, target_c, mp, **KW)
     esiti.append(("anteprima ripetibile (stessa impronta in due esecuzioni)",
-                  imp == anteprima(piano_c, target_c, mp)[1] == approvato["impronta_approvata"]))
-    attesi = ([a[0] for a in ns["COLAZIONI"] + ns["SPUNTINI"]]
-              + [a[1] for a in ns["COLAZIONI"] + ns["SPUNTINI"]]
-              + [p[2] for p in ns["GIORNI"][0]["pasti"] if isinstance(p[2], str)]
-              + [p[3] for p in ns["GIORNI"][0]["pasti"] if isinstance(p[3], str)]
-              + list(approvato["indicazioni_giorno_libero"].values())
-              + [regola, approvato["obiettivo_intestazione"], approvato["avvertenze_box"]])
-    mancanti = [t for t in attesi if t not in testo]
-    esiti.append((f"anteprima con titoli, grammature e testi del PDF ({len(attesi)} voci)"
-                  + (f": mancano {mancanti}" if mancanti else ""), not mancanti))
+                  imp == anteprima(piano_c, target_c, mp, **KW)[1]
+                  == approvato["impronta_approvata"]))
+    if ns is not None:
+        attesi = ([a[0] for a in ns["COLAZIONI"] + ns["SPUNTINI"]]
+                  + [a[1] for a in ns["COLAZIONI"] + ns["SPUNTINI"]]
+                  + [p[2] for p in ns["GIORNI"][0]["pasti"] if isinstance(p[2], str)]
+                  + [p[3] for p in ns["GIORNI"][0]["pasti"] if isinstance(p[3], str)]
+                  + list(approvato["indicazioni_giorno_libero"].values())
+                  + [regola, approvato["obiettivo_intestazione"], approvato["avvertenze_box"]])
+        mancanti = [t for t in attesi if t not in testo]
+        esiti.append((f"anteprima con titoli, grammature e testi del PDF ({len(attesi)} voci)"
+                      + (f": mancano {mancanti}" if mancanti else ""), not mancanti))
+    # verdetto della pipeline nell'anteprima (30/10/2026)
+    esiti.append(("anteprima con il verdetto della pipeline (attenzioni da approvare)",
+                  "## Verdetto della pipeline" in testo
+                  and "[PASSO 5 · TERAPIA_DICHIARATA_ASSENTE]" in testo
+                  and "COLLAUDO_SALTATO" not in testo))
     try:
         prova_meta(approvato)
         esiti.append(("PDF generato con l'impronta approvata", True))
@@ -1006,10 +1128,9 @@ def autotest(template_p):
         esiti.append((f"impronta approvata: fermo inatteso ({e})", False))
 
     def ferma_impronta(etichetta, m, piano_p=piano_c, attesa="cambiato"):
-        with open(mp, "w", encoding="utf-8") as f:
-            json.dump(m, f)
+        scrivi_meta(m, piano_p)
         try:
-            genera(piano_p, target_c, mp, template_p, py, pdf, mese="x")
+            genera(piano_p, target_c, mp, template_p, py, pdf, mese="x", **KW)
             esiti.append((etichetta + " ferma lo script", False))
         except Fermo as e:
             esiti.append((etichetta + " ferma lo script", "impronta_approvata" in str(e)
@@ -1035,22 +1156,21 @@ def autotest(template_p):
         f.write("\n".join(righe_p) + "\n")
     ferma_impronta("grammatura cambiata dopo l'approvazione", approvato, piano_p=piano_mod)
     try:
-        prova_meta(dict(approvato, drive={"cartella_id": "altra", "piano_csv": "piano_v2.csv"}))
+        prova_meta(dict(approvato, drive={"cartella_id": "1AltraCartellaDrive",
+                                          "piano_csv": "piano_v2.csv"}))
         esiti.append(("riferimenti di Drive cambiati: impronta invariata, PDF generato", True))
     except Fermo as e:
         esiti.append((f"riferimenti di Drive cambiati: fermo inatteso ({e})", False))
     # sola verifica (prima del documento di spiegazione) e ordine delle chiavi
-    with open(mp, "w", encoding="utf-8") as f:
-        json.dump(approvato, f)
+    scrivi_meta(approvato)
     try:
         esiti.append(("--verifica-impronta passa sui metadati approvati",
-                      verifica(piano_c, target_c, mp) == approvato["impronta_approvata"]))
+                      verifica(piano_c, target_c, mp, **KW) == approvato["impronta_approvata"]))
     except Fermo as e:
         esiti.append((f"--verifica-impronta: fermo inatteso ({e})", False))
-    with open(mp, "w", encoding="utf-8") as f:
-        json.dump(dict(approvato, limiti_noti=["Limite aggiunto dopo."]), f)
+    scrivi_meta(dict(approvato, limiti_noti=["Limite aggiunto dopo."]))
     try:
-        verifica(piano_c, target_c, mp)
+        verifica(piano_c, target_c, mp, **KW)
         esiti.append(("--verifica-impronta ferma un limite noto aggiunto dopo", False))
     except Fermo as e:
         esiti.append(("--verifica-impronta ferma un limite noto aggiunto dopo",
@@ -1059,17 +1179,91 @@ def autotest(template_p):
         {"pasto": "cena", "da": "x", "a": "y"}]))
     with open(mp, "w", encoding="utf-8") as f:
         f.write(json.dumps(diff_a, sort_keys=True))   # stesso contenuto, chiavi riordinate
+    fai_verdetto()
     try:
-        verifica(piano_c, target_c, mp)
+        verifica(piano_c, target_c, mp, **KW)
         esiti.append(("chiavi riordinate nel JSON: impronta invariata", True))
     except Fermo as e:
         esiti.append((f"chiavi riordinate nel JSON: fermo inatteso ({e})", False))
-    testo_vuoto = anteprima(piano_c, target_c, mp)[0]
+    testo_vuoto = anteprima(piano_c, target_c, mp, **KW)[0]
     esiti.append(("campi del documento di spiegazione assenti mostrati come (nessuna voce)",
                   "- **Limiti noti:** (nessuna voce)" in testo_vuoto
-                  and "- **Terapia (sezione 2 del documento di spiegazione):** (nessuna voce)"
-                  in testo_vuoto
+                  and "- **Terapia (sezione 2 del documento di spiegazione):** nessuna "
+                      "terapia, confermato dal nutrizionista il 23/10/2026" in testo_vuoto
                   and "- **TDEE confermato:** 2040 kcal" in testo_vuoto))
+    # 9) disciplina nel codice (30/10/2026): ogni blocco con la sua prova al contrario
+    scrivi_meta(approvato)
+
+    def ferma(etichetta, attesa, funz):
+        try:
+            funz()
+            esiti.append((etichetta + " ferma lo script", False))
+        except Fermo as e:
+            esiti.append((etichetta + " ferma lo script" + ("" if attesa in str(e)
+                          else f": motivo inatteso ({e})"), attesa in str(e)))
+        except Exception as e:
+            esiti.append((f"{etichetta}: crash {type(e).__name__} invece del fermo", False))
+
+    ferma("anteprima senza --verdetto", "manca --verdetto",
+          lambda: anteprima(piano_c, target_c, mp))
+    ferma("PDF senza --verdetto", "manca --verdetto",
+          lambda: genera(piano_c, target_c, mp, template_p, py, pdf, mese="x"))
+    ferma("verdetto prodotto con --salta-collaudo, senza la deroga dell'autotest",
+          "salta-collaudo", lambda: anteprima(piano_c, target_c, mp, verdetto_p=vp))
+    # il piano originale del caso 03 ha bloccanti: verdetto vero, anteprima negata
+    vp_bl = os.path.join(tmp, "verdetto_bloccato.json")
+    fai_verdetto(os.path.join(caso, "piano.csv"), os.path.join(caso, "target.csv"), vp_bl)
+    ferma("verdetto con rilievi bloccanti", "bloccanti",
+          lambda: anteprima(os.path.join(caso, "piano.csv"), os.path.join(caso, "target.csv"),
+                            mp, verdetto_p=vp_bl, _collaudo_saltato_ok=True))
+    ferma("verdetto di un altro piano", "cambiati",
+          lambda: anteprima(os.path.join(caso, "piano.csv"), target_c, mp, **KW))
+    with open(mp, "w", encoding="utf-8") as f:     # metadati cambiati, verdetto vecchio
+        json.dump(dict(approvato, regole_operative=[regola, "Aggiunta dopo la pipeline."]), f)
+    ferma("metadati cambiati dopo la pipeline", "cambiati",
+          lambda: anteprima(piano_c, target_c, mp, **KW))
+
+    def ferma_meta(etichetta, attesa, m):
+        scrivi_meta(m)
+        ferma(etichetta, attesa, lambda: anteprima(piano_c, target_c, mp, **KW))
+
+    da_conf = [{"testo": "pranzo a casa", "stato": "confermata"},
+               {"testo": "pesce a pranzo", "stato": "da_confermare"}]
+    ferma_meta("assunzione da confermare", "pesce a pranzo", dict(approvato, assunzioni=da_conf))
+    ferma_meta("campo 'assunzioni' assente", "'assunzioni'",
+               {k: v for k, v in approvato.items() if k != "assunzioni"})
+    ferma_meta("assunzione senza stato", "assunzione 1",
+               dict(approvato, assunzioni=[{"testo": "pranzo a casa"}]))
+    ferma_meta("campo 'alimenti_desiderati' assente", "'alimenti_desiderati'",
+               {k: v for k, v in approvato.items() if k != "alimenti_desiderati"})
+    ferma_meta("nota clinica nel campo drive", "drive",
+               dict(approvato, drive={"piano_csv": "piano_v1.csv", "nota": "assume warfarin"}))
+    ferma_meta("frase nel campo drive.fascicolo", "drive.fascicolo",
+               dict(approvato, drive={"fascicolo": "il paziente assume warfarin"}))
+    # prove al contrario: gli stessi campi scritti bene passano
+    ok_m = dict(approvato, assunzioni=[{"testo": "pranzo a casa", "stato": "confermata"}],
+                alimenti_desiderati=["petto di pollo", "hamburger"],
+                drive={"cartella_id": "1AltraCartellaDrive", "fascicolo": "Fascicolo P00.docx",
+                       "altri_file": ["orari_pasti.csv", "verdetto_v1.json"]})
+    scrivi_meta(ok_m)
+    try:
+        t_ok = anteprima(piano_c, target_c, mp, **KW)[0]
+        esiti.append(("assunzioni confermate, desiderati e drive con nomi di file: anteprima "
+                      "con assunzioni, desiderati e avviso dei mancanti",
+                      "- **Assunzione:** pranzo a casa (confermata)" in t_ok
+                      and "hamburger" in t_ok and "ALIMENTI_DESIDERATI_MANCANTI" in t_ok))
+    except Fermo as e:
+        esiti.append((f"metadati scritti bene: fermo inatteso ({e})", False))
+    # le attenzioni sono nell'impronta: un verdetto diverso cambia l'impronta
+    scrivi_meta(approvato)
+    with open(vp, encoding="utf-8") as f:
+        v_mod = json.load(f)
+    v_mod["attenzioni"] = v_mod["attenzioni"][:-1]
+    with open(vp, "w", encoding="utf-8") as f:
+        json.dump(v_mod, f)
+    ferma("attenzione tolta dal verdetto dopo l'approvazione", "impronta_approvata",
+          lambda: verifica(piano_c, target_c, mp, **KW))
+    fai_verdetto()
     # alternative in testa solo se il pasto e' a scelta in TUTTI i giorni strutturati
     alt1, alt2 = [["T", "d", "k", None]], [["U", "e", "k", None]]
     finti = [{"pasti": [("colazione", "", alt1), ("pranzo", "", alt2)]},
@@ -1092,12 +1286,15 @@ def main():
     ap.add_argument("--template")
     ap.add_argument("--autotest", action="store_true")
     ap.add_argument("--anteprima", action="store_true",
-                    help="PASSO 6: anteprima completa (testi e grammature) e impronta, "
-                         "senza template e senza PDF")
-    ap.add_argument("--out-anteprima", dest="out_anteprima")
+                    help="PASSO 6: anteprima completa (testi, grammature, verdetto) e "
+                         "impronta, sempre su file; senza template e senza PDF")
+    ap.add_argument("--out-anteprima", dest="out_anteprima",
+                    help="file dell'anteprima (predefinito: anteprima_<versione>_<impronta>.md)")
     ap.add_argument("--verifica-impronta", dest="verifica", action="store_true",
                     help="prima del documento di spiegazione: controlla solo l'impronta")
     ap.add_argument("--piano"); ap.add_argument("--target"); ap.add_argument("--metadati")
+    ap.add_argument("--verdetto", help="verdetto di pipeline.py --out-verdetto sugli stessi "
+                                       "piano, target e metadati (obbligatorio)")
     ap.add_argument("--orari"); ap.add_argument("--mese")
     ap.add_argument("--eccezione-etichetta", dest="eccezione")
     ap.add_argument("--nomi-eccezione", dest="nomi_eccezione")
@@ -1110,36 +1307,40 @@ def main():
     if (a.anteprima or a.verifica) and (a.template or a.out_py or a.out_pdf):
         ap.error("--anteprima e --verifica-impronta non generano il PDF: togliere "
                  "--template, --out-py e --out-pdf")
+    kw = dict(eccezione_p=a.eccezione, nomi_eccezione_p=a.nomi_eccezione, verdetto_p=a.verdetto)
     try:
+        if a.autotest:
+            return autotest(a.template)
+        for n in ("piano", "target", "metadati"):
+            if not getattr(a, n):
+                ap.error(f"--{n} obbligatorio")
         if a.verifica:
-            for n in ("piano", "target", "metadati"):
-                if not getattr(a, n):
-                    ap.error(f"--{n} obbligatorio")
-            imp = verifica(a.piano, a.target, a.metadati, a.orari,
-                           eccezione_p=a.eccezione, nomi_eccezione_p=a.nomi_eccezione)
+            imp = verifica(a.piano, a.target, a.metadati, a.orari, **kw)
             print(f"IMPRONTA VERIFICATA: {imp} - piano e testi sono quelli approvati")
             return 0
         if a.anteprima:
-            for n in ("piano", "target", "metadati"):
-                if not getattr(a, n):
-                    ap.error(f"--{n} obbligatorio")
-            testo, imp = anteprima(a.piano, a.target, a.metadati, a.orari,
-                                   eccezione_p=a.eccezione, nomi_eccezione_p=a.nomi_eccezione)
+            testo, imp = anteprima(a.piano, a.target, a.metadati, a.orari, **kw)
             testo += f"\n**Impronta per l'approvazione:** `{imp}`\n"
-            if a.out_anteprima:
-                with open(a.out_anteprima, "w", encoding="utf-8") as f:
-                    f.write(testo)
-            print(testo, end="")
+            # sempre su file (30/10/2026): il 28/10 l'approvazione era avvenuta su un
+            # estratto riportato in chat; il file si consegna intero e si approva quello
+            with open(a.metadati, encoding="utf-8") as f:
+                versione = str(json.load(f).get("versione_piano") or "piano")
+            versione = re.sub(r"[^\w.-]+", "", versione) or "piano"
+            out = a.out_anteprima or f"anteprima_{versione}_{imp}.md"
+            with open(out, "w", encoding="utf-8") as f:
+                f.write(testo)
+            print(f"ANTEPRIMA SCRITTA: {out} ({testo.count(chr(10))} righe)")
+            print(f"IMPRONTA: {imp}")
+            print("Si consegna il FILE intero (non un estratto in chat); approvato, "
+                  "l'impronta va in 'impronta_approvata' dei metadati (M2, PASSO 6).")
             return 0
         if not a.template:
             ap.error("--template obbligatorio")
-        if a.autotest:
-            return autotest(a.template)
-        for n in ("piano", "target", "metadati", "out_py", "out_pdf"):
+        for n in ("out_py", "out_pdf"):
             if not getattr(a, n):
                 ap.error(f"--{n.replace('_', '-')} obbligatorio")
         genera(a.piano, a.target, a.metadati, a.template, a.out_py, a.out_pdf, a.orari, a.mese,
-               eccezione_p=a.eccezione, nomi_eccezione_p=a.nomi_eccezione)
+               **kw)
     except Fermo as e:
         print(f"FERMO: {e}")
         return 1

@@ -2,14 +2,16 @@
 
 Modulo operativo. Si carica **dopo l'approvazione dei calcoli**, per generare i due
 deliverable che il paziente riceve.
-Ultimo aggiornamento: 23/10/2026 (testo del documento di spiegazione approvato prima della consegna; template di spiegazione: elenchi puntati «•» al posto di «●», che il font non ha e stampava «NO GLYPH», unica modifica al motore grafico autorizzata dal nutrizionista; impronta dell'approvazione: il PDF si ferma se piano o testi sono cambiati, `--verifica-impronta` prima del documento di spiegazione, orari tra gli allegati; 22/10: fermo sui segnaposto nei testi del paziente; prima: 30/09/2026, secondo spuntino, fino a 5 pasti nel PDF). Presuppone **M2 già eseguito** (in chat A):
+Ultimo aggiornamento: 30/10/2026 (verdetto della pipeline allegato e richiesto da PDF e verifica;
+documento di spiegazione generato con `genera_spiegazione.py`, che si ferma su segnaposto,
+parentesi quadre, struttura e nome del paziente). 23/10/2026: testo del documento di spiegazione approvato prima della consegna; template di spiegazione: elenchi puntati «•» al posto di «●», che il font non ha e stampava «NO GLYPH», unica modifica al motore grafico autorizzata dal nutrizionista; impronta dell'approvazione: il PDF si ferma se piano o testi sono cambiati, `--verifica-impronta` prima del documento di spiegazione, orari tra gli allegati; 22/10: fermo sui segnaposto nei testi del paziente; prima: 30/09/2026, secondo spuntino, fino a 5 pasti nel PDF). Presuppone **M2 già eseguito** (in chat A):
 copre i suoi PASSO 7 e PASSO 8 e non si esegue prima. **In chat B M2 e M1 non si
 ricaricano**: tutto ciò che serve sta nei metadati del piano e nel motore.
 
 ### Avvio della chat B
 
-1. I file del paziente (`piano_vN.csv`, `metadati_piano_vN.json`, fascicolo) si
-   chiedono **allegati alla chat**: la cartella uploads non costa token. Drive si
+1. I file del paziente (`piano_vN.csv`, `metadati_piano_vN.json`, `verdetto_vN.json`,
+   fascicolo) si chiedono **allegati alla chat**: la cartella uploads non costa token. Drive si
    usa solo se un allegato manca. Un piano con eccezione etichetta richiede anche il
    file delle voci da etichetta e quello dei loro nomi paziente (M1, sezione 4); un
    piano con orari anche `orari_pasti.csv`. Si chiedono tutti i file elencati in
@@ -33,7 +35,8 @@ ricaricano**: tutto ciò che serve sta nei metadati del piano e nel motore.
    a mano. Il template si scarica dal link della sezione 2.
    ```
    python3 genera_zona_piano.py --piano piano_vN.csv --target target.csv
-       --metadati metadati_piano_vN.json --template TEMPLATE_..._v5.py
+       --metadati metadati_piano_vN.json --verdetto verdetto_vN.json
+       --template TEMPLATE_..._v5.py
        --orari orari_pasti.csv --out-py CognomeNome_piano_vN.py
        --out-pdf CognomeNome_piano_vN.pdf
        [--eccezione-etichetta voci.csv --nomi-eccezione nomi.csv]
@@ -41,26 +44,24 @@ ricaricano**: tutto ciò che serve sta nei metadati del piano e nel motore.
    Se si ferma, stampa quale campo o titolo manca o contiene un segnaposto («non
    concordato», «N/D», «XX kg», testi d'esempio del template; elenco in M1): si chiede
    al nutrizionista, non si completa a intuito. Si ferma anche se `impronta_approvata`
-   manca o non coincide (M2, PASSO 6): piano o testi diversi da quelli approvati. In chat
+   manca o non coincide (M2, PASSO 6): piano o testi diversi da quelli approvati, e se il
+   verdetto manca, ha un bloccante o riguarda altri dati. Il verdetto NON si rifà in chat
+   B: è quello approvato al PASSO 6, con le sue attenzioni dentro l'impronta. In chat
    B l'impronta NON si rigenera: si torna al nutrizionista con l'anteprima
    (`--anteprima`) e la si fa approvare. Il `.py` prodotto è quello da
    archiviare (sezione 5).
 5. Se nei metadati manca un campo necessario (titolo, obiettivo, criterio) o contiene
    un segnaposto, ci si ferma e lo si chiede: non si decide in chat B. Il documento di
-   spiegazione NON passa da `genera_zona_piano.py`: PRIMA di scriverlo si riesegue
-   `python3 genera_zona_piano.py --verifica-impronta --piano ... --target ...
-   --metadati ... [--orari ...]` (stessi file del PDF), perché un campo cambiato dopo il
-   PDF non lo fermerebbe nessuno. Il documento si scrive dai campi approvati
+   spiegazione si genera con `genera_spiegazione.py` (sezione 3, «Come si genera»), che
+   prima verifica l'impronta con gli stessi file del PDF: un campo cambiato dopo il PDF lo
+   ferma. Il documento si scrive dai campi approvati
    (`regole_operative`, `scelte_principali`, `limiti_noti`, `da_escludere`, `terapia`)
    e dai dati di piano e fascicolo, senza deduzioni cliniche (sezione 3): la prosa è
    della chat B, i contenuti no, e il testo intero passa dall'approvazione del
    nutrizionista prima della consegna (sezione 3, «Quando generarlo»). Obiettivo e
    criterio sono già
    protetti, perché il PDF del piano, generato prima dagli stessi metadati, si ferma
-   su un loro segnaposto. Fino al controllo automatico (in sviluppo) si verificano a
-   vista: nessun testo d'esempio del template rimasto («testo placeholder»), nessun
-   segnaposto in `regole_operative`, `scelte_principali`, `limiti_noti`,
-   `da_escludere` e `terapia`.
+   su un loro segnaposto.
 
 **Due spuntini nello stesso giorno (dal 30/09/2026).** Il secondo spuntino ha il suo
 valore di pasto, `spuntino2`: non si forza più dentro un unico gruppo `spuntino`.
@@ -251,7 +252,7 @@ Subito dopo il PDF del piano, **nella stessa consegna**. Non richiede un nuovo g
 di approvazione dei calcoli, ma **il testo si approva prima della consegna** (decisione
 del 23/10/2026: nel primo piano reale la chat B aveva aggiunto sette contenuti non
 approvati, tra cui «nessun farmaco in terapia» dedotto, e tre frasi inventate):
-1. si genera il PDF e se ne estrae il testo intero:
+1. si genera il PDF con `genera_spiegazione.py` (sotto) e se ne estrae il testo intero:
    `pdftotext -layout CognomeNome_spiegazione_vN.pdf -`;
 2. lo si presenta COSÌ COM'È, non riassunto, con accanto a ogni frase che non viene dai
    campi dei metadati la sua fonte: `[piano]`, `[fascicolo]` o `[dedotto]`. Una
@@ -260,6 +261,28 @@ approvati, tra cui «nessun farmaco in terapia» dedotto, e tre frasi inventate)
 3. il PDF si consegna solo dopo l'approvazione esplicita del testo; ogni correzione
    produce un nuovo PDF, una nuova anteprima visiva (sezione 4) e un nuovo testo da
    approvare: si approva sempre l'ultimo PDF.
+
+### Come si genera (dal 30/10/2026)
+
+Si copia il template, si scrive SOLO la zona dati (`SEZIONI` e, se serve, `INTRO`) nel
+file `CognomeNome_spiegazione_vN.py`, e il PDF si genera con il comando del motore, mai
+lanciando il `.py` direttamente:
+```
+python3 genera_spiegazione.py --py CognomeNome_spiegazione_vN.py
+    --template TEMPLATE_SpiegazioneDieta_StudioTaglialatela_v1.py
+    --piano piano_vN.csv --target target.csv --metadati metadati_piano_vN.json
+    --verdetto verdetto_vN.json [--orari orari_pasti.csv]
+    --out-pdf CognomeNome_spiegazione_vN.pdf
+```
+Si ferma, dicendo dove, se: l'impronta non coincide; motore grafico, intestazione o
+chiusura dello studio sono diversi dal template; le sezioni non sono 6, numerate 1-6, con
+almeno un paragrafo; un testo è vuoto, un segnaposto o un testo d'esempio («testo
+placeholder», «XX», «N settimane», «Nome Cognome»…); un testo contiene parentesi quadre
+(le etichette `[piano]`, `[fascicolo]`, `[dedotto]` si usano SOLO nella presentazione in
+chat, mai nel `.py`; e le alternative del modello come «[i farmaci in terapia / il
+contesto di vita]» vanno sciolte); compare una parola del nome del paziente. Non giudica i
+contenuti: deduzioni cliniche, seconda persona e frasi inventate restano all'approvazione
+del testo intero.
 Il PDF del documento approvato è il riferimento: un contenuto nuovo aggiunto in questa
 fase (es. una regola operativa dettata dal nutrizionista) non torna nei metadati né
 nell'impronta del piano, che restano quelli del PASSO 6.
@@ -310,7 +333,8 @@ la stessa convenzione di Drive (M5): `CognomeNome_piano_vN.pdf`, `CognomeNome_pi
 versione di `piano_vN.csv` e dei metadati; stessa radice `CognomeNome_` dei file di M5. Il
 template di spiegazione prende il nome d'uscita come primo argomento:
 `python3 TEMPLATE_SpiegazioneDieta_StudioTaglialatela_v1.py CognomeNome_spiegazione_vN.pdf`
-(senza argomento scrive `spiegazione_dieta.pdf`). Andamento (M5) e scheda di allenamento
+(senza argomento scrive `spiegazione_dieta.pdf`), ma dal 30/10/2026 non si lancia
+direttamente: lo lancia `genera_spiegazione.py` dopo i controlli (sezione 3). Andamento (M5) e scheda di allenamento
 (M8) hanno ancora convenzioni proprie, già in uso su Drive: non si cambiano qui. Se la cartella
 del paziente non esiste, va creata: un piano generato e non archiviato è un piano
 che esiste solo nella conversazione in cui è nato. **I PDF e il `.py` non li carica

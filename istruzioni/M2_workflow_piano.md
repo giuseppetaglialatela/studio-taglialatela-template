@@ -2,7 +2,10 @@
 
 Modulo operativo: si carica quando si compone, si modifica o si valuta un piano.
 Dipende da **M1**: nessun passo è eseguibile senza il motore collaudato.
-Ultima modifica: 23/10/2026 (PASSO 6 con anteprima completa e impronta, metadati in bozza prima dell'approvazione, un giorno chiuso = una riga in chat; condimenti a porzione libera; `--nessuna-terapia`; 22/10:
+Ultima modifica: 30/10/2026 (tappa 2: apertura con gli alimenti desiderati contro il database e
+le assunzioni da confermare; conferma dell'assenza di terapia nei metadati; PASSO 6 su un
+verdetto della pipeline senza bloccanti, anteprima consegnata come file; campi nuovi dei
+metadati). 23/10/2026: PASSO 6 con anteprima completa e impronta, metadati in bozza prima dell'approvazione, un giorno chiuso = una riga in chat; condimenti a porzione libera; `--nessuna-terapia`; 22/10:
 distribuzione del solo calcio, avviso del livello rinforzato, fermi sui segnaposto). Motivazioni, episodi e date in
 `istruzioni/archivio/M2-motivazioni.md`, che non si carica.
 
@@ -129,6 +132,20 @@ un paziente reale: da confermare o rivedere dopo il primo caso vero che lo perco
 Per ogni nuovo piano o modifica, IN QUESTO ORDINE. Con un fascicolo strutturato c'è prima
 un **PASSO 0**: vedi M4.
 
+**All'apertura, prima di comporre (30/10/2026; il 28/10 alimenti mancanti e assunzioni non
+confermate sono emersi a piano finito e hanno fatto rifare i pranzi):**
+- gli alimenti che paziente o nutrizionista vogliono nel piano (fascicolo, Form B, richieste
+  dirette) si confrontano col database: `python3 metadati_piano.py --desiderati "nome 1"
+  "nome 2" ...`. Gli assenti si dichiarano subito, nelle domande in blocco: si aggiungono
+  (M6, sessione col repository) o si sostituiscono. L'elenco va nei metadati
+  (`alimenti_desiderati`, `[]` se nessuno): la pipeline riporta di nuovo gli assenti come
+  avviso (`ALIMENTI_DESIDERATI_MANCANTI`);
+- ogni assunzione necessaria a comporre che il fascicolo non dice (dove si pranza, pesce a
+  pranzo, cosa si sostituisce…) si scrive nei metadati (`assunzioni`, stato
+  `da_confermare`) e si chiede nello stesso blocco di domande; confermata, diventa
+  `confermata`. Una sola `da_confermare` blocca pipeline e anteprima
+  (`ASSUNZIONE_NON_CONFERMATA`). Nessuna assunzione: `"assunzioni": []`.
+
 ### PASSO 1 — RICERCA SCIENTIFICA
 Studi più recenti pertinenti al profilo clinico (patologie, farmaci, obiettivi). Sintetizza
 i punti che influenzano il piano, comprese le evidenze che ridimensionano l'efficacia
@@ -240,11 +257,16 @@ Ogni criticità con ⚠️ e il **meccanismo**.
   (`farmaci_paziente.csv`, `interazioni.csv`, `orari_pasti.csv`), non solo annotata nella
   Tabella Vincoli. Senza nessun file il PASSO 5 della pipeline dà
   `TERAPIA_NON_DICHIARATA` (attenzione: va confermato che il paziente non sia in
-  terapia); con i file solo in parte blocca (`TERAPIA_INCOMPLETA`). Verificato che il
-  paziente non assume farmaci, si esegue con `--nessuna-terapia "fonte"` (da dove viene la
-  verifica: colloquio, Form A, con la data): al posto di `TERAPIA_NON_DICHIARATA` il
-  verdetto riporta `TERAPIA_DICHIARATA_ASSENTE` con la fonte. Senza fonte, o insieme ai
-  file di terapia, blocca (`TERAPIA_CONTRADDITTORIA`). L'assenza del file non
+  terapia); con i file solo in parte blocca (`TERAPIA_INCOMPLETA`). Se il NUTRIZIONISTA
+  conferma che il paziente non assume farmaci, la conferma si scrive nel campo `terapia`
+  dei metadati con la formula fissa `nessuna terapia, confermato dal nutrizionista il
+  GG/MM/AAAA (fonte: colloquio | Form A | fascicolo)` e si esegue con `--nessuna-terapia
+  --metadati ...`: al posto di `TERAPIA_NON_DICHIARATA` il verdetto riporta
+  `TERAPIA_DICHIARATA_ASSENTE` con la conferma. La formula si scrive solo dopo la sua
+  conferma esplicita, mai dedotta da una scheda (28/10/2026). Un altro testo, o la fonte
+  passata sulla riga di comando come prima del 30/10, blocca (`TERAPIA_NON_CONFERMATA`);
+  l'assenza di terapia insieme ai file di terapia blocca (`TERAPIA_CONTRADDITTORIA`).
+  L'assenza del file non
   è l'assenza di terapia, e un'osservazione discorsiva non è una verifica: con una terapia
   dichiarata nel fascicolo, `TERAPIA_NON_DICHIARATA` vale come bloccante e il piano non si
   presenta finché i tre CSV non arrivano alla pipeline. Senza terapia, la conferma si
@@ -291,7 +313,8 @@ chiedi la portata prima di escludere alimenti che il paziente non ha davvero rif
 ### PASSO 6 — PRESENTAZIONE PER APPROVAZIONE
 Tutti i dati, in verdetto e anteprima, con analisi esplicita di punti di forza e criticità. **Attendi
 approvazione esplicita.** Se `pipeline.py` esce con codice 1 il piano NON è presentabile:
-risolvi i bloccanti e riesegui.
+risolvi i bloccanti e riesegui. Dal 30/10/2026 lo impone il codice: l'anteprima richiede il
+verdetto della pipeline e si ferma se ha un bloccante.
 
 È il **gate** del nucleo: uno solo per piano, non uno per giorno. Nessun PDF prima di qui,
 né con fretta dichiarata né con un piano identico a uno precedente.
@@ -299,14 +322,24 @@ né con fretta dichiarata né con un piano identico a uno precedente.
 **Cosa si presenta, in un solo messaggio** (primo piano reale, 23/10/2026: il
 nutrizionista ha dovuto chiedere le grammature prima di approvare, e testi del giorno
 libero e una regola operativa sono finiti nei metadati senza essergli mai mostrati):
-1. verdetto e rilievi di `pipeline.py`, con punti di forza, criticità e l'elenco qui sotto;
-2. l'**anteprima INTERA**, copiata così come la stampa lo script, senza riassunti né
-   riformattazioni:
+1. verdetto e rilievi di `pipeline.py`, con punti di forza, criticità e l'elenco qui sotto.
+   La pipeline gira con il collaudo, i metadati in bozza e il verdetto su file:
+   ```
+   python3 pipeline.py --piano piano_vN.csv --target target.csv --metadati
+       metadati_piano_vN.json --out-verdetto verdetto_vN.json [terapia: file o
+       --nessuna-terapia] > report_vN.txt
+   ```
+2. l'**anteprima INTERA come FILE**, consegnato in conversazione così com'è (mai un estratto
+   o una sintesi in chat: il 28/10/2026 si era approvato un estratto). Lo script la scrive
+   su `anteprima_vN_<impronta>.md` e in chat stampa solo nome del file e impronta:
    ```
    python3 genera_zona_piano.py --anteprima --piano piano_vN.csv --target target.csv
-       --metadati metadati_piano_vN.json [--orari orari_pasti.csv]
-       [--eccezione-etichetta voci.csv --nomi-eccezione nomi.csv]
+       --metadati metadati_piano_vN.json --verdetto verdetto_vN.json
+       [--orari orari_pasti.csv] [--eccezione-etichetta voci.csv --nomi-eccezione nomi.csv]
    ```
+   Si ferma senza verdetto, con un bloccante, con un verdetto di altri dati (piano, target
+   o metadati cambiati dopo la pipeline: si riesegue la pipeline), con assunzioni da
+   confermare, senza `assunzioni` o `alimenti_desiderati`, con testo libero in `drive`.
    Contiene i **testi del PDF** parola per parola (intestazione, obiettivo, criterio di
    rivalutazione, avvertenze, box target, indicazioni del giorno libero), i **contenuti
    del documento di spiegazione** (regole operative, scelte principali, limiti noti,
@@ -320,13 +353,16 @@ libero e una regola operativa sono finiti nei metadati senza essergli mai mostra
    mancano o sono segnaposto: si chiedono PRIMA, nelle domande in blocco all'apertura
    (nucleo, sezione 4), con i titoli dei piatti proposti. Se il piano usa
    `orari_pasti.csv`, l'anteprima va generata con `--orari`: gli orari compaiono nei
-   pasti e cambiano l'impronta;
-3. l'**impronta** stampata in fondo all'anteprima.
+   pasti e cambiano l'impronta. In fondo, il **verdetto della pipeline** con tutte le
+   attenzioni: si approvano insieme al piano e sono dentro l'impronta;
+3. l'**impronta**, nel nome del file e in fondo all'anteprima.
 
 Ogni correzione chiesta (grammatura, titolo, testo) si fa in `piano.csv` o nei metadati,
-poi si rieseguono pipeline e anteprima e si ripresenta l'anteprima con la nuova impronta:
+poi si rieseguono pipeline (nuovo verdetto) e anteprima e si ripresenta il nuovo file con
+la nuova impronta:
 si approva sempre l'ultima mostrata. **Dopo l'approvazione esplicita** si aggiunge ai
-metadati `"impronta_approvata": "<impronta dell'anteprima approvata>"`. Da lì piano e
+metadati `"impronta_approvata": "<impronta dell'anteprima approvata>"` (non cambia il
+verdetto: `impronta_approvata` e `drive` sono fuori dal suo confronto). Da lì piano e
 testi non si toccano: `genera_zona_piano.py` in chat B ricalcola l'impronta e si ferma se
 manca o non coincide. Un testo per il paziente aggiunto dopo l'approvazione è una nuova
 anteprima da approvare, mai una scrittura diretta nei metadati. Fuori dall'impronta solo i
@@ -345,6 +381,8 @@ una regola di questo modulo.
 - l'eccezione etichetta, se usata (`ALIMENTO_FUORI_DATABASE_SU_RICHIESTA`);
 - la conferma che il paziente non è in terapia, con la sua fonte
   (`TERAPIA_DICHIARATA_ASSENTE`, oppure `TERAPIA_NON_DICHIARATA` da confermare) (PASSO 4);
+- gli alimenti desiderati assenti dal database (`ALIMENTI_DESIDERATI_MANCANTI`), con cosa
+  si è deciso (aggiunti con M6 o sostituiti);
 - l'attenzione `LIVELLO_INCOERENTE_IN_DEROGA`, se presente, con la decisione del
   nutrizionista (sezione 2);
 - l'avviso `VALUTARE_LIVELLO_RINFORZATO`, se presente, con il motivo che lo ha fatto
@@ -360,13 +398,16 @@ accanto al CSV. È ciò che legge la chat B
 ```json
 {
   "versione_piano": "vN",
-  "drive": {"cartella_id": "...", "piano_csv": "piano_vN.csv",
-            "fascicolo": "...", "altri_file": ["..."]},
+  "drive": {"cartella_id": "ID di Drive", "piano_csv": "piano_vN.csv",
+            "fascicolo": "nome_file.docx", "verdetto": "verdetto_vN.json",
+            "altri_file": ["orari_pasti.csv", "..."]},
   "giorni": {"lavorativi": ["lun", "..."], "libero": "dom",
              "range_kcal_libero": [min, max]},
   "livello_colazione": "standard | rinforzata_calcio",
   "tdee_confermato_kcal": 0,
-  "terapia": "principi attivi confermati, oppure \"nessuna terapia (fonte, data)\"",
+  "terapia": "principi attivi confermati, oppure \"nessuna terapia, confermato dal nutrizionista il GG/MM/AAAA (fonte: colloquio)\"",
+  "assunzioni": [{"testo": "pranzo a casa nei giorni lavorativi", "stato": "confermata"}],
+  "alimenti_desiderati": ["petto di pollo", "..."],
   "intestazione": {"nome": "...", "eta": "XX anni", "condizione": "..."},
   "avvertenze_box": "allergie ed esclusioni obbligatorie, o \"Nessuna allergia dichiarata.\"",
   "abbinamento_spuntino": {"<opzione colazione>": "<opzione spuntino>"},
@@ -382,12 +423,20 @@ accanto al CSV. È ciò che legge la chat B
   "impronta_approvata": "impronta dell'anteprima approvata (12 caratteri)"
 }
 ```
+- `drive` (unico campo fuori dall'impronta, con `impronta_approvata`) contiene SOLO
+  riferimenti a file: chiavi `cartella_id`, `piano_csv`, `fascicolo`, `metadati`,
+  `verdetto`, `altri_file`; valori nomi di file con estensione o ID di Drive. Un testo
+  scritto lì ferma pipeline e anteprima (`DRIVE_NON_VALIDO`). Il verdetto è un file del
+  piano: va in `drive.verdetto` e si salva su Drive con il CSV, perché la chat B lo chiede
+  allegato.
+- `assunzioni` e `alimenti_desiderati` (dal 30/10/2026): obbligatori per l'anteprima,
+  anche vuoti (`[]` = nessuna assunzione, nessuna richiesta). Stato di un'assunzione:
+  `confermata` o `da_confermare`, nient'altro.
 - Nessuna kcal, nessun grammo, nessun valore nutrizionale: i numeri li ricalcola il motore
   in chat B da `piano.csv` (principio 2). Sole eccezioni, perché DATI DI INGRESSO
   confermati dal nutrizionista: `tdee_confermato_kcal` e `range_kcal_libero`.
-- `terapia`: dal verdetto della pipeline al PASSO 6, i principi attivi confermati al
-  PASSO 4, oppure «nessuna terapia» con la fonte di `TERAPIA_DICHIARATA_ASSENTE` (es.
-  «nessuna terapia (Form A del 23/10/2026)»). È l'unica fonte della chat B per la
+- `terapia`: i principi attivi confermati al PASSO 4, oppure la formula fissa della conferma
+  (PASSO 4), la stessa che la pipeline ha accettato in `TERAPIA_DICHIARATA_ASSENTE`. È l'unica fonte della chat B per la
   sezione 2 del documento di spiegazione quando manca il fascicolo: senza, la chat B non
   scrive nulla sulla terapia (M3). Campo assente, vuoto, «non concordato» o non testo
   (0, false) = nessuna informazione, con lo stesso effetto: mai letto come «nessun

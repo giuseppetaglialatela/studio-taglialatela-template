@@ -115,55 +115,21 @@ def esegui_caso_pipeline(nome_caso):
         valore = opzioni.get(chiave)
         return os.path.join(cartella, valore) if valore else None
 
-    piano = pl.carica_piano(os.path.join(cartella, "piano.csv"))
-    righe_estese = pl.carica_piano_esteso(os.path.join(cartella, "piano.csv"))
-    target = pl.carica_target(os.path.join(cartella, "target.csv"))
-    gap = pl.carica_gap(os.path.join(BASE, "gap.csv"))
-
-    # stessa sequenza di pipeline.main(), con le stesse funzioni: database
-    # (ufficiale + eventuale eccezione etichetta), food_id, pasti ammessi.
-    # Ognuno di questi controlli puo' fermare tutto.
-    rilievi = pl.Rilievi()
+    # la STESSA sequenza di pipeline.main(): pipeline.esegui() (30/10/2026). Prima la
+    # suite ricostruiva la sequenza a mano, e un passo nuovo poteva mancare qui
+    # senza che nessuno se ne accorgesse (successo con --metadati il 29/10).
+    nt = opzioni.get("nessuna_terapia", False)
     with redirect_stdout(io.StringIO()):
-        db, eccezioni, fermo = pl.carica_database(
-            rilievi, percorso_opzionale("eccezione_etichetta"))
-        if not fermo:
-            fermo = pl.controlla_food_id(rilievi, piano, db, gap, eccezioni)
-        if not fermo:
-            fermo = pl.controlla_pasti_ammessi(rilievi, piano)
-    sottostime = pl.nutrienti_sottostimati(piano, gap)
-    giorni_con_scelte = {r["giorno"] for r in righe_estese if r["gruppo_scelta"]}
-
-    # l'output a video non serve alla suite: conta il verdetto, non la prosa
-    # un controllo d'ingresso che ferma (sopra) salta tutti i passi, come in main()
-    # giornate realmente componibili (tappa 1, 29/10/2026), con l'eventuale
-    # abbinamento colazione -> spuntino dei metadati del caso
-    abbin = None
-    if not fermo and percorso_opzionale("metadati"):
-        with open(percorso_opzionale("metadati"), encoding="utf-8") as fh:
-            abbin = pl.mod_comb.carica_abbinamento(_json.load(fh))
-    combos = None
-    if not fermo:
-        combos = pl.calcola_combinazioni(rilievi, righe_estese, db, abbin)
-        fermo = combos is None
-    with redirect_stdout(io.StringIO()):
-        if not fermo:
-            dati = pl.passo_1_calcolo(rilievi, piano, db, target, giorni_con_scelte)
-            intervalli = pl.passo_2_scenari(rilievi, righe_estese, db, target, combos, abbin)
-            # deve restare allineato alla sequenza di pipeline.main(): un passo
-            # aggiunto li' e non qui passa inosservato alla suite (18/09/2026)
-            pl.verifica_settimanale(rilievi, dati, intervalli, target, combos)
-            esito_calcio = pl.passo_3_micronutrienti(rilievi, dati, intervalli, target,
-                                                     sottostime, db)
-            pl.passo_4_coerenza(rilievi, db, target, piano, gap, sottostime,
-                                righe_estese)
-            pl.passo_5_interazioni(rilievi, piano, db,
-                                   percorso_opzionale("farmaci"),
-                                   percorso_opzionale("interazioni"),
-                                   percorso_opzionale("orari"),
-                                   opzioni.get("nessuna_terapia"))
-            pl.passo_6_livello_unico(rilievi, righe_estese, db,
-                                     opzioni.get("deroga_struttura"), esito_calcio)
+        rilievi, _ = pl.esegui(
+            os.path.join(cartella, "piano.csv"), os.path.join(cartella, "target.csv"),
+            os.path.join(BASE, "gap.csv"),
+            percorso_opzionale("farmaci"), percorso_opzionale("interazioni"),
+            percorso_opzionale("orari"), opzioni.get("deroga_struttura"),
+            nt, percorso_opzionale("metadati"), True,
+            percorso_opzionale("eccezione_etichetta"))
+    # il PASSO 0 (collaudo) e' saltato di proposito: la suite gira dopo il collaudo;
+    # la sua attenzione COLLAUDO_SALTATO non fa parte dell'atteso del caso
+    rilievi.attenzioni = [x for x in rilievi.attenzioni if x[1] != "COLLAUDO_SALTATO"]
 
     dati_rilievi = rilievi.come_dati()
     return {
@@ -520,6 +486,13 @@ def modo_verifica():
     if not ok_meta:
         falliti += 1
         ok_cli = False
+    # catena del PASSO 6 dalla riga di comando (30/10/2026): pipeline con collaudo,
+    # verdetto, anteprima SU FILE e verifica dell'impronta
+    ok_cat, msg_cat = verifica_catena_anteprima()
+    print(f"\n  [{'OK ' if ok_cat else 'XX '}] catena del PASSO 6: {msg_cat}")
+    if not ok_cat:
+        falliti += 1
+        ok_cli = False
     # Calcolo esatto dei pasti a scelta (tappa 1, 29/10/2026): giorno e
     # settimana confrontati con la forza bruta su casi casuali a seme fisso
     import combinazioni
@@ -544,31 +517,112 @@ def modo_verifica():
 
 
 def verifica_riga_di_comando():
-    """pipeline.py eseguito davvero sul caso 45 con --nessuna-terapia: nel
-    verdetto deve comparire TERAPIA_DICHIARATA_ASSENTE con la fonte e non
-    TERAPIA_NON_DICHIARATA."""
-    import subprocess
+    """pipeline.py eseguito davvero sul caso 45 (la suite chiama pipeline.esegui()
+    e non vede il passaggio da argparse a main()):
+    1. --nessuna-terapia con --metadati: nel verdetto TERAPIA_DICHIARATA_ASSENTE con
+       la conferma dei metadati, e non TERAPIA_NON_DICHIARATA;
+    2. --nessuna-terapia "testo" (uso precedente al 30/10/2026): blocca con
+       TERAPIA_NON_CONFERMATA, un testo da riga di comando non e' una conferma;
+    3. --out-verdetto: il file c'e', riporta i dati valutati e le attenzioni."""
+    import subprocess, tempfile, json as _json
     cartella = os.path.join(GOLDEN_DIR, "caso_45_nessuna_terapia_dichiarata")
-    fonte = "prova riga di comando"
+    base = [sys.executable, os.path.join(BASE, "pipeline.py"),
+            "--piano", os.path.join(cartella, "piano.csv"),
+            "--target", os.path.join(cartella, "target.csv"), "--salta-collaudo"]
+    meta = os.path.join(cartella, "metadati.json")
+    tmp = tempfile.mkdtemp()
+    ver = os.path.join(tmp, "verdetto.json")
     try:
-        esito = subprocess.run(
-            [sys.executable, os.path.join(BASE, "pipeline.py"),
-             "--piano", os.path.join(cartella, "piano.csv"),
-             "--target", os.path.join(cartella, "target.csv"),
-             "--nessuna-terapia", fonte, "--salta-collaudo"],
-            capture_output=True, text=True, timeout=60)
+        buona = subprocess.run(base + ["--nessuna-terapia", "--metadati", meta,
+                                       "--out-verdetto", ver],
+                               capture_output=True, text=True, timeout=60)
+        vecchia = subprocess.run(base + ["--nessuna-terapia", "prova riga di comando"],
+                                 capture_output=True, text=True, timeout=60)
     except Exception as e:
         return False, f"esecuzione non riuscita: {e}"
-    out = esito.stdout
-    # solo il verdetto: la fonte e' stampata anche nel corpo del PASSO 5
+    out = buona.stdout
+    # solo il verdetto: la conferma e' stampata anche nel corpo del PASSO 5
     out = out[out.rfind("VERDETTO"):] if "VERDETTO" in out else ""
     if not out:
         return False, "il report non contiene il VERDETTO"
     if "TERAPIA_NON_DICHIARATA" in out:
         return False, "--nessuna-terapia non arriva al PASSO 5 (compare TERAPIA_NON_DICHIARATA)"
-    if "TERAPIA_DICHIARATA_ASSENTE" not in out or fonte not in out:
-        return False, "nel verdetto manca TERAPIA_DICHIARATA_ASSENTE con la fonte"
-    return True, "--nessuna-terapia arriva al PASSO 5 e la fonte compare nel verdetto"
+    if "TERAPIA_DICHIARATA_ASSENTE" not in out or "23/10/2026" not in out:
+        return False, "nel verdetto manca TERAPIA_DICHIARATA_ASSENTE con la conferma"
+    if vecchia.returncode != 1 or "TERAPIA_NON_CONFERMATA" not in vecchia.stdout:
+        return False, "--nessuna-terapia \"testo\" non blocca (TERAPIA_NON_CONFERMATA)"
+    try:
+        v = _json.load(open(ver, encoding="utf-8"))
+    except (OSError, ValueError) as e:
+        return False, f"--out-verdetto non scrive un verdetto leggibile ({e})"
+    finally:
+        import shutil
+        shutil.rmtree(tmp, ignore_errors=True)
+    if not v.get("dati", {}).get("metadati") or \
+            "TERAPIA_DICHIARATA_ASSENTE" not in [c for _, c, _ in v.get("attenzioni", [])]:
+        return False, "il verdetto scritto non riporta metadati e attenzioni"
+    return True, ("--nessuna-terapia arriva al PASSO 5 con la conferma dei metadati; "
+                  "un testo da riga di comando blocca; --out-verdetto scrive il verdetto")
+
+
+def verifica_catena_anteprima():
+    """Come in chat A: pipeline.py (con il collaudo) --metadati --out-verdetto, poi
+    genera_zona_piano.py --anteprima --verdetto. L'anteprima deve finire in un file
+    con l'impronta nel nome e NON in chat (il 28/10/2026 si era approvato un
+    estratto); scritta l'impronta nei metadati, --verifica-impronta deve passare."""
+    import subprocess, tempfile, json as _json, shutil
+    import genera_zona_piano as gzp
+    tmp = tempfile.mkdtemp()
+    try:
+        _, piano, target = gzp._piano_di_collaudo(tmp)
+        meta_p = os.path.join(tmp, "metadati_piano_v1.json")
+        meta = {"versione_piano": "v1",
+                "giorni": {"lavorativi": ["lun"], "libero": "dom", "range_kcal_libero": [1600, 1900]},
+                "livello_colazione": "standard", "tdee_confermato_kcal": 2040,
+                "intestazione": {"nome": "Paziente Fittizio", "eta": "40 anni",
+                                 "condizione": "Caso di collaudo"},
+                "avvertenze_box": "Nessuna allergia dichiarata.",
+                "abbinamento_spuntino": {"A": "B", "B": "A"},
+                "indicazioni_giorno_libero": {"pranzo": "a piacere", "cena": "a piacere"},
+                "titoli_piatti": {"*|colazione|A": "Colazione A", "*|colazione|B": "Colazione B",
+                                  "*|spuntino|A": "Spuntino A", "*|spuntino|B": "Spuntino B",
+                                  "1|pranzo|": "Pranzo", "1|cena|": "Cena"},
+                "obiettivo_intestazione": "collaudo", "criterio_rivalutazione": "collaudo",
+                "terapia": "nessuna terapia, confermato dal nutrizionista il 23/10/2026 "
+                           "(fonte: colloquio)",
+                "assunzioni": [], "alimenti_desiderati": []}
+        with open(meta_p, "w", encoding="utf-8") as f:
+            _json.dump(meta, f)
+        ver = os.path.join(tmp, "verdetto_v1.json")
+        r1 = subprocess.run([sys.executable, os.path.join(BASE, "pipeline.py"), "--piano", piano,
+                             "--target", target, "--nessuna-terapia", "--metadati", meta_p,
+                             "--out-verdetto", ver], capture_output=True, text=True,
+                            timeout=180, cwd=tmp)
+        if r1.returncode != 0:
+            return False, "la pipeline con il collaudo non da' un verdetto presentabile"
+        base_g = [sys.executable, os.path.join(BASE, "genera_zona_piano.py"), "--piano", piano,
+                  "--target", target, "--metadati", meta_p, "--verdetto", ver]
+        r2 = subprocess.run(base_g + ["--anteprima"], capture_output=True, text=True,
+                            timeout=120, cwd=tmp)
+        file_a = [n for n in os.listdir(tmp) if n.startswith("anteprima_v1_") and n.endswith(".md")]
+        if r2.returncode != 0 or len(file_a) != 1:
+            return False, f"anteprima non scritta su file ({r2.stdout.strip()[-120:]})"
+        imp = file_a[0][len("anteprima_v1_"):-3]
+        testo = open(os.path.join(tmp, file_a[0]), encoding="utf-8").read()
+        if "## Piano per esteso" in r2.stdout or "## Verdetto della pipeline" not in testo \
+                or imp not in r2.stdout:
+            return False, "l'anteprima compare in chat o il file e' incompleto"
+        meta["impronta_approvata"] = imp
+        with open(meta_p, "w", encoding="utf-8") as f:
+            _json.dump(meta, f)
+        r3 = subprocess.run(base_g + ["--verifica-impronta"], capture_output=True, text=True,
+                            timeout=120, cwd=tmp)
+        if r3.returncode != 0 or "IMPRONTA VERIFICATA" not in r3.stdout:
+            return False, f"--verifica-impronta non passa ({r3.stdout.strip()[-120:]})"
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+    return True, ("pipeline con collaudo -> verdetto -> anteprima su file (non in chat) -> "
+                  "impronta verificata")
 
 
 def verifica_riga_di_comando_metadati():

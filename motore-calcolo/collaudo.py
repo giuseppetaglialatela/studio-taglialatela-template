@@ -23,6 +23,8 @@ CONTROLLI:
      contiene accoppiamenti vietati (21/10/2026)
   9) Cross-check Atwater sull'intero database: solo falsi positivi verificati
      (23/10/2026; la pipeline lo esegue solo sugli alimenti del piano)
+ 10) Controlli di disciplina (30/10/2026): autotest di metadati_piano.py e di
+     genera_zona_piano.py (verdetto, anteprima, impronta, segnaposto)
 
 NOTA SUL VALORE ATTESO (punto 2):
   EXPECTED_ALIMENTI_COUNT va aggiornato ogni volta che il database cresce
@@ -328,6 +330,50 @@ def controllo_9_atwater():
                   + ", ".join(n for n, _ in noti.values()) + ")")
 
 
+TEMPLATE_PIANO = os.path.join(os.path.dirname(BASE),
+                              "TEMPLATE_PianoAlimentare_StudioTaglialatela_v5.py")
+TEMPLATE_SPIEGAZIONE = os.path.join(os.path.dirname(BASE),
+                                    "TEMPLATE_SpiegazioneDieta_StudioTaglialatela_v1.py")
+
+
+def controllo_10_disciplina():
+    """Autotest dei controlli di disciplina (30/10/2026): metadati_piano.py (formula
+    della terapia, assunzioni, alimenti desiderati, campo drive) e
+    genera_zona_piano.py (verdetto, anteprima, impronta, segnaposto), piu'
+    genera_spiegazione.py se c'e' il suo template. Con i template accanto alla
+    cartella del motore (repository clonato) gira intero, PDF compreso; con il
+    solo motore scaricato dal comando d'avvio gira senza .py e PDF, che si
+    verificano con --template (chat B, M3)."""
+    import io
+    from contextlib import redirect_stdout
+    try:
+        sys.path.insert(0, BASE)
+        import metadati_piano
+        import genera_zona_piano
+        n_meta, ko_meta = metadati_piano.autotest()
+        buf = io.StringIO()
+        template = TEMPLATE_PIANO if os.path.isfile(TEMPLATE_PIANO) else None
+        with redirect_stdout(buf):
+            esito = genera_zona_piano.autotest(template)
+            if os.path.isfile(TEMPLATE_SPIEGAZIONE):
+                import genera_spiegazione
+                esito = genera_spiegazione.autotest(TEMPLATE_SPIEGAZIONE) or esito
+    except Exception as e:
+        return False, f"autotest non eseguibile: {type(e).__name__}: {e}"
+    righe = buf.getvalue().splitlines()
+    ok_g = sum(1 for r in righe if r.startswith("  [OK"))
+    ko_g = [r.strip()[6:] for r in righe if r.startswith("  [KO")]
+    problemi = ko_meta + ko_g
+    if esito != 0 and not ko_g:
+        problemi.append("genera_zona_piano.py --autotest fallito")
+    if problemi:
+        return False, "; ".join(problemi[:6]) + (f" (+{len(problemi) - 6})"
+                                                 if len(problemi) > 6 else "")
+    return True, (f"metadati {n_meta} prove, anteprima, impronta e spiegazione {ok_g} "
+                  f"prove, tutte superate" + ("" if template else
+                                              " (senza PDF: template assenti)"))
+
+
 def _file_da_firmare():
     """Elenco ordinato dei file coperti da SHA256SUMS, relativi a BASE.
 
@@ -514,6 +560,11 @@ def main():
 
     print("\n9) Cross-check Atwater sul database")
     ok, dettaglio = controllo_9_atwater()
+    print(f"   [{'OK ' if ok else 'XX '}] {dettaglio}")
+    tutto_ok = tutto_ok and ok
+
+    print("\n10) Controlli di disciplina (metadati, verdetto, anteprima)")
+    ok, dettaglio = controllo_10_disciplina()
     print(f"   [{'OK ' if ok else 'XX '}] {dettaglio}")
     tutto_ok = tutto_ok and ok
 

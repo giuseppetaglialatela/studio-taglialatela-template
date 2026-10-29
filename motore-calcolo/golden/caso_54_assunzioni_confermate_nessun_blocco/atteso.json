@@ -1,0 +1,17 @@
+{
+  "tipo": "pipeline",
+  "bloccanti": [],
+  "attenzioni": [
+    [
+      3,
+      "MEDIA_SOTTO_LARN_CON_GAP"
+    ],
+    [
+      5,
+      "TERAPIA_DICHIARATA_ASSENTE"
+    ]
+  ],
+  "exit_code": 0,
+  "descrizione": "Prova al contrario dei casi 53, 55 e 56: assunzioni tutte confermate, alimenti desiderati tutti nel database, campo drive con soli nomi di file. Nessun rilievo nuovo: verdetti identici al caso 45 (exit 0). Diventa rosso se uno dei controlli sui metadati scatta senza motivo (falso blocco).",
+  "riferimento": "Costruito il 30/10/2026 (tappa 2, disciplina nel codice) dal caso 45 (stessi piano e target, piano del caso 36); attesi scritti a mano."
+}

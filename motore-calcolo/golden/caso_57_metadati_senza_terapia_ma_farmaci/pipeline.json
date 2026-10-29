@@ -1,0 +1,7 @@
+{
+  "deroga_struttura": null,
+  "farmaci": "farmaci.csv",
+  "interazioni": "interazioni.csv",
+  "orari": "orari.csv",
+  "metadati": "metadati.json"
+}
