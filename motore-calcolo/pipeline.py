@@ -557,10 +557,15 @@ def verifica_settimanale(rilievi, dati_giorni, intervalli, target, combos):
         if giorni_scelta:
             print(f"      min: {_descrivi_settimana(giorni, combos, sc_lo)}")
             print(f"      max: {_descrivi_settimana(giorni, combos, sc_hi)}")
-        # Regola di blocco invariata (18/09/2026): si blocca se TUTTE le
-        # settimane componibili stanno fuori tolleranza dallo stesso lato;
-        # se ne esce solo una parte e' una segnalazione, con la settimana
-        # reale peggiore.
+        # Regola di blocco (18/09/2026, confermata sul merito il 29/10/2026
+        # dal nutrizionista): si blocca se TUTTE le settimane componibili
+        # stanno fuori tolleranza dallo stesso lato; se ne esce solo una parte
+        # e' un AVVISO, con la settimana reale peggiore, da dichiarare al
+        # PASSO 6. Motivo: quella settimana richiede la scelta piu' sbilanciata
+        # ogni giorno, e il blocco spingerebbe a togliere alternative al
+        # paziente. Il motivo del 18/09 («estremi non componibili») non vale
+        # piu' dalla tappa 1. Le kcal invece bloccano su qualsiasi settimana
+        # reale fuori tolleranza.
         tutto_fuori = ((not entro_tolleranza(s_lo)) and
                        (not entro_tolleranza(s_hi)) and
                        ((s_lo > 0) == (s_hi > 0)))

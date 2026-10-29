@@ -192,7 +192,9 @@ livelli colazione/spuntino misti o incoerenti tra pasti; catalogo disallineato.
 (`ALIMENTO_FUORI_DATABASE_SU_RICHIESTA`); giorno con kcal fuori ±5% (entro ±10%) o macro
 fuori ±5 punti; scenario di scelta fuori tolleranza entro ±10%; giornata reale con un macro
 fuori ±5 punti, nominata con le sue scelte; media settimanale di un macro fuori tolleranza
-solo in una parte delle settimane componibili, con la settimana reale peggiore; fibra sotto l'80% del target;
+solo in una parte delle settimane componibili, con la settimana reale peggiore (avviso e
+non blocco: decisione del 29/10/2026, quella settimana richiede la scelta più sbilanciata ogni
+giorno e il blocco spingerebbe a togliere alternative al paziente); fibra sotto l'80% del target;
 micronutrienti sotto l'80% LARN *in media settimanale* (con o senza gap); target privo di
 LARN (micronutrienti non confrontati con niente); distribuzione concentrata; anomalia
 Atwater di un alimento del piano che non è un falso positivo verificato (in pratica solo una
