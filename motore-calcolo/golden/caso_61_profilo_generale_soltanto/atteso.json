@@ -1,0 +1,97 @@
+{
+  "tipo": "pipeline",
+  "bloccanti": [],
+  "attenzioni": [
+    [
+      2,
+      "SCENARIO_KCAL_FUORI_TOLLERANZA"
+    ],
+    [
+      2,
+      "SCENARIO_KCAL_FUORI_TOLLERANZA"
+    ],
+    [
+      2,
+      "SCENARIO_KCAL_FUORI_TOLLERANZA"
+    ],
+    [
+      2,
+      "SCENARIO_KCAL_FUORI_TOLLERANZA"
+    ],
+    [
+      2,
+      "SCENARIO_KCAL_FUORI_TOLLERANZA"
+    ],
+    [
+      2,
+      "SCENARIO_MACRO_FUORI_TOLLERANZA"
+    ],
+    [
+      2,
+      "SCENARIO_MACRO_FUORI_TOLLERANZA"
+    ],
+    [
+      2,
+      "SCENARIO_MACRO_FUORI_TOLLERANZA"
+    ],
+    [
+      2,
+      "SCENARIO_MACRO_FUORI_TOLLERANZA"
+    ],
+    [
+      2,
+      "SCENARIO_MACRO_FUORI_TOLLERANZA"
+    ],
+    [
+      2,
+      "SCENARIO_MACRO_FUORI_TOLLERANZA"
+    ],
+    [
+      2,
+      "SCENARIO_MACRO_FUORI_TOLLERANZA"
+    ],
+    [
+      2,
+      "SCENARIO_MACRO_FUORI_TOLLERANZA"
+    ],
+    [
+      2,
+      "SETTIMANA_MACRO_ESTREMO_FUORI"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN_CON_GAP"
+    ],
+    [
+      4,
+      "FORMATO_CONFEZIONE_NON_RISPETTATO"
+    ],
+    [
+      4,
+      "FORMATO_CONFEZIONE_NON_RISPETTATO"
+    ],
+    [
+      4,
+      "FORMATO_CONFEZIONE_NON_RISPETTATO"
+    ],
+    [
+      5,
+      "TERAPIA_DICHIARATA_ASSENTE"
+    ],
+    [
+      6,
+      "VALUTARE_LIVELLO_RINFORZATO"
+    ],
+    [
+      7,
+      "RIFERIMENTO_FUORI"
+    ],
+    [
+      7,
+      "RIFERIMENTI_NON_VERIFICABILI"
+    ]
+  ],
+  "exit_code": 0,
+  "descrizione": "Prova al contrario del caso 60: stesso piano con profili [] (solo generale). Fibra 23,0 contro 25 (LARN): un solo RIFERIMENTO_FUORI; le proteine non hanno un riferimento generale e non danno avviso. Diventa rosso se un profilo non scelto viene applicato.",
+  "riferimento": "Costruito il 30/10/2026 (registro dei riferimenti) da caso_51_macro_scelte_giornate_reali (stessi piano e target); attesi aggiunti a mano sui valori settimanali calcolati a parte."
+}

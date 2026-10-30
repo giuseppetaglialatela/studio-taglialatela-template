@@ -1,0 +1,22 @@
+{
+  "tipo": "pipeline",
+  "bloccanti": [
+    [
+      7,
+      "PROFILI_NON_VALIDI"
+    ]
+  ],
+  "attenzioni": [
+    [
+      3,
+      "MEDIA_SOTTO_LARN_CON_GAP"
+    ],
+    [
+      5,
+      "TERAPIA_DICHIARATA_ASSENTE"
+    ]
+  ],
+  "exit_code": 1,
+  "descrizione": "Il caso 45 con un profilo che il registro non conosce: il controllo dei riferimenti non si puo' fare e la pipeline blocca (PROFILI_NON_VALIDI, exit 1); il resto uguale al caso 45. Diventa rosso se un profilo scritto male passa in silenzio (il piano sarebbe valutato solo sul generale).",
+  "riferimento": "Costruito il 30/10/2026 (registro dei riferimenti) da caso_45_nessuna_terapia_dichiarata (stessi piano e target); attesi aggiunti a mano sui valori settimanali calcolati a parte."
+}

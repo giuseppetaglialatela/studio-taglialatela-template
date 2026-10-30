@@ -590,7 +590,8 @@ def verifica_catena_anteprima():
                 "obiettivo_intestazione": "collaudo", "criterio_rivalutazione": "collaudo",
                 "terapia": "nessuna terapia, confermato dal nutrizionista il 23/10/2026 "
                            "(fonte: colloquio)",
-                "assunzioni": [], "alimenti_desiderati": []}
+                "assunzioni": [], "alimenti_desiderati": [],
+                "profili": ["ipercolesterolemia"]}
         with open(meta_p, "w", encoding="utf-8") as f:
             _json.dump(meta, f)
         ver = os.path.join(tmp, "verdetto_v1.json")

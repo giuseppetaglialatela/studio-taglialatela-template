@@ -1,7 +1,9 @@
 # M1 — MOTORE DI CALCOLO
 
 Modulo operativo (principio 6). Dipendenze: nessuna. Ne dipendono M2 e M6.
-Ultima modifica: 30/10/2026 (tappa 2, disciplina nel codice: anteprima solo su un verdetto della
+Ultima modifica: 30/10/2026 sera (registro dei riferimenti clinici per profilo: `riferimenti.csv`,
+`riferimenti.py`, `RIFERIMENTI.md`, PASSO 7 della pipeline, controllo 11 del collaudo, casi 58-62).
+30/10/2026 (tappa 2, disciplina nel codice: anteprima solo su un verdetto della
 pipeline senza bloccanti e scritta su file; conferma dell'assenza di terapia nei metadati;
 assunzioni e alimenti desiderati; `drive` solo riferimenti; `metadati_piano.py`,
 `genera_spiegazione.py`, `pipeline.esegui()`, controllo 10 del collaudo, casi 53-57).
@@ -116,7 +118,7 @@ di lavoro, riscarica e ricollauda prima di fidarti dei numeri.
 ## 2. MODULI SOFTWARE
 
 ### collaudo.py — certificato di inizio sessione
-Dieci controlli:
+Undici controlli:
 1. presenza e integrità di tutti i CSV, incluso il numero di colonne per riga
    (`csv.DictReader` da solo NON lo segnala)
 2. righe di `alimenti.csv` contro `EXPECTED_ALIMENTI_COUNT`
@@ -144,6 +146,10 @@ Dieci controlli:
    clonato) gira intero, PDF compreso; con il solo motore del comando d'avvio gira senza
    `.py` e PDF, che si verificano con `--template` (chat B). Dura meno di un secondo
    senza template, circa 2 secondi con
+11. registro dei riferimenti clinici (`riferimenti.csv`): ogni riga attiva con documento,
+   posizione, frase e data di verifica; una sola riga attiva per profilo e parametro;
+   profili, parametri e unità noti; `RIFERIMENTI.md` identica a quella generata dal
+   registro; autotest della regola del più restrittivo e della valutazione settimanale
 
 Esce 0 (superato) o 1 (fallito). File opzionali (`cache.zip`, `BDA_alimenti.xlsx`,
 `crea_cache.zip`): se presenti si verificano come gli altri, se assenti il collaudo lo
@@ -169,6 +175,8 @@ Un comando, passi sempre nello stesso ordine, un report unico:
 5. interazioni farmaco-alimento
 6. livello unico di colazione, spuntino e, se presente, secondo spuntino su tutto il piano;
    poi, con `--metadati`, i metadati: assunzioni, alimenti desiderati, `drive`
+7. con `"profili"` nei metadati: riferimenti clinici del registro (sezione
+   `riferimenti.py`)
 
 La sequenza sta in `pipeline.esegui()`, chiamata sia da `main()` sia dalla suite: un passo
 nuovo non può mancare in una delle due (dal 30/10/2026; prima la suite la ricostruiva a
@@ -215,7 +223,9 @@ file si valutano comunque e i loro rilievi restano; struttura pasti non uniforme
 livelli colazione/spuntino misti o incoerenti tra pasti; catalogo disallineato;
 assunzione di composizione da confermare (`ASSUNZIONE_NON_CONFERMATA`); campo `assunzioni`
 o `alimenti_desiderati` scritto male (`ASSUNZIONI_NON_VALIDE`,
-`ALIMENTI_DESIDERATI_NON_VALIDI`); testo libero in `drive` (`DRIVE_NON_VALIDO`).
+`ALIMENTI_DESIDERATI_NON_VALIDI`); testo libero in `drive` (`DRIVE_NON_VALIDO`); profili
+scritti male o sconosciuti (`PROFILI_NON_VALIDI`); registro dei riferimenti non valido
+(`REGISTRO_RIFERIMENTI_NON_VALIDO`).
 
 **Rilievi DA DICHIARARE** (non bloccano): eccezione etichetta dichiarata
 (`ALIMENTO_FUORI_DATABASE_SU_RICHIESTA`); giorno con kcal fuori ±5% (entro ±10%) o macro
@@ -234,7 +244,10 @@ principi attivi assenti dalla tabella; terapia non dichiarata (né file né
 `--nessuna-terapia`); terapia dichiarata assente, con la conferma dei metadati
 (`TERAPIA_DICHIARATA_ASSENTE`: è la traccia della verifica nel verdetto); alimenti
 desiderati assenti dal database (`ALIMENTI_DESIDERATI_MANCANTI`, avviso per decisione del
-30/10/2026: si aggiungono con M6 o si sostituiscono); pasto assente su tutto il
+30/10/2026: si aggiungono con M6 o si sostituiscono); riferimento di un profilo fuori
+nella settimana reale peggiore (`RIFERIMENTO_FUORI`, con fonte e scelte), riferimenti che il
+motore non calcola (`RIFERIMENTI_NON_VERIFICABILI`, da dichiarare come limite), profilo
+senza righe nel registro (`PROFILO_SENZA_RIFERIMENTI`); pasto assente su tutto il
 piano; livello parziale o fuori catalogo; catalogo assente (livello verificato solo come
 uniforme); collaudo saltato; avviso del livello rinforzato (`VALUTARE_LIVELLO_RINFORZATO`,
 PASSO 6). I totali sottostimati per gap si stampano nel report.
@@ -275,7 +288,7 @@ pasti; il rilievo resta nel report con il motivo. Livello misto e catalogo disal
 restano bloccanti anche con la deroga.
 
 ### regressione.py
-Suite sui 57 casi golden in `golden/`: un comando, pass/fail per caso. Si riesegue **dopo
+Suite sui 62 casi golden in `golden/`: un comando, pass/fail per caso. Si riesegue **dopo
 ogni modifica** al motore o al database, e comunque prima di qualsiasi uso clinico.
 - Nei casi `pipeline` la suite chiama `pipeline.esegui()`, la stessa sequenza di
   `main()` (opzioni in `pipeline.json`, metadati in `metadati.json` del caso).
@@ -470,7 +483,8 @@ python3 genera_zona_piano.py --autotest [--template TEMPLATE_..._v5.py]
   vuota; si ferma su una «da_confermare»), `alimenti_desiderati` (lista, anche vuota),
   `drive` con soli riferimenti a file (chiavi `cartella_id`, `piano_csv`, `fascicolo`,
   `metadati`, `verdetto`, `altri_file`; valori nomi di file con estensione o ID di Drive):
-  `drive` resta fuori dall'impronta, quindi non può contenere testo.
+  `drive` resta fuori dall'impronta, quindi non può contenere testo; `profili` (lista dei
+  profili clinici del registro, `[]` = solo generale).
 - **`--anteprima` (PASSO 6, M2):** sempre su FILE, `anteprima_<versione>_<impronta>.md` o
   `--out-anteprima`; in chat stampa solo nome del file e impronta (il 28/10 si era
   approvato un estratto riportato in chat). Senza template e senza PDF, scrive i testi del PDF parola
@@ -552,6 +566,35 @@ python3 genera_zona_piano.py --autotest [--template TEMPLATE_..._v5.py]
   cartella del motore anche `.py` e PDF (serve `pdftotext`), senza solo il resto. Scrive in
   una cartella temporanea e la cancella; restano in /tmp le cartelle che il template v5
   crea a ogni PDF (riga 218, motore grafico congelato: non si tocca).
+
+### riferimenti.py + riferimenti.csv — registro dei riferimenti clinici (30/10/2026)
+Le soglie cliniche per profilo stanno in `riferimenti.csv`, non nelle istruzioni né nella
+memoria della chat: una riga per profilo e parametro con `valore_min` e/o `valore_max`,
+unità, documento, posizione, frase originale, evidenza, popolazione, data di verifica e
+stato (`attivo`, `superato` con `sostituito_da`, `da_verificare`); `parametro =
+indicazione` per le raccomandazioni senza numero, che si mostrano e non si controllano.
+Le righe vengono dalla scheda «Estrazione linee guida» del documento di progetto, mai da
+memoria.
+- Profili: `generale` (LARN, vale sempre), `over65`, `ipercolesterolemia`,
+  `ipertrigliceridemia`, `ipertensione`, `masld`, `diabete_t2`, `obesita` (vuoto: linea
+  guida SIO/ISS da leggere). Li sceglie il nutrizionista, nei metadati.
+- Regola (nutrizionista, 24/10/2026): un profilo sostituisce il generale solo se più
+  restrittivo; tra più profili vale il più restrittivo; le righe con `regola =
+  sostituisce` (popolazioni, es. `over65`) sostituiscono comunque.
+- Valutazione: sulla media settimanale della settimana reale peggiore (fibra come somma,
+  macro in % dell'energia con Dinkelbach). Calcolati oggi: fibra totale, proteine,
+  carboidrati, grassi; tutti gli altri (saturi, colesterolo, zuccheri, sodio, potassio,
+  EPA+DHA, alcol, fibra solubile) escono come non verificabili finché il dato non entra
+  nel database. Avviso, mai blocco (decisione del 30/10/2026).
+- Evidenze nuove: riga nuova `attivo`, la vecchia `superato` con `sostituito_da`; niente
+  si cancella; poi `python3 riferimenti.py --genera-pagina` (riscrive `RIFERIMENTI.md`,
+  la pagina leggibile su GitHub), firme e commit. Il verdetto porta l'impronta del
+  registro: un registro cambiato dopo la pipeline ferma anteprima e PDF.
+```
+python3 riferimenti.py --profili ipercolesterolemia     (apertura della chat A)
+python3 riferimenti.py --genera-pagina
+python3 riferimenti.py --autotest
+```
 
 ### metadati_piano.py — controlli sui metadati e verdetto (30/10/2026)
 Usato da `pipeline.py` e `genera_zona_piano.py`: formula della conferma «nessuna terapia»

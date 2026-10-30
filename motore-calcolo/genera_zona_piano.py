@@ -515,7 +515,7 @@ CAMPI_FUORI_IMPRONTA = ("drive", "impronta_approvata")
 CAMPI_GIA_IN_ANTEPRIMA = ("versione_piano", "giorni", "tdee_confermato_kcal", "intestazione",
                           "avvertenze_box", "indicazioni_giorno_libero", "titoli_piatti",
                           "obiettivo_intestazione", "criterio_rivalutazione",
-                          "assunzioni", "alimenti_desiderati")
+                          "assunzioni", "alimenti_desiderati", "profili")
 
 
 ETICHETTE_CAMPI = {
@@ -615,6 +615,9 @@ def testo_anteprima(dati, meta, verdetto=None):
         L.append("- **Assunzioni:** nessuna")
     des, _ = mod_meta.leggi_desiderati(meta)
     L.append("- **Alimenti desiderati:** " + (", ".join(des) if des else "nessuno"))
+    prof = meta.get("profili")
+    L.append("- **Profili clinici (riferimenti):** generale"
+             + (" + " + ", ".join(p for p in prof if p != "generale") if prof else ""))
     L += ["", "## Altri campi dei metadati (non stampati per il paziente)", "",
           f"- **TDEE confermato:** {_md_valore(meta.get('tdee_confermato_kcal'))} kcal"]
     inte = meta.get("intestazione")
@@ -655,7 +658,8 @@ def testo_anteprima(dati, meta, verdetto=None):
         att = [a for a in verdetto.get("attenzioni", []) if a[1] != "COLLAUDO_SALTATO"]
         L += ["", "## Verdetto della pipeline (approvato insieme al piano)", "",
               f"- **Collaudo:** {verdetto.get('collaudo')}; **bloccanti:** nessuno; "
-              f"**da dichiarare:** {len(att)}"]
+              f"**da dichiarare:** {len(att)}; **registro dei riferimenti:** "
+              f"{(verdetto.get('dati') or {}).get('riferimenti')}"]
         for passo, codice, msg in att:
             L.append(f"- [PASSO {passo} · {codice}] {msg}")
     return "\n".join(L) + "\n"
@@ -794,6 +798,14 @@ def controlla_metadati_disciplina(meta):
         raise Fermo("metadati: assunzioni non confermate dal nutrizionista: "
                     + "; ".join(f"«{t}»" for t in aperte) + ". Si chiedono prima "
                     "dell'approvazione (M2)")
+    if "profili" not in meta:
+        raise Fermo("metadati: manca il campo 'profili' (i profili clinici scelti dal "
+                    "nutrizionista per i riferimenti, es. [\"ipercolesterolemia\"]; [] = solo "
+                    "il generale). Va scritto in chat A (M2)")
+    import riferimenti as mod_rif
+    _, err = mod_rif.valida_profili(meta["profili"])
+    if err:
+        raise Fermo(f"metadati: {err}")
     des, err = mod_meta.leggi_desiderati(meta)
     if err:
         raise Fermo(f"metadati: {err}")
@@ -901,7 +913,7 @@ def autotest(template_p=None):
                           "1|pranzo|": "Pranzo di collaudo", "1|cena|": "Cena di collaudo"},
         "obiettivo_intestazione": "collaudo", "criterio_rivalutazione": "collaudo",
         "terapia": "nessuna terapia, confermato dal nutrizionista il 23/10/2026 (fonte: colloquio)",
-        "assunzioni": [], "alimenti_desiderati": [],
+        "assunzioni": [], "alimenti_desiderati": [], "profili": [],
     }
     mp = os.path.join(tmp, "metadati.json")
     vp = os.path.join(tmp, "verdetto.json")
@@ -1240,6 +1252,28 @@ def autotest(template_p=None):
                dict(approvato, drive={"piano_csv": "piano_v1.csv", "nota": "assume warfarin"}))
     ferma_meta("frase nel campo drive.fascicolo", "drive.fascicolo",
                dict(approvato, drive={"fascicolo": "il paziente assume warfarin"}))
+    # profili clinici del registro dei riferimenti (30/10/2026)
+    ferma_meta("campo 'profili' assente", "'profili'",
+               {k: v for k, v in approvato.items() if k != "profili"})
+    ferma_meta("profilo sconosciuto", "sconosciuti", dict(approvato, profili=["celiachia"]))
+    ferma_meta("profili scritti come testo", "lista", dict(approvato, profili="ipercolesterolemia"))
+    scrivi_meta(approvato)
+    vero_reg = mod_meta.impronta_registro
+    mod_meta.impronta_registro = lambda: "registro-cambiato"
+    try:
+        ferma("registro dei riferimenti cambiato dopo la pipeline", "registro dei riferimenti",
+              lambda: anteprima(piano_c, target_c, mp, **KW))
+    finally:
+        mod_meta.impronta_registro = vero_reg
+    scrivi_meta(dict(approvato, profili=["ipercolesterolemia"]))
+    try:
+        t_pr = anteprima(piano_c, target_c, mp, **KW)[0]
+        esiti.append(("profilo nei metadati: anteprima con profili, registro e avvisi dei "
+                      "riferimenti", "generale + ipercolesterolemia" in t_pr
+                      and "RIFERIMENTI_NON_VERIFICABILI" in t_pr
+                      and "registro dei riferimenti:** " + str(vero_reg()) in t_pr))
+    except Fermo as e:
+        esiti.append((f"profilo nei metadati: fermo inatteso ({e})", False))
     # prove al contrario: gli stessi campi scritti bene passano
     ok_m = dict(approvato, assunzioni=[{"testo": "pranzo a casa", "stato": "confermata"}],
                 alimenti_desiderati=["petto di pollo", "hamburger"],

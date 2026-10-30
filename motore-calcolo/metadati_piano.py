@@ -58,7 +58,7 @@ import unicodedata
 QUI = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, QUI)
 
-VERSIONE_VERDETTO = 1
+VERSIONE_VERDETTO = 2   # 2 (30/10/2026): impronta del registro dei riferimenti
 
 # ─── 1. terapia assente ────────────────────────────────────────────
 FONTI_TERAPIA = ("colloquio", "form a", "fascicolo")
@@ -254,6 +254,16 @@ def impronta_target(path):
     return _sha(carica_target(path))
 
 
+def impronta_registro():
+    """Impronta del registro dei riferimenti (riferimenti.csv), None se illeggibile:
+    un registro cambiato dopo la pipeline rende il verdetto non piu' valido."""
+    import riferimenti
+    try:
+        return riferimenti.impronta(riferimenti.carica())
+    except riferimenti.ErroreRiferimenti:
+        return None
+
+
 def impronta_metadati(meta):
     return _sha({k: v for k, v in meta.items() if k not in CAMPI_FUORI_DATI})
 
@@ -265,7 +275,8 @@ def scrivi_verdetto(path, rilievi, piano_p, target_p, meta):
         "collaudo": ("saltato" if any(c == "COLLAUDO_SALTATO" for _, c, _ in rilievi.attenzioni)
                      else "superato"),
         "dati": {"piano": impronta_piano(piano_p), "target": impronta_target(target_p),
-                 "metadati": impronta_metadati(meta) if meta is not None else None},
+                 "metadati": impronta_metadati(meta) if meta is not None else None,
+                 "riferimenti": impronta_registro()},
         "bloccanti": [list(x) for x in rilievi.bloccanti],
         "attenzioni": [list(x) for x in rilievi.attenzioni],
     }
@@ -308,7 +319,9 @@ def controlla_verdetto(path, piano_p, target_p, meta, accetta_collaudo_saltato=F
                                 "con gli stessi metadati dell'anteprima")
     diversi = [n for n, a, b in (("piano", d.get("piano"), impronta_piano(piano_p)),
                                  ("target", d.get("target"), impronta_target(target_p)),
-                                 ("metadati", d.get("metadati"), impronta_metadati(meta)))
+                                 ("metadati", d.get("metadati"), impronta_metadati(meta)),
+                                 ("registro dei riferimenti", d.get("riferimenti"),
+                                  impronta_registro()))
                if a != b]
     if diversi:
         raise VerdettoNonValido(f"il verdetto non riguarda questi dati ({', '.join(diversi)} "

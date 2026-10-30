@@ -71,6 +71,7 @@ import accoppiamenti as mod_accoppiamenti
 import struttura_pasti
 import interazioni as mod_interazioni
 import metadati_piano as mod_meta
+import riferimenti as mod_rif
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 # Ordine dei pasti: da calcolatore.ordine_pasti (unica fonte, 30/09/2026).
@@ -1320,6 +1321,72 @@ def controlla_metadati(rilievi, meta):
 
 
 # --------------------------------------------------------------------------
+# PASSO 7 - riferimenti clinici dei profili (30/10/2026)
+# --------------------------------------------------------------------------
+
+def controlla_riferimenti(rilievi, meta, combos, sottostime=None):
+    """Riferimenti del registro (riferimenti.py) per i profili scelti dal
+    nutrizionista nei metadati ("profili"). Gira solo se il campo c'e'; l'anteprima
+    del PASSO 6 lo richiede. Avviso, mai blocco (decisione del 30/10/2026), salvo
+    un campo scritto male o un registro non valido, che rendono il controllo
+    impossibile."""
+    if meta is None or "profili" not in meta:
+        return
+    titolo(7, "RIFERIMENTI CLINICI DEI PROFILI")
+    profili, err = mod_rif.valida_profili(meta["profili"])
+    if err:
+        rilievi.blocca(7, "PROFILI_NON_VALIDI", err)
+        return
+    try:
+        righe = mod_rif.carica()
+        errori = mod_rif.problemi(righe)
+        if errori:
+            raise mod_rif.ErroreRiferimenti("; ".join(errori[:5]))
+        limiti, indicazioni, avvertenze = mod_rif.applicabili(righe, profili)
+    except mod_rif.ErroreRiferimenti as e:
+        rilievi.blocca(7, "REGISTRO_RIFERIMENTI_NON_VALIDO", str(e))
+        return
+    print(f"\n  Profili: generale" + (" + " + ", ".join(profili) if profili else "")
+          + f" (registro {mod_rif.impronta(righe)})")
+    giorni = sorted(combos, key=lambda g: (len(g), g))
+    esiti = mod_rif.valuta(limiti, [combos[g] for g in giorni])
+    sotto = sottostime or {}
+    non_verificabili = []
+    for e in esiti:
+        r = e["riga"]
+        nome = mod_rif.PARAMETRI[e["parametro"]][1]
+        limite = mod_rif.descrivi_limite(r, e["lato"])
+        if not e["verificabile"]:
+            non_verificabili.append(f"{nome} {limite} ({r['id']})")
+            print(f"    {nome:24} {limite:22} NON VERIFICABILE (dato assente dal database)")
+            continue
+        calcolo = mod_rif.PARAMETRI[e["parametro"]][2]
+        campo = calcolo[1]
+        unita = "%" if calcolo[0] == "pct" else " " + mod_rif.UNITA_LEGGIBILE[r["unita"]]
+        nota = (f" [SOTTOSTIMATO: gap su {', '.join(f for f, _ in sotto[campo])}]"
+                if campo in sotto else "")
+        print(f"    {nome:24} {limite:22} media settimanale peggiore "
+              f"{e['valore']:.1f}{unita} -> {'OK' if e['ok'] else 'FUORI'}{nota}")
+        if not e["ok"]:
+            scelte = _descrivi_settimana(giorni, combos, e["indici"])
+            rilievi.segnala(7, "RIFERIMENTO_FUORI",
+                            f"{nome}: media settimanale {e['valore']:.1f}{unita} nella "
+                            f"settimana peggiore ({scelte}), riferimento {limite} "
+                            f"[{r['profilo']}: {mod_rif.fonte(r)}]{nota}. Avviso: si dichiara "
+                            f"e si motiva al PASSO 6")
+    if non_verificabili:
+        rilievi.segnala(7, "RIFERIMENTI_NON_VERIFICABILI",
+                        "riferimenti dei profili che il motore non calcola (dato assente dal "
+                        "database), da dichiarare come limite al PASSO 6: "
+                        + "; ".join(non_verificabili))
+    for a in avvertenze:
+        rilievi.segnala(7, "PROFILO_SENZA_RIFERIMENTI", a)
+    if indicazioni:
+        print("\n    Indicazioni senza numero (si leggono, non si verificano): "
+              + "; ".join(f"{r['note']} ({r['id']})" for r in indicazioni))
+
+
+# --------------------------------------------------------------------------
 # Verdetto finale
 # --------------------------------------------------------------------------
 
@@ -1409,6 +1476,7 @@ def esegui(piano_p, target_p, gap_p=None, farmaci=None, interazioni=None, orari=
                         nessuna_terapia, meta)
     passo_6_livello_unico(rilievi, righe_estese, db, deroga, esito_calcio)
     controlla_metadati(rilievi, meta)
+    controlla_riferimenti(rilievi, meta, combos, sottostime)
     return rilievi, meta
 
 

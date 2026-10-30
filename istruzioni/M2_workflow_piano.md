@@ -2,7 +2,7 @@
 
 Modulo operativo: si carica quando si compone, si modifica o si valuta un piano.
 Dipende da **M1**: nessun passo è eseguibile senza il motore collaudato.
-Ultima modifica: 30/10/2026 (tappa 2: apertura con gli alimenti desiderati contro il database e
+Ultima modifica: 30/10/2026 sera (profili clinici e registro dei riferimenti all'apertura). 30/10/2026 (tappa 2: apertura con gli alimenti desiderati contro il database e
 le assunzioni da confermare; conferma dell'assenza di terapia nei metadati; PASSO 6 su un
 verdetto della pipeline senza bloccanti, anteprima consegnata come file; campi nuovi dei
 metadati). 23/10/2026: PASSO 6 con anteprima completa e impronta, metadati in bozza prima dell'approvazione, un giorno chiuso = una riga in chat; condimenti a porzione libera; `--nessuna-terapia`; 22/10:
@@ -134,6 +134,13 @@ un **PASSO 0**: vedi M4.
 
 **All'apertura, prima di comporre (30/10/2026; il 28/10 alimenti mancanti e assunzioni non
 confermate sono emersi a piano finito e hanno fatto rifare i pranzi):**
+- i **profili clinici** del piano (ipercolesterolemia, ipertensione, diabete_t2…, elenco in
+  M1) li sceglie il nutrizionista, nel blocco di domande: dal fascicolo e dalle analisi si
+  PROPONE, non si deduce. Poi `python3 riferimenti.py --profili <profili>` e la tabella si
+  presenta nello stesso blocco: sono i riferimenti, con fonte e frase, su cui si compone il
+  piano, e quali il motore non può verificare. Nessuna soglia clinica da memoria o da una
+  ricerca fatta in chat: se manca nel registro, si dichiara e si porta al progetto di
+  consolidamento. Nei metadati: `"profili": [...]` (`[]` = solo generale);
 - gli alimenti che paziente o nutrizionista vogliono nel piano (fascicolo, Form B, richieste
   dirette) si confrontano col database: `python3 metadati_piano.py --desiderati "nome 1"
   "nome 2" ...`. Gli assenti si dichiarano subito, nelle domande in blocco: si aggiungono
@@ -339,7 +346,8 @@ libero e una regola operativa sono finiti nei metadati senza essergli mai mostra
    ```
    Si ferma senza verdetto, con un bloccante, con un verdetto di altri dati (piano, target
    o metadati cambiati dopo la pipeline: si riesegue la pipeline), con assunzioni da
-   confermare, senza `assunzioni` o `alimenti_desiderati`, con testo libero in `drive`.
+   confermare, senza `assunzioni`, `alimenti_desiderati` o `profili`, con testo libero in
+   `drive`, con un registro dei riferimenti cambiato dopo la pipeline.
    Contiene i **testi del PDF** parola per parola (intestazione, obiettivo, criterio di
    rivalutazione, avvertenze, box target, indicazioni del giorno libero), i **contenuti
    del documento di spiegazione** (regole operative, scelte principali, limiti noti,
@@ -383,6 +391,8 @@ una regola di questo modulo.
   (`TERAPIA_DICHIARATA_ASSENTE`, oppure `TERAPIA_NON_DICHIARATA` da confermare) (PASSO 4);
 - gli alimenti desiderati assenti dal database (`ALIMENTI_DESIDERATI_MANCANTI`), con cosa
   si è deciso (aggiunti con M6 o sostituiti);
+- i riferimenti dei profili fuori (`RIFERIMENTO_FUORI`), con il motivo se restano, e quelli
+  non verificabili (`RIFERIMENTI_NON_VERIFICABILI`), dichiarati come limite;
 - l'attenzione `LIVELLO_INCOERENTE_IN_DEROGA`, se presente, con la decisione del
   nutrizionista (sezione 2);
 - l'avviso `VALUTARE_LIVELLO_RINFORZATO`, se presente, con il motivo che lo ha fatto
@@ -408,6 +418,7 @@ accanto al CSV. È ciò che legge la chat B
   "terapia": "principi attivi confermati, oppure \"nessuna terapia, confermato dal nutrizionista il GG/MM/AAAA (fonte: colloquio)\"",
   "assunzioni": [{"testo": "pranzo a casa nei giorni lavorativi", "stato": "confermata"}],
   "alimenti_desiderati": ["petto di pollo", "..."],
+  "profili": ["ipercolesterolemia"],
   "intestazione": {"nome": "...", "eta": "XX anni", "condizione": "..."},
   "avvertenze_box": "allergie ed esclusioni obbligatorie, o \"Nessuna allergia dichiarata.\"",
   "abbinamento_spuntino": {"<opzione colazione>": "<opzione spuntino>"},

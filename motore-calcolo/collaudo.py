@@ -25,6 +25,8 @@ CONTROLLI:
      (23/10/2026; la pipeline lo esegue solo sugli alimenti del piano)
  10) Controlli di disciplina (30/10/2026): autotest di metadati_piano.py e di
      genera_zona_piano.py (verdetto, anteprima, impronta, segnaposto)
+ 11) Registro dei riferimenti clinici (30/10/2026): fonti complete, una riga
+     attiva per profilo e parametro, RIFERIMENTI.md allineata, autotest
 
 NOTA SUL VALORE ATTESO (punto 2):
   EXPECTED_ALIMENTI_COUNT va aggiornato ogni volta che il database cresce
@@ -374,6 +376,39 @@ def controllo_10_disciplina():
                                               " (senza PDF: template assenti)"))
 
 
+def controllo_11_riferimenti():
+    """Registro dei riferimenti clinici (30/10/2026): ogni riga attiva con documento,
+    posizione, frase e data; una sola riga attiva per profilo e parametro; nessun
+    profilo, parametro o unita' sconosciuti; RIFERIMENTI.md uguale al registro
+    (la pagina leggibile non deve restare indietro); autotest della regola del piu'
+    restrittivo e della valutazione settimanale."""
+    try:
+        sys.path.insert(0, BASE)
+        import riferimenti
+        righe = riferimenti.carica()
+        errori = riferimenti.problemi(righe)
+        n_auto, ko = riferimenti.autotest()
+        try:
+            pagina = open(riferimenti.FILE_PAGINA, encoding="utf-8").read()
+        except OSError:
+            pagina = None
+    except Exception as e:
+        return False, f"registro non controllabile: {type(e).__name__}: {e}"
+    problemi = list(errori)
+    if pagina is None:
+        problemi.append("RIFERIMENTI.md assente (python3 riferimenti.py --genera-pagina)")
+    elif pagina != riferimenti.testo_pagina(righe):
+        problemi.append("RIFERIMENTI.md non coincide con riferimenti.csv "
+                        "(python3 riferimenti.py --genera-pagina)")
+    problemi += ko
+    if problemi:
+        return False, "; ".join(problemi[:6]) + (f" (+{len(problemi) - 6})"
+                                                 if len(problemi) > 6 else "")
+    attive = sum(1 for r in righe if r["stato"] == "attivo")
+    return True, (f"{len(righe)} righe ({attive} attive), tutte con fonte; pagina allineata; "
+                  f"autotest {n_auto} prove superate")
+
+
 def _file_da_firmare():
     """Elenco ordinato dei file coperti da SHA256SUMS, relativi a BASE.
 
@@ -565,6 +600,11 @@ def main():
 
     print("\n10) Controlli di disciplina (metadati, verdetto, anteprima)")
     ok, dettaglio = controllo_10_disciplina()
+    print(f"   [{'OK ' if ok else 'XX '}] {dettaglio}")
+    tutto_ok = tutto_ok and ok
+
+    print("\n11) Registro dei riferimenti clinici (riferimenti.csv)")
+    ok, dettaglio = controllo_11_riferimenti()
     print(f"   [{'OK ' if ok else 'XX '}] {dettaglio}")
     tutto_ok = tutto_ok and ok
 
