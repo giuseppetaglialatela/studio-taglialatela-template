@@ -1,7 +1,8 @@
 # M1 — MOTORE DI CALCOLO
 
 Modulo operativo (principio 6). Dipendenze: nessuna. Ne dipendono M2 e M6.
-Ultima modifica: 30/10/2026 sera (registro dei riferimenti clinici per profilo: `riferimenti.csv`,
+Ultima modifica: 31/10/2026 (riferimenti: si controllano solo i parametri dei profili scelti).
+30/10/2026 sera (registro dei riferimenti clinici per profilo: `riferimenti.csv`,
 `riferimenti.py`, `RIFERIMENTI.md`, PASSO 7 della pipeline, controllo 11 del collaudo, casi 58-62).
 30/10/2026 (tappa 2, disciplina nel codice: anteprima solo su un verdetto della
 pipeline senza bloccanti e scritta su file; conferma dell'assenza di terapia nei metadati;
@@ -575,11 +576,15 @@ stato (`attivo`, `superato` con `sostituito_da`, `da_verificare`); `parametro =
 indicazione` per le raccomandazioni senza numero, che si mostrano e non si controllano.
 Le righe vengono dalla scheda «Estrazione linee guida» del documento di progetto, mai da
 memoria.
-- Profili: `generale` (LARN, vale sempre), `over65`, `ipercolesterolemia`,
+- Profili: `generale` (LARN: termine di confronto, da solo non dà avvisi), `over65`, `ipercolesterolemia`,
   `ipertrigliceridemia`, `ipertensione`, `masld`, `diabete_t2`, `obesita` (vuoto: linea
   guida SIO/ISS da leggere). Li sceglie il nutrizionista, nei metadati.
-- Regola (nutrizionista, 24/10/2026): un profilo sostituisce il generale solo se più
-  restrittivo; tra più profili vale il più restrittivo; le righe con `regola =
+- Si controllano SOLO i parametri dei profili scelti (nutrizionista, 31/10/2026: «i
+  controlli devono scattare solo nelle apposite diete»): un piano con `"profili": []` non ha
+  avvisi del PASSO 7, e un parametro che sta solo nel generale (es. sodio, EPA+DHA) non si
+  controlla in un piano per ipercolesterolemia. Per i parametri del profilo il generale è il
+  termine di confronto: il profilo lo sostituisce solo se più restrittivo (24/10/2026), a
+  parità si cita il profilo; tra più profili vale il più restrittivo; le righe con `regola =
   sostituisce` (popolazioni, es. `over65`) sostituiscono comunque.
 - Valutazione: sulla media settimanale della settimana reale peggiore (fibra come somma,
   macro in % dell'energia con Dinkelbach). Calcolati oggi: fibra totale, proteine,

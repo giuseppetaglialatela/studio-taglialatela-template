@@ -19,9 +19,12 @@ COME FUNZIONA
   non si controlla.
 - Il profilo lo sceglie il nutrizionista nei metadati del piano
   ("profili": ["ipercolesterolemia"], [] = solo il profilo generale): mai dedotto.
-- Il profilo «generale» (LARN) vale sempre. Il valore di un altro profilo lo
-  sostituisce solo se e' PIU' RESTRITTIVO (regola del nutrizionista, 24/10/2026);
-  tra piu' profili vale il piu' restrittivo. Eccezione: le righe con regola
+- Si controllano SOLO i parametri dei profili scelti (decisione del 31/10/2026:
+  «i controlli devono scattare solo nelle apposite diete»): un piano senza profili,
+  o un parametro che sta solo nel profilo «generale», non da' avvisi. Il valore del
+  generale (LARN) resta il termine di confronto: il valore di un profilo lo
+  sostituisce solo se e' PIU' RESTRITTIVO (regola del 24/10/2026), a parita' si cita
+  il profilo; tra piu' profili vale il piu' restrittivo. Le righe con regola
   «sostituisce» (popolazioni, es. over65) sostituiscono il generale comunque.
 - Parametri calcolati dal motore: verificati sulla MEDIA SETTIMANALE (principio 8),
   nella settimana reale peggiore. Gli altri: dichiarati «non verificabili».
@@ -52,7 +55,7 @@ COLONNE = ["id", "profilo", "parametro", "valore_min", "valore_max", "unita", "r
            "stato", "sostituito_da", "note"]
 
 PROFILI = {
-    "generale": "popolazione adulta sana (LARN): vale sempre",
+    "generale": "popolazione adulta sana (LARN): termine di confronto, da solo non da' avvisi",
     "over65": "65 anni e oltre (sostituisce i valori generali)",
     "ipercolesterolemia": "ipercolesterolemia / LDL elevato",
     "ipertrigliceridemia": "trigliceridi elevati",
@@ -209,22 +212,28 @@ def valida_profili(valore):
 
 def applicabili(righe, profili):
     """Limiti che valgono per il piano. Restituisce (limiti, indicazioni, avvertenze):
-    limiti[parametro] = {"min": riga|None, "max": riga|None}; indicazioni = righe;
-    avvertenze = testi (es. profilo senza riferimenti)."""
+    limiti[parametro] = {"min": riga|None, "max": riga|None}, SOLO per i parametri
+    che compaiono nei profili scelti (31/10/2026); indicazioni = righe dei profili
+    scelti; avvertenze = testi (es. profilo senza riferimenti)."""
     attive = [r for r in righe if r["stato"] == "attivo"]
     limiti, indicazioni, avvertenze = {}, [], []
 
     def lato(r, s):
         return r["min"] if s == "min" else r["max"]
 
+    generale = {}
     for r in attive:
         if r["profilo"] == "generale" and r["parametro"] != "indicazione":
-            lim = limiti.setdefault(r["parametro"], {"min": None, "max": None})
+            g = generale.setdefault(r["parametro"], {"min": None, "max": None})
             for s in ("min", "max"):
                 if lato(r, s) is not None:
-                    lim[s] = r
-        elif r["profilo"] == "generale":
-            indicazioni.append(r)
+                    g[s] = r
+    richiesti = {(r["parametro"], s) for r in attive
+                 if r["profilo"] in profili and r["parametro"] != "indicazione"
+                 for s in ("min", "max") if lato(r, s) is not None}
+    for par, s in richiesti:
+        lim = limiti.setdefault(par, {"min": None, "max": None})
+        lim[s] = generale.get(par, {}).get(s)
     sostituiti = {}
     for p in profili:
         proprie = [r for r in attive if r["profilo"] == p]
@@ -252,6 +261,8 @@ def applicabili(righe, profili):
                 cur = lim[s]
                 if cur is None:
                     lim[s] = r
+                elif cur["profilo"] == "generale" and v == lato(cur, s):
+                    lim[s] = r          # a parita' si cita il profilo che chiede il controllo
                 elif s == "min" and v > lato(cur, s):
                     lim[s] = r
                 elif s == "max" and v < lato(cur, s):
@@ -322,8 +333,9 @@ def testo_apertura(righe, profili):
     limiti, indicazioni, avvertenze = applicabili(righe, profili)
     L = [f"RIFERIMENTI PER I PROFILI: generale" + (" + " + ", ".join(profili) if profili else ""),
          f"Registro {impronta(righe)}", ""]
-    L.append("| Parametro | Limite | Verificato dal motore | Profilo | Fonte | Frase | Evidenza |")
-    L.append("|---|---|---|---|---|---|---|")
+    if limiti:
+        L.append("| Parametro | Limite | Verificato dal motore | Profilo | Fonte | Frase | Evidenza |")
+        L.append("|---|---|---|---|---|---|---|")
     for par in sorted(limiti):
         for s in ("min", "max"):
             r = limiti[par][s]
@@ -333,6 +345,14 @@ def testo_apertura(righe, profili):
             L.append(f"| {PARAMETRI[par][1]} | {descrivi_limite(r, s)} | {calc} | {r['profilo']} "
                      f"| {r['documento']}, {r['posizione']} ({r['id']}) | {r['frase']} "
                      f"| {r['evidenza']} |")
+    if not profili:
+        L.insert(3, "Nessun profilo clinico scelto: nessun riferimento da verificare.")
+    info = [r for r in righe if r["stato"] == "attivo" and r["profilo"] == "generale"
+            and r["parametro"] != "indicazione" and r["parametro"] not in limiti]
+    if info:
+        L += ["", "Riferimenti generali (LARN), solo informativi: nessun avviso senza un "
+                  "profilo che li richieda:"]
+        L += [f"- {PARAMETRI[r['parametro']][1]} {descrivi_limite(r)} ({r['id']})" for r in info]
     if indicazioni:
         L += ["", "Indicazioni senza numero (non verificate dal motore):"]
         for r in indicazioni:
@@ -352,8 +372,10 @@ def testo_pagina(righe):
     L = ["# Registro dei riferimenti clinici", "",
          "Generato da `riferimenti.py --genera-pagina` da `riferimenti.csv`: non si modifica "
          "a mano (il collaudo controlla che coincida). Ogni valore con documento, posizione "
-         "e frase originale. Il profilo «generale» vale sempre; un altro profilo lo sostituisce "
-         "solo se più restrittivo, salvo le righe «sostituisce». Avvisi, mai blocchi.", "",
+         "e frase originale. Si controllano solo i parametri dei profili scelti nel piano: "
+         "il profilo «generale» (LARN) da solo non dà avvisi, è il termine di confronto, e un "
+         "profilo lo sostituisce solo se più restrittivo (salvo le righe «sostituisce»). "
+         "Avvisi, mai blocchi.", "",
          f"Impronta del registro: `{impronta(righe)}`", ""]
     for p, descr in PROFILI.items():
         proprie = [r for r in righe if r["profilo"] == p]
@@ -417,8 +439,11 @@ def autotest():
            riga("I1", "masld", "indicazione")]
     atteso("registro di prova valido", problemi(reg), [])
     lim, ind, avv = applicabili(reg, [])
-    atteso("senza profili vale il generale", (lim["saturi_pct"]["max"]["id"],
-                                              lim["fibra_g"]["min"]["id"]), ("G2", "G1"))
+    atteso("senza profili nessun controllo (31/10/2026)", (lim, ind), ({}, []))
+    lim, _, _ = applicabili(reg, ["ipercolesterolemia"])
+    atteso("parametro solo generale non controllato (sodio)", "sodio_mg" in lim, False)
+    lim, _, _ = applicabili(reg, ["diabete_t2"])
+    atteso("a parita' si cita il profilo (saturi 10 = 10)", lim["saturi_pct"]["max"]["id"], "P4")
     lim, _, _ = applicabili(reg, ["ipercolesterolemia"])
     atteso("profilo piu' restrittivo sostituisce (saturi 7 < 10)", lim["saturi_pct"]["max"]["id"], "P1")
     atteso("profilo meno restrittivo NON sostituisce (fibra 20 < 25)", lim["fibra_g"]["min"]["id"], "G1")
@@ -428,8 +453,8 @@ def autotest():
     atteso("tra due profili vale il piu' restrittivo (saturi 7)", lim["saturi_pct"]["max"]["id"], "P1")
     lim, _, _ = applicabili(reg, ["over65"])
     atteso("riga «sostituisce» vale anche se meno restrittiva", lim["sodio_mg"]["max"]["id"], "O1")
-    lim, _, _ = applicabili(reg, ["ipertensione"])
-    atteso("riga da_verificare non si usa", lim["sodio_mg"]["max"]["id"], "G3")
+    lim, _, avv = applicabili(reg, ["ipertensione"])
+    atteso("riga da_verificare non si usa", ("sodio_mg" in lim, len(avv)), (False, 1))
     _, ind, avv = applicabili(reg, ["masld", "obesita"])
     atteso("indicazioni del profilo mostrate", [r["id"] for r in ind], ["I1"])
     atteso("profilo senza righe segnalato", len(avv), 1)
@@ -481,7 +506,7 @@ def autotest():
     r_sup = [dict(x) for x in reg] + [riga("G9", "generale", "fibra_g", mn="30",
                                            stato="superato", sostituito_da="G1")]
     atteso("prova al contrario: riga superata con sostituto valida", problemi(r_sup), [])
-    lim, _, _ = applicabili(r_sup, [])
+    lim, _, _ = applicabili(r_sup, ["ipercolesterolemia"])
     atteso("riga superata non si usa", lim["fibra_g"]["min"]["id"], "G1")
     atteso("profili non lista respinti", valida_profili("ipercolesterolemia")[1] is not None, True)
     atteso("profilo sconosciuto respinto", valida_profili(["celiachia"])[1] is not None, True)

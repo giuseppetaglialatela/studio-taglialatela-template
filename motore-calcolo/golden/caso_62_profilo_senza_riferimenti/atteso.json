@@ -84,18 +84,10 @@
     ],
     [
       7,
-      "RIFERIMENTO_FUORI"
-    ],
-    [
-      7,
-      "RIFERIMENTI_NON_VERIFICABILI"
-    ],
-    [
-      7,
       "PROFILO_SENZA_RIFERIMENTI"
     ]
   ],
   "exit_code": 0,
-  "descrizione": "Il caso 61 con il profilo obesita, che nel registro non ha ancora righe (linea guida SIO/ISS non letta): oltre agli avvisi del generale compare PROFILO_SENZA_RIFERIMENTI. Diventa rosso se un profilo vuoto passa come se fosse stato controllato.",
-  "riferimento": "Costruito il 30/10/2026 (registro dei riferimenti) da caso_51_macro_scelte_giornate_reali (stessi piano e target); attesi aggiunti a mano sui valori settimanali calcolati a parte."
+  "descrizione": "Il caso 51 con il profilo obesita, che nel registro non ha ancora righe (linea guida SIO/ISS non letta): compare solo PROFILO_SENZA_RIFERIMENTI, nessun avviso dai valori generali. Diventa rosso se un profilo vuoto passa come se fosse stato controllato.",
+  "riferimento": "Costruito il 30/10/2026 (registro dei riferimenti) da caso_51_macro_scelte_giornate_reali (stessi piano e target); attesi aggiunti a mano sui valori settimanali calcolati a parte. Aggiornato il 31/10/2026: i controlli scattano solo per i parametri dei profili scelti (decisione del nutrizionista)."
 }

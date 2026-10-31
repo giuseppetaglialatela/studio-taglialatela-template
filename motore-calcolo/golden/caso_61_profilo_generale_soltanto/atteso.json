@@ -81,17 +81,9 @@
     [
       6,
       "VALUTARE_LIVELLO_RINFORZATO"
-    ],
-    [
-      7,
-      "RIFERIMENTO_FUORI"
-    ],
-    [
-      7,
-      "RIFERIMENTI_NON_VERIFICABILI"
     ]
   ],
   "exit_code": 0,
-  "descrizione": "Prova al contrario del caso 60: stesso piano con profili [] (solo generale). Fibra 23,0 contro 25 (LARN): un solo RIFERIMENTO_FUORI; le proteine non hanno un riferimento generale e non danno avviso. Diventa rosso se un profilo non scelto viene applicato.",
-  "riferimento": "Costruito il 30/10/2026 (registro dei riferimenti) da caso_51_macro_scelte_giornate_reali (stessi piano e target); attesi aggiunti a mano sui valori settimanali calcolati a parte."
+  "descrizione": "Prova al contrario del caso 60: stesso piano con profili [] (nessun profilo clinico). Decisione del 31/10/2026: i controlli dei riferimenti scattano solo per i parametri dei profili scelti, quindi nessun avviso del PASSO 7, anche se la fibra (23,0 g/die) e' sotto i 25 g del LARN. Verdetti identici al caso 51. Diventa rosso se i valori generali tornano a dare avvisi da soli.",
+  "riferimento": "Costruito il 30/10/2026 (registro dei riferimenti) da caso_51_macro_scelte_giornate_reali (stessi piano e target); attesi aggiunti a mano sui valori settimanali calcolati a parte. Aggiornato il 31/10/2026: i controlli scattano solo per i parametri dei profili scelti (decisione del nutrizionista)."
 }

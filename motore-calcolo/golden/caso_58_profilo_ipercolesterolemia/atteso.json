@@ -24,6 +24,6 @@
     ]
   ],
   "exit_code": 0,
-  "descrizione": "Il caso 45 con il profilo ipercolesterolemia nei metadati. Media settimanale: carboidrati 35,6-43,4% dell'energia contro 45-55% (ESC/EAS 2019, R024) e fibra 20,4-24,2 g/die contro almeno 25 (LARN, R004: il valore ESC di 25 non e' piu' restrittivo e non lo sostituisce): due RIFERIMENTO_FUORI, avvisi. Saturi (<7%, R020), colesterolo, fibra solubile, zuccheri aggiunti, alcol e gli altri non calcolati: un RIFERIMENTI_NON_VERIFICABILI. Nessun blocco nuovo (decisione del 30/10/2026: avviso). Diventa rosso se il profilo viene ignorato o se un riferimento diventa un blocco.",
+  "descrizione": "Il caso 45 con il profilo ipercolesterolemia nei metadati. Media settimanale: carboidrati 35,6-43,4% dell'energia contro 45-55% (ESC/EAS 2019, R024) e fibra 20,4-24,2 g/die contro almeno 25 (ESC/EAS 2019, R022: uguale al LARN, a parita' si cita il profilo): due RIFERIMENTO_FUORI, avvisi. Saturi (<7%, R020), colesterolo, fibra solubile, zuccheri aggiunti e alcol, non calcolati (i soli parametri del profilo: sodio, potassio ed EPA+DHA del LARN non compaiono): un RIFERIMENTI_NON_VERIFICABILI. Nessun blocco nuovo (decisione del 30/10/2026: avviso). Diventa rosso se il profilo viene ignorato o se un riferimento diventa un blocco.",
   "riferimento": "Costruito il 30/10/2026 (registro dei riferimenti) da caso_45_nessuna_terapia_dichiarata (stessi piano e target); attesi aggiunti a mano sui valori settimanali calcolati a parte."
 }

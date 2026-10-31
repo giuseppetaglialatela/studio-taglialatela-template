@@ -1,10 +1,10 @@
 # Registro dei riferimenti clinici
 
-Generato da `riferimenti.py --genera-pagina` da `riferimenti.csv`: non si modifica a mano (il collaudo controlla che coincida). Ogni valore con documento, posizione e frase originale. Il profilo «generale» vale sempre; un altro profilo lo sostituisce solo se più restrittivo, salvo le righe «sostituisce». Avvisi, mai blocchi.
+Generato da `riferimenti.py --genera-pagina` da `riferimenti.csv`: non si modifica a mano (il collaudo controlla che coincida). Ogni valore con documento, posizione e frase originale. Si controllano solo i parametri dei profili scelti nel piano: il profilo «generale» (LARN) da solo non dà avvisi, è il termine di confronto, e un profilo lo sostituisce solo se più restrittivo (salvo le righe «sostituisce»). Avvisi, mai blocchi.
 
 Impronta del registro: `7f5db1f99598`
 
-## generale — popolazione adulta sana (LARN): vale sempre
+## generale — popolazione adulta sana (LARN): termine di confronto, da solo non da' avvisi
 
 - `R001` **acidi grassi saturi** ≤ 10 % dell'energia
   - SINU, LARN V revisione (2024), Appendici A-D, App. D p. 12, tab. 1; p. 5; evidenza: SDT, nessuna classe; popolazione: adulti sani; verificato: 2026-10-28

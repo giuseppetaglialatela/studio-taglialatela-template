@@ -2,7 +2,7 @@
 
 Modulo operativo: si carica quando si compone, si modifica o si valuta un piano.
 Dipende da **M1**: nessun passo è eseguibile senza il motore collaudato.
-Ultima modifica: 30/10/2026 sera (profili clinici e registro dei riferimenti all'apertura). 30/10/2026 (tappa 2: apertura con gli alimenti desiderati contro il database e
+Ultima modifica: 31/10/2026 (avvisi dei riferimenti solo per i profili scelti). 30/10/2026 sera (profili clinici e registro dei riferimenti all'apertura). 30/10/2026 (tappa 2: apertura con gli alimenti desiderati contro il database e
 le assunzioni da confermare; conferma dell'assenza di terapia nei metadati; PASSO 6 su un
 verdetto della pipeline senza bloccanti, anteprima consegnata come file; campi nuovi dei
 metadati). 23/10/2026: PASSO 6 con anteprima completa e impronta, metadati in bozza prima dell'approvazione, un giorno chiuso = una riga in chat; condimenti a porzione libera; `--nessuna-terapia`; 22/10:
@@ -140,7 +140,8 @@ confermate sono emersi a piano finito e hanno fatto rifare i pranzi):**
   presenta nello stesso blocco: sono i riferimenti, con fonte e frase, su cui si compone il
   piano, e quali il motore non può verificare. Nessuna soglia clinica da memoria o da una
   ricerca fatta in chat: se manca nel registro, si dichiara e si porta al progetto di
-  consolidamento. Nei metadati: `"profili": [...]` (`[]` = solo generale);
+  consolidamento. Nei metadati: `"profili": [...]`; `[]` = nessun profilo clinico, e
+  allora il PASSO 7 non dà avvisi (si controllano solo i parametri dei profili scelti);
 - gli alimenti che paziente o nutrizionista vogliono nel piano (fascicolo, Form B, richieste
   dirette) si confrontano col database: `python3 metadati_piano.py --desiderati "nome 1"
   "nome 2" ...`. Gli assenti si dichiarano subito, nelle domande in blocco: si aggiungono
