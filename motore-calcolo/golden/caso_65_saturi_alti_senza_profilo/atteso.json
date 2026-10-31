@@ -1,0 +1,37 @@
+{
+  "tipo": "pipeline",
+  "bloccanti": [],
+  "attenzioni": [
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      5,
+      "TERAPIA_DICHIARATA_ASSENTE"
+    ],
+    [
+      6,
+      "LIVELLO_FUORI_CATALOGO"
+    ],
+    [
+      6,
+      "LIVELLO_FUORI_CATALOGO"
+    ],
+    [
+      6,
+      "VALUTARE_LIVELLO_RINFORZATO"
+    ]
+  ],
+  "exit_code": 0,
+  "descrizione": "Prova al contrario della regola del 31/10/2026 («i controlli devono scattare solo nelle apposite diete»): lo stesso piano del caso 63 (saturi 7,3%, oltre il 7% del profilo ipercolesterolemia) con profili []: nessun avviso del PASSO 7, ne' sui saturi ne' sul colesterolo; il dato si mostra soltanto (sezione LIPIDI del report). Diventa rosso se i lipidi danno avvisi in un piano senza profilo.",
+  "riferimento": "Costruito il 31/10/2026 (lipidi.csv) dal caso 63."
+}

@@ -1,0 +1,49 @@
+{
+  "tipo": "pipeline",
+  "bloccanti": [],
+  "attenzioni": [
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      5,
+      "TERAPIA_DICHIARATA_ASSENTE"
+    ],
+    [
+      6,
+      "LIVELLO_FUORI_CATALOGO"
+    ],
+    [
+      6,
+      "LIVELLO_FUORI_CATALOGO"
+    ],
+    [
+      6,
+      "VALUTARE_LIVELLO_RINFORZATO"
+    ],
+    [
+      7,
+      "RIFERIMENTI_NON_VERIFICABILI"
+    ],
+    [
+      7,
+      "RIFERIMENTO_FUORI"
+    ],
+    [
+      7,
+      "RIFERIMENTO_FUORI"
+    ]
+  ],
+  "exit_code": 0,
+  "descrizione": "Piano di 2 giorni identici, profilo ipercolesterolemia, parmigiano 24 g a pranzo: saturi 7,3% dell'energia (7,27 ricalcolato a parte dai CSV) contro meno del 7% (ESC/EAS 2019, R020, letto da lipidi.csv dal 31/10/2026): RIFERIMENTO_FUORI sui saturi, avviso. Fibra 21,8 g contro 25 (R022): secondo RIFERIMENTO_FUORI. Colesterolo dentro i 300 mg (R021). Diventa rosso se i saturi tornano non calcolati o se l'avviso diventa un blocco.",
+  "riferimento": "Costruito il 31/10/2026 (lipidi.csv): grammi tarati per stare 0,3 punti sopra la soglia; saturi verificati con un calcolo indipendente sui CSV."
+}

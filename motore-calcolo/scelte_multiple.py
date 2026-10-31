@@ -41,6 +41,10 @@ from collections import defaultdict
 NUTRIENTI = ["kcal_100g", "proteine_g", "carboidrati_g", "grassi_g", "fibra_g",
              "calcio_mg", "ferro_mg", "vitamina_d_ug", "folati_ug",
              "vitamina_b12_ug", "zinco_mg", "magnesio_mg", "vitamina_c_mg"]
+# campi del file affiancato lipidi.csv (31/10/2026): entrano nelle giornate
+# componibili perche' i riferimenti (saturi, colesterolo) si valutano su quelle
+from lipidi import CAMPI as _CAMPI_LIPIDI
+NUTRIENTI = NUTRIENTI + list(_CAMPI_LIPIDI)
 
 
 def carica_piano_esteso(path):

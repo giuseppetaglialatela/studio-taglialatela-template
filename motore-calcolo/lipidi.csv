@@ -1,0 +1,159 @@
+food_id,saturi_g,monoinsaturi_g,polinsaturi_g,epa_g,dha_g,colesterolo_mg,fonte,codice_fonte,origine_dato,metodo,data_verifica
+106500,0.25,0.19,0.23,0,0,60,BDA-IEO,8689_2,analitico,stesso alimento in BDA (decisione del nutrizionista 31/10/2026); grassi coincidenti (0.8 g),2026-10-31
+000800,0.19,0.14,0.61,0,0,0,BDA-IEO,50_2,analitico,stesso alimento in BDA (decisione del nutrizionista 31/10/2026); grassi coincidenti (1.2 g),2026-10-31
+004210,0.12,0.048,0.288,0,0,0,BDA-IEO,100139_1,analitico,"proporzione dalla scheda BDA (decisione del nutrizionista 31/10/2026); grassi diversi (0.6 contro 0.5 della scheda): acidi grassi in proporzione ai grassi di alimenti.csv (fattore 1.200), colesterolo invariato; EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).",2026-10-31
+008540,4.59,39.44,10.85,0,0,0,BDA-IEO,8808_2,analitico,stesso alimento in BDA (decisione del nutrizionista 31/10/2026); grassi coincidenti (55.3 g),2026-10-31
+000550,0.27,0.26,0.51,0,0,0,BDA-IEO,33_2,calcolato da BDA su alimento simile,stesso alimento in BDA (decisione del nutrizionista 31/10/2026); grassi coincidenti (1.3 g),2026-10-31
+100015,4.242,2.254,0.195,0,0,24,BDA-IEO,100015_2,calcolato da BDA su alimento simile,scheda BDA dichiarata in codice_fonte; grassi coincidenti (7.1 g),2026-10-31
+391,0.03,0.03,0.08,0,0,0,BDA-IEO,391_1,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.2 g); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
+8807,0,0,0,0,0,0,BDA-IEO,8807_2,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0 g),2026-10-31
+1631,0.95,0.38,0.05,0,0,8,BDA-IEO,1631_2,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (1.7 g),2026-10-31
+60091,0.32,0.27,0.85,0,0,0,BDA-IEO,60091_2,calcolato da BDA su alimento simile,scheda BDA dichiarata in codice_fonte; grassi coincidenti (2.2 g),2026-10-31
+4005,0.3086,0.6661,1.3176,0,0,0,BDA-IEO,201_1,analitico,"proporzione dalla scheda BDA (decisione del nutrizionista 31/10/2026); grassi diversi (2.4 contro 4.9 della scheda): acidi grassi in proporzione ai grassi di alimenti.csv (fattore 0.490), colesterolo invariato; EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).",2026-10-31
+345,0.07,0.05,0.42,0,0,0,BDA-IEO,345_1,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.7 g); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
+1313,0.06,0.07,0.12,0.03,0.08,50,BDA-IEO,1313_2,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.3 g),2026-10-31
+381,0.03,0.01,0.01,0,0,0,BDA-IEO,381_1,calcolato da BDA sullo stesso alimento,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.1 g); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
+101,0.02,0,0.06,0,0,0,BDA-IEO,101_1,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.1 g); tracce lette come 0 (mono); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
+702901,14.46,72.95,7.52,0,0,0,BDA-IEO,702901_2,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (99.9 g),2026-10-31
+1800,3.17,2.58,1.26,0,0,371,BDA-IEO,1800_2,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (8.7 g),2026-10-31
+600009,1.42,2.46,3,0,0,0,BDA-IEO,600009_2,calcolato da BDA su alimento simile,scheda BDA dichiarata in codice_fonte; grassi coincidenti (6.9 g),2026-10-31
+1726,18.54,8.81,0.79,0,0,91,BDA-IEO,1726_2,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (28.1 g),2026-10-31
+500010,0.35,0.63,0.59,0,0,0,BDA-IEO,500010_2,calcolato da BDA su alimento simile,scheda BDA dichiarata in codice_fonte; grassi coincidenti (1.9 g),2026-10-31
+8603,0.41,0.45,1.26,0,0,0,BDA-IEO,8603_2,valori di un alimento simile (BDA),scheda BDA dichiarata in codice_fonte; grassi coincidenti (2.4 g),2026-10-31
+700405,2.97,4.6,3.05,0.89,1.19,35,BDA-IEO,700405_2,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (12 g),2026-10-31
+1325,3.35,1.51,3.2,0.8,2.15,70,BDA-IEO,1325_2,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (8.1 g),2026-10-31
+1321,2.61,4.13,2.46,0.73,1.26,95,BDA-IEO,1321_2,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (11.1 g),2026-10-31
+8734,1.94,2.78,2.21,0.46,0.95,68,BDA-IEO,8734_2,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (8.4 g),2026-10-31
+1309,0.09,0.128,0.193,0.09,0.065,150,BDA-IEO,1309_2,calcolato da BDA su alimento simile,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.6 g),2026-10-31
+349,0.02,0.01,0.04,0,0,0,BDA-IEO,349_1,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.1 g); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
+336,0.05,0.02,0.16,0,0,0,BDA-IEO,336_1,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.3 g); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
+334,0.02,0.01,0.04,0,0,0,BDA-IEO,334_1,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.1 g); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
+331,0.05,0.01,0.21,0,0,0,BDA-IEO,331_1,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.4 g); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
+312,0,0,0,0,0,0,BDA-IEO,312_1,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0 g); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
+700169,0.09,0.05,0.32,0,0,0,BDA-IEO,700169_1,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.7 g); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
+406,0.11,0.04,0.09,0,0,0,BDA-IEO,406_2,calcolato da BDA su alimento simile,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.3 g),2026-10-31
+510,5.57,9.54,40.66,0,0,0,BDA-IEO,510_2,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (68.1 g),2026-10-31
+4505,0.0544,0.0672,0.1872,0,0,0,BDA-IEO,204_1,analitico,"proporzione dalla scheda BDA (decisione del nutrizionista 31/10/2026); grassi diversi (0.4 contro 2.5 della scheda): acidi grassi in proporzione ai grassi di alimenti.csv (fattore 0.160), colesterolo invariato; EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).",2026-10-31
+1718,11.429,5.958,0.65,0,0,46,BDA-IEO,1718_2,calcolato da BDA su alimento simile,scheda BDA dichiarata in codice_fonte; grassi coincidenti (19.5 g),2026-10-31
+11793,6.82,2.76,0.39,0,0,50,BDA-IEO,11793_2,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (10.9 g),2026-10-31
+8697,0.38,0.31,0.34,,0.03,50,BDA-IEO,8697_2,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (1.2 g); EPA/DHA assenti dalla scheda: dato mancante (gap).,2026-10-31
+8520,0.786,0.776,0.486,0.048,0.028,61.2,BDA-IEO,8520_2,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (2.38 g),2026-10-31
+592,3.51,17.52,2.81,0,0,0,BDA-IEO,592_1,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (25.1 g); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
+8053,4.83,1.96,0.303,0,0,15,BDA-IEO,8053_2,calcolato da BDA su alimento simile,scheda BDA dichiarata in codice_fonte; grassi coincidenti (9.1 g),2026-10-31
+1515,0.1,0.05,0.1,0,0.05,63,BDA-IEO,1515_2,calcolato da BDA sullo stesso alimento,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.3 g),2026-10-31
+135020,0.89,0.47,0.08,0,0,7,BDA-IEO,1603_2,analitico,stesso alimento in BDA (decisione del nutrizionista 31/10/2026); grassi coincidenti (1.5 g),2026-10-31
+701307,3.32,5.4,7.69,0,0,15,BDA-IEO,701307_2,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (17.5 g),2026-10-31
+304,0.05,0.01,0.09,0,0,0,BDA-IEO,304_1,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.2 g); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
+30097,0.32,0.68,0.41,0,0,0,BDA-IEO,30097_2,calcolato da BDA su alimento simile,scheda BDA dichiarata in codice_fonte; grassi coincidenti (1.7 g),2026-10-31
+8077,0.69,1.25,1.2,0,0,0,BDA-IEO,8077_2,calcolato da BDA su alimento simile,scheda BDA dichiarata in codice_fonte; grassi coincidenti (3.4 g),2026-10-31
+347,0.05,0.01,0.01,0,0,0,BDA-IEO,347_1,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.1 g); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
+103,0.08,0.06,0.02,0,0,0,BDA-IEO,103_1,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.2 g); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
+411,0.02,0.057,0.207,0,0,0,BDA-IEO,411_2,calcolato da BDA sullo stesso alimento,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.4 g),2026-10-31
+421,0.054,0.003,0.085,0,0,0,BDA-IEO,421_2,calcolato da BDA sullo stesso alimento,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.2 g),2026-10-31
+428,0.034,0.004,0.03,0,0,0,BDA-IEO,428_2,calcolato da BDA sullo stesso alimento,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.1 g),2026-10-31
+407,0.019,0.024,0.026,0,0,0,BDA-IEO,407_2,calcolato da BDA su alimento simile,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.1 g),2026-10-31
+427,0.006,0.048,0.016,0,0,0,BDA-IEO,427_2,calcolato da BDA sullo stesso alimento,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.1 g),2026-10-31
+401,0.007,0.044,0.02,0,0,0,BDA-IEO,401_2,calcolato da BDA sullo stesso alimento,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.1 g),2026-10-31
+429,0.033,0.054,0.331,0,0,0,BDA-IEO,429_2,calcolato da BDA sullo stesso alimento,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.6 g),2026-10-31
+700607,5.61,36.47,10.66,0,0,0,BDA-IEO,700607_2,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (56.1 g),2026-10-31
+511,4.16,38.6,5.2,0,0,0,BDA-IEO,511_2,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (64.1 g),2026-10-31
+324,0,0,0,0,0,0,BDA-IEO,324_1,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0 g); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
+318,0.17,0.01,0.23,0,0,0,BDA-IEO,318_1,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.5 g); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
+999692,2.48,18.33,1.45,0,0,0,BDA-IEO,999692_2,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (23 g),2026-10-31
+8711,1.51,2.05,0.57,0,0,66,BDA-IEO,8711_2,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (4.6 g),2026-10-31
+100030,16.235,8.464,0.923,0,0,90,BDA-IEO,100030_2,calcolato da BDA su alimento simile,scheda BDA dichiarata in codice_fonte; grassi coincidenti (27.7 g),2026-10-31
+339,0.02,0,0.05,0,0,0,BDA-IEO,339_1,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.1 g); tracce lette come 0 (mono); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
+100061,0.75,1.08,0.39,0.1,0.01,67,BDA-IEO,100061_2,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (2.6 g),2026-10-31
+805080,14.187,4.388,0.561,0,0,70,BDA-IEO,805080_2,calcolato da BDA su alimento simile,scheda BDA dichiarata in codice_fonte; grassi coincidenti (20.2 g),2026-10-31
+329,0.1,0.01,0.22,0,0,0,BDA-IEO,329_1,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.4 g); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
+3009,0.59,0.88,2.14,0,0,0,BDA-IEO,3009_2,calcolato da BDA su alimento simile,scheda BDA dichiarata in codice_fonte; grassi coincidenti (4.2 g),2026-10-31
+50399,0.06,0.01,0.132,0,0,0,BDA-IEO,50399_1,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.3 g); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
+888013,0.22,0.11,0.44,0,0,0,BDA-IEO,888013_2,calcolato da BDA su alimento simile,scheda BDA dichiarata in codice_fonte; grassi coincidenti (1.1 g),2026-10-31
+309,0.06,0.03,0.19,0,0,0,BDA-IEO,309_1,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.4 g); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
+500021,0.017,0.028,0.088,0,0,0,BDA-IEO,500021_2,calcolato da BDA sullo stesso alimento,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.2 g),2026-10-31
+1510,2.265,4.182,3.311,0.871,1.394,35,BDA-IEO,1510_2,calcolato da BDA su alimento simile,scheda BDA dichiarata in codice_fonte; grassi coincidenti (11.5 g),2026-10-31
+123200,0.35,0.3,0.4,0.09,0.2,48,BDA-IEO,1323_2,analitico,stesso alimento in BDA (decisione del nutrizionista 31/10/2026); grassi coincidenti (1.5 g),2026-10-31
+7290,0,0,0,0,0,0,decisione nutrizionista,,zero per decisione,acidi grassi a zero per decisione del nutrizionista 31/10/2026 (grassi trascurabili); colesterolo zero biologico (alimento vegetale),2026-10-31
+7260,0,0,0,0,0,0,decisione nutrizionista,,zero per decisione,acidi grassi a zero per decisione del nutrizionista 31/10/2026 (grassi trascurabili); colesterolo zero biologico (alimento vegetale),2026-10-31
+7040,0,0,0,0,0,0,BDA-IEO,408_2,analitico,stesso alimento in BDA (decisione del nutrizionista 31/10/2026); grassi coincidenti (0 g),2026-10-31
+5080,0.02,0.02,0.04,0,0,0,BDA-IEO,307_1,analitico,stesso alimento in BDA (decisione del nutrizionista 31/10/2026); grassi coincidenti (0.1 g); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
+127150,0.42,0.2,0.4,0.18,0.22,72,BDA-IEO,1316_2,analitico,stesso alimento in BDA (decisione del nutrizionista 31/10/2026); grassi coincidenti (1 g),2026-10-31
+105210,2.23,2.38,1.82,0,0,61,BDA-IEO,8670_2,analitico,stesso alimento in BDA (decisione del nutrizionista 31/10/2026); grassi coincidenti (7 g),2026-10-31
+3020,0.09,0.2,0.42,0,0,0,BDA-IEO,19_2,calcolato da BDA su alimento simile,stesso alimento in BDA (decisione del nutrizionista 31/10/2026); grassi coincidenti (0.8 g),2026-10-31
+1721,17.344,7.943,0.601,0,0,104,BDA-IEO,1721_2,calcolato da BDA su alimento simile,scheda BDA dichiarata in codice_fonte; grassi coincidenti (32 g),2026-10-31
+409,0.04,0.044,0.096,0,0,0,BDA-IEO,409_2,calcolato da BDA sullo stesso alimento,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.2 g),2026-10-31
+9007,1.527,1.811,0.733,0.012,0,62,BDA-IEO,9007_2,calcolato da BDA su alimento simile,scheda BDA dichiarata in codice_fonte; grassi coincidenti (4.4 g),2026-10-31
+11796,,,,,,56,BDA-IEO,11796_2,calcolato da BDA sullo stesso alimento,"scheda BDA dichiarata in codice_fonte; grassi coincidenti (24.4 g); EPA/DHA assenti dalla scheda: dato mancante (gap).; acidi grassi della scheda NON usati: incoerenti con i grassi totali (somma 7,3 g su 24,4), dato mancante in attesa di decisione",2026-10-31
+323,0.02,0.01,0.04,0,0,0,BDA-IEO,323_1,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.1 g); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
+343,0.05,0.04,0.1,0,0,0,BDA-IEO,343_1,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.2 g); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
+392,0.07,0.08,0.21,0,0,0,BDA-IEO,392_1,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.5 g); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
+21792,18.519,9.869,0.839,0,0,90,BDA-IEO,21792_2,calcolato da BDA su alimento simile,scheda BDA dichiarata in codice_fonte; grassi coincidenti (31 g),2026-10-31
+889001,0.93,2.14,4.37,0,0.07,0,BDA-IEO,889001_2,calcolato da BDA su alimento simile,scheda BDA dichiarata in codice_fonte; grassi coincidenti (8.1 g),2026-10-31
+777010,0.01,0.01,0.01,0,0,0,BDA-IEO,777010_1,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.1 g); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
+700832,0.19,0.17,0.55,0.14,0.15,67,BDA-IEO,700832_2,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (2 g),2026-10-31
+101520,1.0437,1.2597,0.1797,0.0009,0,55,USDA,USDA173826,analitico USDA,"USDA 173826 Veal, loin, separable lean only, raw (lombata: USDA non ha il filetto di vitello); acidi grassi in proporzione ai grassi di alimenti.csv (fattore 0.931); colesterolo invariato; decisione del nutrizionista 31/10/2026",2026-10-31
+115800,1.749,2.077,0.244,0,0,95,BDA-IEO,1209_2,calcolato da BDA su alimento simile,stesso alimento in BDA (decisione del nutrizionista 31/10/2026); grassi coincidenti (5 g),2026-10-31
+127120,0.52,0.63,0.58,0.27,0.11,121,BDA-IEO,1307_2,analitico,stesso alimento in BDA (decisione del nutrizionista 31/10/2026); grassi coincidenti (2.7 g),2026-10-31
+005000,0.1467,0.0133,0.4,0,0,0,BDA-IEO,301_1,analitico,"proporzione dalla scheda BDA (decisione del nutrizionista 31/10/2026); grassi diversi (0.8 contro 0.6 della scheda): acidi grassi in proporzione ai grassi di alimenti.csv (fattore 1.333), colesterolo invariato; EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).",2026-10-31
+005160,0.03,0.01,0.08,0,0,0,BDA-IEO,313_1,analitico,stesso alimento in BDA (decisione del nutrizionista 31/10/2026); grassi coincidenti (0.2 g); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
+005300,0.02,0.01,0.03,0,0,0,BDA-IEO,322_1,analitico,stesso alimento in BDA (decisione del nutrizionista 31/10/2026); grassi coincidenti (0.1 g); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
+008030,0,0,0,0,0,0,BDA-IEO,413_2,analitico,stesso alimento in BDA (decisione del nutrizionista 31/10/2026); grassi coincidenti (0 g),2026-10-31
+210010,0,0,0,0,0,0,BDA-IEO,2017_2,analitico,stesso alimento in BDA (decisione del nutrizionista 31/10/2026); grassi coincidenti (0 g),2026-10-31
+100154_2,0.04,0.04,0.15,0,0,0,BDA-IEO,100154_2,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.4 g),2026-10-31
+000100,0.1,0.13,0.18,0,0,0,BDA-IEO,5_2,analitico,stesso alimento in BDA (decisione del nutrizionista 31/10/2026); grassi coincidenti (0.4 g),2026-10-31
+004125,0.08,0.0304,0.192,0,0,0,BDA-IEO,202_1,analitico,"proporzione dalla scheda BDA (decisione del nutrizionista 31/10/2026); grassi diversi (0.4 contro 2.5 della scheda): acidi grassi in proporzione ai grassi di alimenti.csv (fattore 0.160), colesterolo invariato; EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).",2026-10-31
+004425,0.2167,0.26,0.546,0,0,0,BDA-IEO,203_1,analitico,"scheda BDA dichiarata in codice_fonte; grassi diversi (1.3 contro 3 della scheda): acidi grassi in proporzione ai grassi di alimenti.csv (fattore 0.433), colesterolo invariato; EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).",2026-10-31
+005120,0.05,0.01,0.08,0,0,0,BDA-IEO,310_1,analitico,stesso alimento in BDA (decisione del nutrizionista 31/10/2026); grassi coincidenti (0.2 g); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
+005650,0.01,0,0.05,0,0,0,BDA-IEO,337_1,analitico,stesso alimento in BDA (decisione del nutrizionista 31/10/2026); grassi coincidenti (0.1 g); tracce lette come 0 (mono); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
+005060,0,0,0,0,0,0,BDA-IEO,306_1,analitico,stesso alimento in BDA (decisione del nutrizionista 31/10/2026); grassi coincidenti (0 g); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
+008000,0.025,0.038,0.042,0,0,0,BDA-IEO,404_2,calcolato da BDA sullo stesso alimento,stesso alimento in BDA (decisione del nutrizionista 31/10/2026); grassi coincidenti (0.2 g),2026-10-31
+008060,0.038,0.058,0.063,0,0,0,BDA-IEO,417_2,calcolato da BDA su alimento simile,stesso alimento in BDA (decisione del nutrizionista 31/10/2026); grassi coincidenti (0.3 g),2026-10-31
+008820,2.1,10.47,1.68,0,0,0,BDA-IEO,590_1,analitico,stesso alimento in BDA (decisione del nutrizionista 31/10/2026); grassi coincidenti (15 g); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
+150010,2.07,0.84,0.13,0,0,11,BDA-IEO,1630_2,analitico,stesso alimento in BDA (decisione del nutrizionista 31/10/2026); grassi coincidenti (3.9 g),2026-10-31
+166810,7.36,2.5,0.68,0,0,56,BDA-IEO,1723_2,analitico,stesso alimento in BDA (decisione del nutrizionista 31/10/2026); grassi coincidenti (11.5 g),2026-10-31
+000130,0.13,0.16,0.23,0,0,0,BDA-IEO,8075_2,calcolato da BDA su alimento simile,stesso alimento in BDA (decisione del nutrizionista 31/10/2026); grassi coincidenti (1.9 g),2026-10-31
+1322,0.219,0.328,0.959,0.267,0.389,25,BDA-IEO,1322_2,calcolato da BDA su alimento simile,scheda BDA dichiarata in codice_fonte; grassi coincidenti (1.7 g),2026-10-31
+1300,1.3,0.4,0.85,0.27,0.52,61,BDA-IEO,1300_2,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (2.6 g),2026-10-31
+1304,0.85,0.45,0.4,0.31,0.09,64,BDA-IEO,1304_2,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (1.7 g),2026-10-31
+1307,0.52,0.63,0.58,0.27,0.11,121,BDA-IEO,1307_2,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (2.7 g),2026-10-31
+1328,0.242,0.206,0.722,0.18,0.18,50,BDA-IEO,1328_2,calcolato da BDA su alimento simile,scheda BDA dichiarata in codice_fonte; grassi coincidenti (2.5 g),2026-10-31
+1320,0.429,0.214,0.429,0.214,0.214,64,BDA-IEO,1320_2,calcolato da BDA sullo stesso alimento,scheda BDA dichiarata in codice_fonte; grassi coincidenti (1.5 g),2026-10-31
+122410,0.777,1.8,1.268,0.205,0.532,35,BDA-IEO,700407_2,calcolato da BDA su alimento simile,scheda BDA dichiarata in codice_fonte; grassi coincidenti (4.5 g),2026-10-31
+203020,20.59,11.08,1.41,0,0,0,BDA-IEO,2005_2,analitico,stesso alimento in BDA (decisione del nutrizionista 31/10/2026); grassi coincidenti (33.6 g),2026-10-31
+100110_2,1.149,1.623,0.964,0.115,0.555,70,BDA-IEO,100110_2,calcolato da BDA sullo stesso alimento,scheda BDA dichiarata in codice_fonte; grassi coincidenti (4.2 g),2026-10-31
+122900,0.09,0.078,0.125,0.011,0.086,67,BDA-IEO,8739_2,calcolato da BDA su alimento simile,stesso alimento in BDA (decisione del nutrizionista 31/10/2026); grassi coincidenti (0.4 g),2026-10-31
+004010,0.2957,0.6407,1.265,0,0,0,BDA-IEO,700082_1,analitico,"proporzione dalla scheda BDA (decisione del nutrizionista 31/10/2026); grassi diversi (2.3 contro 1.4 della scheda): acidi grassi in proporzione ai grassi di alimenti.csv (fattore 1.643), colesterolo invariato; EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).",2026-10-31
+182010,0,0,0,0,0,0,BDA-IEO,1801_2,analitico,"scheda BDA dell'albume (tracce = 0, coerente con la decisione del nutrizionista 31/10/2026); grassi coincidenti (0.05 g); tracce lette come 0 (sat, mono, poli)",2026-10-31
+152000,0.503,0.201,0.026,0,0,2,BDA-IEO,1632_2,calcolato da BDA su alimento simile,stesso alimento in BDA (decisione del nutrizionista 31/10/2026); grassi coincidenti (0.9 g),2026-10-31
+000070,0.2,0.3,0.57,0,0,0,BDA-IEO,9039_2,calcolato da BDA su alimento simile,scheda BDA dichiarata in codice_fonte; grassi coincidenti (1.3 g),2026-10-31
+009010,10.62,27.21,13.45,0,0,0,BDA-IEO,606010_2,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (53.7 g),2026-10-31
+000200,1.46,2.53,3.09,0,0,0,BDA-IEO,9_2,valori di un alimento simile (BDA),scheda BDA dichiarata in codice_fonte; grassi coincidenti (7.1 g),2026-10-31
+135030,0.14,0.05,0.01,0,0,2,BDA-IEO,1604_2,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.2 g),2026-10-31
+001500,0.83,1.47,2.4,0,0,0,BDA-IEO,73_2,calcolato da BDA su alimento simile,scheda BDA dichiarata in codice_fonte; grassi coincidenti (6 g),2026-10-31
+106410,1.08,1.06,0.98,0.02,0.05,88,BDA-IEO,8686_2,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (3.7 g),2026-10-31
+101170,1.67,1.63,0.99,0.11,0.05,60,BDA-IEO,8655_2,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (5 g),2026-10-31
+150030,0,0,0,0,0,5,decisione nutrizionista+USDA,USDA170894,zero per decisione; colesterolo analitico USDA,"acidi grassi a zero per decisione del nutrizionista 31/10/2026 (grassi 0 in alimenti.csv); colesterolo da USDA 170894 Yogurt, Greek, plain, nonfat",2026-10-31
+170510,8.499,4.431,0.483,0,0,42,BDA-IEO,8054_2,calcolato da BDA su alimento simile,scheda BDA dichiarata in codice_fonte; grassi coincidenti (14.5 g),2026-10-31
+008610,8.165,24.964,8.23,0,0,0,BDA-IEO,8802_2,calcolato da BDA su alimento simile,scheda BDA dichiarata in codice_fonte; grassi coincidenti (46 g),2026-10-31
+183010,9.82,8.29,4.63,0,0,1337,BDA-IEO,1802_2,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (29.1 g),2026-10-31
+000090,0.36,0.19,0.85,0,0,0,BDA-IEO,4_2,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (1.5 g),2026-10-31
+106856,0.43,0.37,0.38,,0.04,62,BDA-IEO,8698_2,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (1.4 g); EPA/DHA assenti dalla scheda: dato mancante (gap).,2026-10-31
+203500,9.17,16.51,5.3,0,0,2,BDA-IEO,2008_2,calcolato da BDA su alimento simile,scheda BDA dichiarata in codice_fonte; grassi coincidenti (32.4 g),2026-10-31
+000570,0.25,0.21,0.8,0,0,0,BDA-IEO,35_2,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (2.1 g),2026-10-31
+9600_1,3,5.3,21.2,0,0,0,BDA-IEO,9600_1,valore originario invariato (BDA),scheda BDA dichiarata in codice_fonte; grassi coincidenti (31 g); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
+101120,2.3026,2.275,1.4338,0.1382,0.0768,61.8,BDA-IEO,8522_2,analitico,"scheda BDA dichiarata in codice_fonte; grassi diversi (7 contro 4.56 della scheda): acidi grassi in proporzione ai grassi di alimenti.csv (fattore 1.535), colesterolo invariato",2026-10-31
+005090,0.07,0.02,0.12,0,0,0,BDA-IEO,308_1,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.3 g); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
+005465,0.075,0,0.135,0,0,0,BDA-IEO,100181_1,analitico,"scheda BDA dichiarata in codice_fonte; grassi diversi (0.3 contro 0.2 della scheda): acidi grassi in proporzione ai grassi di alimenti.csv (fattore 1.500), colesterolo invariato; tracce lette come 0 (mono); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).",2026-10-31
+005240,0.05,0,0.09,0,0,0,BDA-IEO,319_1,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.2 g); tracce lette come 0 (mono); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
+005230,0.02,0,0.04,0,0,0,BDA-IEO,320_1,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.1 g); tracce lette come 0 (mono); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
+005180,0.05,0.02,0.14,0,0,0,BDA-IEO,314_1,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.3 g); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
+005200,0.01,0.01,0.05,0,0,0,BDA-IEO,316_1,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.1 g); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
+005190,0.03,0.01,0.1,0,0,0,BDA-IEO,317_1,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.2 g); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
+005170,0.1,0.04,0.26,0,0,0,BDA-IEO,315_1,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.5 g); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
+005400,0.07,0.01,0.13,0,0,0,BDA-IEO,330_1,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.3 g); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
+005250,0.07,0.01,0.13,0,0,0,BDA-IEO,321_1,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.3 g); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
+100171_1,0.12,0.01,0.22,0,0,0,BDA-IEO,100171_1,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.5 g); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
+19072_1,0.05,0.01,0.21,0,0,0,BDA-IEO,19072_1,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.4 g); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
+005140,0.01,0.02,0.04,0,0,0,BDA-IEO,311_1,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.1 g); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
+005690,0.03,0.02,0.05,0,0,0,BDA-IEO,344_1,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.1 g); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
+006800,0.05,0.12,0.51,0,0,0,BDA-IEO,8001_1,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.8 g); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31

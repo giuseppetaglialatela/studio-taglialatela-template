@@ -28,6 +28,8 @@ COME FUNZIONA
   «sostituisce» (popolazioni, es. over65) sostituiscono il generale comunque.
 - Parametri calcolati dal motore: verificati sulla MEDIA SETTIMANALE (principio 8),
   nella settimana reale peggiore. Gli altri: dichiarati «non verificabili».
+  Dal 31/10/2026 anche saturi (% dell'energia, 9 kcal/g) e colesterolo, dal file
+  affiancato lipidi.csv; dato mancante = totale sottostimato (gap.csv).
 - Avviso, mai blocco (decisione del 30/10/2026).
 - Evidenze nuove: si aggiunge la riga nuova «attivo» e la vecchia diventa
   «superato» con sostituito_da; niente si cancella. Una riga «da_verificare» non
@@ -76,9 +78,9 @@ PARAMETRI = {
     "proteine_pct": ("pct_energia", "proteine", ("pct", "proteine_g", 4)),
     "carboidrati_pct": ("pct_energia", "carboidrati", ("pct", "carboidrati_g", 4)),
     "grassi_pct": ("pct_energia", "grassi totali", ("pct", "grassi_g", 9)),
-    "saturi_pct": ("pct_energia", "acidi grassi saturi", None),
+    "saturi_pct": ("pct_energia", "acidi grassi saturi", ("pct", "saturi_g", 9)),
     "trans_pct": ("pct_energia", "acidi grassi trans", None),
-    "colesterolo_mg": ("mg_die", "colesterolo alimentare", None),
+    "colesterolo_mg": ("mg_die", "colesterolo alimentare", ("somma", "colesterolo_mg")),
     "fibra_solubile_g": ("g_die", "fibra solubile", None),
     "zuccheri_totali_pct": ("pct_energia", "zuccheri totali", None),
     "zuccheri_aggiunti_pct": ("pct_energia", "zuccheri aggiunti", None),
@@ -301,9 +303,15 @@ def valuta(limiti, combos_per_giorno):
             else:
                 if sett is None:
                     sett = mod_comb.estremi_settimana(combos_per_giorno)
-                if calcolo[1] not in sett["macro"]:
-                    continue
-                (lo, ilo), (hi, ihi) = sett["macro"][calcolo[1]]
+                if calcolo[1] in sett["macro"]:
+                    (lo, ilo), (hi, ihi) = sett["macro"][calcolo[1]]
+                else:
+                    # saturi e altri campi in % dell'energia (lipidi.csv, 31/10/2026)
+                    est = mod_comb.estremi_pct_settimana(combos_per_giorno, calcolo[1],
+                                                         calcolo[2])
+                    if est is None:
+                        continue
+                    (lo, ilo), (hi, ihi) = est
             valore, indici = (lo, ilo) if s == "min" else (hi, ihi)
             ok = valore >= soglia - 1e-9 if s == "min" else valore <= soglia + 1e-9
             esiti.append(dict(parametro=par, lato=s, riga=r, soglia=soglia, verificabile=True,
@@ -460,16 +468,46 @@ def autotest():
     atteso("profilo senza righe segnalato", len(avv), 1)
 
     # valutazione settimanale: due giorni, il secondo con due giornate
-    def c(fibra, p, cc, g):
+    def c(fibra, p, cc, g, sat=0.0, col=0.0):
         k = 4 * p + 4 * cc + 9 * g
         return {"tot": {"kcal_100g": k, "proteine_g": p, "carboidrati_g": cc, "grassi_g": g,
-                        "fibra_g": fibra}, "scelte": ()}
+                        "fibra_g": fibra, "saturi_g": sat, "colesterolo_mg": col},
+                "scelte": ()}
     cp = [[c(30, 20, 50, 10)], [c(10, 20, 50, 10), c(40, 20, 50, 10)]]
     lim, _, _ = applicabili(reg, ["diabete_t2"])
     es = {(e["parametro"], e["lato"]): e for e in valuta(lim, cp)}
     atteso("fibra: media della settimana peggiore (30+10)/2 = 20", round(es[("fibra_g", "min")]["valore"], 6), 20.0)
     atteso("fibra 20 sotto 35: fuori", es[("fibra_g", "min")]["ok"], False)
-    atteso("saturi: non verificabile oggi", es[("saturi_pct", "max")]["verificabile"], False)
+    atteso("saturi: verificabile dal 31/10/2026 (lipidi.csv)",
+           es[("saturi_pct", "max")]["verificabile"], True)
+
+    # saturi < 7% (ipercolesterolemia) sulla settimana reale peggiore, con prova al
+    # contrario; colesterolo < 300 mg come somma
+    reg_l = [riga("L1", "ipercolesterolemia", "saturi_pct", mx="7"),
+             riga("L2", "ipercolesterolemia", "colesterolo_mg", mx="300"),
+             riga("L3", "generale", "saturi_pct", mx="10")]
+    k0 = 4 * 20 + 4 * 50 + 9 * 10              # 370 kcal per giornata di prova
+    s7 = 0.07 * k0 / 9                          # saturi che danno esattamente il 7%
+    cp_l = [[c(30, 20, 50, 10, sat=s7 * 0.8, col=200)],
+            [c(30, 20, 50, 10, sat=s7 * 0.9, col=250), c(30, 20, 50, 10, sat=s7 * 1.4, col=420)]]
+    lim, _, _ = applicabili(reg_l, ["ipercolesterolemia"])
+    es = {(e["parametro"], e["lato"]): e for e in valuta(lim, cp_l)}
+    atteso("saturi: settimana peggiore (0,8+1,4)/2 x 7% = 7,7%",
+           round(es[("saturi_pct", "max")]["valore"], 6), round(7 * 1.1, 6))
+    atteso("saturi 7,7% oltre 7%: fuori", es[("saturi_pct", "max")]["ok"], False)
+    atteso("saturi: la giornata peggiore e' quella scelta", es[("saturi_pct", "max")]["indici"],
+           [0, 1])
+    atteso("colesterolo: (200+420)/2 = 310 oltre 300", (round(es[("colesterolo_mg", "max")]
+           ["valore"], 6), es[("colesterolo_mg", "max")]["ok"]), (310.0, False))
+    cp_l2 = [[c(30, 20, 50, 10, sat=s7 * 0.8, col=200)],
+             [c(30, 20, 50, 10, sat=s7 * 0.9, col=250), c(30, 20, 50, 10, sat=s7 * 1.2, col=380)]]
+    es = {(e["parametro"], e["lato"]): e for e in valuta(lim, cp_l2)}
+    atteso("prova al contrario: saturi (0,8+1,2)/2 = 7,0% non oltre 7%",
+           es[("saturi_pct", "max")]["ok"], True)
+    atteso("prova al contrario: colesterolo 290 dentro", es[("colesterolo_mg", "max")]["ok"], True)
+    lim, _, _ = applicabili(reg_l, [])
+    atteso("senza profilo i saturi non si controllano", valuta(lim, cp_l), [])
+    lim, _, _ = applicabili(reg, ["diabete_t2"])
     cp_ok = [[c(36, 20, 50, 10)], [c(35, 20, 50, 10), c(40, 20, 50, 10)]]
     es = {(e["parametro"], e["lato"]): e for e in valuta(lim, cp_ok)}
     atteso("prova al contrario: fibra 35,5 dentro", es[("fibra_g", "min")]["ok"], True)

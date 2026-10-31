@@ -72,6 +72,7 @@ import struttura_pasti
 import interazioni as mod_interazioni
 import metadati_piano as mod_meta
 import riferimenti as mod_rif
+import lipidi as mod_lipidi
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 # Ordine dei pasti: da calcolatore.ordine_pasti (unica fonte, 30/09/2026).
@@ -203,7 +204,7 @@ def controlla_food_id(rilievi, piano, db, gap, eccezioni):
         return True
     usate = sorted({r["food_id"] for r in piano if r["food_id"] in eccezioni})
     for f in usate:
-        for nutriente in MICRONUTRIENTI_LARN:
+        for nutriente in list(MICRONUTRIENTI_LARN) + mod_lipidi.CAMPI:
             if not db[f].get(nutriente):
                 gap.setdefault(f, {}).setdefault(
                     nutriente, "eccezione etichetta: dato non dichiarato")
@@ -1324,6 +1325,46 @@ def controlla_metadati(rilievi, meta):
 # PASSO 7 - riferimenti clinici dei profili (30/10/2026)
 # --------------------------------------------------------------------------
 
+def mostra_lipidi(combos, sottostime):
+    """Saturi, colesterolo ed EPA+DHA (lipidi.csv, 31/10/2026): si MOSTRANO in
+    tutti i piani, per giorno e come media settimanale (minimo-massimo sulle
+    giornate realmente componibili). Nessun rilievo qui: gli avvisi li da' il
+    PASSO 7, solo per i profili che chiedono il parametro (regola del 31/10/2026)."""
+    print("\n  LIPIDI (informativo: gli avvisi solo nei profili che li chiedono, PASSO 7)")
+    giorni = sorted(combos, key=lambda g: (len(g), g))
+
+    def nota(*campi):
+        voci = sorted({f for c in campi for f, _ in sottostime.get(c, [])})
+        return f"  [SOTTOSTIMATO: gap su {', '.join(voci)}]" if voci else ""
+
+    def rng(a, b, fmt):
+        return fmt.format(a) if abs(a - b) < 1e-9 else fmt.format(a) + "-" + fmt.format(b)
+
+    print(f"    {'giorno':12} {'saturi g':>13} {'saturi %En':>13} {'colesterolo mg':>16} "
+          f"{'EPA+DHA mg':>13}")
+    for g in giorni:
+        cs = combos[g]
+        sg = [c["tot"]["saturi_g"] for c in cs]
+        sp = [c["tot"]["saturi_g"] * 9 * 100 / c["tot"]["kcal_100g"]
+              for c in cs if c["tot"]["kcal_100g"] > 0]
+        co = [c["tot"]["colesterolo_mg"] for c in cs]
+        ed = [(c["tot"]["epa_g"] + c["tot"]["dha_g"]) * 1000 for c in cs]
+        print(f"    {g:12} {rng(min(sg), max(sg), '{:.1f}'):>13} "
+              f"{(rng(min(sp), max(sp), '{:.1f}') if sp else '-'):>13} "
+              f"{rng(min(co), max(co), '{:.0f}'):>16} {rng(min(ed), max(ed), '{:.0f}'):>13}")
+    serie = [combos[g] for g in giorni]
+    n = len(serie)
+    est = mod_comb.estremi_pct_settimana(serie, "saturi_g", 9)
+    pct = rng(est[0][0], est[1][0], "{:.1f}") + "%" if est else "-"
+    co_lo = sum(min(c["tot"]["colesterolo_mg"] for c in g) for g in serie) / n
+    co_hi = sum(max(c["tot"]["colesterolo_mg"] for c in g) for g in serie) / n
+    ed_lo = sum(min((c["tot"]["epa_g"] + c["tot"]["dha_g"]) * 1000 for c in g) for g in serie) / n
+    ed_hi = sum(max((c["tot"]["epa_g"] + c["tot"]["dha_g"]) * 1000 for c in g) for g in serie) / n
+    print(f"    Media settimanale: saturi {pct} dell'energia{nota('saturi_g')}; "
+          f"colesterolo {rng(co_lo, co_hi, '{:.0f}')} mg/die{nota('colesterolo_mg')}; "
+          f"EPA+DHA {rng(ed_lo, ed_hi, '{:.0f}')} mg/die{nota('epa_g', 'dha_g')}")
+
+
 def controlla_riferimenti(rilievi, meta, combos, sottostime=None):
     """Riferimenti del registro (riferimenti.py) per i profili scelti dal
     nutrizionista nei metadati ("profili"). Gira solo se il campo c'e'; l'anteprima
@@ -1471,6 +1512,7 @@ def esegui(piano_p, target_p, gap_p=None, farmaci=None, interazioni=None, orari=
     verifica_settimanale(rilievi, dati_giorni, intervalli, target, combos)
     esito_calcio = passo_3_micronutrienti(rilievi, dati_giorni, intervalli, target,
                                           sottostime, db)
+    mostra_lipidi(combos, sottostime)
     passo_4_coerenza(rilievi, db, target, piano, gap, sottostime, righe_estese)
     passo_5_interazioni(rilievi, piano, db, farmaci, interazioni, orari,
                         nessuna_terapia, meta)

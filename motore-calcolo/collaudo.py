@@ -27,6 +27,10 @@ CONTROLLI:
      genera_zona_piano.py (verdetto, anteprima, impronta, segnaposto)
  11) Registro dei riferimenti clinici (30/10/2026): fonti complete, una riga
      attiva per profilo e parametro, RIFERIMENTI.md allineata, autotest
+ 12) Lipidi (31/10/2026): ogni food_id ha in lipidi.csv i sei valori (saturi,
+     mono, poli, EPA, DHA, colesterolo) oppure la riga corrispondente in gap.csv;
+     nessun valore con un gap dichiarato; nomi dei nutrienti di gap.csv validi;
+     acidi grassi non oltre i grassi totali; autotest
 
 NOTA SUL VALORE ATTESO (punto 2):
   EXPECTED_ALIMENTI_COUNT va aggiornato ogni volta che il database cresce
@@ -75,6 +79,7 @@ FILE_OPZIONALI = [
 FILE_DA_VERIFICARE = [
     "alimenti.csv",
     "gap.csv",
+    "lipidi.csv",
     "colazioni_spuntini.csv",
     "larn.csv",
     "formati_confezione.csv",
@@ -409,6 +414,37 @@ def controllo_11_riferimenti():
                   f"autotest {n_auto} prove superate")
 
 
+def controllo_12_lipidi():
+    """lipidi.csv (31/10/2026): copertura completa contro alimenti.csv, con gap.csv
+    come unica via per un dato mancante (cella vuota). Un gap su un nutriente che
+    non esiste non marca niente come sottostimato: si ferma anche quello."""
+    try:
+        sys.path.insert(0, BASE)
+        import lipidi
+        from calcolatore import carica_gap, NUTRIENTI_PER_100G
+        lip = lipidi.carica()
+        with open(os.path.join(BASE, "alimenti.csv"), newline="", encoding="utf-8") as f:
+            alimenti = list(csv.DictReader(f))
+        gap = carica_gap(os.path.join(BASE, "gap.csv"))
+        n_auto, ko = lipidi.autotest()
+    except Exception as e:
+        return False, f"lipidi non controllabili: {type(e).__name__}: {e}"
+    ids = [r["food_id"] for r in alimenti]
+    grassi = {r["food_id"]: float(r["grassi_g"]) for r in alimenti}
+    validi = set(NUTRIENTI_PER_100G) | set(lipidi.CAMPI)
+    problemi = lipidi.problemi(lip, ids, gap, grassi)
+    problemi += [f"gap.csv: {fid} {n} non e' un nutriente del motore"
+                 for fid, d in gap.items() for n in d if n not in validi]
+    problemi += [f"gap.csv: {fid} non e' in alimenti.csv" for fid in gap if fid not in grassi]
+    problemi += ko
+    if problemi:
+        return False, "; ".join(problemi[:6]) + (f" (+{len(problemi) - 6})"
+                                                 if len(problemi) > 6 else "")
+    n_gap = sum(1 for d in gap.values() for n in d if n in lipidi.CAMPI)
+    return True, (f"{len(lip)} voci su {len(ids)}, {n_gap} dati lipidici mancanti dichiarati "
+                  f"in gap.csv; autotest {n_auto} prove superate")
+
+
 def _file_da_firmare():
     """Elenco ordinato dei file coperti da SHA256SUMS, relativi a BASE.
 
@@ -605,6 +641,11 @@ def main():
 
     print("\n11) Registro dei riferimenti clinici (riferimenti.csv)")
     ok, dettaglio = controllo_11_riferimenti()
+    print(f"   [{'OK ' if ok else 'XX '}] {dettaglio}")
+    tutto_ok = tutto_ok and ok
+
+    print("\n12) Lipidi (lipidi.csv)")
+    ok, dettaglio = controllo_12_lipidi()
     print(f"   [{'OK ' if ok else 'XX '}] {dettaglio}")
     tutto_ok = tutto_ok and ok
 

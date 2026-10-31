@@ -2,7 +2,7 @@
 
 Modulo operativo: si carica quando si compone, si modifica o si valuta un piano.
 Dipende da **M1**: nessun passo è eseguibile senza il motore collaudato.
-Ultima modifica: 31/10/2026 (avvisi dei riferimenti solo per i profili scelti). 30/10/2026 sera (profili clinici e registro dei riferimenti all'apertura). 30/10/2026 (tappa 2: apertura con gli alimenti desiderati contro il database e
+Ultima modifica: 31/10/2026 pomeriggio (deroga INSA estesa ad acidi grassi e colesterolo; saturi e colesterolo nel report, sezione LIPIDI). 31/10/2026 (avvisi dei riferimenti solo per i profili scelti). 30/10/2026 sera (profili clinici e registro dei riferimenti all'apertura). 30/10/2026 (tappa 2: apertura con gli alimenti desiderati contro il database e
 le assunzioni da confermare; conferma dell'assenza di terapia nei metadati; PASSO 6 su un
 verdetto della pipeline senza bloccanti, anteprima consegnata come file; campi nuovi dei
 metadati). 23/10/2026: PASSO 6 con anteprima completa e impronta, metadati in bozza prima dell'approvazione, un giorno chiuso = una riga in chat; condimenti a porzione libera; `--nessuna-terapia`; 22/10:
@@ -46,7 +46,7 @@ sgocciolamento non tratte da CREA/BDA/USDA sono stime di mercato, non dati verif
 **Foto di una confezione:** serve solo per il formato in grammi e la variante (intero o
 scremato), che determina quale voce del database usare. I valori dell'etichetta NON
 entrano nel database. Deroghe alle tre fonti: INSA, voce per voce su decisione del
-nutrizionista e solo per i micronutrienti, mai per kcal e macro (M1, sezione 4); etichetta, SOLO su richiesta esplicita del nutrizionista e
+nutrizionista, per i micronutrienti e (dal 31/10/2026) per acidi grassi e colesterolo, mai per kcal e macro (M1, sezione 4); etichetta, SOLO su richiesta esplicita del nutrizionista e
 per il singolo piano, con `--eccezione-etichetta` (M1, sezione 4), mai in `alimenti.csv`.
 L'eccezione si dichiara nella tabella del PASSO 6.
 

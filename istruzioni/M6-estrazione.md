@@ -99,6 +99,15 @@ voce generica al posto di quella specifica, marcala come proxy e dichiarala.
   sotto un altro nome (sarda/sardina): due righe per lo stesso alimento non sono
   un duplicato di `food_id`, quindi nessun controllo automatico le vede, e chi
   compone un piano può prendere quella sbagliata.
+- **Lipidi (dal 31/10/2026).** Ogni voce nuova di `alimenti.csv` ha la sua riga in
+  `lipidi.csv` (saturi, mono, poli, EPA, DHA, colesterolo, con fonte, codice, origine e
+  metodo; M1 sezione 5) dalla stessa scheda BDA-IEO usata per la voce; se la scheda ha
+  grassi diversi da quelli di `alimenti.csv`, acidi grassi in proporzione ai grassi, metodo
+  scritto nella riga. Un valore che la fonte non dà resta vuoto e va in `gap.csv` (EPA/DHA
+  assenti: zero biologico solo per i vegetali). Prima di accettare una scheda controlla la
+  quota dei saturi sui grassi contro quella degli alimenti della stessa categoria: la
+  scheda BDA della mozzarella di bufala (4,9 g su 24,4) è incoerente e non è stata usata.
+  Senza riga in `lipidi.csv` e senza gap il controllo 12 del collaudo si ferma.
 - **Mai food_id inventati** (999xxx) né valori "di convenzione": ogni riga deve
   avere `codice_fonte` e `data_verifica` compilabili. Se non lo sono, l'alimento
   non entra — si usa un proxy dichiarato oppure si esclude.
@@ -123,7 +132,8 @@ errata, l'alimento va in `coerenza.ATWATER_FALSI_POSITIVI_NOTI` con il suo scart
 nuovo `--genera-checksums` e collaudo); quali righe sono
 state aggiunte a gap.csv. Poi salva con un commit (M1, sezione 1, «Come si salva una
 modifica»): `alimenti.csv`, `collaudo.py` (conteggio atteso), `nomi_paziente.csv`,
-`ruoli_alimenti.csv`, `coerenza.py` se è cambiato l'elenco dei falsi positivi, e
+`ruoli_alimenti.csv`, `lipidi.csv` (e `gap.csv` se serve), `coerenza.py` se è cambiato
+l'elenco dei falsi positivi, e
 `SHA256SUMS` vanno nello STESSO commit, altrimenti il collaudo
 fallisce alla sessione dopo.
 

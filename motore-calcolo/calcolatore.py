@@ -95,13 +95,20 @@ def entro_tolleranza(scarto, tolleranza=TOLLERANZA_PCT):
     return abs(scarto) <= tolleranza
 
 
-def carica_alimenti(path):
+def carica_alimenti(path, lipidi_path=None):
+    """Database alimenti. Ogni voce riceve anche i campi lipidici del file
+    affiancato lipidi.csv (31/10/2026), letto dalla stessa cartella: dato
+    mancante = 0 e totale sottostimato tramite gap.csv (vedi lipidi.py)."""
+    import lipidi as mod_lipidi
     db = {}
     with open(path, newline="", encoding="utf-8") as f:
         for row in csv.DictReader(f):
             fid = row["food_id"]
             db[fid] = {k: float(row[k]) for k in NUTRIENTI_PER_100G}
             db[fid]["nome"] = row["nome"]
+    if lipidi_path is None:
+        lipidi_path = os.path.join(os.path.dirname(os.path.abspath(path)), "lipidi.csv")
+    mod_lipidi.arricchisci(db, mod_lipidi.carica_se_presente(lipidi_path))
     return db
 
 
@@ -171,6 +178,10 @@ def carica_eccezioni_etichetta(path, db_ufficiale):
                              f"valori non plausibili per un'etichetta")
         valori["nome"] = row["nome"].strip()
         voci[fid] = valori
+    # lipidi: un'etichetta non li porta nello schema; valgono 0 e la pipeline
+    # li dichiara come gap (totali sottostimati)
+    import lipidi as mod_lipidi
+    mod_lipidi.arricchisci(voci, {})
     return voci
 
 

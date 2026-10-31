@@ -20,10 +20,14 @@
     ],
     [
       7,
+      "RIFERIMENTO_FUORI"
+    ],
+    [
+      7,
       "RIFERIMENTI_NON_VERIFICABILI"
     ]
   ],
   "exit_code": 0,
-  "descrizione": "Il caso 45 con il profilo ipercolesterolemia nei metadati. Media settimanale: carboidrati 35,6-43,4% dell'energia contro 45-55% (ESC/EAS 2019, R024) e fibra 20,4-24,2 g/die contro almeno 25 (ESC/EAS 2019, R022: uguale al LARN, a parita' si cita il profilo): due RIFERIMENTO_FUORI, avvisi. Saturi (<7%, R020), colesterolo, fibra solubile, zuccheri aggiunti e alcol, non calcolati (i soli parametri del profilo: sodio, potassio ed EPA+DHA del LARN non compaiono): un RIFERIMENTI_NON_VERIFICABILI. Nessun blocco nuovo (decisione del 30/10/2026: avviso). Diventa rosso se il profilo viene ignorato o se un riferimento diventa un blocco.",
-  "riferimento": "Costruito il 30/10/2026 (registro dei riferimenti) da caso_45_nessuna_terapia_dichiarata (stessi piano e target); attesi aggiunti a mano sui valori settimanali calcolati a parte."
+  "descrizione": "Il caso 45 con il profilo ipercolesterolemia nei metadati. Media settimanale: carboidrati 35,6-43,4% dell'energia contro 45-55% (ESC/EAS 2019, R024), fibra 20,4-24,2 g/die contro almeno 25 (ESC/EAS 2019, R022: uguale al LARN, a parita' si cita il profilo) e, dal 31/10/2026 (lipidi.csv), saturi 7,9-11,5% contro meno del 7% (R020): tre RIFERIMENTO_FUORI, avvisi. Colesterolo 106-154 mg/die contro 300 (R021): dentro. Fibra solubile, zuccheri aggiunti e alcol non calcolati (i soli parametri del profilo: sodio, potassio ed EPA+DHA del LARN non compaiono): un RIFERIMENTI_NON_VERIFICABILI. Nessun blocco nuovo (decisione del 30/10/2026: avviso). Diventa rosso se il profilo viene ignorato, se un riferimento diventa un blocco o se i saturi tornano non calcolati.",
+  "riferimento": "Costruito il 30/10/2026 (registro dei riferimenti) da caso_45_nessuna_terapia_dichiarata (stessi piano e target); attesi aggiunti a mano sui valori settimanali calcolati a parte. Aggiornato il 31/10/2026: saturi e colesterolo calcolati da lipidi.csv; saturi 11,5% (colazione A + spuntino B) ricalcolato a parte dai CSV, 17,93 g su 1403 kcal."
 }

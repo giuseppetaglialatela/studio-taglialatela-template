@@ -92,10 +92,14 @@
     ],
     [
       7,
+      "RIFERIMENTO_FUORI"
+    ],
+    [
+      7,
       "RIFERIMENTI_NON_VERIFICABILI"
     ]
   ],
   "exit_code": 0,
-  "descrizione": "Il caso 51 con il profilo diabete tipo 2. Fibra 23,0-32,1 g/die contro almeno 35 (EASD 2023, R050, piu' restrittivo dei 25 del LARN) e proteine 18,5-23,6% contro 10-20% (R054): due RIFERIMENTO_FUORI; saturi, trans, zuccheri liberi e gli altri: RIFERIMENTI_NON_VERIFICABILI. Il resto uguale al caso 51.",
-  "riferimento": "Costruito il 30/10/2026 (registro dei riferimenti) da caso_51_macro_scelte_giornate_reali (stessi piano e target); attesi aggiunti a mano sui valori settimanali calcolati a parte."
+  "descrizione": "Il caso 51 con il profilo diabete tipo 2. Fibra 23,0-32,1 g/die contro almeno 35 (EASD 2023, R050, piu' restrittivo dei 25 del LARN), proteine 18,5-23,6% contro 10-20% (R054) e, dal 31/10/2026 (lipidi.csv), saturi 4,7-10,7% contro meno del 10% (R052): tre RIFERIMENTO_FUORI; trans e zuccheri liberi: RIFERIMENTI_NON_VERIFICABILI. Il resto uguale al caso 51.",
+  "riferimento": "Costruito il 30/10/2026 (registro dei riferimenti) da caso_51_macro_scelte_giornate_reali (stessi piano e target); attesi aggiunti a mano sui valori settimanali calcolati a parte. Aggiornato il 31/10/2026: saturi calcolati da lipidi.csv (settimana peggiore 10,7%, colazione S2 + spuntino SPA + spuntino2 A)."
 }

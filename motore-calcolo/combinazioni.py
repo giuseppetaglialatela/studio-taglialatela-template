@@ -203,6 +203,17 @@ def estremi_settimana(combos_per_giorno):
     return out
 
 
+def estremi_pct_settimana(combos_per_giorno, campo, kc):
+    """Come estremi_settimana per un solo campo qualsiasi (es. saturi_g, 9 kcal/g):
+    ((pct_min, indici), (pct_max, indici)) della media settimanale, oppure None
+    se una giornata ha kcal nulle. Stesso metodo esatto (Dinkelbach)."""
+    coppie = [[(c["tot"][campo] * kc * 100, c["tot"]["kcal_100g"]) for c in g]
+              for g in combos_per_giorno]
+    if any(b <= 0 for g in coppie for _, b in g):
+        return None
+    return _dinkelbach(coppie, -1), _dinkelbach(coppie, +1)
+
+
 def descrivi_scelte(combo):
     """'colazione S2 + spuntino SPrA' (vuoto per un giorno senza scelte)."""
     return " + ".join(f"{pasto} {o}" for (pasto, _), o in combo["scelte"])
@@ -312,6 +323,14 @@ def autotest(n_casi=300, seme=20261029, verboso=False):
                 if verboso:
                     print(f"  caso {caso}, settimana, {campo}: esatto {lo:.6f}/{hi:.6f}, "
                           f"forza bruta {blo:.6f}/{bhi:.6f}")
+        # saturi in % dell'energia (riferimenti, 31/10/2026): stesso metodo esatto
+        blo, bhi = _forza_bruta_settimana(per_giorno, "saturi_g", 9)
+        (lo, _), (hi, _) = estremi_pct_settimana(per_giorno, "saturi_g", 9)
+        if abs(lo - blo) > 1e-9 or abs(hi - bhi) > 1e-9:
+            differenze += 1
+            if verboso:
+                print(f"  caso {caso}, settimana, saturi_g: esatto {lo:.6f}/{hi:.6f}, "
+                      f"forza bruta {blo:.6f}/{bhi:.6f}")
     return n_casi, differenze
 
 

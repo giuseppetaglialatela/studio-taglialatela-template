@@ -208,7 +208,10 @@ def esegui_caso_scelta_multipla(nome_caso):
     caso deve accorgersene."""
     from collections import defaultdict
     from calcolatore import carica_alimenti
-    from scelte_multiple import carica_piano_esteso, calcola_intervallo_giorno, NUTRIENTI
+    from scelte_multiple import carica_piano_esteso, calcola_intervallo_giorno
+    # i 13 nutrienti di alimenti.csv: i lipidi (31/10/2026) hanno casi propri,
+    # cosi' gli attesi dei casi a scelta restano quelli scritti allora
+    from calcolatore import NUTRIENTI_PER_100G as NUTRIENTI
 
     percorso = os.path.join(GOLDEN_DIR, nome_caso)
     db = carica_alimenti(os.path.join(BASE, "alimenti.csv"))

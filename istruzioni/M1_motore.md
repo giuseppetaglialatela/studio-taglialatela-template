@@ -1,7 +1,10 @@
 # M1 — MOTORE DI CALCOLO
 
 Modulo operativo (principio 6). Dipendenze: nessuna. Ne dipendono M2 e M6.
-Ultima modifica: 31/10/2026 (riferimenti: si controllano solo i parametri dei profili scelti).
+Ultima modifica: 31/10/2026 pomeriggio (file affiancato `lipidi.csv`: saturi, mono, poli,
+EPA, DHA, colesterolo; saturi e colesterolo calcolati nei riferimenti; sezione LIPIDI del
+report; controllo 12 del collaudo; casi 63-65). 31/10/2026 (riferimenti: si controllano solo
+i parametri dei profili scelti).
 30/10/2026 sera (registro dei riferimenti clinici per profilo: `riferimenti.csv`,
 `riferimenti.py`, `RIFERIMENTI.md`, PASSO 7 della pipeline, controllo 11 del collaudo, casi 58-62).
 30/10/2026 (tappa 2, disciplina nel codice: anteprima solo su un verdetto della
@@ -119,7 +122,7 @@ di lavoro, riscarica e ricollauda prima di fidarti dei numeri.
 ## 2. MODULI SOFTWARE
 
 ### collaudo.py — certificato di inizio sessione
-Undici controlli:
+Dodici controlli:
 1. presenza e integrità di tutti i CSV, incluso il numero di colonne per riga
    (`csv.DictReader` da solo NON lo segnala)
 2. righe di `alimenti.csv` contro `EXPECTED_ALIMENTI_COUNT`
@@ -151,6 +154,10 @@ Undici controlli:
    posizione, frase e data di verifica; una sola riga attiva per profilo e parametro;
    profili, parametri e unità noti; `RIFERIMENTI.md` identica a quella generata dal
    registro; autotest della regola del più restrittivo e della valutazione settimanale
+12. lipidi (`lipidi.csv`, 31/10/2026): ogni `food_id` di `alimenti.csv` ha i sei valori
+   oppure, per ogni valore che manca, la riga in `gap.csv`; nessun valore con un gap
+   dichiarato; ogni nutriente di `gap.csv` esiste nel motore; saturi + mono + poli non oltre
+   i grassi totali; autotest di `lipidi.py`
 
 Esce 0 (superato) o 1 (fallito). File opzionali (`cache.zip`, `BDA_alimenti.xlsx`,
 `crea_cache.zip`): se presenti si verificano come gli altri, se assenti il collaudo lo
@@ -586,11 +593,13 @@ memoria.
   termine di confronto: il profilo lo sostituisce solo se più restrittivo (24/10/2026), a
   parità si cita il profilo; tra più profili vale il più restrittivo; le righe con `regola =
   sostituisce` (popolazioni, es. `over65`) sostituiscono comunque.
-- Valutazione: sulla media settimanale della settimana reale peggiore (fibra come somma,
-  macro in % dell'energia con Dinkelbach). Calcolati oggi: fibra totale, proteine,
-  carboidrati, grassi; tutti gli altri (saturi, colesterolo, zuccheri, sodio, potassio,
-  EPA+DHA, alcol, fibra solubile) escono come non verificabili finché il dato non entra
-  nel database. Avviso, mai blocco (decisione del 30/10/2026).
+- Valutazione: sulla media settimanale della settimana reale peggiore (fibra e colesterolo
+  come somma, macro e saturi in % dell'energia con Dinkelbach). Calcolati: fibra totale,
+  proteine, carboidrati, grassi e, dal 31/10/2026 (`lipidi.csv`), saturi (9 kcal/g) e
+  colesterolo; gli altri (zuccheri, sodio, potassio, EPA+DHA, alcol, fibra solubile) escono
+  come non verificabili finché il dato non entra nel motore (EPA+DHA è in `lipidi.csv` ma
+  sta solo nel profilo generale, che non dà avvisi: resta da rendere calcolabile quando un
+  profilo lo chiederà). Avviso, mai blocco (decisione del 30/10/2026).
 - Evidenze nuove: riga nuova `attivo`, la vecchia `superato` con `sostituito_da`; niente
   si cancella; poi `python3 riferimenti.py --genera-pagina` (riscrive `RIFERIMENTI.md`,
   la pagina leggibile su GitHub), firme e commit. Il verdetto porta l'impronta del
@@ -750,6 +759,13 @@ validato).
 - **52_abbinamento_restringe_giornate** — il caso 06 con l'abbinamento dei metadati (S2 solo
   con SPrB): 7 giornate su 8, le attenzioni sui macro spariscono. `regressione.py` verifica
   a parte che `--metadati` arrivi dalla riga di comando.
+- **58, 60** (aggiornati il 31/10/2026) — con `lipidi.csv` i saturi diventano calcolati:
+  un RIFERIMENTO_FUORI in più (58: 11,5% contro 7%; 60: 10,7% contro 10%).
+- **63_saturi_oltre_7_ipercolesterolemia**, **64_saturi_sotto_7_prova_al_contrario** —
+  stesso piano di 2 giorni, parmigiano 24 g o 18 g: saturi 7,3% (avviso) o 6,6% (nessun
+  avviso), valori ricalcolati a parte sui CSV.
+- **65_saturi_alti_senza_profilo** — il piano del 63 con `"profili": []`: nessun avviso del
+  PASSO 7 (regola del 31/10/2026).
 
 **Tipi di caso.** `fisso` e `scelta_multipla` si deducono dal piano (presenza di
 `gruppo_scelta`). `pipeline` è l'unico DICHIARATO, da un `pipeline.json` nella cartella del
@@ -786,9 +802,11 @@ non è già presente. Oltre le 150 voci solo su richiesta esplicita del nutrizio
 **Eccezione INSA** (tabella nazionale portoghese, Base de Dados da Composição de Alimentos,
 INSA, v 7.1 – 2026; citazione della fonte obbligatoria per licenza). SOLO per decisione del
 nutrizionista, voce per voce, quando le tre fonti sono incoerenti tra loro e INSA ha la
-stessa specie e lo stesso stato (crudo/cotto). Mai per kcal e macro, che restano CREA. In
-`fonte` si scrive `INSA(...)`, in `codice_fonte` `INSA<cod>`. Righe in eccezione: 122800
-sardine (micronutrienti).
+stessa specie e lo stesso stato (crudo/cotto). Mai per kcal e macro, che restano CREA; dal
+31/10/2026 (decisione del nutrizionista) vale anche per acidi grassi e colesterolo di
+`lipidi.csv`, in proporzione ai grassi CREA della voce. In `fonte` si scrive `INSA(...)`,
+in `codice_fonte` `INSA<cod>`. Righe in eccezione: 122800 sardine (micronutrienti; acidi
+grassi e colesterolo in attesa della tabella INSA, oggi in `gap.csv`).
 
 **Eccezione etichetta — solo su richiesta esplicita del nutrizionista, mai nel database.**
 I valori di un'etichetta non entrano in `alimenti.csv`. Quando il nutrizionista lo chiede
@@ -841,6 +859,34 @@ nutrizionali precalcolati (principio 2): chi dichiara alimenti dichiara solo ing
 e i valori si ricalcolano da `alimenti.csv`.
 
 **gap.csv** — `food_id, nome, nutriente, motivo` (sezione 6).
+
+**lipidi.csv** (31/10/2026, decisioni del nutrizionista dello stesso giorno) — `food_id,
+saturi_g, monoinsaturi_g, polinsaturi_g, epa_g, dha_g, colesterolo_mg, fonte, codice_fonte,
+origine_dato, metodo, data_verifica`, per 100 g di parte edibile. Letto da `lipidi.py` e
+aggiunto a ogni voce del database da `calcolatore.carica_alimenti()`; entra nelle giornate
+componibili (`scelte_multiple.NUTRIENTI`).
+- Cella vuota = dato mancante, e solo così: ha la sua riga in `gap.csv` (nutriente = nome
+  della colonna) e il totale esce sottostimato. Zero = zero vero (tracce, zero biologico,
+  decisione). Voce senza riga = tutte e sei le colonne in `gap.csv` (controllo 12).
+- Fonti e metodi (scritti voce per voce nella colonna `metodo`): scheda BDA-IEO dichiarata
+  in `codice_fonte` o con lo stesso alimento (30 voci accettate in blocco); se i grassi della
+  scheda differiscono da `alimenti.csv`, acidi grassi in proporzione ai grassi di
+  `alimenti.csv`, colesterolo invariato (legumi cotti e in scatola dalla scheda del secco o
+  dello scatolame, aglio, macinato, fave, scarola); vitello da USDA 173826 (lombata magra:
+  USDA non ha il filetto); pere e pesche a zero, yogurt greco 0% acidi grassi a zero e
+  colesterolo USDA 170894, albume dalla scheda BDA 1801_2 (tracce). `origine_dato` dice se
+  i saturi della BDA sono analitici o calcolati da un alimento simile (accettati, con
+  l'origine registrata). EPA/DHA assenti dalla scheda: zero biologico per i vegetali, gap per
+  gli alimenti di origine animale.
+- Aperti (in `gap.csv`): sardine 122800, tutto in attesa di INSA 882 (deroga INSA estesa
+  agli acidi grassi); mozzarella di bufala 11796, acidi grassi della scheda BDA incoerenti
+  (saturi 4,9 g su 24,4 g di grassi), in attesa di decisione; EPA/DHA di tacchino petto,
+  tacchino fesa e bufala.
+- Report: la pipeline mostra in TUTTI i piani saturi (g e % dell'energia), colesterolo ed
+  EPA+DHA per giorno e come media settimanale (sezione LIPIDI, dopo il PASSO 3); gli avvisi
+  solo al PASSO 7 per i profili che li chiedono (saturi: ipercolesterolemia R020 < 7%,
+  diabete_t2 R052 < 10%; colesterolo: ipercolesterolemia R021 < 300 mg).
+- Voce da etichetta: i lipidi non ci sono, valgono 0 e diventano gap.
 
 **larn.csv** — vedi `larn.py`.
 
@@ -925,9 +971,10 @@ elenca le voci responsabili.
 Un valore sotto l'80% LARN con quel flag NON è una carenza accertata: prima di intervenire
 clinicamente, verifica se dipende dal gap.
 
-**Stato (verificato sul file il 21/10/2026):** 8 righe su 4 alimenti — latte parzialmente
-scremato (vitamina D, B12), orata (vitamina D), salmone affumicato (vitamina D), trippa
-(vitamina D, B12, folati, zinco).
+**Stato (verificato sul file il 31/10/2026):** 21 righe. Micronutrienti, 8 su 4 alimenti —
+latte parzialmente scremato (vitamina D, B12), orata (vitamina D), salmone affumicato
+(vitamina D), trippa (vitamina D, B12, folati, zinco). Lipidi, 13 (vedi `lipidi.csv`,
+sezione 5).
 
 **Fave secche cotte — caso a parte:** minerali e folati presi dalla voce BDA delle fave
 CRUDE (proxy), quindi probabilmente SOVRASTIMATI. Non usarle come fonte portante di ferro o
