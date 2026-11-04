@@ -135,7 +135,7 @@ def _voci(rr, nomi, uovo_g, etichetta=frozenset()):
     return f"<div class=voci>{out}</div>"
 
 
-def componi(piano, db, nomi, meta, orari, etichetta=frozenset()):
+def componi(piano, db, nomi, meta, orari, target_kcal, etichetta=frozenset()):
     """etichetta: i food_id delle voci da etichetta dichiarate. Stanno nella settimana;
     le tabelle leggono solo i loro elenchi, quindi non le propongono mai come scambio."""
     titoli = meta["titoli_piatti"]
@@ -206,19 +206,23 @@ def componi(piano, db, nomi, meta, orari, etichetta=frozenset()):
                f"<div><span class=e>PRANZO</span> {E(lib['pranzo'])}</div>"
                f"<div><span class=e>CENA</span> {E(lib['cena'])}</div></div></div>")
 
-    carbo, pesce, verd = (tc.tabella_carboidrati(piano, db), tc.tabella_pesce(piano, db),
-                          tc.tabella_verdure(piano, db))
+    filtro = tc.Filtro(piano, db, target_kcal)
+    carbo, pesce, verd = (tc.tabella_carboidrati(piano, db, filtro=filtro),
+                          tc.tabella_pesce(piano, db, filtro=filtro),
+                          tc.tabella_verdure(piano, db, filtro=filtro))
     note = meta.get("scheda_cucina") or {}
     seg = "".join(f" {E(s)}." for s in verd["segnalate"])
     chip = lambda k: "".join(f"<span class=chip>{E(x)}</span>" for x in verd["gruppi"][k])
+    gruppi_v = "".join(f"<b>{n}</b><div>{chip(k)}</div>" for n, k in (("Crude", "crude"), ("Cotte", "cotte"))
+                       if verd["gruppi"][k])
+    trattino = "<div class=n>— = scambio non previsto per questo piano.</div>"
     sez_c = (f"<h2>Carboidrati <span>stessa quantità di carboidrati</span></h2>{_tabella_html(carbo)}"
-             f"{_nota_scarto(carbo)}" if carbo["righe"] else "")
+             f"{trattino}{_nota_scarto(carbo)}" if carbo["righe"] else "")
     if note.get("note_carboidrati"):
         sez_c += f"<div class=n>{E(note['note_carboidrati'])}</div>"
     sez_p = (f"<h2>Pesce <span>stessa quantità di proteine</span></h2>{_tabella_html(pesce)}"
-             f"{_nota_scarto(pesce)}" if pesce["righe"] else "")
-    sez_v = (f"<h2>Verdure <span>stesso peso, stesso gruppo</span></h2><div class=v><b>Crude</b>"
-             f"<div>{chip('crude')}</div><b>Cotte</b><div>{chip('cotte')}</div></div>"
+             f"{trattino}{_nota_scarto(pesce)}" if pesce["righe"] else "")
+    sez_v = (f"<h2>Verdure <span>stesso peso, stesso gruppo</span></h2><div class=v>{gruppi_v}</div>"
              f"<div class=n>Patate e legumi non si scambiano con le verdure.{seg}</div>")
     top = ("<div class=top><span><b>Dott. Giuseppe Taglialatela</b> — Consulente in Nutrizione</span>"
            "<span>Scheda per chi cucina</span></div>")
@@ -238,9 +242,9 @@ def componi(piano, db, nomi, meta, orari, etichetta=frozenset()):
 
 def _prepara(piano_p, target_p, meta_p, orari_p=None, **kw):
     gzp.verifica(piano_p, target_p, meta_p, orari_p, **kw)     # verdetto e impronta
-    db, nomi, piano, _t, meta, _v = gzp._prepara(piano_p, target_p, meta_p, **kw)
+    db, nomi, piano, target, meta, _v = gzp._prepara(piano_p, target_p, meta_p, **kw)
     etichetta = frozenset(db) - frozenset(tc.carica_db())
-    return componi(piano, db, nomi, meta, gzp.carica_orari(orari_p), etichetta)
+    return componi(piano, db, nomi, meta, gzp.carica_orari(orari_p), target["kcal_target"], etichetta)
 
 
 def in_pdf(html_p, pdf_p):
@@ -270,8 +274,9 @@ def riepilogo(tabelle):
     L = []
     for nome in ("carboidrati", "pesce"):
         s = scarto_massimo(tabelle[nome])
-        L.append(f"{nome}: {len(tabelle[nome]['righe'])} righe" +
-                 (f", scarto da {s[0]:+d} a {s[1]:+d} kcal" if s else ""))
+        L.append(f"{nome}: {len(tabelle[nome]['righe'])} righe, {tabelle[nome]['esclusi']} scambi "
+                 f"esclusi dal filtro" + (f", scarto da {s[0]:+d} a {s[1]:+d} kcal" if s else ""))
+    L.append(f"verdure: {tabelle['verdure']['esclusi']} voci escluse dal filtro")
     if tabelle["verdure"]["fuori_elenco"]:
         L.append("verdure del piano fuori elenco: " + ", ".join(tabelle["verdure"]["fuori_elenco"]))
     return L
@@ -327,7 +332,7 @@ def autotest():
         return [f"scheda non generata sul piano approvato: {e}"]
     for atteso in ("La settimana", "Come scambiare gli alimenti", "Paziente Fittizio",
                    "Pranzo di collaudo", "Domenica",
-                   "Nota di collaudo.", "Piede di collaudo", "Patate e legumi", "Carote"):
+                   "Nota di collaudo.", "Piede di collaudo", "Patate e legumi"):
         if atteso not in pagina:
             problemi.append(f"scheda senza «{atteso}»")
     if "(&#x27;" in pagina or "(\'" in pagina:
@@ -344,11 +349,49 @@ def autotest():
         problemi.append("pane integrale 100 g in couscous non vale 60 g")
     if [r["food_id"] for r in t["righe"]] != ["000550", "381"]:
         problemi.append("righe dei carboidrati non legate al piano")
-    if tc.tabella_pesce(prova, db)["righe"][0]["celle"][1]["grammi"] != 185:
+    tp = tc.tabella_pesce(prova, db)
+    if tp["righe"][0]["celle"][tp["colonne"].index("Spigola")]["grammi"] != 185:
         problemi.append("merluzzo 180 g in spigola non vale 185 g")
     if tc.tabella_verdure(prova, db)["segnalate"] == []:
         problemi.append("nessuna verdura segnalata")
+    problemi += _autotest_filtro(db)
     problemi += _autotest_etichetta(tmp, meta)
+    return problemi
+
+
+def _autotest_filtro(db):
+    """Il filtro toglie lo scambio oltre il 2,5% del target e quello che, nel giorno
+    reale, porterebbe oltre il 10%. Prova al contrario: lo stesso scambio resta con un
+    target largo o con un giorno lontano dal limite."""
+    problemi = []
+    riga = lambda g, p, f, q, o="": {"giorno": g, "pasto": p, "food_id": f, "grammi": q, "opzione": o}
+    # riso 80 g -> pane integrale: scarto ricalcolato, target tarato attorno al limite
+    piano = [riga("1", "pranzo", "000100", "80"), riga("1", "cena", "1313", "150")]
+    scarto = tc.kcal("000550", tc.equivalente(80, "000100", "000550", "carboidrati_g", db), db) \
+        - tc.kcal("000100", 80, db)
+    target_stretto = abs(scarto) / tc.QUOTA_SCAMBIO - 1
+    giorno = sum(tc.kcal(r["food_id"], float(r["grammi"]), db) for r in piano)
+    f = tc.Filtro([], db, target_stretto)      # senza giorni: agisce solo il 2,5%
+    if f.ammesso("000100", 80, scarto):
+        problemi.append("scambio oltre il 2,5% del target rimasto")
+    largo = abs(scarto) / tc.QUOTA_SCAMBIO + 1
+    if tc.Filtro([], db, largo).ammesso("000100", 80, scarto) is not True:
+        problemi.append("scambio entro il 2,5% tolto")
+    # stesso scarto: il giorno a +9% lo esclude, il giorno in pari no
+    vicino = tc.Filtro(piano, db, giorno / 1.09)
+    pari = tc.Filtro(piano, db, giorno)
+    if vicino.ammesso("000100", 80, 1):
+        problemi.append("scambio che porta il giorno oltre il 10% rimasto")
+    if not pari.ammesso("000100", 80, 1):
+        problemi.append("scambio su giorno in pari tolto")
+    # un giorno a scelta conta con l'opzione piu' alta
+    scelta = tc.Filtro([riga("1", "cena", "000100", "80", "A"), riga("1", "cena", "000100", "40", "B")], db, 100)
+    if not (scelta.giorni["1"][0] < scelta.giorni["1"][1]):
+        problemi.append("opzioni a scelta non considerate nel giorno")
+    # il pesce grasso che non e' in elenco non diventa scambio; la cella esclusa non si mostra
+    t = tc.tabella_pesce([riga("1", "cena", "1313", "150")], db, filtro=tc.Filtro([riga("1", "cena", "1313", "150")], db, 1000))
+    if any(c and abs(c["scarto_kcal"]) > 25 for r in t["righe"] for c in r["celle"]):
+        problemi.append("cella oltre il filtro mostrata")
     return problemi
 
 

@@ -311,6 +311,12 @@ Pagina 2: le tabelle di conversione, personalizzate sulle voci del piano:
 - **Verdure:** a parità di peso, gruppi crude e cotte, patate e legumi esclusi, segnalate
   quelle che si discostano.
 
+Uno scambio che altera la dieta non compare: filtro del 2,5% del target per scambio, più
+il limite del ±10% sui giorni reali (M1). Non è più prevista la pagina «Tabella di
+sostituzione» in coda al PDF del piano: gli scambi stanno solo nella scheda, così non ci
+sono due tabelle diverse. La scheda resta a disposizione di chi cucina: le regole operative
+stanno nel documento di spiegazione.
+
 Si genera con `genera_scheda_cucina.py` (M1) dopo il PDF: si ferma senza verdetto e
 impronta approvata. Un piano con eccezione etichetta richiede gli stessi due file del PDF
 (`--eccezione-etichetta`, `--nomi-eccezione`): la voce sta nella settimana, non negli scambi. Le tabelle non si scrivono a mano. Si genera sempre con `--out-pdf`:

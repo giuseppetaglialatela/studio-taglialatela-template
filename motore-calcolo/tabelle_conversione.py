@@ -17,6 +17,11 @@ DATI
   decisione del nutrizionista: compare solo se e' nel piano, mai come alternativa
   (quinoa e piadina, 04/11/2026: a parita' di carboidrati oltre 100 kcal in piu').
 
+Filtro di sicurezza (decisione del 04/11/2026, delegata dal nutrizionista): uno scambio
+compare solo se 1) lo scarto non supera il 2,5% delle kcal del target, cosi' due scambi
+nello stesso giorno restano entro il 5%; 2) in ogni giorno in cui la voce compare, sommando
+lo scambio e un secondo scambio al limite, nessuno scenario supera il +/-10%.
+
 La colonna grammi_porzione e' controllata dal collaudo (controllo 13): se alimenti.csv
 cambia, il collaudo si ferma finche' non si esegue --rigenera.
 
@@ -39,6 +44,40 @@ RUOLI_AMMESSI = {"carboidrati": {"cereale", "patate"}, "pesce": {"pesce", "mollu
 USI_VERDURE = {"crude", "cotte", "entrambe"}
 STATI = {"confermato", "da_confermare", "solo_piano"}
 PASTI_PRINCIPALI = ("pranzo", "cena")
+QUOTA_SCAMBIO = 0.025                  # dello scarto ammesso sul target giornaliero
+LIMITE_GIORNO = 0.10                   # limite di sicurezza del nucleo, principio 8
+
+
+class Filtro:
+    """Decide se uno scambio resta in tabella, sui giorni reali del piano."""
+
+    def __init__(self, piano, db, target_kcal):
+        self.target = float(target_kcal)
+        self.limite = QUOTA_SCAMBIO * self.target
+        pasti, self.dove = {}, {}
+        for r in piano:
+            k = (r["giorno"], r["pasto"])
+            o = r.get("opzione", "")
+            pasti.setdefault(k, {}).setdefault(o, 0.0)
+            pasti[k][o] += kcal(r["food_id"], float(r["grammi"]), db)
+            self.dove.setdefault((r["food_id"], float(r["grammi"])), set()).add(r["giorno"])
+        self.giorni = {}
+        for (g, _p), opz in pasti.items():
+            fisso = opz.get("", 0.0)
+            scelte = [v for o, v in opz.items() if o] or [0.0]
+            lo, hi = self.giorni.get(g, (0.0, 0.0))
+            self.giorni[g] = (lo + fisso + min(scelte), hi + fisso + max(scelte))
+
+    def ammesso(self, fid, grammi, scarto):
+        if abs(scarto) > self.limite:
+            return False
+        for g in self.dove.get((fid, float(grammi)), ()):
+            lo, hi = self.giorni[g]
+            if hi + max(scarto, 0) + self.limite > (1 + LIMITE_GIORNO) * self.target:
+                return False
+            if lo + min(scarto, 0) - self.limite < (1 - LIMITE_GIORNO) * self.target:
+                return False
+        return True
 
 
 def arrotonda(g):
@@ -68,7 +107,7 @@ def kcal(fid, grammi, db):
     return grammi * float(db[fid]["kcal_100g"]) / 100
 
 
-def _tabella(piano, db, scambi, campo):
+def _tabella(piano, db, scambi, campo, filtro=None):
     """Righe = voci del piano (pranzo e cena) presenti nell'elenco; colonne = voci
     confermate. Ogni cella: grammi equivalenti e scarto in kcal."""
     elenco = {s["food_id"]: s["nome_riferimento"] for s in scambi}
@@ -76,7 +115,7 @@ def _tabella(piano, db, scambi, campo):
     viste = sorted({(r["food_id"], float(r["grammi"])) for r in piano
                     if r["pasto"] in PASTI_PRINCIPALI and r["food_id"] in elenco},
                    key=lambda x: (list(elenco).index(x[0]), -x[1]))
-    righe = []
+    righe, esclusi = [], 0
     for fid, g in viste:
         celle = []
         for c in colonne:
@@ -85,27 +124,55 @@ def _tabella(piano, db, scambi, campo):
                 celle.append(None)
                 continue
             ga = equivalente(g, fid, alt, campo, db)
-            celle.append({"grammi": ga, "scarto_kcal": round(kcal(alt, ga, db) - kcal(fid, g, db))})
+            scarto = kcal(alt, ga, db) - kcal(fid, g, db)
+            if filtro is not None and not filtro.ammesso(fid, g, scarto):
+                celle.append(None)
+                esclusi += 1
+                continue
+            celle.append({"grammi": ga, "scarto_kcal": round(scarto)})
         righe.append({"food_id": fid, "nome": elenco[fid], "grammi": g, "celle": celle})
-    return {"colonne": [c["nome_riferimento"] for c in colonne], "righe": righe}
+    # un'alternativa senza nessuno scambio ammesso non si mostra
+    vive = [i for i in range(len(colonne)) if any(r["celle"][i] for r in righe)]
+    for r in righe:
+        r["celle"] = [r["celle"][i] for i in vive]
+    return {"colonne": [colonne[i]["nome_riferimento"] for i in vive], "righe": righe,
+            "esclusi": esclusi}
 
 
-def tabella_carboidrati(piano, db, base=None):
-    return _tabella(piano, db, carica_scambi("scambi_carboidrati.csv", base), "carboidrati_g")
+def tabella_carboidrati(piano, db, base=None, filtro=None):
+    return _tabella(piano, db, carica_scambi("scambi_carboidrati.csv", base), "carboidrati_g", filtro)
 
 
-def tabella_pesce(piano, db, base=None):
-    return _tabella(piano, db, carica_scambi("scambi_pesce.csv", base), "proteine_g")
+def tabella_pesce(piano, db, base=None, filtro=None):
+    return _tabella(piano, db, carica_scambi("scambi_pesce.csv", base), "proteine_g", filtro)
 
 
-def tabella_verdure(piano, db, base=None):
-    """Gruppi crude e cotte, voci che si discostano, verdure del piano fuori elenco."""
+def tabella_verdure(piano, db, base=None, filtro=None):
+    """Gruppi crude e cotte, voci che si discostano, verdure del piano fuori elenco.
+    Con il filtro un gruppo mostra solo cio' che puo' sostituire ogni sua verdura del
+    piano; senza verdure del piano il gruppo resta vuoto."""
     scambi = carica_scambi("scambi_verdure.csv", base)
     conf = [s for s in scambi if s["stato"] == "confermato"]
     gruppi = {u: [s["nome_riferimento"] for s in conf if s["uso"] in (u, "entrambe")]
               for u in ("crude", "cotte")}
+    esclusi = 0
+    if filtro is not None:
+        ids = {s["nome_riferimento"]: s["food_id"] for s in conf}
+        gruppi_f = {}
+        for u, nomi_u in gruppi.items():
+            del_piano = {(ids[n], float(r["grammi"])) for n in nomi_u for r in piano
+                         if r["food_id"] == ids[n] and r["pasto"] in PASTI_PRINCIPALI}
+            tenuti = [n for n in nomi_u if del_piano and all(
+                f == ids[n] or filtro.ammesso(f, g, kcal(ids[n], g, db) - kcal(f, g, db))
+                for f, g in del_piano)]
+            esclusi += len(nomi_u) - len(tenuti) if del_piano else 0
+            gruppi_f[u] = tenuti
+        gruppi = gruppi_f
+    mostrate = set(gruppi["crude"]) | set(gruppi["cotte"])
     segnalate = []
     for s in conf:
+        if s["nome_riferimento"] not in mostrate:
+            continue
         d = db[s["food_id"]]
         if float(d["carboidrati_g"]) >= SOGLIA_CARBOIDRATI_VERDURA:
             segnalate.append(f"{s['nome_riferimento']}: più carboidrati ({float(d['carboidrati_g']):g} g/100 g)")
@@ -116,7 +183,7 @@ def tabella_verdure(piano, db, base=None):
     fuori = sorted({db[r["food_id"]]["nome"] for r in piano
                     if ruoli.get(r["food_id"]) == "verdura" and r["pasto"] in PASTI_PRINCIPALI
                     and r["food_id"] not in elenco})
-    return {"gruppi": gruppi, "segnalate": segnalate, "fuori_elenco": fuori}
+    return {"gruppi": gruppi, "segnalate": segnalate, "fuori_elenco": fuori, "esclusi": esclusi}
 
 
 def attese(nome, base=None, db=None):

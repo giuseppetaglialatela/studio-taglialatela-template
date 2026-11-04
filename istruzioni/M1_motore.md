@@ -636,7 +636,9 @@ Due pagine, settimana e tabelle di conversione, tutte calcolate da piano, metada
 scheda.html [--out-pdf scheda.pdf]`. Le voci da etichetta passano con gli stessi controlli di
 `genera_zona_piano.py`: compaiono nella settimana con nome e nota di peso, mai nelle tabelle di
 scambio; non dichiarate, la scheda si ferma. Stampa righe, scarti in kcal e
-verdure del piano fuori elenco. Il PDF richiede Chromium con Playwright; è `in_pdf` a
+verdure del piano fuori elenco. Filtro di sicurezza (`tabelle_conversione.Filtro`, 04/11/2026):
+uno scambio compare solo con scarto entro il 2,5% delle kcal del target e se, nei giorni reali
+della voce, con un secondo scambio al limite nessuno scenario supera il ±10%. Il PDF richiede Chromium con Playwright; è `in_pdf` a
 misurare se il contenuto sta nelle pagine (versione compatta, poi fermo), l'HTML no.
 
 ### genera_spiegazione.py — documento di spiegazione (30/10/2026)
