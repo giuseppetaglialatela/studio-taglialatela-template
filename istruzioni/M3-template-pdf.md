@@ -322,6 +322,20 @@ Si genera con `genera_scheda_cucina.py` (M1) dopo il PDF: si ferma senza verdett
 impronta approvata. Un piano con eccezione etichetta richiede gli stessi due file del PDF
 (`--eccezione-etichetta`, `--nomi-eccezione`): la voce sta nella settimana, non negli scambi. Le tabelle non si scrivono a mano. Si genera sempre con `--out-pdf`.
 
+**Esclusioni del piano (04/11/2026).** La scheda genera gli scambi dagli elenchi generali e non
+sa cosa una dieta vieta. Per un piano con alimenti vietati o limiti di porzione si passa
+`--esclusioni esclusioni.json`, un file fuori dal repository e dai metadati (non tocca
+l'impronta):
+```
+{"escludi_food_id": {"<food_id>": "<nome>"},
+ "massimo_g_a_pasto": {"<food_id>": 70},
+ "verdure_crude_ammesse": ["<food_id>"]}
+```
+La voce vietata sparisce da tabelle e verdure; una casella oltre il massimo diventa «—» e una
+riga vuota sparisce; se `verdure_crude_ammesse` c'è, il gruppo Crude contiene solo quelle.
+Una voce vietata presente nel piano, un `food_id` sconosciuto o un campo non previsto fermano la
+scheda. Senza il file, la scheda di un piano con esclusioni non si consegna.
+
 **Adattamento al contenuto (04/11/2026).** Il contenuto del piano non si cambia per far
 entrare la scheda. Il motore prova due pagine, riducendo spazi e poi scrittura fino al minimo
 di 9 punti per gli ingredienti; sotto non si scende. Griglie regolari in ogni livello: nessun

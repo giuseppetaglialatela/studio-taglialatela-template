@@ -703,7 +703,26 @@ def verifica_scheda_etichetta():
             return False, f"con i file la scheda non si genera ({con.stdout.strip()[-120:]})"
         if "Vellutata di prova (peso da confezione)" not in open(html_p, encoding="utf-8").read():
             return False, "voce da etichetta senza nome e nota di peso"
-        return True, "con i due file si genera, con nome e nota di peso; senza, si ferma"
+        # --esclusioni dalla riga di comando (04/11/2026): file valido, voce vietata nel
+        # piano, campo non previsto
+        esc_p = os.path.join(tmp, "esclusioni.json")
+
+        def con_esclusioni(contenuto):
+            with open(esc_p, "w", encoding="utf-8") as f:
+                _json.dump(contenuto, f)
+            return subprocess.run(base_s + ["--eccezione-etichetta", voci, "--nomi-eccezione", nomi,
+                                            "--esclusioni", esc_p], capture_output=True, text=True,
+                                  timeout=60, cwd=tmp)
+        if con_esclusioni({"escludi_food_id": {"000100": "voce di prova"}}).returncode != 0:
+            return False, "--esclusioni valido non accettato"
+        vietato = gzp.carica_piano_esteso(piano)[0]["food_id"]
+        r = con_esclusioni({"escludi_food_id": {vietato: "voce del piano"}})
+        if r.returncode == 0 or "contraddizione" not in r.stdout:
+            return False, "voce vietata presente nel piano non fermata"
+        if con_esclusioni({"campo_ignoto": 1}).returncode == 0:
+            return False, "campo non previsto in --esclusioni non fermato"
+        return True, ("con i due file si genera, con nome e nota di peso; senza, si ferma; "
+                      "--esclusioni e i suoi fermi provati")
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
 
@@ -748,6 +767,18 @@ def _piano_scheda(alternative, n_col, n_spu):
     return righe, meta
 
 
+def _pdf_senza_piede(p, tmp):
+    """Prova al contrario: lo stesso PDF con una pagina sola in meno ha i piedi sbagliati."""
+    from pypdf import PdfReader, PdfWriter
+    w = PdfWriter()
+    for pagina in PdfReader(p).pages[:-1]:
+        w.add_page(pagina)
+    out = os.path.join(tmp, "monco.pdf")
+    with open(out, "wb") as f:
+        w.write(f)
+    return out
+
+
 def verifica_adattamento_scheda():
     """Piano piccolo: due pagine, livello normale. Grande come il caso reale del
     04/11/2026: tre pagine, nessuna sotto il minimo. Estremo: fermo, nessun PDF."""
@@ -756,8 +787,9 @@ def verifica_adattamento_scheda():
     import genera_scheda_cucina as gsc
     try:
         import playwright  # noqa: F401
+        from pypdf import PdfReader
     except ImportError:
-        return True, "NON ESEGUITO: Chromium assente in questa sessione"
+        return True, "NON ESEGUITO: Chromium o pypdf assenti in questa sessione"
     db = gzp.carica_alimenti(os.path.join(BASE, "alimenti.csv"))
     nomi = gzp.carica_nomi(os.path.join(BASE, "nomi_paziente.csv"))
     tmp = tempfile.mkdtemp()
@@ -805,6 +837,13 @@ def verifica_adattamento_scheda():
         except gzp.Fermo as ex:
             if "tagliato" not in str(ex):
                 return False, f"fermo diverso dal taglio: {ex}"
+        # 04/11/2026: il piano che riempie la pagina 1 aveva il piede sulla pagina 2
+        for alt, c, sp in (((1, 2, 1, 2, 2), 4, 4), ((2, 2, 2, 2, 2), 4, 4), ((1, 1, 1, 1, 1), 4, 4)):
+            e = fai(alt, c, sp)
+            if not gsc.piedi_a_posto(p) or len(PdfReader(p).pages) != len(e):
+                return False, f"piede fuori pagina con {alt}"
+        if gsc.piedi_a_posto(_pdf_senza_piede(p, tmp)):
+            return False, "il controllo dei piedi non vede un piede mancante"
         os.remove(p)
         try:
             fai((10, 10, 10, 10, 10, 10), 10, 10)

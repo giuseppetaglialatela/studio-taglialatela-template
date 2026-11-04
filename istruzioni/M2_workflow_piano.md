@@ -2,7 +2,7 @@
 
 Modulo operativo: si carica quando si compone, si modifica o si valuta un piano.
 Dipende da **M1**: nessun passo è eseguibile senza il motore collaudato.
-Ultima modifica: 04/11/2026 (scatolame ammesso in consumo familiare; `scheda_cucina` nei metadati). 31/10/2026 pomeriggio (deroga INSA estesa ad acidi grassi e colesterolo; saturi e colesterolo nel report, sezione LIPIDI). 31/10/2026 (avvisi dei riferimenti solo per i profili scelti). 30/10/2026 sera (profili clinici e registro dei riferimenti all'apertura). 30/10/2026 (tappa 2: apertura con gli alimenti desiderati contro il database e
+Ultima modifica: 04/11/2026 (scatolame ammesso in consumo familiare; `scheda_cucina` nei metadati; file delle esclusioni al PASSO 6). 31/10/2026 pomeriggio (deroga INSA estesa ad acidi grassi e colesterolo; saturi e colesterolo nel report, sezione LIPIDI). 31/10/2026 (avvisi dei riferimenti solo per i profili scelti). 30/10/2026 sera (profili clinici e registro dei riferimenti all'apertura). 30/10/2026 (tappa 2: apertura con gli alimenti desiderati contro il database e
 le assunzioni da confermare; conferma dell'assenza di terapia nei metadati; PASSO 6 su un
 verdetto della pipeline senza bloccanti, anteprima consegnata come file; campi nuovi dei
 metadati). 23/10/2026: PASSO 6 con anteprima completa e impronta, metadati in bozza prima dell'approvazione, un giorno chiuso = una riga in chat; condimenti a porzione libera; `--nessuna-terapia`; 22/10:
@@ -325,6 +325,10 @@ Tutti i dati, in verdetto e anteprima, con analisi esplicita di punti di forza e
 approvazione esplicita.** Se `pipeline.py` esce con codice 1 il piano NON è presentabile:
 risolvi i bloccanti e riesegui. Dal 30/10/2026 lo impone il codice: l'anteprima richiede il
 verdetto della pipeline e si ferma se ha un bloccante.
+
+Per ogni piano con alimenti vietati o limiti di porzione si prepara anche il file `esclusioni.json`
+(M3, sezione 3 bis) e si approva con il resto. Senza file, la scheda di un piano con esclusioni
+non si consegna.
 
 È il **gate** del nucleo: uno solo per piano, non uno per giorno. Nessun PDF prima di qui,
 né con fretta dichiarata né con un piano identico a uno precedente.

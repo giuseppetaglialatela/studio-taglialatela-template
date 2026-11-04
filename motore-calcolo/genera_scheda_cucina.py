@@ -15,6 +15,7 @@ USO
   python3 genera_scheda_cucina.py --piano piano_vN.csv --target target_vN.csv
       --metadati metadati_piano_vN.json --verdetto verdetto_vN.json
       [--orari orari_pasti.csv] [--eccezione-etichetta voci.csv --nomi-eccezione nomi.csv]
+      [--esclusioni esclusioni.json]
       --out-html scheda.html [--out-pdf scheda.pdf]
   python3 genera_scheda_cucina.py --autotest
 """
@@ -45,8 +46,8 @@ GIORNI = {"lun": "Lunedì", "mar": "Martedì", "mer": "Mercoledì", "gio": "Giov
           "ven": "Venerdì", "sab": "Sabato", "dom": "Domenica"}
 CSS = """@page{size:A4;margin:11mm 15mm 10mm}*{box-sizing:border-box}
 :root{--navy:#1C3A4A;--teal:#2E7D8C;--ara:#C0622B;--gr:#666;--lin:#CCC;--ten:#F4F8F9;--testo:#333}
-body{margin:0;font-family:'Liberation Sans',Arial,sans-serif;color:#1A1A1A;background:#fff}
-.pag{page-break-after:always;height:276mm;display:flex;flex-direction:column;font-size:var(--fs,10pt);line-height:var(--lh,1.32)}.pag:last-child{page-break-after:auto}
+body{margin:0;width:180mm;font-family:'Liberation Sans',Arial,sans-serif;color:#1A1A1A;background:#fff}
+.pag{page-break-after:always;height:275mm;display:flex;flex-direction:column;font-size:var(--fs,10pt);line-height:var(--lh,1.32)}.pag:last-child{page-break-after:auto}
 .top{font-size:9pt;color:var(--gr);border-bottom:.7pt solid var(--teal);padding-bottom:3px}.top b{color:var(--teal)}.top i{font-style:italic}
 h1{font-size:var(--h1,19pt);color:var(--navy);text-align:center;margin:var(--mh1,10px 0 1px)}.sub{color:var(--gr);font-style:italic;font-size:9pt;text-align:center;margin-bottom:var(--msub,6px)}
 h2{font-size:10.5pt;color:var(--ara);margin:var(--mh,10px 0 4px);text-transform:uppercase;letter-spacing:.4px}h2 span{color:var(--gr);font-weight:normal;font-size:9pt;text-transform:none;letter-spacing:0;font-style:italic}
@@ -168,7 +169,8 @@ def _voci(rr, nomi, uovo_g, etichetta=frozenset()):
     return f"<div class=voci>{out}</div>"
 
 
-def componi(piano, db, nomi, meta, orari, target_kcal, etichetta=frozenset(), pagine=2, giorni_p1=0):
+def componi(piano, db, nomi, meta, orari, target_kcal, etichetta=frozenset(), pagine=2, giorni_p1=0,
+            esclusioni=None):
     """etichetta: i food_id delle voci da etichetta dichiarate. Stanno nella settimana;
     le tabelle leggono solo i loro elenchi, quindi non le propongono mai come scambio."""
     titoli = meta["titoli_piatti"]
@@ -249,9 +251,14 @@ def componi(piano, db, nomi, meta, orari, target_kcal, etichetta=frozenset(), pa
     primi, resto = (carte_g[:giorni_p1], carte_g[giorni_p1:]) if pagine == 3 else ([], carte_g)
 
     filtro = tc.Filtro(piano, db, target_kcal)
-    carbo, pesce, verd = (tc.tabella_carboidrati(piano, db, filtro=filtro),
-                          tc.tabella_pesce(piano, db, filtro=filtro),
-                          tc.tabella_verdure(piano, db, filtro=filtro))
+    if esclusioni:
+        contro = tc.controlla_esclusioni(piano, esclusioni)
+        if contro:
+            raise Fermo(f"scheda: {', '.join(contro)} vietato dal file delle esclusioni ma "
+                        f"presente nel piano: contraddizione da risolvere")
+    carbo, pesce, verd = (tc.tabella_carboidrati(piano, db, filtro=filtro, esc=esclusioni),
+                          tc.tabella_pesce(piano, db, filtro=filtro, esc=esclusioni),
+                          tc.tabella_verdure(piano, db, filtro=filtro, esc=esclusioni))
     note = meta.get("scheda_cucina") or {}
     seg = "".join(f" {E(s)}." for s in verd["segnalate"])
     gruppi_v = "".join(f"<b>{n}</b><div>{''.join(f'<span class=chip>{E(x)}</span>' for x in f)}</div>"
@@ -323,6 +330,20 @@ _VUOTI = """() => [...document.querySelectorAll('.pag')].map(p => {
   return Math.round(f.getBoundingClientRect().top - u.getBoundingClientRect().bottom); })"""
 
 
+def piedi_a_posto(pdf_p):
+    """La misura in px puo' non coincidere con la stampa: fa fede il PDF. Ogni pagina deve
+    contenere il proprio «n/N» e le pagine devono essere N."""
+    try:
+        from pypdf import PdfReader
+        testi = [p.extract_text() or "" for p in PdfReader(pdf_p).pages]
+    except ImportError:
+        import subprocess
+        testi = subprocess.run(["pdftotext", pdf_p, "-"], capture_output=True, text=True,
+                               check=True).stdout.rstrip("\f").split("\f")
+    n = len(testi)
+    return all(f"· {i}/{n}" in t for i, t in enumerate(testi, 1))
+
+
 def controlla_tagli(pag):
     """Ogni quantita' e ogni testo devono stare dentro il loro riquadro."""
     fuori = pag.evaluate(_TAGLI)
@@ -355,7 +376,10 @@ def adatta(costruisci, html_p, pdf_p, n_giorni):
     from playwright.sync_api import sync_playwright
     with sync_playwright() as p:
         b = p.chromium.launch()
-        pag = b.new_page(viewport={"width": 695, "height": 1028})
+        # la stessa larghezza della stampa: A4 meno i margini di @page, 180 mm. Con una
+        # finestra piu' larga il testo andava a capo meno che sulla carta, e il piede
+        # della pagina finiva sulla pagina dopo (rilievo del 04/11/2026)
+        pag = b.new_page(viewport={"width": 680, "height": 1040})
         pag.emulate_media(media="print")
 
         def prova(pagine, k):
@@ -363,9 +387,8 @@ def adatta(costruisci, html_p, pdf_p, n_giorni):
                 f.write(costruisci(pagine, k))
             pag.goto("file://" + os.path.abspath(html_p))
             return _adatta_pagine(pag)
-        esito, scelta = prova(2, 0), (2, 0)
-        if isinstance(esito, tuple):
-            ultimo, migliore = esito, None
+        def tre_pagine():
+            ultimo, migliore = None, None
             for k in range(0, n_giorni + 1, 2):         # righe intere di riquadri
                 e = prova(3, k)
                 if isinstance(e, tuple):
@@ -378,17 +401,31 @@ def adatta(costruisci, html_p, pdf_p, n_giorni):
             if migliore is None:
                 b.close()
                 _, n, alto, disp = ultimo
-                raise Fermo(f"scheda: il contenuto non sta in tre pagine con ingredienti a 9 punti, la scrittura minima "
-                            f"(pagina {n}: {alto} px su {disp}, {100 * (alto - disp) // disp + 1}% "
-                            f"di troppo). PDF non generato: serve una decisione del nutrizionista")
-            esito, scelta = migliore[1], (3, migliore[2])
-            prova(*scelta)
-        try:
-            controlla_tagli(pag)
-        except Fermo:
-            b.close()
-            raise
-        pag.pdf(path=pdf_p, prefer_css_page_size=True, print_background=True)
+                raise Fermo(f"scheda: il contenuto non sta in tre pagine con ingredienti a 9 punti, "
+                            f"la scrittura minima (pagina {n}: {alto} px su {disp}, "
+                            f"{100 * (alto - disp) // disp + 1}% di troppo). PDF non generato: "
+                            f"serve una decisione del nutrizionista")
+            prova(3, migliore[2])
+            return migliore[1]
+
+        def stampa():
+            """Scrive il PDF e controlla sul PDF che ogni pagina porti il proprio piede."""
+            try:
+                controlla_tagli(pag)
+            except Fermo:
+                b.close()
+                raise
+            pag.pdf(path=pdf_p, prefer_css_page_size=True, print_background=True)
+            return piedi_a_posto(pdf_p)
+        esito = prova(2, 0)
+        a_posto = not isinstance(esito, tuple) and stampa()
+        if not a_posto:
+            esito = tre_pagine()
+            if not stampa():
+                b.close()
+                os.remove(pdf_p)
+                raise Fermo("scheda: un piede di pagina non sta sulla sua pagina del PDF, "
+                            "PDF non generato")
         with open(html_p, "w", encoding="utf-8") as f:
             f.write(pag.content())
         b.close()
@@ -398,6 +435,10 @@ def adatta(costruisci, html_p, pdf_p, n_giorni):
 def riepilogo(tabelle):
     """Righe per il nutrizionista, in chat: gli scarti e cio' che resta fuori."""
     L = []
+    voci = sum(tabelle[k]["da_file"]["voci"] for k in tabelle)
+    celle = sum(tabelle[k]["da_file"]["celle"] for k in tabelle)
+    if voci or celle:
+        L.append(f"esclusioni del piano: tolte {voci} voci e {celle} caselle")
     for nome in ("carboidrati", "pesce"):
         s = scarto_massimo(tabelle[nome])
         L.append(f"{nome}: {len(tabelle[nome]['righe'])} righe, {tabelle[nome]['esclusi']} scambi "
@@ -488,6 +529,7 @@ def autotest():
     if tc.tabella_verdure(prova, db)["segnalate"] == []:
         problemi.append("nessuna verdura segnalata")
     problemi += _autotest_filtro(db)
+    problemi += _autotest_esclusioni(tmp, db)
     problemi += _autotest_etichetta(tmp, meta)
     return problemi
 
@@ -526,6 +568,52 @@ def _autotest_filtro(db):
     t = tc.tabella_pesce([riga("1", "cena", "1313", "150")], db, filtro=tc.Filtro([riga("1", "cena", "1313", "150")], db, 1000))
     if any(c and abs(c["scarto_kcal"]) > 25 for r in t["righe"] for c in r["celle"]):
         problemi.append("cella oltre il filtro mostrata")
+    return problemi
+
+
+def _autotest_esclusioni(tmp, db):
+    """Ogni regola del file --esclusioni, con i fermi e la prova al contrario."""
+    import json as _j
+    problemi = []
+    riga = lambda f, q: {"giorno": "1", "pasto": "cena", "food_id": f, "grammi": q, "opzione": ""}
+    piano = [riga("1313", "150"), riga("000800", "80"), riga("349", "200"), riga("391", "100")]
+    fl = tc.Filtro(piano, db, sum(tc.kcal(r["food_id"], float(r["grammi"]), db) for r in piano))
+
+    def esc(contenuto):
+        p = os.path.join(tmp, "esc.json")
+        with open(p, "w", encoding="utf-8") as f:
+            _j.dump(contenuto, f)
+        return tc.carica_esclusioni(p, db)
+    for nome, cont in (("campo non previsto", {"altro": 1}), ("food_id sconosciuto", {"escludi_food_id": {"XXX": "x"}}),
+                       ("massimo non valido", {"massimo_g_a_pasto": {"000100": 0}})):
+        try:
+            esc(cont)
+            problemi.append(f"esclusioni: {nome} accettato")
+        except ValueError:
+            pass
+    vuoto = esc({})
+    uguali = [tc.tabella_carboidrati(piano, db, filtro=fl) == tc.tabella_carboidrati(piano, db, filtro=fl, esc=vuoto),
+              tc.tabella_verdure(piano, db, filtro=fl) == tc.tabella_verdure(piano, db, filtro=fl, esc=vuoto)]
+    if not all(uguali):
+        problemi.append("esclusioni: file vuoto cambia le tabelle")
+    e = esc({"escludi_food_id": {"000100": "riso", "005120": "carciofi", "101": "fagiolini"},
+             "massimo_g_a_pasto": {"000550": 70}, "verdure_crude_ammesse": ["391"]})
+    t = tc.tabella_carboidrati(piano, db, filtro=fl, esc=e)
+    if "Riso" in t["colonne"] or t["da_file"]["voci"] != 1:
+        problemi.append("esclusioni: voce vietata rimasta tra gli scambi")
+    if "Pane integrale" in t["colonne"] or t["da_file"]["celle"] != 1:
+        problemi.append("esclusioni: casella oltre il massimo rimasta")
+    if not t["righe"] or t["righe"][0]["food_id"] != "000800":
+        problemi.append("esclusioni: voce del piano in colonna persa")
+    v = tc.tabella_verdure(piano, db, filtro=fl, esc=e)
+    nomi_v = {n for g in v["gruppi"].values() for f in g for n in f}
+    if {"Fagiolini", "Carciofi"} & nomi_v or "Carciofi" in " ".join(v["segnalate"]):
+        problemi.append("esclusioni: verdura vietata mostrata o citata")
+    crude = {n for f in v["gruppi"]["crude"] for n in f}
+    if crude - {"Pomodori"}:
+        problemi.append("esclusioni: gruppo Crude con voci non ammesse")
+    if tc.controlla_esclusioni(piano, esc({"escludi_food_id": {"1313": "merluzzo"}})) != ["1313"]:
+        problemi.append("esclusioni: voce vietata nel piano non rilevata")
     return problemi
 
 
@@ -595,6 +683,7 @@ def main():
     a.add_argument("--out-pdf"); a.add_argument("--autotest", action="store_true")
     a.add_argument("--eccezione-etichetta", dest="eccezione")
     a.add_argument("--nomi-eccezione", dest="nomi_eccezione")
+    a.add_argument("--esclusioni")
     o = a.parse_args()
     if o.autotest:
         p = autotest()
@@ -603,7 +692,13 @@ def main():
     try:
         dati = _dati(o.piano, o.target, o.metadati, o.orari, verdetto_p=o.verdetto,
                      eccezione_p=o.eccezione, nomi_eccezione_p=o.nomi_eccezione)
-        pagina, tabelle = componi(*dati)
+        esc = None
+        if o.esclusioni:
+            try:
+                esc = tc.carica_esclusioni(o.esclusioni, dati[1])
+            except (OSError, ValueError) as e:
+                raise Fermo(f"esclusioni: {e}")
+        pagina, tabelle = componi(*dati, esclusioni=esc)
     except Fermo as e:
         print(f"FERMO: {e}")
         return 1
@@ -615,7 +710,7 @@ def main():
         return 0
     try:
         n_giorni = len({r["giorno"] for r in dati[0]}) + 1
-        esito = adatta(lambda p, k: componi(*dati, pagine=p, giorni_p1=k)[0], o.out_html, o.out_pdf, n_giorni)
+        esito = adatta(lambda p, k: componi(*dati, pagine=p, giorni_p1=k, esclusioni=esc)[0], o.out_html, o.out_pdf, n_giorni)
     except Fermo as e:
         print(f"FERMO: {e}")
         return 1

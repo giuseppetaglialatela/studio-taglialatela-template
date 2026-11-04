@@ -24,6 +24,10 @@ lo scambio e un secondo scambio uguale, nessuno scenario supera il +/-10%.
 Verdure: a parita' di peso si dividono in fasce di energia, per gruppo; una fascia con una
 verdura del piano non resta mai vuota in silenzio.
 
+Esclusioni del singolo piano (04/11/2026): file JSON facoltativo, fuori dal repository e
+dai metadati, con le chiavi escludi_food_id, massimo_g_a_pasto e verdure_crude_ammesse
+(carica_esclusioni). Toglie dalle tabelle cio' che quella dieta vieta.
+
 La colonna grammi_porzione e' controllata dal collaudo (controllo 13): se alimenti.csv
 cambia, il collaudo si ferma finche' non si esegue --rigenera.
 
@@ -48,6 +52,41 @@ STATI = {"confermato", "da_confermare", "solo_piano"}
 PASTI_PRINCIPALI = ("pranzo", "cena")
 QUOTA_SCAMBIO = 0.025                  # dello scarto ammesso sul target giornaliero
 LIMITE_GIORNO = 0.10                   # limite di sicurezza del nucleo, principio 8
+
+
+CHIAVI_ESCLUSIONI = ("escludi_food_id", "massimo_g_a_pasto", "verdure_crude_ammesse")
+
+
+def carica_esclusioni(path, db):
+    """Legge e valida il file. ValueError su campo non previsto, food_id sconosciuto o
+    valore non valido: chi lo usa si ferma."""
+    import json
+    with open(path, encoding="utf-8") as f:
+        dati = json.load(f)
+    if not isinstance(dati, dict):
+        raise ValueError(f"{path}: serve un oggetto JSON")
+    estranei = sorted(set(dati) - set(CHIAVI_ESCLUSIONI))
+    if estranei:
+        raise ValueError(f"{path}: campi non previsti: {', '.join(estranei)}")
+    vieti = dati.get("escludi_food_id", {})
+    massimi = dati.get("massimo_g_a_pasto", {})
+    crude = dati.get("verdure_crude_ammesse")
+    if not isinstance(vieti, dict) or not isinstance(massimi, dict) or \
+            not (crude is None or isinstance(crude, list)):
+        raise ValueError(f"{path}: formato non valido")
+    sconosciuti = sorted(f for f in [*vieti, *massimi, *(crude or [])] if f not in db)
+    if sconosciuti:
+        raise ValueError(f"{path}: food_id sconosciuti: {', '.join(map(str, sconosciuti))}")
+    for f, g in massimi.items():
+        if isinstance(g, bool) or not isinstance(g, (int, float)) or g <= 0:
+            raise ValueError(f"{path}: massimo non valido per {f}: {g}")
+    return {"vieti": set(vieti), "massimi": {f: float(g) for f, g in massimi.items()},
+            "crude": None if crude is None else set(crude)}
+
+
+def controlla_esclusioni(piano, esc):
+    """Una voce vietata non puo' stare nel piano: e' una contraddizione."""
+    return sorted({r["food_id"] for r in piano if r["food_id"] in esc["vieti"]})
 
 
 class Filtro:
@@ -109,11 +148,16 @@ def kcal(fid, grammi, db):
     return grammi * float(db[fid]["kcal_100g"]) / 100
 
 
-def _tabella(piano, db, scambi, campo, filtro=None):
+def _tabella(piano, db, scambi, campo, filtro=None, esc=None):
     """Righe = voci del piano (pranzo e cena) presenti nell'elenco; colonne = voci
     confermate. Ogni cella: grammi equivalenti e scarto in kcal."""
+    tolte_voci = sum(s["food_id"] in esc["vieti"] for s in scambi) if esc else 0
+    if esc:
+        scambi = [s for s in scambi if s["food_id"] not in esc["vieti"]]
     elenco = {s["food_id"]: s["nome_riferimento"] for s in scambi}
     colonne = [s for s in scambi if s["stato"] == "confermato"]
+    massimi = esc["massimi"] if esc else {}
+    tolte_celle = 0
     viste = sorted({(r["food_id"], float(r["grammi"])) for r in piano
                     if r["pasto"] in PASTI_PRINCIPALI and r["food_id"] in elenco},
                    key=lambda x: (list(elenco).index(x[0]), -x[1]))
@@ -126,6 +170,10 @@ def _tabella(piano, db, scambi, campo, filtro=None):
                 celle.append(None)
                 continue
             ga = equivalente(g, fid, alt, campo, db)
+            if alt in massimi and ga > massimi[alt]:
+                celle.append(None)
+                tolte_celle += 1
+                continue
             scarto = kcal(alt, ga, db) - kcal(fid, g, db)
             if filtro is not None and not filtro.ammesso(fid, g, scarto):
                 celle.append(None)
@@ -138,15 +186,15 @@ def _tabella(piano, db, scambi, campo, filtro=None):
     for r in righe:
         r["celle"] = [r["celle"][i] for i in vive]
     return {"colonne": [colonne[i]["nome_riferimento"] for i in vive], "righe": righe,
-            "esclusi": esclusi}
+            "esclusi": esclusi, "da_file": {"voci": tolte_voci, "celle": tolte_celle}}
 
 
-def tabella_carboidrati(piano, db, base=None, filtro=None):
-    return _tabella(piano, db, carica_scambi("scambi_carboidrati.csv", base), "carboidrati_g", filtro)
+def tabella_carboidrati(piano, db, base=None, filtro=None, esc=None):
+    return _tabella(piano, db, carica_scambi("scambi_carboidrati.csv", base), "carboidrati_g", filtro, esc)
 
 
-def tabella_pesce(piano, db, base=None, filtro=None):
-    return _tabella(piano, db, carica_scambi("scambi_pesce.csv", base), "proteine_g", filtro)
+def tabella_pesce(piano, db, base=None, filtro=None, esc=None):
+    return _tabella(piano, db, carica_scambi("scambi_pesce.csv", base), "proteine_g", filtro, esc)
 
 
 def _fasce(voci, grammi, limite):
@@ -161,7 +209,7 @@ def _fasce(voci, grammi, limite):
     return fasce
 
 
-def tabella_verdure(piano, db, base=None, filtro=None):
+def tabella_verdure(piano, db, base=None, filtro=None, esc=None):
     """Per ogni gruppo (crude, cotte) le fasce di verdure scambiabili tra loro. Con il
     filtro restano le fasce con una verdura del piano e, in queste, le voci che il piano
     regge; la verdura del piano non si toglie mai. Le verdure del piano senza scambio si
@@ -169,9 +217,15 @@ def tabella_verdure(piano, db, base=None, filtro=None):
     scambi = carica_scambi("scambi_verdure.csv", base)
     conf = [s for s in scambi if s["stato"] == "confermato"]
     gruppi, senza, esclusi = {}, [], 0
+    tolte = 0
     for u in ("crude", "cotte"):
+        tutte = [s for s in conf if s["uso"] in (u, "entrambe")]
+        ammesse = [s for s in tutte if not esc or s["food_id"] not in esc["vieti"]]
+        if esc and u == "crude" and esc["crude"] is not None:
+            ammesse = [s for s in ammesse if s["food_id"] in esc["crude"]]
+        tolte += len(tutte) - len(ammesse)
         voci = sorted((float(db[s["food_id"]]["kcal_100g"]), s["nome_riferimento"], s["food_id"])
-                      for s in conf if s["uso"] in (u, "entrambe"))
+                      for s in ammesse)
         if filtro is None:
             gruppi[u] = [[v[1] for v in voci]]
             continue
@@ -212,7 +266,7 @@ def tabella_verdure(piano, db, base=None, filtro=None):
                     if ruoli.get(r["food_id"]) == "verdura" and r["pasto"] in PASTI_PRINCIPALI
                     and r["food_id"] not in elenco})
     return {"gruppi": gruppi, "segnalate": segnalate, "fuori_elenco": fuori, "esclusi": esclusi,
-            "senza_scambio": sorted(set(senza) - mostrate)}
+            "senza_scambio": sorted(set(senza) - mostrate), "da_file": {"voci": tolte, "celle": 0}}
 
 
 def attese(nome, base=None, db=None):

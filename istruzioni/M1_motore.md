@@ -632,8 +632,11 @@ un alimento mancante. Un nome generico trova più voci: si sceglie in composizio
 Settimana e tabelle di conversione, in due o tre pagine, tutte calcolate da piano, metadati e
 `alimenti.csv` (M3, sezione 3). Richiede lo stesso verdetto e la stessa impronta del PDF.
 `python3 genera_scheda_cucina.py --piano ... --target ... --metadati ... --verdetto ...
-[--orari ...] [--eccezione-etichetta voci.csv --nomi-eccezione nomi.csv] --out-html
-scheda.html [--out-pdf scheda.pdf]`. Le voci da etichetta passano con gli stessi controlli di
+[--orari ...] [--eccezione-etichetta voci.csv --nomi-eccezione nomi.csv] [--esclusioni
+esclusioni.json] --out-html scheda.html [--out-pdf scheda.pdf]`. `--esclusioni` (04/11/2026,
+facoltativa): file fuori dal repository e dai metadati, con `escludi_food_id`,
+`massimo_g_a_pasto`, `verdure_crude_ammesse`; campo non previsto, `food_id` sconosciuto o voce
+vietata presente nel piano fermano la scheda. Le voci da etichetta passano con gli stessi controlli di
 `genera_zona_piano.py`: compaiono nella settimana con nome e nota di peso, mai nelle tabelle di
 scambio; non dichiarate, la scheda si ferma. Stampa righe, scarti in kcal e
 verdure del piano fuori elenco. Filtro di sicurezza (`tabelle_conversione.Filtro`, 04/11/2026):
@@ -642,7 +645,8 @@ della voce, con un secondo scambio al limite nessuno scenario supera il ±10% co
 energia per gruppo: una verdura del piano non sparisce, al massimo risulta «senza scambio». Il PDF richiede Chromium con Playwright. `adatta` prova su ogni
 pagina i `LIVELLI` (spazi, poi scrittura fino a 9 punti per gli ingredienti), sempre sulla stessa griglia;
 se due pagine non bastano prova tre, dividendo la settimana dove la scrittura resta più
-pari; se non basta si ferma. Si ferma anche se una quantità o un testo escono dal riquadro. Riporta pagine, livello e punti. L'HTML senza `--out-pdf` non
+pari; se non basta si ferma. Si ferma anche se una quantità o un testo escono dal riquadro. La misura
+è alla larghezza di stampa (180 mm) e il PDF si controlla: ogni pagina deve avere il suo «n/N». Riporta pagine, livello e punti. L'HTML senza `--out-pdf` non
 è misurato.
 
 ### genera_spiegazione.py — documento di spiegazione (30/10/2026)
