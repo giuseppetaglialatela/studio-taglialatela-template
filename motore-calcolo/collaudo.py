@@ -506,6 +506,23 @@ def controllo_13_tabelle():
     return True, "elenchi e grammature coerenti col ricalcolo; scheda solo su piano approvato"
 
 
+def controllo_14_fonti():
+    """Ogni valore del database contro la sua scheda in cache (04/11/2026). Una differenza
+    non elencata in differenze_note.csv ferma il motore."""
+    try:
+        sys.path.insert(0, BASE)
+        import verifica_fonti
+        nuove = verifica_fonti.nuove()
+        e = verifica_fonti.esamina()
+    except Exception as ex:
+        return False, f"controllo non eseguibile: {type(ex).__name__}: {ex}"
+    if nuove:
+        return False, ("valori diversi dalla scheda: "
+                       + "; ".join(f"{x[0]} {x[1]} {x[2]:g}" for x in nuove[:5]))
+    return True, (f"{e['verificata']} valori coincidono con la scheda, {len(e['diversa'])} "
+                  f"differenze note, {len(e['senza_scheda'])} senza scheda in cache")
+
+
 def controllo_5_checksum():
     """FASE 4 - verifica di integrita' contro SHA256SUMS.
 
@@ -676,6 +693,11 @@ def main():
 
     print("\n13) Tabelle di conversione e scheda per chi cucina")
     ok, dettaglio = controllo_13_tabelle()
+    print(f"   [{'OK ' if ok else 'XX '}] {dettaglio}")
+    tutto_ok = tutto_ok and ok
+
+    print("\n14) Valori del database contro le schede")
+    ok, dettaglio = controllo_14_fonti()
     print(f"   [{'OK ' if ok else 'XX '}] {dettaglio}")
     tutto_ok = tutto_ok and ok
 

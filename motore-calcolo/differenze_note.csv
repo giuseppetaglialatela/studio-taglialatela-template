@@ -1,0 +1,12 @@
+alimento,colonna,valore,schede,fonte,stato
+Ceci secchi cotti bolliti,vitamina_c_mg,0.1,0|5,CREA,da_esaminare
+Sardine fresche,zinco_mg,1.6,3.9,CREA+INSA(micronutrienti),"legittima: INSA 882, decisione del nutrizionista"
+Sardine fresche,magnesio_mg,31,70,CREA+INSA(micronutrienti),"legittima: INSA 882, decisione del nutrizionista"
+Branzino spigola,vitamina_b12_ug,0.6,4,CREA+BDA-IEO+USDA,da_esaminare
+Anguria cocomero fresco,magnesio_mg,11.4,8,CREA+BDA-IEO+USDA,da_esaminare
+Maiale lombo crudo,magnesio_mg,22,24,CREA+BDA-IEO+USDA,da_esaminare
+Trippa di bovini,magnesio_mg,13,8,CREA+USDA,da_esaminare
+Carciofi,magnesio_mg,60,45,CREA+BDA-IEO(proxy zinco/folati)+USDA,da_esaminare
+Olive verdi,folati_ug,0.5,0,CREA+BDA-IEO(proxy zinco/folati)+USDA,da_esaminare
+Cicoria di campo cruda,folati_ug,110,16,CREA+BDA-IEO+USDA(proxy folati/magnesio),da_esaminare
+Cicoria da taglio cruda,folati_ug,110,12,CREA+BDA-IEO+USDA(proxy folati/magnesio),da_esaminare

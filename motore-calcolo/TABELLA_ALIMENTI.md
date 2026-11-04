@@ -2,7 +2,7 @@
 
 Generata da `tabella_alimenti.py --genera-pagina` dai CSV del motore: non si modifica a mano. Valori per 100 g di parte edibile. «n.d.» = dato mancante, dichiarato in `gap.csv`: non è uno zero.
 
-**161 alimenti**, 12 valori mancanti su 7 alimenti.
+**161 alimenti**, 18 valori mancanti su 8 alimenti.
 
 ## Valori mancanti
 
@@ -20,6 +20,12 @@ Generata da `tabella_alimenti.py --genera-pagina` dai CSV del motore: non si mod
 | Mozzarella di bufala | epa_g | EPA/DHA non riportati dalla scheda BDA 11796_2: dato mancante, alimento di origine animale |
 | Orata d'allevamento filetti | vitamina_d_ug | alimento di origine animale: zero implausibile, dato non pubblicato dalla fonte |
 | Salmone affumicato | vitamina_d_ug | BDA-IEO dichiara traccia (0.005) su un pesce grasso; USDA riporta 17.1 ug ma con derivazione BFSN da altra forma dell alimento, dataPoints 0: valore probabilmente sottostimato, non usare come fonte portante |
+| Sardine fresche | colesterolo_mg | acidi grassi e colesterolo da INSA 882 (deroga INSA estesa agli acidi grassi, decisione del nutrizionista 31/10/2026): tabella non ancora acquisita |
+| Sardine fresche | dha_g | acidi grassi e colesterolo da INSA 882 (deroga INSA estesa agli acidi grassi, decisione del nutrizionista 31/10/2026): tabella non ancora acquisita |
+| Sardine fresche | epa_g | acidi grassi e colesterolo da INSA 882 (deroga INSA estesa agli acidi grassi, decisione del nutrizionista 31/10/2026): tabella non ancora acquisita |
+| Sardine fresche | monoinsaturi_g | acidi grassi e colesterolo da INSA 882 (deroga INSA estesa agli acidi grassi, decisione del nutrizionista 31/10/2026): tabella non ancora acquisita |
+| Sardine fresche | polinsaturi_g | acidi grassi e colesterolo da INSA 882 (deroga INSA estesa agli acidi grassi, decisione del nutrizionista 31/10/2026): tabella non ancora acquisita |
+| Sardine fresche | saturi_g | acidi grassi e colesterolo da INSA 882 (deroga INSA estesa agli acidi grassi, decisione del nutrizionista 31/10/2026): tabella non ancora acquisita |
 
 ## Altro
 
@@ -662,7 +668,7 @@ Generata da `tabella_alimenti.py --genera-pagina` dai CSV del motore: non si mod
 | Salmone | 2,97 | 4,6 | 3,05 | 0,89 | 1,19 | 35 |
 | Salmone affumicato | 0,777 | 1,8 | 1,268 | 0,205 | 0,532 | 35 |
 | Salmone in salamoia (in scatola) | 2,265 | 4,182 | 3,311 | 0,871 | 1,394 | 35 |
-| Sardine fresche | 3,78 | 3,15 | 5,98 | 2,44 | 1,67 | 63 |
+| Sardine fresche | n.d. | n.d. | n.d. | n.d. | n.d. | n.d. |
 | Scorfano | 0,09 | 0,078 | 0,125 | 0,011 | 0,086 | 67 |
 | Sgombro | 2,61 | 4,13 | 2,46 | 0,73 | 1,26 | 95 |
 | Sogliola fresca | 0,219 | 0,328 | 0,959 | 0,267 | 0,389 | 25 |
@@ -685,7 +691,7 @@ Generata da `tabella_alimenti.py --genera-pagina` dai CSV del motore: non si mod
 | Salmone | 700405 | BDA-IEO | 700405 | 2026-07-26 | BDA-IEO 700405_2 |
 | Salmone affumicato | 122410 | CREA+BDA-IEO | 122410+700407 | 2026-08-07 | BDA-IEO 700407_2 |
 | Salmone in salamoia (in scatola) | 1510 | BDA-IEO | 1510 | 2026-07-26 | BDA-IEO 1510_2 |
-| Sardine fresche | 122800 | CREA+INSA(micronutrienti) | 122800+INSA882 | 2026-10-01 | Bandarra 1997+BDA-IEO JFoodSci62(1)+1319_2 |
+| Sardine fresche | 122800 | CREA+INSA(micronutrienti) | 122800+INSA882 | 2026-10-01 |   |
 | Scorfano | 122900 | CREA+BDA-IEO | 122900 | 2026-09-15 | BDA-IEO 8739_2 |
 | Sgombro | 1321 | BDA-IEO | 1321 | 2026-07-26 | BDA-IEO 1321_2 |
 | Sogliola fresca | 1322 | BDA-IEO | 1322 | 2026-07-27 | BDA-IEO 1322_2 |

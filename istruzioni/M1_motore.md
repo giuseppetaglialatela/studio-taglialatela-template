@@ -158,6 +158,8 @@ Dodici controlli:
    oppure, per ogni valore che manca, la riga in `gap.csv`; nessun valore con un gap
    dichiarato; ogni nutriente di `gap.csv` esiste nel motore; saturi + mono + poli non oltre
    i grassi totali; autotest di `lipidi.py`
+14. ogni cella del database contro le schede in cache (`verifica_fonti.py`): si ferma su ogni
+   differenza non elencata in `differenze_note.csv`
 13. tabelle di conversione (04/11/2026): elenchi con `food_id` esistenti e ruolo ammesso
    (niente patate e legumi tra le verdure), `grammi_porzione` uguali al ricalcolo da
    `alimenti.csv`, scheda per chi cucina generata solo su piano approvato
@@ -628,6 +630,13 @@ nel dubbio un falso «assente», che si vede, piuttosto che un falso «presente�
 un alimento mancante. Un nome generico trova più voci: si sceglie in composizione.
 `autotest()` (45 prove) gira nel collaudo.
 
+### verifica_fonti.py — ogni valore contro la sua scheda (04/11/2026)
+Confronta le celle del database con le schede CREA e BDA-IEO in cache. Le differenze note stanno
+in `differenze_note.csv` con il loro stato (`legittima`, `da_esaminare`); il controllo 14 del
+collaudo si ferma su ogni differenza non elencata. Le celle da USDA non sono in cache: non sono
+coperte. Nessun valore si scrive a mano: si estrae dalla scheda, e la scheda deve essere stata
+letta sull'originale.
+
 ### tabella_alimenti.py — tabella di tutti gli alimenti (04/11/2026)
 `python3 tabella_alimenti.py --genera-pagina` riscrive `TABELLA_ALIMENTI.md` da `alimenti.csv`,
 `lipidi.csv` e `gap.csv`: valori, fonte e dati mancanti di ogni alimento. Si legge lì e non nel
@@ -834,10 +843,9 @@ nutrizionista, voce per voce, quando le tre fonti sono incoerenti tra loro e INS
 stessa specie e lo stesso stato (crudo/cotto). Mai per kcal e macro, che restano CREA; dal
 31/10/2026 (decisione del nutrizionista) vale anche per acidi grassi e colesterolo di
 `lipidi.csv`, in proporzione ai grassi CREA della voce. In `fonte` si scrive `INSA(...)`,
-in `codice_fonte` `INSA<cod>`. Righe in eccezione: 122800 sardine (micronutrienti). Acidi grassi delle sardine:
-dal 04/11/2026, con INSA non raggiungibile e su decisione del nutrizionista, da Bandarra et al.,
-J Food Sci 1997;62(1), *Sardina pilchardus* cruda con 15,8% di lipidi, sui 15,4 g CREA con
-fattore 0,90 per il pesce grasso (FAO, Exler 1975); colesterolo da BDA 1319_2.
+in `codice_fonte` `INSA<cod>`. Righe in eccezione: 122800 sardine (micronutrienti; acidi grassi e colesterolo in attesa della tabella INSA, oggi in
+`gap.csv`; candidato alternativo, solo se letto sull'originale: Bandarra et al., J Food Sci
+1997;62(1)). Un valore letto da un riassunto non entra nel database.
 
 **Eccezione etichetta — solo su richiesta esplicita del nutrizionista, mai nel database.**
 I valori di un'etichetta non entrano in `alimenti.csv`. Quando il nutrizionista lo chiede
@@ -909,7 +917,8 @@ componibili (`scelte_multiple.NUTRIENTI`).
   i saturi della BDA sono analitici o calcolati da un alimento simile (accettati, con
   l'origine registrata). EPA/DHA assenti dalla scheda: zero biologico per i vegetali, gap per
   gli alimenti di origine animale.
-- Aperti (in `gap.csv`): EPA/DHA di tacchino petto, tacchino fesa e bufala. Mozzarella di bufala
+- Aperti (in `gap.csv`): sardine 122800, in attesa di INSA 882; EPA/DHA di tacchino petto,
+  tacchino fesa e bufala. Mozzarella di bufala
   11796: acidi grassi della scheda BDA incoerenti, dal 04/11/2026 in proporzione dalla
   mozzarella di vacca BDA 1718_2 (decisione del nutrizionista).
 - Report: la pipeline mostra in TUTTI i piani saturi (g e % dell'energia), colesterolo ed
@@ -1013,9 +1022,9 @@ elenca le voci responsabili.
 Un valore sotto l'80% LARN con quel flag NON è una carenza accertata: prima di intervenire
 clinicamente, verifica se dipende dal gap.
 
-**Stato (verificato sul file il 04/11/2026):** 12 righe. Micronutrienti, 8 su 4 alimenti —
+**Stato (verificato sul file il 04/11/2026):** 18 righe. Micronutrienti, 8 su 4 alimenti —
 latte parzialmente scremato (vitamina D, B12), orata (vitamina D), salmone affumicato
-(vitamina D), trippa (vitamina D, B12, folati, zinco). Lipidi, 4 (vedi `lipidi.csv`,
+(vitamina D), trippa (vitamina D, B12, folati, zinco). Lipidi, 10 (vedi `lipidi.csv`,
 sezione 5).
 
 **Fave secche cotte — caso a parte:** minerali e folati presi dalla voce BDA delle fave
