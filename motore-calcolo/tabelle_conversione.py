@@ -20,7 +20,9 @@ DATI
 Filtro di sicurezza (decisione del 04/11/2026, delegata dal nutrizionista): uno scambio
 compare solo se 1) lo scarto non supera il 2,5% delle kcal del target, cosi' due scambi
 nello stesso giorno restano entro il 5%; 2) in ogni giorno in cui la voce compare, sommando
-lo scambio e un secondo scambio al limite, nessuno scenario supera il +/-10%.
+lo scambio e un secondo scambio uguale, nessuno scenario supera il +/-10%.
+Verdure: a parita' di peso si dividono in fasce di energia, per gruppo; una fascia con una
+verdura del piano non resta mai vuota in silenzio.
 
 La colonna grammi_porzione e' controllata dal collaudo (controllo 13): se alimenti.csv
 cambia, il collaudo si ferma finche' non si esegue --rigenera.
@@ -73,9 +75,9 @@ class Filtro:
             return False
         for g in self.dove.get((fid, float(grammi)), ()):
             lo, hi = self.giorni[g]
-            if hi + max(scarto, 0) + self.limite > (1 + LIMITE_GIORNO) * self.target:
+            if hi + 2 * max(scarto, 0) > (1 + LIMITE_GIORNO) * self.target:
                 return False
-            if lo + min(scarto, 0) - self.limite < (1 - LIMITE_GIORNO) * self.target:
+            if lo + 2 * min(scarto, 0) < (1 - LIMITE_GIORNO) * self.target:
                 return False
         return True
 
@@ -147,28 +149,54 @@ def tabella_pesce(piano, db, base=None, filtro=None):
     return _tabella(piano, db, carica_scambi("scambi_pesce.csv", base), "proteine_g", filtro)
 
 
+def _fasce(voci, grammi, limite):
+    """voci: [(kcal/100 g, nome, food_id)] in ordine. Fasce in cui due voci qualsiasi, a
+    quel peso, differiscono al massimo di 'limite' kcal."""
+    fasce = []
+    for v in voci:
+        if fasce and (v[0] - fasce[-1][0][0]) * grammi / 100 <= limite:
+            fasce[-1].append(v)
+        else:
+            fasce.append([v])
+    return fasce
+
+
 def tabella_verdure(piano, db, base=None, filtro=None):
-    """Gruppi crude e cotte, voci che si discostano, verdure del piano fuori elenco.
-    Con il filtro un gruppo mostra solo cio' che puo' sostituire ogni sua verdura del
-    piano; senza verdure del piano il gruppo resta vuoto."""
+    """Per ogni gruppo (crude, cotte) le fasce di verdure scambiabili tra loro. Con il
+    filtro restano le fasce con una verdura del piano e, in queste, le voci che il piano
+    regge; la verdura del piano non si toglie mai. Le verdure del piano senza scambio si
+    riportano in 'senza_scambio', non spariscono in silenzio."""
     scambi = carica_scambi("scambi_verdure.csv", base)
     conf = [s for s in scambi if s["stato"] == "confermato"]
-    gruppi = {u: [s["nome_riferimento"] for s in conf if s["uso"] in (u, "entrambe")]
-              for u in ("crude", "cotte")}
-    esclusi = 0
-    if filtro is not None:
-        ids = {s["nome_riferimento"]: s["food_id"] for s in conf}
-        gruppi_f = {}
-        for u, nomi_u in gruppi.items():
-            del_piano = {(ids[n], float(r["grammi"])) for n in nomi_u for r in piano
-                         if r["food_id"] == ids[n] and r["pasto"] in PASTI_PRINCIPALI}
-            tenuti = [n for n in nomi_u if del_piano and all(
-                f == ids[n] or filtro.ammesso(f, g, kcal(ids[n], g, db) - kcal(f, g, db))
-                for f, g in del_piano)]
-            esclusi += len(nomi_u) - len(tenuti) if del_piano else 0
-            gruppi_f[u] = tenuti
-        gruppi = gruppi_f
-    mostrate = set(gruppi["crude"]) | set(gruppi["cotte"])
+    gruppi, senza, esclusi = {}, [], 0
+    for u in ("crude", "cotte"):
+        voci = sorted((float(db[s["food_id"]]["kcal_100g"]), s["nome_riferimento"], s["food_id"])
+                      for s in conf if s["uso"] in (u, "entrambe"))
+        if filtro is None:
+            gruppi[u] = [[v[1] for v in voci]]
+            continue
+        del_piano = {}
+        for r in piano:
+            if r["pasto"] in PASTI_PRINCIPALI and any(v[2] == r["food_id"] for v in voci):
+                del_piano.setdefault(r["food_id"], []).append(float(r["grammi"]))
+        if not del_piano:
+            gruppi[u] = []
+            continue
+        peso = max(g for gg in del_piano.values() for g in gg)
+        gruppi[u] = []
+        for fascia in _fasce(voci, peso, filtro.limite):
+            nel_piano = [v for v in fascia if v[2] in del_piano]
+            if not nel_piano:
+                continue
+            tenute = [v for v in fascia if v[2] in del_piano or all(
+                filtro.ammesso(f[2], g, (v[0] - f[0]) * g / 100)
+                for f in nel_piano for g in del_piano[f[2]])]
+            esclusi += len(fascia) - len(tenute)
+            if len(tenute) > 1:
+                gruppi[u].append([v[1] for v in tenute])
+            else:
+                senza.append(tenute[0][1])
+    mostrate = {n for fasce in gruppi.values() for f in fasce for n in f}
     segnalate = []
     for s in conf:
         if s["nome_riferimento"] not in mostrate:
@@ -183,7 +211,8 @@ def tabella_verdure(piano, db, base=None, filtro=None):
     fuori = sorted({db[r["food_id"]]["nome"] for r in piano
                     if ruoli.get(r["food_id"]) == "verdura" and r["pasto"] in PASTI_PRINCIPALI
                     and r["food_id"] not in elenco})
-    return {"gruppi": gruppi, "segnalate": segnalate, "fuori_elenco": fuori, "esclusi": esclusi}
+    return {"gruppi": gruppi, "segnalate": segnalate, "fuori_elenco": fuori, "esclusi": esclusi,
+            "senza_scambio": sorted(set(senza) - mostrate)}
 
 
 def attese(nome, base=None, db=None):

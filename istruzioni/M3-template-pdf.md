@@ -308,6 +308,7 @@ di conversione, personalizzate sulle voci del piano:
   e lo scarto in kcal dichiarato. Quinoa e piadina compaiono solo se sono nel piano,
   mai come alternative (`solo_piano`): a parità di carboidrati superano le 100 kcal in più.
 - **Pesce:** a parità di proteine, stesso arrotondamento.
+- **Voci con meno di 3 scambi:** non occupano una colonna, vanno in una riga sotto la tabella.
 - **Verdure:** a parità di peso, gruppi crude e cotte, patate e legumi esclusi, segnalate
   quelle che si discostano.
 
@@ -323,9 +324,10 @@ impronta approvata. Un piano con eccezione etichetta richiede gli stessi due fil
 
 **Adattamento al contenuto (04/11/2026).** Il contenuto del piano non si cambia per far
 entrare la scheda. Il motore prova due pagine, riducendo spazi e poi scrittura fino al minimo
-approvato di 8 punti per gli ingredienti e 8,5 per i titoli; sotto non si scende. Se non basta
-passa da solo a tre pagine: due per la settimana, una per le tabelle. Se non bastano nemmeno
-tre si ferma e decide il nutrizionista. Pagine, livello e punti si riportano in chat. Il suo riepilogo (scarti, verdure fuori elenco) si riporta in chat.
+di 9 punti per gli ingredienti; sotto non si scende. Griglie regolari in ogni livello: nessun
+riquadro orfano, stessa altezza per riga, stile del piano. Se non basta passa da solo a tre
+pagine: due per la settimana, una per le tabelle. Se non bastano nemmeno
+tre, o se una quantità esce dal riquadro, si ferma e decide il nutrizionista. Pagine, livello e punti si riportano in chat. Il suo riepilogo (scarti, verdure fuori elenco) si riporta in chat.
 
 ## 4. ANTEPRIMA OBBLIGATORIA
 

@@ -2,9 +2,9 @@
 """
 Scheda per chi cucina (04/11/2026): la settimana, a riquadri per giorno, e le tabelle
 di conversione. Si adatta da sola al contenuto: due pagine finche' si puo', con spazi
-e scrittura ridotti fino al minimo di 8 punti per gli ingredienti, poi tre pagine.
+e scrittura ridotti fino al minimo di 9 punti per gli ingredienti, poi tre pagine.
 
-Grafica scelta dal nutrizionista il 04/11/2026 (versione B). Qui i dati vengono tutti da
+Grafica approvata dal nutrizionista il 04/11/2026: griglie regolari, stile del piano. Qui i dati vengono tutti da
 piano, metadati e alimenti.csv: nessuna grammatura scritta a mano.
 
 Si genera dopo i controlli del piano: stesso verdetto e stessa impronta approvata
@@ -22,6 +22,7 @@ import argparse
 import html
 import json
 import os
+import re
 import sys
 import tempfile
 
@@ -42,25 +43,39 @@ NOMI_BREVI = {"702901": "Olio EVO", "391": "Pomodori", "392": "Pomodori pelati",
               "4505": "Lenticchie lessate", "000550": "Pane integrale"}
 GIORNI = {"lun": "Lunedì", "mar": "Martedì", "mer": "Mercoledì", "gio": "Giovedì",
           "ven": "Venerdì", "sab": "Sabato", "dom": "Domenica"}
-CSS = """@page{size:A4;margin:12mm 13mm}*{box-sizing:border-box}
-:root{--blu:#1d3a4a;--ver:#2e7d8c;--ara:#c0562b;--gr:#5b6770;--lin:#d5e0e3;--ten:#f1f6f7}
-body{margin:0;font-family:'Liberation Sans',Arial,sans-serif;font-size:10pt;line-height:1.35;color:#1f2529;background:#fff}
-.pag{page-break-after:always;height:272mm;display:flex;flex-direction:column}.pag:last-child{page-break-after:auto}
-.top{display:flex;justify-content:space-between;font-size:8.5pt;color:var(--gr);border-bottom:1.5px solid var(--ver);padding-bottom:3px}.top b{color:var(--ver)}
-h1{font-size:19pt;color:var(--blu);margin:7px 0 1px}.sub{color:var(--gr);font-size:9.5pt;margin-bottom:5px}
-h2{font-size:11pt;color:var(--ara);margin:8px 0 4px}h2 span{color:var(--gr);font-weight:normal;font-size:9pt}
-.t{font-weight:bold;color:var(--blu)}.griglia{display:grid;gap:5px 10px;grid-template-columns:1fr 1fr}
-.voci{display:flex;flex-wrap:wrap;gap:0 9px;font-size:9.5pt}.voci span{white-space:nowrap}
-.card{background:var(--ten);border-radius:4px;padding:4px 8px;break-inside:avoid}.l{color:var(--ver);font-weight:bold;margin-right:3px}.sc{color:var(--gr);font-size:9pt}
-.gg{break-inside:avoid;border:1px solid var(--lin);border-radius:5px;overflow:hidden}.gg .d{background:var(--ver);color:#fff;font-weight:bold;padding:2px 8px}.gg .m{padding:3px 8px;border-top:1px solid var(--lin)}.gg .d+.m{border-top:0}.gg .e{font-size:8pt;color:var(--ver);font-weight:bold;letter-spacing:.4px}
-.libero{grid-column:1/3}.libero .m{display:grid;grid-template-columns:1fr 1fr;gap:10px;border-top:0}
-.conv{width:100%;border-collapse:collapse;font-size:9.5pt}.conv th,.conv td{padding:3.5px 6px;text-align:center;border-bottom:1px solid var(--lin)}.conv thead th{color:var(--blu);font-weight:normal;font-size:8.5pt;border-bottom:1.5px solid var(--ver);vertical-align:bottom}.conv th.cap{text-align:left;color:var(--gr);font-style:italic}.conv tbody th{text-align:left;color:var(--blu);font-weight:bold}.conv td.sel{color:#b6c1c5}.conv tbody tr:nth-child(even){background:var(--ten)}
-.n{color:var(--gr);font-size:9pt;margin-top:4px}.chip{display:inline-block;background:var(--ten);border-radius:10px;padding:1px 8px;margin:0 3px 3px 0;font-size:9.5pt}.v{display:grid;grid-template-columns:60px 1fr;gap:3px 6px;align-items:baseline}.v>b{color:var(--ver)}
-.pag{font-size:var(--fs,10pt);line-height:var(--lh,1.35)}.voci{font-size:var(--fv,9.5pt)}.card{padding:var(--pc,4px 8px)}.gg .m{padding:var(--pm,3px 8px)}
-.griglia{gap:var(--gap,5px 10px)}h2{margin:var(--mh,8px 0 4px)}h1{font-size:var(--h1,19pt);margin:var(--mh1,7px 0 1px)}.sub{margin-bottom:var(--msub,5px)}
-.conv{font-size:var(--fv,9.5pt)}.conv th,.conv td{padding:var(--pt,3.5px 6px)}
-.flusso .giorni{display:block;columns:2;column-gap:10px}.flusso .giorni .gg{margin-bottom:4px}.flusso .libero .m{display:block}.flusso .scelte{grid-template-columns:1fr 1fr 1fr}
-.foot{margin-top:auto;border-top:1px solid var(--lin);padding-top:3px;color:var(--gr);font-size:8pt;display:flex;justify-content:space-between;gap:12px}"""
+CSS = """@page{size:A4;margin:11mm 15mm 10mm}*{box-sizing:border-box}
+:root{--navy:#1C3A4A;--teal:#2E7D8C;--ara:#C0622B;--gr:#666;--lin:#CCC;--ten:#F4F8F9;--testo:#333}
+body{margin:0;font-family:'Liberation Sans',Arial,sans-serif;color:#1A1A1A;background:#fff}
+.pag{page-break-after:always;height:276mm;display:flex;flex-direction:column;font-size:var(--fs,10pt);line-height:var(--lh,1.32)}.pag:last-child{page-break-after:auto}
+.top{font-size:9pt;color:var(--gr);border-bottom:.7pt solid var(--teal);padding-bottom:3px}.top b{color:var(--teal)}.top i{font-style:italic}
+h1{font-size:var(--h1,19pt);color:var(--navy);text-align:center;margin:var(--mh1,10px 0 1px)}.sub{color:var(--gr);font-style:italic;font-size:9pt;text-align:center;margin-bottom:var(--msub,6px)}
+h2{font-size:10.5pt;color:var(--ara);margin:var(--mh,10px 0 4px);text-transform:uppercase;letter-spacing:.4px}h2 span{color:var(--gr);font-weight:normal;font-size:9pt;text-transform:none;letter-spacing:0;font-style:italic}
+.griglia{display:grid;gap:var(--gap,6px 10px)}
+.t{font-weight:bold;color:var(--navy);font-size:calc(var(--fs,10pt) + .5pt)}.l{color:var(--ara);font-weight:bold;margin-right:4px}.sc{color:var(--gr);font-size:8.5pt;font-style:italic}
+.voci{display:flex;flex-wrap:wrap;gap:0 10px;font-size:var(--fv,9.5pt);color:var(--testo);margin-top:1px}.voci>span{max-width:100%;min-width:0;overflow-wrap:anywhere}.voci b{color:#1A1A1A;white-space:nowrap}
+.card{background:var(--ten);border:.5pt solid #DCE6E9;border-radius:3px;padding:var(--pc,4px 8px);min-width:0}
+.giorni{grid-template-columns:1fr 1fr}
+.gg{display:grid;grid-row:span 3;grid-template-rows:subgrid;row-gap:0;border:.7pt solid var(--teal);border-radius:3px;overflow:hidden;min-width:0;break-inside:avoid}.gg .d{background:var(--teal);color:#fff;font-weight:bold;padding:2px 8px}.gg .m{padding:var(--pm,4px 8px);border-top:.5pt solid var(--lin)}.pr .m:first-child{border-top:0}.ce{border-top:.5pt solid var(--lin)}.ce .m{border-top:0}
+.e{font-size:8pt;color:var(--teal);font-weight:bold;letter-spacing:.5px}.cena .e{color:var(--navy)}
+.libero .m{grid-row:span 2;border-top:0}.fascia{grid-column:1/3;grid-row:span 2}.fascia .m{grid-row:auto}.fascia .m{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.conv{width:100%;border-collapse:collapse;font-size:var(--fv,9.5pt)}.conv th,.conv td{padding:var(--pt,3.5px 6px);text-align:center;border-bottom:.5pt solid var(--lin)}.conv thead th{background:var(--teal);color:#fff;font-weight:normal;font-size:8.5pt;vertical-align:bottom;border:0}.conv th.cap{text-align:left;font-style:italic}.conv tbody th{text-align:left;color:var(--navy);font-weight:bold}.conv td.sel{color:#B6C1C5}.conv tbody tr:nth-child(even){background:var(--ten)}
+.n{color:var(--gr);font-size:9pt;margin-top:3px;font-style:italic}.chip{display:inline-block;background:var(--ten);border-radius:10px;padding:1px 8px;margin:0 3px 3px 0;font-size:9.5pt}.v{display:grid;grid-template-columns:60px 1fr;gap:3px 6px;align-items:baseline}.v>b{color:var(--teal)}
+.foot{margin-top:auto;border-top:.5pt solid var(--lin);padding-top:3px;color:var(--gr);font-size:7.5pt;display:flex;justify-content:space-between;gap:12px}"""
+
+
+def _giorno(testo):
+    """Il testo dei metadati, con le abbreviazioni scritte per intero («sab o dom»)."""
+    t = re.sub(r"\b(lun|mar|mer|gio|ven|sab|dom)\b",
+               lambda m: GIORNI[m.group(1)].lower(), str(testo), flags=re.I)
+    return t[:1].upper() + t[1:]
+
+
+def colonne_griglia(n):
+    """Colonne per n riquadri, mai uno solo sull'ultima riga."""
+    c = {1: 1, 2: 2, 3: 3, 4: 2, 5: 3, 6: 3, 7: 4, 8: 4, 9: 3}.get(n, 4)
+    if n > c and n % c == 1:
+        c -= 1
+    return c
 
 
 def _g(v):
@@ -105,16 +120,30 @@ def _orario(orari, primo, pasto):
     return f" ore {o}" if o else ""
 
 
+MIN_SCAMBI_COLONNA = 3
+
+
 def _tabella_html(t):
-    """Una riga per alternativa, una colonna per ogni voce del piano."""
-    testa = "".join(f"<th>{E(r['nome'])}<br><b>{r['grammi']:g} g</b></th>" for r in t["righe"])
+    """Una riga per alternativa, una colonna per ogni voce del piano. Le voci con meno di
+    tre scambi non occupano una colonna quasi vuota: vanno in una riga sotto la tabella."""
+    piene = [j for j, r in enumerate(t["righe"])
+             if sum(c is not None for c in r["celle"]) >= MIN_SCAMBI_COLONNA]
+    testa = "".join(f"<th>{E(t['righe'][j]['nome'])}<br><b>{t['righe'][j]['grammi']:g} g</b></th>" for j in piene)
     corpo = ""
     for i, col in enumerate(t["colonne"]):
-        celle = "".join("<td class=sel>—</td>" if r["celle"][i] is None
-                        else f"<td>{r['celle'][i]['grammi']}\u00a0g</td>" for r in t["righe"])
+        if not any(t["righe"][j]["celle"][i] for j in piene):
+            continue
+        celle = "".join("<td class=sel>—</td>" if t["righe"][j]["celle"][i] is None
+                        else f"<td>{t['righe'][j]['celle'][i]['grammi']}\u00a0g</td>" for j in piene)
         corpo += f"<tr><th>{E(col)}</th>{celle}</tr>"
-    return (f"<table class=conv><thead><tr><th class=cap>Al posto di →</th>{testa}</tr></thead>"
-            f"<tbody>{corpo}</tbody></table>")
+    out = (f"<table class=conv><thead><tr><th class=cap>Al posto di →</th>{testa}</tr></thead>"
+           f"<tbody>{corpo}</tbody></table>") if piene else ""
+    for j, r in enumerate(t["righe"]):
+        if j in piene:
+            continue
+        sc = ", ".join(f"{col} {c['grammi']}\u00a0g" for col, c in zip(t["colonne"], r["celle"]) if c)
+        out += f"<div class=n><b>{E(r['nome'])} {r['grammi']:g} g:</b> {E(sc) if sc else 'nessuno scambio previsto'}.</div>"
+    return out
 
 
 def scarto_massimo(t):
@@ -132,10 +161,10 @@ def _voci(rr, nomi, uovo_g, etichetta=frozenset()):
     for r in rr:
         v = voce(r, nomi, uovo_g, etichetta)
         if r["food_id"] == FOOD_UOVO:
-            out += f"<span><b>{E(v)}</b></span>"
+            out += f"<span class=x><b class=q>{E(v)}</b></span>"
         else:
             nome, peso = v.rsplit(" ", 1)
-            out += f"<span>{E(nome)} <b>{E(peso)}</b></span>"
+            out += f"<span class=x>{E(nome)} <b class=q>{E(peso)}</b></span>"
     return f"<div class=voci>{out}</div>"
 
 
@@ -166,6 +195,11 @@ def componi(piano, db, nomi, meta, orari, target_kcal, etichetta=frozenset(), pa
                     + _voci(_sel(piano, primo, pasto, o), nomi, uovo_g, etichetta) + "</div>")
         return out
 
+    def griglia_carte(pasto):
+        n = len(_opzioni(piano, primo, pasto))
+        return (f"<div class=griglia style='grid-template-columns:repeat({colonne_griglia(n)},1fr)'>"
+                f"{carte(pasto)}</div>")
+
     def ora(pasto):
         return _orario(orari, primo, pasto).replace(" ore ", "ore ")
 
@@ -184,31 +218,34 @@ def componi(piano, db, nomi, meta, orari, target_kcal, etichetta=frozenset(), pa
         if cont("spuntino") == cont("spuntino2") and tit("spuntino") == tit("spuntino2"):
             orari_sp = " e ".join(x for x in (ora("spuntino"), ora("spuntino2")) if x)
             nota = ", ".join(x for x in ("uno a scelta", orari_sp) if x)
-            spuntini = f"<h2>Spuntini <span>{E(nota)}</span></h2><div class='griglia scelte'>{carte('spuntino')}</div>"
+            spuntini = f"<h2>Spuntini <span>{E(nota)}</span></h2>{griglia_carte('spuntino')}"
         else:
             spuntini = (f"<div class=griglia><div>{sez('Spuntino', 'spuntino')}{carte('spuntino')}</div>"
                         f"<div>{sez('Secondo spuntino', 'spuntino2')}{carte('spuntino2')}</div></div>")
     else:
-        spuntini = sez("Spuntino", "spuntino") + f"<div class='griglia scelte'>{carte('spuntino')}</div>"
+        spuntini = sez("Spuntino", "spuntino") + f"{griglia_carte('spuntino')}"
 
     lav = meta["giorni"]["lavorativi"]
     carte_g = []
     for i, g in enumerate(giorni):
-        nome = GIORNI.get(str(lav[i]).lower()[:3], str(lav[i]))
-        blocchi = ""
+        nome = _giorno(lav[i])
+        blocchi = {"pranzo": "", "cena": ""}
         for pasto, et in (("pranzo", "PRANZO"), ("cena", "CENA")):
             orario = ora(pasto)
             testa = f"{et}{' · ' + E(orario) if orario else ''}"
             for o in _opzioni(piano, g, pasto):
                 let = f" {E(o)}" if o else ""
-                blocchi += f"<div class=m><div class=e>{testa}{let}</div>{piatto(g, pasto, o)}</div>"
-        carte_g.append(f"<div class=gg><div class=d>{E(nome)}</div>{blocchi}</div>")
+                blocchi[pasto] += f"<div class=m><div class=e>{testa}{let}</div>{piatto(g, pasto, o)}</div>"
+        carte_g.append(f"<div class=gg><div class=d>{E(nome)}</div><div class=pr>{blocchi['pranzo']}</div>"
+                       f"<div class=ce>{blocchi['cena']}</div></div>")
     lib = meta.get("indicazioni_giorno_libero")
     if isinstance(lib, dict):
-        nome = GIORNI.get(str(meta["giorni"].get("libero", "")).lower()[:3], "Giorno libero")
-        carte_g.append(f"<div class='gg libero'><div class=d>{E(nome)} · pasto libero</div><div class=m>"
-               f"<div><span class=e>PRANZO</span> {E(lib['pranzo'])}</div>"
-               f"<div><span class=e>CENA</span> {E(lib['cena'])}</div></div></div>")
+        nome = _giorno(meta["giorni"].get("libero") or "Giorno libero")
+        # numero dispari di giorni: il giorno libero chiude la griglia, altrimenti fascia
+        classe = "libero" if len(carte_g) % 2 else "libero fascia"
+        carte_g.append(f"<div class='gg {classe}'><div class=d>{E(nome)} · pasto libero</div><div class=m>"
+                       f"<div><span class=e>PRANZO</span> {E(lib['pranzo'])}</div>"
+                       f"<div><span class=e>CENA</span> {E(lib['cena'])}</div></div></div>")
     primi, resto = (carte_g[:giorni_p1], carte_g[giorni_p1:]) if pagine == 3 else ([], carte_g)
 
     filtro = tc.Filtro(piano, db, target_kcal)
@@ -217,9 +254,13 @@ def componi(piano, db, nomi, meta, orari, target_kcal, etichetta=frozenset(), pa
                           tc.tabella_verdure(piano, db, filtro=filtro))
     note = meta.get("scheda_cucina") or {}
     seg = "".join(f" {E(s)}." for s in verd["segnalate"])
-    chip = lambda k: "".join(f"<span class=chip>{E(x)}</span>" for x in verd["gruppi"][k])
-    gruppi_v = "".join(f"<b>{n}</b><div>{chip(k)}</div>" for n, k in (("Crude", "crude"), ("Cotte", "cotte"))
-                       if verd["gruppi"][k])
+    gruppi_v = "".join(f"<b>{n}</b><div>{''.join(f'<span class=chip>{E(x)}</span>' for x in f)}</div>"
+                       for n, k in (("Crude", "crude"), ("Cotte", "cotte"))
+                       for f in verd["gruppi"][k])
+    if any(len(f) > 1 for f in verd["gruppi"].values()):
+        seg = " Si scambiano solo le verdure della stessa riga." + seg
+    if verd["senza_scambio"]:
+        seg += f" Senza scambio: {E(', '.join(verd['senza_scambio']))}."
     trattino = "<div class=n>— = scambio non previsto per questo piano.</div>"
     vuoto = "<div class=n>Nessuno scambio previsto per questo piano.</div>"
     corpo = lambda t: f"{_tabella_html(t)}{trattino}{_nota_scarto(t)}" if t["colonne"] else vuoto
@@ -231,8 +272,7 @@ def componi(piano, db, nomi, meta, orari, target_kcal, etichetta=frozenset(), pa
              if pesce["righe"] else "")
     sez_v = (f"<h2>Verdure <span>stesso peso, stesso gruppo</span></h2><div class=v>{gruppi_v}</div>"
              f"<div class=n>Patate e legumi non si scambiano con le verdure.{seg}</div>")
-    top = ("<div class=top><span><b>Dott. Giuseppe Taglialatela</b> — Consulente in Nutrizione</span>"
-           "<span>Scheda per chi cucina</span></div>")
+    top = "<div class=top><b>Dott. Giuseppe Taglialatela</b> <i>— Consulente in Nutrizione</i></div>"
     nome_paz = E(meta["intestazione"]["nome"])
     piede = " · ".join(x for x in ("Pesi sempre a crudo, tranne legumi lessati e scatolame",
                                    E(note.get("note_piede", ""))) if x)
@@ -244,8 +284,8 @@ def componi(piano, db, nomi, meta, orari, target_kcal, etichetta=frozenset(), pa
         salto = ((f"<h2>Pranzo e cena</h2>{griglia(primi)}" if primi else "")
                  + f"{foot(1)}</div><div class=pag>{top}<h1>Pranzo e cena</h1><div class=sub>{nome_paz}</div>")
     pagina = f"""<!doctype html><html lang=it><head><meta charset=utf-8><title>Scheda per chi cucina</title><style>{CSS}</style></head><body>
-<div class=pag>{top}<h1>La settimana</h1><div class=sub>{nome_paz}</div>
-{sez('Colazione', 'colazione')}<div class="griglia scelte">{carte('colazione')}</div>{spuntini}
+<div class=pag>{top}<h1>La settimana</h1><div class=sub>{nome_paz} · scheda per chi cucina</div>
+{sez('Colazione', 'colazione')}{griglia_carte('colazione')}{spuntini}
 {salto}{"" if pagine == 3 else "<h2>Pranzo e cena</h2>"}{griglia(resto)}{foot(pagine - 1)}</div>
 <div class=pag>{top}<h1>Come scambiare gli alimenti</h1><div class=sub>{nome_paz} · Lo scambio vale nello stesso pasto</div>
 {sez_c}{sez_p}{sez_v}{foot(pagine)}</div></body></html>"""
@@ -264,16 +304,31 @@ def _dati(piano_p, target_p, meta_p, orari_p=None, **kw):
 
 
 # Adattamento al contenuto (decisione del nutrizionista, 04/11/2026). Ogni pagina prova i
-# livelli in ordine e si ferma al primo che entra; il contenuto non cambia mai.
-# Minimo approvato: ingredienti a 8 punti, titoli a 8,5.
-SPAZI = ("--gap:3px 8px;--mh:5px 0 2px;--h1:16pt;--mh1:4px 0 0;--msub:2px;--pc:2px 6px;"
-         "--pm:2px 6px;--pt:2px 5px;")
-LIVELLI = (("normale", 10.0, 9.5, "", False),
-           ("spazi ridotti", 10.0, 9.5, SPAZI, False),
-           ("colonne a riempimento", 10.0, 9.5, SPAZI, True),
-           ("scrittura 9,5", 9.5, 9.0, SPAZI, True),
-           ("scrittura 9", 9.0, 8.5, SPAZI, True),
-           ("scrittura minima 8,5", 8.5, 8.0, SPAZI, True))
+# livelli in ordine e si ferma al primo che entra; il contenuto non cambia mai. Ogni
+# livello tiene la stessa griglia. Minimo: ingredienti a 9 punti, poi la terza pagina.
+SPAZI = ("--gap:4px 8px;--mh:6px 0 3px;--h1:16pt;--mh1:5px 0 0;--msub:3px;--pc:3px 6px;"
+         "--pm:2px 7px;--pt:2.5px 5px;")
+LIVELLI = (("normale", 10.0, 9.5, ""),
+           ("spazi ridotti", 10.0, 9.5, SPAZI),
+           ("scrittura minima 9", 9.5, 9.0, SPAZI))
+_TAGLI = """() => { const fuori = [];
+  for (const q of document.querySelectorAll('.q, .t, .chip, .conv td, .conv th, .x')) {
+    const c = q.closest('.card, .gg, .pag').getBoundingClientRect(), r = q.getBoundingClientRect();
+    if (r.right > c.right + 0.5 || r.left < c.left - 0.5) fuori.push(q.textContent.trim().slice(0, 60)); }
+  return fuori; }"""
+
+
+_VUOTI = """() => [...document.querySelectorAll('.pag')].map(p => {
+  const c = [...p.children], f = c[c.length - 1], u = c[c.length - 2];
+  return Math.round(f.getBoundingClientRect().top - u.getBoundingClientRect().bottom); })"""
+
+
+def controlla_tagli(pag):
+    """Ogni quantita' e ogni testo devono stare dentro il loro riquadro."""
+    fuori = pag.evaluate(_TAGLI)
+    if fuori:
+        raise Fermo("scheda: testo tagliato dal bordo, quantita' non leggibile: "
+                    + "; ".join(f"«{t}»" for t in fuori[:3]) + ". PDF non generato")
 
 
 def _adatta_pagine(pag):
@@ -281,9 +336,9 @@ def _adatta_pagine(pag):
     una pagina non entra al minimo, (None, pagina, altezza, disponibile)."""
     esito = []
     for n, el in enumerate(pag.query_selector_all(".pag"), 1):
-        for nome, fs, fv, spazi, flusso in LIVELLI:
-            el.evaluate("(p, a) => { p.style.cssText = a[0]; p.classList.toggle('flusso', a[1]); }",
-                        [f"--fs:{fs}pt;--fv:{fv}pt;--lh:{1.35 if fs >= 10 else 1.25};{spazi}", flusso])
+        for nome, fs, fv, spazi in LIVELLI:
+            el.evaluate("(p, a) => { p.style.cssText = a; }",
+                        f"--fs:{fs}pt;--fv:{fv}pt;--lh:{1.32 if fs >= 10 else 1.25};{spazi}")
             alto, disp = el.evaluate("p => [p.scrollHeight, p.clientHeight]")
             if alto <= disp + 1:
                 esito.append((n, nome, fv))
@@ -311,22 +366,28 @@ def adatta(costruisci, html_p, pdf_p, n_giorni):
         esito, scelta = prova(2, 0), (2, 0)
         if isinstance(esito, tuple):
             ultimo, migliore = esito, None
-            for k in range(n_giorni + 1):
+            for k in range(0, n_giorni + 1, 2):         # righe intere di riquadri
                 e = prova(3, k)
                 if isinstance(e, tuple):
                     ultimo = e
                     continue
-                voto = (min(x[2] for x in e), k)
+                v = pag.evaluate(_VUOTI)                # pagine piene in modo simile
+                voto = (-abs(v[0] - v[1]), min(x[2] for x in e))
                 if migliore is None or voto > migliore[0]:
                     migliore = (voto, e, k)
             if migliore is None:
                 b.close()
                 _, n, alto, disp = ultimo
-                raise Fermo(f"scheda: il contenuto non sta in tre pagine alla scrittura minima "
+                raise Fermo(f"scheda: il contenuto non sta in tre pagine con ingredienti a 9 punti, la scrittura minima "
                             f"(pagina {n}: {alto} px su {disp}, {100 * (alto - disp) // disp + 1}% "
                             f"di troppo). PDF non generato: serve una decisione del nutrizionista")
             esito, scelta = migliore[1], (3, migliore[2])
             prova(*scelta)
+        try:
+            controlla_tagli(pag)
+        except Fermo:
+            b.close()
+            raise
         pag.pdf(path=pdf_p, prefer_css_page_size=True, print_background=True)
         with open(html_p, "w", encoding="utf-8") as f:
             f.write(pag.content())
@@ -341,7 +402,10 @@ def riepilogo(tabelle):
         s = scarto_massimo(tabelle[nome])
         L.append(f"{nome}: {len(tabelle[nome]['righe'])} righe, {tabelle[nome]['esclusi']} scambi "
                  f"esclusi dal filtro" + (f", scarto da {s[0]:+d} a {s[1]:+d} kcal" if s else ""))
-    L.append(f"verdure: {tabelle['verdure']['esclusi']} voci escluse dal filtro")
+    v = tabelle["verdure"]
+    L.append(f"verdure: {sum(len(f) for g in v['gruppi'].values() for f in g)} in tabella, "
+             f"{v['esclusi']} escluse dal filtro" +
+             (f", senza scambio: {', '.join(v['senza_scambio'])}" if v["senza_scambio"] else ""))
     if tabelle["verdure"]["fuori_elenco"]:
         L.append("verdure del piano fuori elenco: " + ", ".join(tabelle["verdure"]["fuori_elenco"]))
     return L
@@ -419,7 +483,7 @@ def autotest():
         problemi.append("merluzzo 180 g in spigola non vale 185 g")
     tv = tc.tabella_pesce([{"pasto": "cena", "food_id": "1313", "grammi": "150", "giorno": "1", "opzione": ""}], db,
                           filtro=tc.Filtro([], db, 1))
-    if tv["colonne"] or _tabella_html(tv).count("<tr>") != 1:
+    if tv["colonne"] or "nessuno scambio previsto" not in _tabella_html(tv):
         problemi.append("tabella senza scambi: colonne rimaste")
     if tc.tabella_verdure(prova, db)["segnalate"] == []:
         problemi.append("nessuna verdura segnalata")
@@ -449,9 +513,10 @@ def _autotest_filtro(db):
     # stesso scarto: il giorno a +9% lo esclude, il giorno in pari no
     vicino = tc.Filtro(piano, db, giorno / 1.09)
     pari = tc.Filtro(piano, db, giorno)
-    if vicino.ammesso("000100", 80, 1):
+    scambio = 0.02 * giorno
+    if vicino.ammesso("000100", 80, scambio):
         problemi.append("scambio che porta il giorno oltre il 10% rimasto")
-    if not pari.ammesso("000100", 80, 1):
+    if not pari.ammesso("000100", 80, scambio):
         problemi.append("scambio su giorno in pari tolto")
     # un giorno a scelta conta con l'opzione piu' alta
     scelta = tc.Filtro([riga("1", "cena", "000100", "80", "A"), riga("1", "cena", "000100", "40", "B")], db, 100)

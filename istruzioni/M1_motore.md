@@ -638,10 +638,11 @@ scheda.html [--out-pdf scheda.pdf]`. Le voci da etichetta passano con gli stessi
 scambio; non dichiarate, la scheda si ferma. Stampa righe, scarti in kcal e
 verdure del piano fuori elenco. Filtro di sicurezza (`tabelle_conversione.Filtro`, 04/11/2026):
 uno scambio compare solo con scarto entro il 2,5% delle kcal del target e se, nei giorni reali
-della voce, con un secondo scambio al limite nessuno scenario supera il ±10%. Il PDF richiede Chromium con Playwright. `adatta` prova su ogni
-pagina i `LIVELLI` (spazi, colonne a riempimento, scrittura fino a 8 punti per gli ingredienti);
+della voce, con un secondo scambio al limite nessuno scenario supera il ±10% con due scambi uguali. Le verdure si dividono in fasce di
+energia per gruppo: una verdura del piano non sparisce, al massimo risulta «senza scambio». Il PDF richiede Chromium con Playwright. `adatta` prova su ogni
+pagina i `LIVELLI` (spazi, poi scrittura fino a 9 punti per gli ingredienti), sempre sulla stessa griglia;
 se due pagine non bastano prova tre, dividendo la settimana dove la scrittura resta più
-grande; se non basta si ferma. Riporta pagine, livello e punti. L'HTML senza `--out-pdf` non
+pari; se non basta si ferma. Si ferma anche se una quantità o un testo escono dal riquadro. Riporta pagine, livello e punti. L'HTML senza `--out-pdf` non
 è misurato.
 
 ### genera_spiegazione.py — documento di spiegazione (30/10/2026)

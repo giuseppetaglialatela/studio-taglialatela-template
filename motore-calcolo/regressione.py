@@ -772,11 +772,39 @@ def verifica_adattamento_scheda():
         if len(e) != 2 or any(x[1] != "normale" for x in e):
             return False, f"piano piccolo non al livello normale: {e}"
         e = fai((3, 4, 3, 4, 3, 1), 4, 6)
-        if len(e) != 3 or min(x[2] for x in e) < 8:
+        if len(e) != 3 or min(x[2] for x in e) < 9:
             return False, f"piano grande non adattato: {e}"
         testo = open(h, encoding="utf-8").read()
-        if testo.count("class=\"gg\"") + testo.count("class=gg") != 6:
+        if testo.count("<div class=\"gg\">") + testo.count("<div class=gg>") != 6:
             return False, "piano grande: giorni persi nell'adattamento"
+        # 04/11/2026: voce lunga, 4 colazioni e 6 spuntini, giorni diversi, giorno libero a testo
+        righe, meta = _piano_scheda((1, 2, 1, 2, 2), 4, 6)
+        meta["giorni"]["libero"] = "sab o dom"
+        db2 = dict(db, ETI_L=db["347"])
+        nomi2 = dict(nomi, ETI_L=("Vellutata di prova fittizia con un nome molto lungo per il riquadro",
+                                  "peso del prodotto surgelato da pesare prima della cottura"))
+        righe.append({"giorno": "4", "pasto": "cena", "food_id": "ETI_L", "grammi": "250", "opzione": ""})
+        for g, f in (("1", "312"), ("2", "349"), ("3", "345"), ("4", "309"), ("5", "336")):
+            righe.append({"giorno": g, "pasto": "cena", "food_id": f, "grammi": "200", "opzione": ""})
+        costruisci = lambda n, k: gsc.componi(righe, db2, nomi2, meta, {}, 1500, frozenset({"ETI_L"}),
+                                              pagine=n, giorni_p1=k)[0]
+        gsc.adatta(costruisci, h, p, 6)
+        testo = open(h, encoding="utf-8").read()
+        if "Sabato o domenica" not in testo:
+            return False, "giorno libero non preso dai metadati"
+        if "repeat(2,1fr)" not in testo or "repeat(3,1fr)" not in testo:
+            return False, "colonne non legate al numero di voci (4 e 6 riquadri)"
+        tv = gsc.tc.tabella_verdure(righe, gsc.tc.carica_db() | {"ETI_L": db2["ETI_L"]},
+                                    filtro=gsc.tc.Filtro([], db, 1500))
+        if not tv["gruppi"]["cotte"]:
+            return False, "verdure cotte del piano sparite dal gruppo"
+        forzata = lambda n, k: costruisci(n, k).replace(".voci>span{", ".voci>span{white-space:nowrap;")
+        try:
+            gsc.adatta(forzata, h, p, 6)
+            return False, "grammatura fuori dal riquadro non fermata"
+        except gzp.Fermo as ex:
+            if "tagliato" not in str(ex):
+                return False, f"fermo diverso dal taglio: {ex}"
         os.remove(p)
         try:
             fai((10, 10, 10, 10, 10, 10), 10, 10)
@@ -786,7 +814,8 @@ def verifica_adattamento_scheda():
                 return False, f"fermo poco chiaro o PDF scritto: {ex}"
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
-    return True, "piccolo a livello normale; grande in 3 pagine sopra il minimo; estremo fermato"
+    return True, ("piccolo normale; grande in 3 pagine a 9 punti o piu'; estremo fermato; voce lunga, "
+                  "griglie, verdure cotte e giorno libero a posto; grammatura tagliata fermata")
 
 
 def verifica_riga_di_comando_metadati():
