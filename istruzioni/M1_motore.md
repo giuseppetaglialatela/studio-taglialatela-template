@@ -829,8 +829,10 @@ nutrizionista, voce per voce, quando le tre fonti sono incoerenti tra loro e INS
 stessa specie e lo stesso stato (crudo/cotto). Mai per kcal e macro, che restano CREA; dal
 31/10/2026 (decisione del nutrizionista) vale anche per acidi grassi e colesterolo di
 `lipidi.csv`, in proporzione ai grassi CREA della voce. In `fonte` si scrive `INSA(...)`,
-in `codice_fonte` `INSA<cod>`. Righe in eccezione: 122800 sardine (micronutrienti; acidi
-grassi e colesterolo in attesa della tabella INSA, oggi in `gap.csv`).
+in `codice_fonte` `INSA<cod>`. Righe in eccezione: 122800 sardine (micronutrienti). Acidi grassi delle sardine:
+dal 04/11/2026, con INSA non raggiungibile e su decisione del nutrizionista, da Bandarra et al.,
+J Food Sci 1997;62(1), *Sardina pilchardus* cruda con 15,8% di lipidi, sui 15,4 g CREA con
+fattore 0,90 per il pesce grasso (FAO, Exler 1975); colesterolo da BDA 1319_2.
 
 **Eccezione etichetta — solo su richiesta esplicita del nutrizionista, mai nel database.**
 I valori di un'etichetta non entrano in `alimenti.csv`. Quando il nutrizionista lo chiede
@@ -902,8 +904,7 @@ componibili (`scelte_multiple.NUTRIENTI`).
   i saturi della BDA sono analitici o calcolati da un alimento simile (accettati, con
   l'origine registrata). EPA/DHA assenti dalla scheda: zero biologico per i vegetali, gap per
   gli alimenti di origine animale.
-- Aperti (in `gap.csv`): sardine 122800, tutto in attesa di INSA 882 (deroga INSA estesa
-  agli acidi grassi); EPA/DHA di tacchino petto, tacchino fesa e bufala. Mozzarella di bufala
+- Aperti (in `gap.csv`): EPA/DHA di tacchino petto, tacchino fesa e bufala. Mozzarella di bufala
   11796: acidi grassi della scheda BDA incoerenti, dal 04/11/2026 in proporzione dalla
   mozzarella di vacca BDA 1718_2 (decisione del nutrizionista).
 - Report: la pipeline mostra in TUTTI i piani saturi (g e % dell'energia), colesterolo ed
@@ -1007,9 +1008,9 @@ elenca le voci responsabili.
 Un valore sotto l'80% LARN con quel flag NON è una carenza accertata: prima di intervenire
 clinicamente, verifica se dipende dal gap.
 
-**Stato (verificato sul file il 04/11/2026):** 18 righe. Micronutrienti, 8 su 4 alimenti —
+**Stato (verificato sul file il 04/11/2026):** 12 righe. Micronutrienti, 8 su 4 alimenti —
 latte parzialmente scremato (vitamina D, B12), orata (vitamina D), salmone affumicato
-(vitamina D), trippa (vitamina D, B12, folati, zinco). Lipidi, 10 (vedi `lipidi.csv`,
+(vitamina D), trippa (vitamina D, B12, folati, zinco). Lipidi, 4 (vedi `lipidi.csv`,
 sezione 5).
 
 **Fave secche cotte — caso a parte:** minerali e folati presi dalla voce BDA delle fave
