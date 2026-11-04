@@ -899,9 +899,9 @@ componibili (`scelte_multiple.NUTRIENTI`).
   l'origine registrata). EPA/DHA assenti dalla scheda: zero biologico per i vegetali, gap per
   gli alimenti di origine animale.
 - Aperti (in `gap.csv`): sardine 122800, tutto in attesa di INSA 882 (deroga INSA estesa
-  agli acidi grassi); mozzarella di bufala 11796, acidi grassi della scheda BDA incoerenti
-  (saturi 4,9 g su 24,4 g di grassi), in attesa di decisione; EPA/DHA di tacchino petto,
-  tacchino fesa e bufala.
+  agli acidi grassi); EPA/DHA di tacchino petto, tacchino fesa e bufala. Mozzarella di bufala
+  11796: acidi grassi della scheda BDA incoerenti, dal 04/11/2026 in proporzione dalla
+  mozzarella di vacca BDA 1718_2 (decisione del nutrizionista).
 - Report: la pipeline mostra in TUTTI i piani saturi (g e % dell'energia), colesterolo ed
   EPA+DHA per giorno e come media settimanale (sezione LIPIDI, dopo il PASSO 3); gli avvisi
   solo al PASSO 7 per i profili che li chiedono (saturi: ipercolesterolemia R020 < 7%,
@@ -1003,9 +1003,9 @@ elenca le voci responsabili.
 Un valore sotto l'80% LARN con quel flag NON è una carenza accertata: prima di intervenire
 clinicamente, verifica se dipende dal gap.
 
-**Stato (verificato sul file il 31/10/2026):** 21 righe. Micronutrienti, 8 su 4 alimenti —
+**Stato (verificato sul file il 04/11/2026):** 18 righe. Micronutrienti, 8 su 4 alimenti —
 latte parzialmente scremato (vitamina D, B12), orata (vitamina D), salmone affumicato
-(vitamina D), trippa (vitamina D, B12, folati, zinco). Lipidi, 13 (vedi `lipidi.csv`,
+(vitamina D), trippa (vitamina D, B12, folati, zinco). Lipidi, 10 (vedi `lipidi.csv`,
 sezione 5).
 
 **Fave secche cotte — caso a parte:** minerali e folati presi dalla voce BDA delle fave

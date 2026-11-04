@@ -106,7 +106,8 @@ voce generica al posto di quella specifica, marcala come proxy e dichiarala.
   scritto nella riga. Un valore che la fonte non dà resta vuoto e va in `gap.csv` (EPA/DHA
   assenti: zero biologico solo per i vegetali). Prima di accettare una scheda controlla la
   quota dei saturi sui grassi contro quella degli alimenti della stessa categoria: la
-  scheda BDA della mozzarella di bufala (4,9 g su 24,4) è incoerente e non è stata usata.
+  scheda BDA della mozzarella di bufala (4,9 g su 24,4) è incoerente e non è stata usata
+  (acidi grassi in proporzione dalla mozzarella di vacca, decisione del 04/11/2026).
   Senza riga in `lipidi.csv` e senza gap il controllo 12 del collaudo si ferma.
 - **Mai food_id inventati** (999xxx) né valori "di convenzione": ogni riga deve
   avere `codice_fonte` e `data_verifica` compilabili. Se non lo sono, l'alimento
