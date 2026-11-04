@@ -118,6 +118,7 @@ voce generica al posto di quella specifica, marcala come proxy e dichiarala.
 ```
 python3 cerca_crea.py verifica   # kcal, macro e fibra delle righe CREA = cache
 # aggiorna EXPECTED_ALIMENTI_COUNT in collaudo.py
+python3 tabella_alimenti.py --genera-pagina
 python3 collaudo.py --genera-checksums
 python3 collaudo.py
 python3 regressione.py
@@ -133,7 +134,7 @@ errata, l'alimento va in `coerenza.ATWATER_FALSI_POSITIVI_NOTI` con il suo scart
 nuovo `--genera-checksums` e collaudo); quali righe sono
 state aggiunte a gap.csv. Poi salva con un commit (M1, sezione 1, «Come si salva una
 modifica»): `alimenti.csv`, `collaudo.py` (conteggio atteso), `nomi_paziente.csv`,
-`ruoli_alimenti.csv`, `lipidi.csv` (e `gap.csv` se serve), `coerenza.py` se è cambiato
+`ruoli_alimenti.csv`, `lipidi.csv` (e `gap.csv` se serve), `TABELLA_ALIMENTI.md`, `coerenza.py` se è cambiato
 l'elenco dei falsi positivi, e
 `SHA256SUMS` vanno nello STESSO commit, altrimenti il collaudo
 fallisce alla sessione dopo.

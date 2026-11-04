@@ -628,6 +628,11 @@ nel dubbio un falso «assente», che si vede, piuttosto che un falso «presente�
 un alimento mancante. Un nome generico trova più voci: si sceglie in composizione.
 `autotest()` (45 prove) gira nel collaudo.
 
+### tabella_alimenti.py — tabella di tutti gli alimenti (04/11/2026)
+`python3 tabella_alimenti.py --genera-pagina` riscrive `TABELLA_ALIMENTI.md` da `alimenti.csv`,
+`lipidi.csv` e `gap.csv`: valori, fonte e dati mancanti di ogni alimento. Si legge lì e non nel
+nucleo, che tiene solo le regole. Il controllo 12 si ferma se la pagina non coincide con i CSV.
+
 ### genera_scheda_cucina.py — scheda per chi cucina (04/11/2026)
 Settimana e tabelle di conversione, in due o tre pagine, tutte calcolate da piano, metadati e
 `alimenti.csv` (M3, sezione 3). Richiede lo stesso verdetto e la stessa impronta del PDF.

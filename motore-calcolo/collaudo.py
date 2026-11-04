@@ -446,6 +446,10 @@ def controllo_12_lipidi():
         return False, "; ".join(problemi[:6]) + (f" (+{len(problemi) - 6})"
                                                  if len(problemi) > 6 else "")
     n_gap = sum(1 for d in gap.values() for n in d if n in lipidi.CAMPI)
+    import tabella_alimenti
+    if not tabella_alimenti.controlla():
+        return False, ("TABELLA_ALIMENTI.md non coincide con i CSV "
+                       "(python3 tabella_alimenti.py --genera-pagina)")
     return True, (f"{len(lip)} voci su {len(ids)}, {n_gap} dati lipidici mancanti dichiarati "
                   f"in gap.csv; autotest {n_auto} prove superate")
 
