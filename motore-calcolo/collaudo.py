@@ -27,6 +27,8 @@ CONTROLLI:
      genera_zona_piano.py (verdetto, anteprima, impronta, segnaposto)
  11) Registro dei riferimenti clinici (30/10/2026): fonti complete, una riga
      attiva per profilo e parametro, RIFERIMENTI.md allineata, autotest
+ 13) Tabelle di conversione (04/11/2026): elenchi, ricalcolo, scheda solo su piano
+     approvato.
  12) Lipidi (31/10/2026): ogni food_id ha in lipidi.csv i sei valori (saturi,
      mono, poli, EPA, DHA, colesterolo) oppure la riga corrispondente in gap.csv;
      nessun valore con un gap dichiarato; nomi dei nutrienti di gap.csv validi;
@@ -84,6 +86,9 @@ FILE_DA_VERIFICARE = [
     "larn.csv",
     "formati_confezione.csv",
     "scambi_frutta.csv",
+    "scambi_carboidrati.csv",
+    "scambi_pesce.csv",
+    "scambi_verdure.csv",
     "ruoli_alimenti.csv",
     "accoppiamenti_vietati.csv",
     "alimenti_test.csv",
@@ -481,6 +486,22 @@ def _sha256(path):
     return h.hexdigest()
 
 
+def controllo_13_tabelle():
+    """Tabelle di conversione (04/11/2026): elenchi coerenti con alimenti.csv e
+    ruoli, grammature uguali al ricalcolo, scheda per chi cucina solo su piano
+    approvato."""
+    try:
+        sys.path.insert(0, BASE)
+        import tabelle_conversione
+        import genera_scheda_cucina
+        problemi = tabelle_conversione.controlla() + genera_scheda_cucina.autotest()
+    except Exception as e:
+        return False, f"controllo non eseguibile: {type(e).__name__}: {e}"
+    if problemi:
+        return False, "; ".join(problemi[:6])
+    return True, "elenchi e grammature coerenti col ricalcolo; scheda solo su piano approvato"
+
+
 def controllo_5_checksum():
     """FASE 4 - verifica di integrita' contro SHA256SUMS.
 
@@ -646,6 +667,11 @@ def main():
 
     print("\n12) Lipidi (lipidi.csv)")
     ok, dettaglio = controllo_12_lipidi()
+    print(f"   [{'OK ' if ok else 'XX '}] {dettaglio}")
+    tutto_ok = tutto_ok and ok
+
+    print("\n13) Tabelle di conversione e scheda per chi cucina")
+    ok, dettaglio = controllo_13_tabelle()
     print(f"   [{'OK ' if ok else 'XX '}] {dettaglio}")
     tutto_ok = tutto_ok and ok
 

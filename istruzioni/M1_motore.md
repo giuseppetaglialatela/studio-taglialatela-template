@@ -1,7 +1,7 @@
 # M1 — MOTORE DI CALCOLO
 
 Modulo operativo (principio 6). Dipendenze: nessuna. Ne dipendono M2 e M6.
-Ultima modifica: 31/10/2026 pomeriggio (file affiancato `lipidi.csv`: saturi, mono, poli,
+Ultima modifica: 04/11/2026 (161 alimenti: piadina e cereali in formelle; scatolame a stato `familiare`; tabelle di conversione: `scambi_carboidrati.csv`, `scambi_pesce.csv`, `scambi_verdure.csv`, `tabelle_conversione.py`; `genera_scheda_cucina.py`; controllo 13 del collaudo). 31/10/2026 pomeriggio (file affiancato `lipidi.csv`: saturi, mono, poli,
 EPA, DHA, colesterolo; saturi e colesterolo calcolati nei riferimenti; sezione LIPIDI del
 report; controllo 12 del collaudo; casi 63-65). 31/10/2026 (riferimenti: si controllano solo
 i parametri dei profili scelti).
@@ -158,6 +158,9 @@ Dodici controlli:
    oppure, per ogni valore che manca, la riga in `gap.csv`; nessun valore con un gap
    dichiarato; ogni nutriente di `gap.csv` esiste nel motore; saturi + mono + poli non oltre
    i grassi totali; autotest di `lipidi.py`
+13. tabelle di conversione (04/11/2026): elenchi con `food_id` esistenti e ruolo ammesso
+   (niente patate e legumi tra le verdure), `grammi_porzione` uguali al ricalcolo da
+   `alimenti.csv`, scheda per chi cucina generata solo su piano approvato
 
 Esce 0 (superato) o 1 (fallito). File opzionali (`cache.zip`, `BDA_alimenti.xlsx`,
 `crea_cache.zip`): se presenti si verificano come gli altri, se assenti il collaudo lo
@@ -625,6 +628,13 @@ nel dubbio un falso «assente», che si vede, piuttosto che un falso «presente�
 un alimento mancante. Un nome generico trova più voci: si sceglie in composizione.
 `autotest()` (45 prove) gira nel collaudo.
 
+### genera_scheda_cucina.py — scheda per chi cucina (04/11/2026)
+Una pagina con settimana e tabelle di conversione, tutta calcolata da piano, metadati e
+`alimenti.csv` (M3, sezione 3). Richiede lo stesso verdetto e la stessa impronta del PDF.
+`python3 genera_scheda_cucina.py --piano ... --target ... --metadati ... --verdetto ...
+[--orari ...] --out-html scheda.html [--out-pdf scheda.pdf]`. Stampa righe, scarti in kcal e
+verdure del piano fuori elenco. Il PDF richiede Chromium con Playwright.
+
 ### genera_spiegazione.py — documento di spiegazione (30/10/2026)
 Genera il PDF del documento di spiegazione solo dopo i controlli: impronta approvata (come
 `--verifica-impronta`), motore grafico e intestazione dello studio identici al template,
@@ -785,7 +795,7 @@ diventa un nuovo caso golden.
 
 ## 4. DATABASE ALIMENTI E GERARCHIA FONTI
 
-**Stato:** 159 alimenti verificati e tracciati alla fonte; il numero vincolante è
+**Stato:** 161 alimenti verificati e tracciati alla fonte; il numero vincolante è
 `EXPECTED_ALIMENTI_COUNT` in `collaudo.py`. Conformità kcal/macro/fibra a CREA:
 `python3 cerca_crea.py verifica`.
 
@@ -892,12 +902,24 @@ componibili (`scelte_multiple.NUTRIENTI`).
 
 **formati_confezione.csv** — `food_id, nome_riferimento, unita_g, tolleranza_g, fonte, stato`.
 `unita_g` è una lista separata da `|` (es. `125|150|170`). Alimento PRESENTE = vincolato a
-confezione intera o multiplo; ASSENTE = porzione libera. `stato`: `confermato` o
-`da_confermare`.
+confezione intera o multiplo; ASSENTE = porzione libera. `stato`: `confermato`,
+`da_confermare` o `familiare` (scatolame, 04/11/2026: il formato converte le scatole in
+grammi ma non vincola né segnala, perché una scatola si divide in famiglia).
 
 **scambi_frutta.csv** — `food_id, nome_riferimento, grammi_porzione, stato`. Porzioni di
 frutta equivalenti in energia (riferimento banana 100 g), per la tabella di scambio del
 documento di spiegazione.
+
+**scambi_carboidrati.csv, scambi_pesce.csv** — stesso schema. `grammi_porzione` = grammi
+equivalenti a 80 g di pasta cruda (parità di carboidrati) o a 100 g di merluzzo (parità di
+proteine), arrotondati a 5 g. Non si scrivono a mano: `python3 tabelle_conversione.py
+--rigenera` li ricalcola da `alimenti.csv`; se il database cambia, il controllo 13 si ferma
+finché non lo si esegue. `da_confermare` = compare come riga se è nel piano, non come
+colonna.
+
+**scambi_verdure.csv** — `food_id, nome_riferimento, uso, stato`. `uso`: `crude`, `cotte`,
+`entrambe`. Scambio a parità di peso. Si segnalano da sole le voci da almeno 5 g/100 g di
+carboidrati o di fibre (costanti in `tabelle_conversione.py`).
 
 **nomi_paziente.csv** — `food_id, nome_paziente, nota_peso`. Nome leggibile dell'alimento
 nel PDF e nota di peso (`crudo`, `sgocciolato e sciacquato`, `cotto`, `peso netto di

@@ -67,14 +67,6 @@
       "FORMATO_CONFEZIONE_NON_RISPETTATO"
     ],
     [
-      4,
-      "FORMATO_CONFEZIONE_NON_RISPETTATO"
-    ],
-    [
-      4,
-      "FORMATO_CONFEZIONE_NON_RISPETTATO"
-    ],
-    [
       5,
       "TERAPIA_DICHIARATA_ASSENTE"
     ],
@@ -89,5 +81,5 @@
   ],
   "exit_code": 0,
   "descrizione": "Il caso 51 con il profilo obesita, che nel registro non ha ancora righe (linea guida SIO/ISS non letta): compare solo PROFILO_SENZA_RIFERIMENTI, nessun avviso dai valori generali. Diventa rosso se un profilo vuoto passa come se fosse stato controllato.",
-  "riferimento": "Costruito il 30/10/2026 (registro dei riferimenti) da caso_51_macro_scelte_giornate_reali (stessi piano e target); attesi aggiunti a mano sui valori settimanali calcolati a parte. Aggiornato il 31/10/2026: i controlli scattano solo per i parametri dei profili scelti (decisione del nutrizionista)."
+  "riferimento": "Costruito il 30/10/2026 (registro dei riferimenti) da caso_51_macro_scelte_giornate_reali (stessi piano e target); attesi aggiunti a mano sui valori settimanali calcolati a parte. Aggiornato il 31/10/2026: i controlli scattano solo per i parametri dei profili scelti (decisione del nutrizionista). Il 04/11/2026 tolte le due segnalazioni dello scatolame (stato familiare, decisione del nutrizionista): resta quella degli altri alimenti."
 }

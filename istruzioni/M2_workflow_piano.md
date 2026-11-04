@@ -2,7 +2,7 @@
 
 Modulo operativo: si carica quando si compone, si modifica o si valuta un piano.
 Dipende da **M1**: nessun passo è eseguibile senza il motore collaudato.
-Ultima modifica: 31/10/2026 pomeriggio (deroga INSA estesa ad acidi grassi e colesterolo; saturi e colesterolo nel report, sezione LIPIDI). 31/10/2026 (avvisi dei riferimenti solo per i profili scelti). 30/10/2026 sera (profili clinici e registro dei riferimenti all'apertura). 30/10/2026 (tappa 2: apertura con gli alimenti desiderati contro il database e
+Ultima modifica: 04/11/2026 (scatolame ammesso in consumo familiare; `scheda_cucina` nei metadati). 31/10/2026 pomeriggio (deroga INSA estesa ad acidi grassi e colesterolo; saturi e colesterolo nel report, sezione LIPIDI). 31/10/2026 (avvisi dei riferimenti solo per i profili scelti). 30/10/2026 sera (profili clinici e registro dei riferimenti all'apertura). 30/10/2026 (tappa 2: apertura con gli alimenti desiderati contro il database e
 le assunzioni da confermare; conferma dell'assenza di terapia nei metadati; PASSO 6 su un
 verdetto della pipeline senza bloccanti, anteprima consegnata come file; campi nuovi dei
 metadati). 23/10/2026: PASSO 6 con anteprima completa e impronta, metadati in bozza prima dell'approvazione, un giorno chiuso = una riga in chat; condimenti a porzione libera; `--nessuna-terapia`; 22/10:
@@ -29,15 +29,17 @@ dedurre dalla formulazione del piatto.
 
 **Formati di confezione — nessuno spreco.** Fonte: `formati_confezione.csv`, nella cartella
 del motore.
-1. **Monoporzione o deperibile una volta aperto** (yogurt, fiocchi di latte, scatolame
-   tranne i condimenti, uova): confezione intera o multiplo esatto del formato.
+1. **Monoporzione o deperibile una volta aperto** (yogurt, fiocchi di latte, uova):
+   confezione intera o multiplo esatto del formato.
 2. **A peso al banco** (affettati, formaggi, carne, pesce, pane): qualsiasi grammatura.
 3. **Non deperibile o consumabile in famiglia** (pasta, riso, couscous, cereali, frutta
-   secca, gallette, cioccolato, latte, olive) e **condimenti, sempre** (olio, pomodori
+   secca, gallette, cioccolato, latte, olive, scatolame, stato `familiare` nel CSV) e **condimenti, sempre** (olio, pomodori
    pelati e passata, aceto…): porzione libera.
 Assente dal CSV = porzione libera. Il controllo E del PASSO 4 di `pipeline.py` SEGNALA (non
 blocca) le quantità fuori formato: si compone già a formato, e le segnalazioni residue si
-dichiarano al PASSO 6. Formato nuovo: stato `da_confermare` finché il nutrizionista non lo
+dichiarano al PASSO 6. I testi facoltativi della scheda per chi cucina (`scheda_cucina`: `note_carboidrati`,
+`note_piede`) si scrivono nei metadati prima dell'anteprima e si approvano con essa.
+Formato nuovo: stato `da_confermare` finché il nutrizionista non lo
 conferma. Il CSV converte un formato commerciale in grammi (es. «una scatoletta di tonno»,
 «un vasetto di yogurt» → grammi in `piano.csv`), non è un dato nutrizionale: il dato resta
 quello di `alimenti.csv`, già per 100 g di prodotto sgocciolato/edibile. Le percentuali di

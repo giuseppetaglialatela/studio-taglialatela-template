@@ -12,6 +12,9 @@ DATI
                           Un alimento PRESENTE nel file e' vincolato.
                           Un alimento ASSENTE e' a porzione libera (al banco,
                           non deperibile o consumabile in famiglia).
+                          Stato 'familiare' (scatolame, 04/11/2026): il formato resta
+                          per convertire le scatole in grammi, ma non vincola: una
+                          scatola si divide tra piu' persone.
   scambi_frutta.csv       food_id, nome_riferimento, grammi_porzione, stato.
                           Porzioni di frutta equivalenti in energia
                           (riferimento: banana 100 g), usate per la tabella di
@@ -71,7 +74,7 @@ def controlla_piano(piano, formati):
     trovate = {}
     for r in piano:
         fid = r["food_id"]
-        if fid not in formati:
+        if fid not in formati or formati[fid]["stato"] == "familiare":
             continue
         g = float(r["grammi"])
         if not quantita_valida(g, formati[fid]):

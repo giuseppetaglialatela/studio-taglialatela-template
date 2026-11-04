@@ -652,6 +652,12 @@ def testo_anteprima(dati, meta, verdetto=None):
         L.append(f"- {g['totale']}")
         L += _md_macro_giorno(g)
     L += _md_macro_settimana(giorni)
+    note_scheda = meta.get("scheda_cucina")
+    if note_scheda:
+        # testi della scheda per chi cucina (04/11/2026): solo se presenti, cosi'
+        # le anteprime dei piani senza scheda non cambiano impronta
+        L += ["", "## Testi della scheda per chi cucina", ""]
+        L += [f"- **{k}:** {note_scheda[k]}" for k in sorted(note_scheda)]
     if verdetto is not None:
         # verdetto della pipeline (30/10/2026): le attenzioni si approvano insieme al
         # piano e fanno parte dell'impronta; con un bloccante l'anteprima non esiste
