@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Scheda di una pagina per chi cucina, con le tabelle di conversione (04/11/2026).
+Scheda per chi cucina (04/11/2026): pagina 1 la settimana, a riquadri per giorno;
+pagina 2 le tabelle di conversione.
 
-Modello grafico: la scheda scritta a mano per un piano reale, approvata dal
-nutrizionista il 04/11/2026 come formato delle tabelle. Qui i dati vengono tutti da
+Grafica scelta dal nutrizionista il 04/11/2026 (versione B). Qui i dati vengono tutti da
 piano, metadati e alimenti.csv: nessuna grammatura scritta a mano.
 
 Si genera dopo i controlli del piano: stesso verdetto e stessa impronta approvata
@@ -40,12 +40,22 @@ NOMI_BREVI = {"702901": "Olio EVO", "391": "Pomodori", "392": "Pomodori pelati",
               "4505": "Lenticchie lessate", "000550": "Pane integrale"}
 GIORNI = {"lun": "Lunedì", "mar": "Martedì", "mer": "Mercoledì", "gio": "Giovedì",
           "ven": "Venerdì", "sab": "Sabato", "dom": "Domenica"}
-CSS = """@page{size:A4;margin:9mm 10mm}*{box-sizing:border-box}body{margin:0;font-family:'Liberation Sans',Arial,sans-serif;font-size:8.9pt;line-height:1.25;color:#1b1b1b;background:#fff}
-.top{display:flex;justify-content:space-between;border-bottom:1px solid #2e7d8c;padding-bottom:2px;color:#2e6b7a;font-weight:bold}.top i{font-weight:normal;color:#555}
-h1{font-size:17pt;color:#1d3a4a;text-align:center;margin:4px 0 0}.sub{text-align:center;font-style:italic;color:#555;margin-bottom:3px}
-h2{font-size:10.5pt;color:#c0562b;margin:5px 0 2px}.tit{font-weight:bold;color:#1d3a4a}.cols{display:grid;grid-template-columns:1.9fr 1fr;gap:8px}.gr{display:grid;grid-template-columns:1fr 1fr;gap:2px 8px}.op{padding:1px 0}
-table{width:100%;border-collapse:collapse}th,td{border:1px solid #c9d6da;padding:2px 4px;vertical-align:top}thead th{background:#2e7d8c;color:#fff;text-align:center}tbody th{text-align:left;color:#1d3a4a;width:58px;background:#f0f5f6}tbody tr:nth-child(even) td{background:#f7fafa}
-.c td,.c th{text-align:center;white-space:nowrap;padding:2px 3px}.c tbody th{width:auto;text-align:left}.nota{font-style:italic;color:#555;margin-top:2px}.d{display:grid;grid-template-columns:1fr 1fr;gap:8px}.foot{margin-top:4px;border-top:1px solid #ccc;padding-top:2px;color:#666;display:flex;justify-content:space-between;font-size:8pt}"""
+CSS = """@page{size:A4;margin:12mm 13mm}*{box-sizing:border-box}
+:root{--blu:#1d3a4a;--ver:#2e7d8c;--ara:#c0562b;--gr:#5b6770;--lin:#d5e0e3;--ten:#f1f6f7}
+body{margin:0;font-family:'Liberation Sans',Arial,sans-serif;font-size:10pt;line-height:1.35;color:#1f2529;background:#fff}
+.pag{page-break-after:always;height:272mm;display:flex;flex-direction:column}.pag:last-child{page-break-after:auto}
+.top{display:flex;justify-content:space-between;font-size:8.5pt;color:var(--gr);border-bottom:1.5px solid var(--ver);padding-bottom:3px}.top b{color:var(--ver)}
+h1{font-size:19pt;color:var(--blu);margin:7px 0 1px}.sub{color:var(--gr);font-size:9.5pt;margin-bottom:5px}
+h2{font-size:11pt;color:var(--ara);margin:8px 0 4px}h2 span{color:var(--gr);font-weight:normal;font-size:9pt}
+.t{font-weight:bold;color:var(--blu)}.griglia{display:grid;gap:5px 10px;grid-template-columns:1fr 1fr}
+.voci{display:flex;flex-wrap:wrap;gap:0 9px;font-size:9.5pt}.voci span{white-space:nowrap}
+.card{background:var(--ten);border-radius:4px;padding:4px 8px;break-inside:avoid}.l{color:var(--ver);font-weight:bold;margin-right:3px}.sc{color:var(--gr);font-size:9pt}
+.gg{break-inside:avoid;border:1px solid var(--lin);border-radius:5px;overflow:hidden}.gg .d{background:var(--ver);color:#fff;font-weight:bold;padding:2px 8px}.gg .m{padding:3px 8px;border-top:1px solid var(--lin)}.gg .d+.m{border-top:0}.gg .e{font-size:8pt;color:var(--ver);font-weight:bold;letter-spacing:.4px}
+.libero{grid-column:1/3}.libero .m{display:grid;grid-template-columns:1fr 1fr;gap:10px;border-top:0}
+.conv{width:100%;border-collapse:collapse;font-size:9.5pt}.conv th,.conv td{padding:3.5px 6px;text-align:center;border-bottom:1px solid var(--lin)}.conv thead th{color:var(--blu);font-weight:normal;font-size:8.5pt;border-bottom:1.5px solid var(--ver);vertical-align:bottom}.conv th.cap{text-align:left;color:var(--gr);font-style:italic}.conv tbody th{text-align:left;color:var(--blu);font-weight:bold}.conv td.sel{color:#b6c1c5}.conv tbody tr:nth-child(even){background:var(--ten)}
+.n{color:var(--gr);font-size:9pt;margin-top:4px}.chip{display:inline-block;background:var(--ten);border-radius:10px;padding:1px 8px;margin:0 3px 3px 0;font-size:9.5pt}.v{display:grid;grid-template-columns:60px 1fr;gap:3px 6px;align-items:baseline}.v>b{color:var(--ver)}
+.densa{font-size:9pt;line-height:1.22}.densa h1{font-size:15pt;margin:4px 0 0}.densa .sub{margin-bottom:2px}.densa h2{font-size:10pt;margin:4px 0 2px}.densa .griglia{gap:3px 8px}.densa .voci{font-size:8.5pt}.densa .card{padding:2px 6px}.densa .gg .m{padding:1px 6px}.densa .gg .e{font-size:7pt}
+.foot{margin-top:auto;border-top:1px solid var(--lin);padding-top:3px;color:var(--gr);font-size:8pt;display:flex;justify-content:space-between;gap:12px}"""
 
 
 def _g(v):
@@ -78,7 +88,7 @@ def _fisso(piano, pasto):
         if r["pasto"] == pasto:
             per_giorno.setdefault(r["giorno"], set()).add((r["opzione"], r["food_id"], r["grammi"]))
     if len(set(map(frozenset, per_giorno.values()))) > 1:
-        raise Fermo(f"scheda: {pasto} diverso tra i giorni, la pagina unica non lo regge")
+        raise Fermo(f"scheda: {pasto} diverso tra i giorni, la scheda lo mostra una volta sola")
 
 
 def _orario(orari, primo, pasto):
@@ -86,14 +96,15 @@ def _orario(orari, primo, pasto):
     return f" ore {o}" if o else ""
 
 
-def _tabella_html(t, intestazione_riga="Nel piano"):
-    testa = "".join(f"<th>{E(c)}</th>" for c in t["colonne"])
+def _tabella_html(t):
+    """Una riga per alternativa, una colonna per ogni voce del piano."""
+    testa = "".join(f"<th>{E(r['nome'])}<br><b>{r['grammi']:g} g</b></th>" for r in t["righe"])
     corpo = ""
-    for r in t["righe"]:
-        celle = "".join("<td>—</td>" if c is None else f"<td>{c['grammi']} g</td>"
-                        for c in r["celle"])
-        corpo += f"<tr><th>{E(r['nome'])} {_g(r['grammi'])}</th>{celle}</tr>"
-    return (f"<table class=c><thead><tr><th>{intestazione_riga}</th>{testa}</tr></thead>"
+    for i, col in enumerate(t["colonne"]):
+        celle = "".join("<td class=sel>—</td>" if r["celle"][i] is None
+                        else f"<td>{r['celle'][i]['grammi']}\u00a0g</td>" for r in t["righe"])
+        corpo += f"<tr><th>{E(col)}</th>{celle}</tr>"
+    return (f"<table class=conv><thead><tr><th class=cap>Al posto di →</th>{testa}</tr></thead>"
             f"<tbody>{corpo}</tbody></table>")
 
 
@@ -104,7 +115,19 @@ def scarto_massimo(t):
 
 def _nota_scarto(t):
     s = scarto_massimo(t)
-    return f"<div class=nota>Scarto di energia degli scambi: da {s[0]:+d} a {s[1]:+d} kcal.</div>" if s else ""
+    return f"<div class=n>Scarto di energia degli scambi: da {s[0]:+d} a {s[1]:+d} kcal.</div>" if s else ""
+
+
+def _voci(rr, nomi, uovo_g):
+    out = ""
+    for r in rr:
+        v = voce(r, nomi, uovo_g)
+        if r["food_id"] == FOOD_UOVO:
+            out += f"<span><b>{E(v)}</b></span>"
+        else:
+            nome, peso = v.rsplit(" ", 1)
+            out += f"<span>{E(nome)} <b>{E(peso)}</b></span>"
+    return f"<div class=voci>{out}</div>"
 
 
 def componi(piano, db, nomi, meta, orari):
@@ -116,65 +139,93 @@ def componi(piano, db, nomi, meta, orari):
         _fisso(piano, p)
     ab = gzp._abbinamenti(meta) or {}
 
-    def blocco(giorno, pasto, opzione, freccia=""):
-        rr = _sel(piano, giorno, pasto, opzione)
-        t = gzp._titolo(titoli, giorno, pasto, opzione)
-        lista = " · ".join(voce(r, nomi, uovo_g) for r in rr)
-        return f"<span class=tit>{E(t)}</span><br>{E(lista)}{freccia}"
+    def piatto(giorno, pasto, opzione):
+        return (f"<div class=t>{E(gzp._titolo(titoli, giorno, pasto, opzione))}</div>"
+                + _voci(_sel(piano, giorno, pasto, opzione), nomi, uovo_g))
 
-    def opz(pasto):
+    def carte(pasto):
         out = ""
         for o in _opzioni(piano, primo, pasto):
             fr = ""
             if pasto == "colazione" and o in ab:
-                fr = f" <i>→ spuntino {E(' o '.join(ab[o]))}</i>"
-            let = f"<b>{E(o)}</b> " if o else ""
-            out += f"<div class=op>{let}{blocco(primo, pasto, o, fr)}</div>"
+                fr = f" <span class=sc>→ spuntino {E(' o '.join(ab[o]))}</span>"
+            let = f"<span class=l>{E(o)}</span>" if o else ""
+            t = E(gzp._titolo(titoli, primo, pasto, o))
+            out += (f"<div class=card>{let}<span class=t>{t}</span>{fr}"
+                    + _voci(_sel(piano, primo, pasto, o), nomi, uovo_g) + "</div>")
         return out
 
-    righe = ""
+    def ora(pasto):
+        return _orario(orari, primo, pasto).replace(" ore ", "ore ")
+
+    def cont(pasto):
+        return sorted((r["opzione"], r["food_id"], r["grammi"]) for r in _sel(piano, primo, pasto))
+
+    def tit(pasto):
+        return [gzp._titolo(titoli, primo, pasto, o) for o in _opzioni(piano, primo, pasto)]
+
+    def sez(nome, pasto):
+        n = len(_opzioni(piano, primo, pasto))
+        nota = ", ".join(x for x in ("una a scelta" if n > 1 else "", ora(pasto)) if x)
+        return f"<h2>{nome} <span>{E(nota)}</span></h2>"
+
+    if any(r["pasto"] == "spuntino2" for r in piano):
+        if cont("spuntino") == cont("spuntino2") and tit("spuntino") == tit("spuntino2"):
+            orari_sp = " e ".join(x for x in (ora("spuntino"), ora("spuntino2")) if x)
+            nota = ", ".join(x for x in ("uno a scelta", orari_sp) if x)
+            spuntini = f"<h2>Spuntini <span>{E(nota)}</span></h2><div class=griglia>{carte('spuntino')}</div>"
+        else:
+            spuntini = (f"<div class=griglia><div>{sez('Spuntino', 'spuntino')}{carte('spuntino')}</div>"
+                        f"<div>{sez('Secondo spuntino', 'spuntino2')}{carte('spuntino2')}</div></div>")
+    else:
+        spuntini = sez("Spuntino", "spuntino") + f"<div class=griglia>{carte('spuntino')}</div>"
+
     lav = meta["giorni"]["lavorativi"]
+    gg = ""
     for i, g in enumerate(giorni):
         nome = GIORNI.get(str(lav[i]).lower()[:3], str(lav[i]))
-        cc = []
-        for pasto in ("pranzo", "cena"):
-            ops = _opzioni(piano, g, pasto)
-            if len(ops) > 1 or (ops and ops[0]):
-                cc.append("".join(f"<div><b>{E(o)}</b> {blocco(g, pasto, o)}</div>" for o in ops))
-            else:
-                cc.append(blocco(g, pasto, "") if ops else "")
-        righe += f"<tr><th>{E(nome)}</th><td>{cc[0]}</td><td>{cc[1]}</td></tr>"
+        blocchi = ""
+        for pasto, et in (("pranzo", "PRANZO"), ("cena", "CENA")):
+            orario = ora(pasto)
+            testa = f"{et}{' · ' + E(orario) if orario else ''}"
+            for o in _opzioni(piano, g, pasto):
+                let = f" {E(o)}" if o else ""
+                blocchi += f"<div class=m><div class=e>{testa}{let}</div>{piatto(g, pasto, o)}</div>"
+        gg += f"<div class=gg><div class=d>{E(nome)}</div>{blocchi}</div>"
     lib = meta.get("indicazioni_giorno_libero")
     if isinstance(lib, dict):
         nome = GIORNI.get(str(meta["giorni"].get("libero", "")).lower()[:3], "Giorno libero")
-        righe += (f"<tr><th>{E(nome)}</th><td><span class=tit>Pasto libero</span><br>{E(lib['pranzo'])}</td>"
-                  f"<td><span class=tit>Pasto libero</span><br>{E(lib['cena'])}</td></tr>")
+        gg += (f"<div class='gg libero'><div class=d>{E(nome)} · pasto libero</div><div class=m>"
+               f"<div><span class=e>PRANZO</span> {E(lib['pranzo'])}</div>"
+               f"<div><span class=e>CENA</span> {E(lib['cena'])}</div></div></div>")
 
     carbo, pesce, verd = (tc.tabella_carboidrati(piano, db), tc.tabella_pesce(piano, db),
                           tc.tabella_verdure(piano, db))
     note = meta.get("scheda_cucina") or {}
     seg = "".join(f" {E(s)}." for s in verd["segnalate"])
-    sez_v = (f"<h2>VERDURE: stesso peso, stesso gruppo</h2><table><tbody>"
-             f"<tr><th>Crude</th><td>{E(', '.join(verd['gruppi']['crude']))}</td></tr>"
-             f"<tr><th>Cotte</th><td>{E(', '.join(verd['gruppi']['cotte']))}</td></tr></tbody></table>"
-             f"<div class=nota>Patate e legumi non si scambiano con le verdure.{seg}</div>")
-    sez_p = (f"<h2>PESCE: a parità di proteine</h2>{_tabella_html(pesce)}{_nota_scarto(pesce)}"
-             if pesce["righe"] else "")
-    sez_c = (f"<h2>CARBOIDRATI: a parità di carboidrati</h2>{_tabella_html(carbo)}{_nota_scarto(carbo)}"
-             if carbo["righe"] else "")
+    chip = lambda k: "".join(f"<span class=chip>{E(x)}</span>" for x in verd["gruppi"][k])
+    sez_c = (f"<h2>Carboidrati <span>stessa quantità di carboidrati</span></h2>{_tabella_html(carbo)}"
+             f"{_nota_scarto(carbo)}" if carbo["righe"] else "")
     if note.get("note_carboidrati"):
-        sez_c += f"<div class=nota>{E(note['note_carboidrati'])}</div>"
-    sp2 = ""
-    if any(r["pasto"] == "spuntino2" for r in piano):
-        sp2 = f"<h2>SECONDO SPUNTINO{_orario(orari, primo, 'spuntino2')}</h2>{opz('spuntino2')}"
-    nome_paz = meta["intestazione"]["nome"]
+        sez_c += f"<div class=n>{E(note['note_carboidrati'])}</div>"
+    sez_p = (f"<h2>Pesce <span>stessa quantità di proteine</span></h2>{_tabella_html(pesce)}"
+             f"{_nota_scarto(pesce)}" if pesce["righe"] else "")
+    sez_v = (f"<h2>Verdure <span>stesso peso, stesso gruppo</span></h2><div class=v><b>Crude</b>"
+             f"<div>{chip('crude')}</div><b>Cotte</b><div>{chip('cotte')}</div></div>"
+             f"<div class=n>Patate e legumi non si scambiano con le verdure.{seg}</div>")
+    top = ("<div class=top><span><b>Dott. Giuseppe Taglialatela</b> — Consulente in Nutrizione</span>"
+           "<span>Scheda per chi cucina</span></div>")
+    nome_paz = E(meta["intestazione"]["nome"])
+    piede = " · ".join(x for x in ("Pesi sempre a crudo, tranne legumi lessati e scatolame",
+                                   E(note.get("note_piede", ""))) if x)
+    foot = lambda n: (f"<div class=foot><span>{piede}</span><span>Studio Nutrizionale "
+                      f"Taglialatela · {n}/2</span></div>")
     pagina = f"""<!doctype html><html lang=it><head><meta charset=utf-8><title>Scheda per chi cucina</title><style>{CSS}</style></head><body>
-<div class=top><span>Dott. Giuseppe Taglialatela <i>— Consulente in Nutrizione</i></span><span>Scheda per chi cucina</span></div>
-<h1>LA SETTIMANA IN UNA PAGINA</h1><div class=sub>{E(nome_paz)} · pesi sempre a crudo, tranne legumi lessati e scatolame</div>
-<div class=cols><div><h2>COLAZIONE (una a scelta)</h2><div class=gr>{opz('colazione')}</div></div><div><h2>SPUNTINO{_orario(orari, primo, 'spuntino')}</h2>{opz('spuntino')}{sp2}</div></div>
-<h2>PRANZO E CENA</h2><table><thead><tr><th>Giorno</th><th>Pranzo{_orario(orari, primo, 'pranzo').replace(' ore', ', ore')}</th><th>Cena{_orario(orari, primo, 'cena').replace(' ore', ', ore')}</th></tr></thead><tbody>{righe}</tbody></table>
-<div class=d><div>{sez_v}{sez_p}</div><div>{sez_c}</div></div>
-<div class=foot><span>{E(note.get('note_piede', ''))}</span><span>Studio Nutrizionale Taglialatela</span></div></body></html>"""
+<div class=pag>{top}<h1>La settimana</h1><div class=sub>{nome_paz}</div>
+{sez('Colazione', 'colazione')}<div class=griglia>{carte('colazione')}</div>{spuntini}
+<h2>Pranzo e cena</h2><div class=griglia>{gg}</div>{foot(1)}</div>
+<div class=pag>{top}<h1>Come scambiare gli alimenti</h1><div class=sub>{nome_paz} · Lo scambio vale nello stesso pasto</div>
+{sez_c}{sez_p}{sez_v}{foot(2)}</div></body></html>"""
     return pagina, {"carboidrati": carbo, "pesce": pesce, "verdure": verd}
 
 
@@ -185,13 +236,25 @@ def _prepara(piano_p, target_p, meta_p, orari_p=None, **kw):
 
 
 def in_pdf(html_p, pdf_p):
+    """PDF con Chromium. La pagina si misura alla larghezza di stampa: se il contenuto
+    non sta, si passa alla versione compatta; se non basta, ci si ferma."""
     from playwright.sync_api import sync_playwright
+    sborda = ("[...document.querySelectorAll('.pag')].some("
+              "p => p.scrollHeight > p.clientHeight + 1)")
     with sync_playwright() as p:
         b = p.chromium.launch()
-        pag = b.new_page()
+        pag = b.new_page(viewport={"width": 695, "height": 1028})
         pag.goto("file://" + os.path.abspath(html_p))
-        pag.pdf(path=pdf_p, prefer_css_page_size=True, print_background=True)
+        pag.emulate_media(media="print")
+        troppo = pag.evaluate(sborda)
+        if troppo:
+            pag.evaluate("document.body.classList.add('densa')")
+            troppo = pag.evaluate(sborda)
+        if not troppo:
+            pag.pdf(path=pdf_p, prefer_css_page_size=True, print_background=True)
         b.close()
+    if troppo:
+        raise Fermo("scheda: il contenuto non sta nelle due pagine, PDF non generato")
 
 
 def riepilogo(tabelle):
@@ -254,7 +317,8 @@ def autotest():
         pagina, tab = _prepara(piano_c, target_c, mp, **kw)
     except Fermo as e:
         return [f"scheda non generata sul piano approvato: {e}"]
-    for atteso in ("LA SETTIMANA IN UNA PAGINA", "Paziente Fittizio", "Pranzo di collaudo",
+    for atteso in ("La settimana", "Come scambiare gli alimenti", "Paziente Fittizio",
+                   "Pranzo di collaudo", "Domenica",
                    "Nota di collaudo.", "Piede di collaudo", "Patate e legumi", "Carote"):
         if atteso not in pagina:
             problemi.append(f"scheda senza «{atteso}»")
@@ -298,7 +362,11 @@ def main():
         f.write(pagina)
     print("\n".join(riepilogo(tabelle)))
     if o.out_pdf:
-        in_pdf(o.out_html, o.out_pdf)
+        try:
+            in_pdf(o.out_html, o.out_pdf)
+        except Fermo as e:
+            print(f"FERMO: {e}")
+            return 1
     return 0
 
 

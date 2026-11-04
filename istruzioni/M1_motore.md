@@ -629,11 +629,12 @@ un alimento mancante. Un nome generico trova più voci: si sceglie in composizio
 `autotest()` (45 prove) gira nel collaudo.
 
 ### genera_scheda_cucina.py — scheda per chi cucina (04/11/2026)
-Una pagina con settimana e tabelle di conversione, tutta calcolata da piano, metadati e
+Due pagine, settimana e tabelle di conversione, tutte calcolate da piano, metadati e
 `alimenti.csv` (M3, sezione 3). Richiede lo stesso verdetto e la stessa impronta del PDF.
 `python3 genera_scheda_cucina.py --piano ... --target ... --metadati ... --verdetto ...
 [--orari ...] --out-html scheda.html [--out-pdf scheda.pdf]`. Stampa righe, scarti in kcal e
-verdure del piano fuori elenco. Il PDF richiede Chromium con Playwright.
+verdure del piano fuori elenco. Il PDF richiede Chromium con Playwright; è `in_pdf` a
+misurare se il contenuto sta nelle pagine (versione compatta, poi fermo), l'HTML no.
 
 ### genera_spiegazione.py — documento di spiegazione (30/10/2026)
 Genera il PDF del documento di spiegazione solo dopo i controlli: impronta approvata (come
@@ -915,7 +916,7 @@ equivalenti a 80 g di pasta cruda (parità di carboidrati) o a 100 g di merluzzo
 proteine), arrotondati a 5 g. Non si scrivono a mano: `python3 tabelle_conversione.py
 --rigenera` li ricalcola da `alimenti.csv`; se il database cambia, il controllo 13 si ferma
 finché non lo si esegue. `da_confermare` = compare come riga se è nel piano, non come
-colonna.
+alternativa; `solo_piano` = lo stesso, per decisione del nutrizionista (quinoa e piadina).
 
 **scambi_verdure.csv** — `food_id, nome_riferimento, uso, stato`. `uso`: `crude`, `cotte`,
 `entrambe`. Scambio a parità di peso. Si segnalano da sole le voci da almeno 5 g/100 g di

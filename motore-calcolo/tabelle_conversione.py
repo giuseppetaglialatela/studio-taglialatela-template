@@ -13,7 +13,9 @@ DATI
   scambi_verdure.csv      food_id, nome_riferimento, uso (crude|cotte|entrambe), stato.
                           A parita' di peso; patate e legumi esclusi.
   Stato: 'confermato' = compare come alternativa; 'da_confermare' = compare solo come
-  riga, se e' nel piano, finche' il nutrizionista non lo conferma.
+  riga, se e' nel piano, finche' il nutrizionista non lo conferma; 'solo_piano' =
+  decisione del nutrizionista: compare solo se e' nel piano, mai come alternativa
+  (quinoa e piadina, 04/11/2026: a parita' di carboidrati oltre 100 kcal in piu').
 
 La colonna grammi_porzione e' controllata dal collaudo (controllo 13): se alimenti.csv
 cambia, il collaudo si ferma finche' non si esegue --rigenera.
@@ -35,7 +37,7 @@ SOGLIA_FIBRA_VERDURA = 5.0             # g/100 g: oltre, la verdura si segnala
 RUOLI_AMMESSI = {"carboidrati": {"cereale", "patate"}, "pesce": {"pesce", "molluschi_crostacei"},
                  "verdure": {"verdura"}}
 USI_VERDURE = {"crude", "cotte", "entrambe"}
-STATI = {"confermato", "da_confermare"}
+STATI = {"confermato", "da_confermare", "solo_piano"}
 PASTI_PRINCIPALI = ("pranzo", "cena")
 
 

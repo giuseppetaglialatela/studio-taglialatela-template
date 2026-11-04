@@ -5,10 +5,10 @@ food_id,nome_riferimento,grammi_porzione,stato
 000550,Pane integrale,130,confermato
 100154_2,Pane comune,95,confermato
 381,Patate,325,confermato
-60091,Pasta integrale,90,da_confermare
-500010,Riso integrale,75,da_confermare
-000130,Riso basmati,70,da_confermare
-8603,Farro,85,da_confermare
-000090,Orzo perlato,80,da_confermare
-889001,Quinoa,100,da_confermare
-9090,Piadina,115,da_confermare
+60091,Pasta integrale,90,confermato
+500010,Riso integrale,75,confermato
+000130,Riso basmati,70,confermato
+8603,Farro,85,confermato
+000090,Orzo perlato,80,confermato
+889001,Quinoa,100,solo_piano
+9090,Piadina,115,solo_piano

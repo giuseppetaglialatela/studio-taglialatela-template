@@ -2,7 +2,7 @@
 
 Modulo operativo. Si carica **dopo l'approvazione dei calcoli**, per generare i due
 deliverable che il paziente riceve.
-Ultimo aggiornamento: 04/11/2026 (scheda per chi cucina con le tabelle di conversione, in ogni dieta). 30/10/2026 (verdetto della pipeline allegato e richiesto da PDF e verifica;
+Ultimo aggiornamento: 04/11/2026 (scheda per chi cucina in due pagine, con le tabelle di conversione, in ogni dieta). 30/10/2026 (verdetto della pipeline allegato e richiesto da PDF e verifica;
 documento di spiegazione generato con `genera_spiegazione.py`, che si ferma su segnaposto,
 parentesi quadre, struttura e nome del paziente). 23/10/2026: testo del documento di spiegazione approvato prima della consegna; template di spiegazione: elenchi puntati «•» al posto di «●», che il font non ha e stampava «NO GLYPH», unica modifica al motore grafico autorizzata dal nutrizionista; impronta dell'approvazione: il PDF si ferma se piano o testi sono cambiati, `--verifica-impronta` prima del documento di spiegazione, orari tra gli allegati; 22/10: fermo sui segnaposto nei testi del paziente; prima: 30/09/2026, secondo spuntino, fino a 5 pasti nel PDF). Presuppone **M2 già eseguito** (in chat A):
 copre i suoi PASSO 7 e PASSO 8 e non si esegue prima. **In chat B M2 e M1 non si
@@ -301,18 +301,19 @@ piano, con la stessa veste professionale.
 
 ## 3 BIS. SCHEDA PER CHI CUCINA E TABELLE DI CONVERSIONE
 
-Decisione del nutrizionista, 04/11/2026: ogni dieta ha una scheda di una pagina, separata
-dal PDF del piano, che resta congelato. Porta la settimana e le tabelle di conversione,
-personalizzate sulle voci del piano:
+Decisione del nutrizionista, 04/11/2026: ogni dieta ha una scheda di due pagine, separata
+dal PDF del piano, che resta congelato. Pagina 1: la settimana, a riquadri per giorno.
+Pagina 2: le tabelle di conversione, personalizzate sulle voci del piano:
 - **Carboidrati:** a parità di carboidrati, arrotondati a 5 g, con la colonna della pasta
-  e lo scarto in kcal dichiarato.
+  e lo scarto in kcal dichiarato. Quinoa e piadina compaiono solo se sono nel piano,
+  mai come alternative (`solo_piano`): a parità di carboidrati superano le 100 kcal in più.
 - **Pesce:** a parità di proteine, stesso arrotondamento.
 - **Verdure:** a parità di peso, gruppi crude e cotte, patate e legumi esclusi, segnalate
   quelle che si discostano.
 
 Si genera con `genera_scheda_cucina.py` (M1) dopo il PDF: si ferma senza verdetto e
-impronta approvata. Le tabelle non si scrivono a mano. La scheda si controlla a occhio:
-una pagina sola. Il suo riepilogo (scarti, verdure fuori elenco) si riporta in chat.
+impronta approvata. Le tabelle non si scrivono a mano. Si genera sempre con `--out-pdf`:
+se il contenuto non sta passa da solo alla versione compatta, e se non basta si ferma. Il suo riepilogo (scarti, verdure fuori elenco) si riporta in chat.
 
 ## 4. ANTEPRIMA OBBLIGATORIA
 
