@@ -301,9 +301,9 @@ piano, con la stessa veste professionale.
 
 ## 3 BIS. SCHEDA PER CHI CUCINA E TABELLE DI CONVERSIONE
 
-Decisione del nutrizionista, 04/11/2026: ogni dieta ha una scheda di due pagine, separata
-dal PDF del piano, che resta congelato. Pagina 1: la settimana, a riquadri per giorno.
-Pagina 2: le tabelle di conversione, personalizzate sulle voci del piano:
+Decisione del nutrizionista, 04/11/2026: ogni dieta ha una scheda per chi cucina, separata
+dal PDF del piano, che resta congelato: la settimana, a riquadri per giorno, e le tabelle
+di conversione, personalizzate sulle voci del piano:
 - **Carboidrati:** a parità di carboidrati, arrotondati a 5 g, con la colonna della pasta
   e lo scarto in kcal dichiarato. Quinoa e piadina compaiono solo se sono nel piano,
   mai come alternative (`solo_piano`): a parità di carboidrati superano le 100 kcal in più.
@@ -319,8 +319,13 @@ stanno nel documento di spiegazione.
 
 Si genera con `genera_scheda_cucina.py` (M1) dopo il PDF: si ferma senza verdetto e
 impronta approvata. Un piano con eccezione etichetta richiede gli stessi due file del PDF
-(`--eccezione-etichetta`, `--nomi-eccezione`): la voce sta nella settimana, non negli scambi. Le tabelle non si scrivono a mano. Si genera sempre con `--out-pdf`:
-se il contenuto non sta passa da solo alla versione compatta, e se non basta si ferma. Il suo riepilogo (scarti, verdure fuori elenco) si riporta in chat.
+(`--eccezione-etichetta`, `--nomi-eccezione`): la voce sta nella settimana, non negli scambi. Le tabelle non si scrivono a mano. Si genera sempre con `--out-pdf`.
+
+**Adattamento al contenuto (04/11/2026).** Il contenuto del piano non si cambia per far
+entrare la scheda. Il motore prova due pagine, riducendo spazi e poi scrittura fino al minimo
+approvato di 8 punti per gli ingredienti e 8,5 per i titoli; sotto non si scende. Se non basta
+passa da solo a tre pagine: due per la settimana, una per le tabelle. Se non bastano nemmeno
+tre si ferma e decide il nutrizionista. Pagine, livello e punti si riportano in chat. Il suo riepilogo (scarti, verdure fuori elenco) si riporta in chat.
 
 ## 4. ANTEPRIMA OBBLIGATORIA
 

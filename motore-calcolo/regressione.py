@@ -502,6 +502,12 @@ def modo_verifica():
     if not ok_sch:
         falliti += 1
         ok_cli = False
+    # Adattamento della scheda al contenuto (04/11/2026): tre piani fittizi
+    ok_ad, msg_ad = verifica_adattamento_scheda()
+    print(f"\n  [{'OK ' if ok_ad else 'XX '}] adattamento della scheda: {msg_ad}")
+    if not ok_ad:
+        falliti += 1
+        ok_cli = False
     # Calcolo esatto dei pasti a scelta (tappa 1, 29/10/2026): giorno e
     # settimana confrontati con la forza bruta su casi casuali a seme fisso
     import combinazioni
@@ -689,7 +695,9 @@ def verifica_scheda_etichetta():
         senza = subprocess.run(base_s, capture_output=True, text=True, timeout=60, cwd=tmp)
         if senza.returncode == 0 or "ETI_TEST" not in senza.stdout or os.path.exists(html_p):
             return False, "senza i file la voce da etichetta non ferma la scheda"
-        con = subprocess.run(base_s + ["--eccezione-etichetta", voci, "--nomi-eccezione", nomi],
+        pdf_p = os.path.join(tmp, "scheda.pdf")
+        con = subprocess.run(base_s + ["--eccezione-etichetta", voci, "--nomi-eccezione", nomi,
+                                       "--out-pdf", pdf_p],
                              capture_output=True, text=True, timeout=60, cwd=tmp)
         if con.returncode != 0 or not os.path.exists(html_p):
             return False, f"con i file la scheda non si genera ({con.stdout.strip()[-120:]})"
@@ -698,6 +706,87 @@ def verifica_scheda_etichetta():
         return True, "con i due file si genera, con nome e nota di peso; senza, si ferma"
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
+
+
+def _piano_scheda(alternative, n_col, n_spu):
+    """Piano fittizio per la scheda: solo food_id e grammi di collaudo."""
+    pr = [[("000800", 80), ("1515", 52), ("391", 150), ("700169", 30), ("1726", 10), ("702901", 10)],
+          [("60091", 80), ("4005", 90), ("345", 180), ("391", 100), ("1726", 10), ("702901", 13)],
+          [("500010", 80), ("106500", 120), ("349", 200), ("339", 50), ("1726", 10), ("702901", 12)],
+          [("100154_2", 70), ("8711", 60), ("1726", 20), ("331", 60), ("391", 100), ("702901", 8)]]
+    ce = [("000550", 60), ("1313", 180), ("101", 200), ("702901", 12)]
+    col = [[("135020", 200), ("600009", 40), ("406", 100), ("008820", 10)],
+           [("8053", 170), ("000550", 50), ("8807", 150)],
+           [("1800", 104), ("000550", 60), ("391", 100), ("702901", 5)],
+           [("100015", 200), ("000550", 45), ("391", 100), ("702901", 5)]]
+    spu = [[("1631", 125), ("406", 100)], [("8053", 150)], [("008000", 200), ("406", 50)],
+           [("8807", 150), ("100015", 100)], [("429", 140)], [("1631", 125), ("8807", 150)]]
+    lettere = "ABCDEFGHIJ"
+    righe = []
+
+    def agg(g, pasto, voci, o):
+        righe.extend({"giorno": g, "pasto": pasto, "food_id": f, "grammi": str(q), "opzione": o}
+                     for f, q in voci)
+    for n, alt in enumerate(alternative, 1):
+        g = str(n)
+        for i in range(n_col):
+            agg(g, "colazione", col[i % 4], lettere[i])
+        for i in range(n_spu):
+            agg(g, "spuntino", spu[i % 6], lettere[i])
+        for i in range(alt):
+            agg(g, "pranzo", pr[i % 4], lettere[i] if alt > 1 else "")
+        agg(g, "cena", ce, "")
+    titoli = {}
+    for r in righe:
+        k = (f"{r['giorno']}|{r['pasto']}|{r['opzione']}" if r["pasto"] in ("pranzo", "cena")
+             else f"*|{r['pasto']}|{r['opzione']}")
+        titoli[k] = "Titolo di piatto di media lunghezza come nei piani"
+    giorni = ["lun", "mar", "mer", "gio", "ven", "sab"][:len(alternative)]
+    meta = {"titoli_piatti": titoli, "giorni": {"lavorativi": giorni, "libero": "dom"},
+            "intestazione": {"nome": "Paziente Fittizio"}, "abbinamento_spuntino": "non concordato",
+            "indicazioni_giorno_libero": {"pranzo": "a piacere", "cena": "a piacere"}}
+    return righe, meta
+
+
+def verifica_adattamento_scheda():
+    """Piano piccolo: due pagine, livello normale. Grande come il caso reale del
+    04/11/2026: tre pagine, nessuna sotto il minimo. Estremo: fermo, nessun PDF."""
+    import tempfile, shutil
+    import genera_zona_piano as gzp
+    import genera_scheda_cucina as gsc
+    try:
+        import playwright  # noqa: F401
+    except ImportError:
+        return True, "NON ESEGUITO: Chromium assente in questa sessione"
+    db = gzp.carica_alimenti(os.path.join(BASE, "alimenti.csv"))
+    nomi = gzp.carica_nomi(os.path.join(BASE, "nomi_paziente.csv"))
+    tmp = tempfile.mkdtemp()
+    h, p = os.path.join(tmp, "s.html"), os.path.join(tmp, "s.pdf")
+
+    def fai(alt, n_col, n_spu):
+        righe, meta = _piano_scheda(alt, n_col, n_spu)
+        return gsc.adatta(lambda n, k: gsc.componi(righe, db, nomi, meta, {}, 1800, pagine=n,
+                                                   giorni_p1=k)[0], h, p, len(alt) + 1)
+    try:
+        e = fai((1, 1, 1), 2, 2)
+        if len(e) != 2 or any(x[1] != "normale" for x in e):
+            return False, f"piano piccolo non al livello normale: {e}"
+        e = fai((3, 4, 3, 4, 3, 1), 4, 6)
+        if len(e) != 3 or min(x[2] for x in e) < 8:
+            return False, f"piano grande non adattato: {e}"
+        testo = open(h, encoding="utf-8").read()
+        if testo.count("class=\"gg\"") + testo.count("class=gg") != 6:
+            return False, "piano grande: giorni persi nell'adattamento"
+        os.remove(p)
+        try:
+            fai((10, 10, 10, 10, 10, 10), 10, 10)
+            return False, "piano estremo non fermato"
+        except gzp.Fermo as ex:
+            if "scrittura minima" not in str(ex) or os.path.exists(p):
+                return False, f"fermo poco chiaro o PDF scritto: {ex}"
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+    return True, "piccolo a livello normale; grande in 3 pagine sopra il minimo; estremo fermato"
 
 
 def verifica_riga_di_comando_metadati():

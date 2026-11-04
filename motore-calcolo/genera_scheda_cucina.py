@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-Scheda per chi cucina (04/11/2026): pagina 1 la settimana, a riquadri per giorno;
-pagina 2 le tabelle di conversione.
+Scheda per chi cucina (04/11/2026): la settimana, a riquadri per giorno, e le tabelle
+di conversione. Si adatta da sola al contenuto: due pagine finche' si puo', con spazi
+e scrittura ridotti fino al minimo di 8 punti per gli ingredienti, poi tre pagine.
 
 Grafica scelta dal nutrizionista il 04/11/2026 (versione B). Qui i dati vengono tutti da
 piano, metadati e alimenti.csv: nessuna grammatura scritta a mano.
@@ -55,7 +56,10 @@ h2{font-size:11pt;color:var(--ara);margin:8px 0 4px}h2 span{color:var(--gr);font
 .libero{grid-column:1/3}.libero .m{display:grid;grid-template-columns:1fr 1fr;gap:10px;border-top:0}
 .conv{width:100%;border-collapse:collapse;font-size:9.5pt}.conv th,.conv td{padding:3.5px 6px;text-align:center;border-bottom:1px solid var(--lin)}.conv thead th{color:var(--blu);font-weight:normal;font-size:8.5pt;border-bottom:1.5px solid var(--ver);vertical-align:bottom}.conv th.cap{text-align:left;color:var(--gr);font-style:italic}.conv tbody th{text-align:left;color:var(--blu);font-weight:bold}.conv td.sel{color:#b6c1c5}.conv tbody tr:nth-child(even){background:var(--ten)}
 .n{color:var(--gr);font-size:9pt;margin-top:4px}.chip{display:inline-block;background:var(--ten);border-radius:10px;padding:1px 8px;margin:0 3px 3px 0;font-size:9.5pt}.v{display:grid;grid-template-columns:60px 1fr;gap:3px 6px;align-items:baseline}.v>b{color:var(--ver)}
-.densa{font-size:9pt;line-height:1.22}.densa h1{font-size:15pt;margin:4px 0 0}.densa .sub{margin-bottom:2px}.densa h2{font-size:10pt;margin:4px 0 2px}.densa .griglia{gap:3px 8px}.densa .voci{font-size:8.5pt}.densa .card{padding:2px 6px}.densa .gg .m{padding:1px 6px}.densa .gg .e{font-size:7pt}
+.pag{font-size:var(--fs,10pt);line-height:var(--lh,1.35)}.voci{font-size:var(--fv,9.5pt)}.card{padding:var(--pc,4px 8px)}.gg .m{padding:var(--pm,3px 8px)}
+.griglia{gap:var(--gap,5px 10px)}h2{margin:var(--mh,8px 0 4px)}h1{font-size:var(--h1,19pt);margin:var(--mh1,7px 0 1px)}.sub{margin-bottom:var(--msub,5px)}
+.conv{font-size:var(--fv,9.5pt)}.conv th,.conv td{padding:var(--pt,3.5px 6px)}
+.flusso .giorni{display:block;columns:2;column-gap:10px}.flusso .giorni .gg{margin-bottom:4px}.flusso .libero .m{display:block}.flusso .scelte{grid-template-columns:1fr 1fr 1fr}
 .foot{margin-top:auto;border-top:1px solid var(--lin);padding-top:3px;color:var(--gr);font-size:8pt;display:flex;justify-content:space-between;gap:12px}"""
 
 
@@ -135,7 +139,7 @@ def _voci(rr, nomi, uovo_g, etichetta=frozenset()):
     return f"<div class=voci>{out}</div>"
 
 
-def componi(piano, db, nomi, meta, orari, target_kcal, etichetta=frozenset()):
+def componi(piano, db, nomi, meta, orari, target_kcal, etichetta=frozenset(), pagine=2, giorni_p1=0):
     """etichetta: i food_id delle voci da etichetta dichiarate. Stanno nella settimana;
     le tabelle leggono solo i loro elenchi, quindi non le propongono mai come scambio."""
     titoli = meta["titoli_piatti"]
@@ -180,15 +184,15 @@ def componi(piano, db, nomi, meta, orari, target_kcal, etichetta=frozenset()):
         if cont("spuntino") == cont("spuntino2") and tit("spuntino") == tit("spuntino2"):
             orari_sp = " e ".join(x for x in (ora("spuntino"), ora("spuntino2")) if x)
             nota = ", ".join(x for x in ("uno a scelta", orari_sp) if x)
-            spuntini = f"<h2>Spuntini <span>{E(nota)}</span></h2><div class=griglia>{carte('spuntino')}</div>"
+            spuntini = f"<h2>Spuntini <span>{E(nota)}</span></h2><div class='griglia scelte'>{carte('spuntino')}</div>"
         else:
             spuntini = (f"<div class=griglia><div>{sez('Spuntino', 'spuntino')}{carte('spuntino')}</div>"
                         f"<div>{sez('Secondo spuntino', 'spuntino2')}{carte('spuntino2')}</div></div>")
     else:
-        spuntini = sez("Spuntino", "spuntino") + f"<div class=griglia>{carte('spuntino')}</div>"
+        spuntini = sez("Spuntino", "spuntino") + f"<div class='griglia scelte'>{carte('spuntino')}</div>"
 
     lav = meta["giorni"]["lavorativi"]
-    gg = ""
+    carte_g = []
     for i, g in enumerate(giorni):
         nome = GIORNI.get(str(lav[i]).lower()[:3], str(lav[i]))
         blocchi = ""
@@ -198,13 +202,14 @@ def componi(piano, db, nomi, meta, orari, target_kcal, etichetta=frozenset()):
             for o in _opzioni(piano, g, pasto):
                 let = f" {E(o)}" if o else ""
                 blocchi += f"<div class=m><div class=e>{testa}{let}</div>{piatto(g, pasto, o)}</div>"
-        gg += f"<div class=gg><div class=d>{E(nome)}</div>{blocchi}</div>"
+        carte_g.append(f"<div class=gg><div class=d>{E(nome)}</div>{blocchi}</div>")
     lib = meta.get("indicazioni_giorno_libero")
     if isinstance(lib, dict):
         nome = GIORNI.get(str(meta["giorni"].get("libero", "")).lower()[:3], "Giorno libero")
-        gg += (f"<div class='gg libero'><div class=d>{E(nome)} · pasto libero</div><div class=m>"
+        carte_g.append(f"<div class='gg libero'><div class=d>{E(nome)} · pasto libero</div><div class=m>"
                f"<div><span class=e>PRANZO</span> {E(lib['pranzo'])}</div>"
                f"<div><span class=e>CENA</span> {E(lib['cena'])}</div></div></div>")
+    primi, resto = (carte_g[:giorni_p1], carte_g[giorni_p1:]) if pagine == 3 else ([], carte_g)
 
     filtro = tc.Filtro(piano, db, target_kcal)
     carbo, pesce, verd = (tc.tabella_carboidrati(piano, db, filtro=filtro),
@@ -216,12 +221,14 @@ def componi(piano, db, nomi, meta, orari, target_kcal, etichetta=frozenset()):
     gruppi_v = "".join(f"<b>{n}</b><div>{chip(k)}</div>" for n, k in (("Crude", "crude"), ("Cotte", "cotte"))
                        if verd["gruppi"][k])
     trattino = "<div class=n>— = scambio non previsto per questo piano.</div>"
-    sez_c = (f"<h2>Carboidrati <span>stessa quantità di carboidrati</span></h2>{_tabella_html(carbo)}"
-             f"{trattino}{_nota_scarto(carbo)}" if carbo["righe"] else "")
+    vuoto = "<div class=n>Nessuno scambio previsto per questo piano.</div>"
+    corpo = lambda t: f"{_tabella_html(t)}{trattino}{_nota_scarto(t)}" if t["colonne"] else vuoto
+    sez_c = (f"<h2>Carboidrati <span>stessa quantità di carboidrati</span></h2>{corpo(carbo)}"
+             if carbo["righe"] else "")
     if note.get("note_carboidrati"):
         sez_c += f"<div class=n>{E(note['note_carboidrati'])}</div>"
-    sez_p = (f"<h2>Pesce <span>stessa quantità di proteine</span></h2>{_tabella_html(pesce)}"
-             f"{trattino}{_nota_scarto(pesce)}" if pesce["righe"] else "")
+    sez_p = (f"<h2>Pesce <span>stessa quantità di proteine</span></h2>{corpo(pesce)}"
+             if pesce["righe"] else "")
     sez_v = (f"<h2>Verdure <span>stesso peso, stesso gruppo</span></h2><div class=v>{gruppi_v}</div>"
              f"<div class=n>Patate e legumi non si scambiano con le verdure.{seg}</div>")
     top = ("<div class=top><span><b>Dott. Giuseppe Taglialatela</b> — Consulente in Nutrizione</span>"
@@ -230,43 +237,101 @@ def componi(piano, db, nomi, meta, orari, target_kcal, etichetta=frozenset()):
     piede = " · ".join(x for x in ("Pesi sempre a crudo, tranne legumi lessati e scatolame",
                                    E(note.get("note_piede", ""))) if x)
     foot = lambda n: (f"<div class=foot><span>{piede}</span><span>Studio Nutrizionale "
-                      f"Taglialatela · {n}/2</span></div>")
+                      f"Taglialatela · {n}/{pagine}</span></div>")
+    griglia = lambda c: f'<div class="griglia giorni">{"".join(c)}</div>'
+    salto = ""
+    if pagine == 3:
+        salto = ((f"<h2>Pranzo e cena</h2>{griglia(primi)}" if primi else "")
+                 + f"{foot(1)}</div><div class=pag>{top}<h1>Pranzo e cena</h1><div class=sub>{nome_paz}</div>")
     pagina = f"""<!doctype html><html lang=it><head><meta charset=utf-8><title>Scheda per chi cucina</title><style>{CSS}</style></head><body>
 <div class=pag>{top}<h1>La settimana</h1><div class=sub>{nome_paz}</div>
-{sez('Colazione', 'colazione')}<div class=griglia>{carte('colazione')}</div>{spuntini}
-<h2>Pranzo e cena</h2><div class=griglia>{gg}</div>{foot(1)}</div>
+{sez('Colazione', 'colazione')}<div class="griglia scelte">{carte('colazione')}</div>{spuntini}
+{salto}{"" if pagine == 3 else "<h2>Pranzo e cena</h2>"}{griglia(resto)}{foot(pagine - 1)}</div>
 <div class=pag>{top}<h1>Come scambiare gli alimenti</h1><div class=sub>{nome_paz} · Lo scambio vale nello stesso pasto</div>
-{sez_c}{sez_p}{sez_v}{foot(2)}</div></body></html>"""
+{sez_c}{sez_p}{sez_v}{foot(pagine)}</div></body></html>"""
     return pagina, {"carboidrati": carbo, "pesce": pesce, "verdure": verd}
 
 
 def _prepara(piano_p, target_p, meta_p, orari_p=None, **kw):
+    return componi(*_dati(piano_p, target_p, meta_p, orari_p, **kw))
+
+
+def _dati(piano_p, target_p, meta_p, orari_p=None, **kw):
     gzp.verifica(piano_p, target_p, meta_p, orari_p, **kw)     # verdetto e impronta
     db, nomi, piano, target, meta, _v = gzp._prepara(piano_p, target_p, meta_p, **kw)
     etichetta = frozenset(db) - frozenset(tc.carica_db())
-    return componi(piano, db, nomi, meta, gzp.carica_orari(orari_p), target["kcal_target"], etichetta)
+    return piano, db, nomi, meta, gzp.carica_orari(orari_p), target["kcal_target"], etichetta
 
 
-def in_pdf(html_p, pdf_p):
-    """PDF con Chromium. La pagina si misura alla larghezza di stampa: se il contenuto
-    non sta, si passa alla versione compatta; se non basta, ci si ferma."""
+# Adattamento al contenuto (decisione del nutrizionista, 04/11/2026). Ogni pagina prova i
+# livelli in ordine e si ferma al primo che entra; il contenuto non cambia mai.
+# Minimo approvato: ingredienti a 8 punti, titoli a 8,5.
+SPAZI = ("--gap:3px 8px;--mh:5px 0 2px;--h1:16pt;--mh1:4px 0 0;--msub:2px;--pc:2px 6px;"
+         "--pm:2px 6px;--pt:2px 5px;")
+LIVELLI = (("normale", 10.0, 9.5, "", False),
+           ("spazi ridotti", 10.0, 9.5, SPAZI, False),
+           ("colonne a riempimento", 10.0, 9.5, SPAZI, True),
+           ("scrittura 9,5", 9.5, 9.0, SPAZI, True),
+           ("scrittura 9", 9.0, 8.5, SPAZI, True),
+           ("scrittura minima 8,5", 8.5, 8.0, SPAZI, True))
+
+
+def _adatta_pagine(pag):
+    """Prova i livelli su ogni pagina. Restituisce [(pagina, livello, punti)] oppure, se
+    una pagina non entra al minimo, (None, pagina, altezza, disponibile)."""
+    esito = []
+    for n, el in enumerate(pag.query_selector_all(".pag"), 1):
+        for nome, fs, fv, spazi, flusso in LIVELLI:
+            el.evaluate("(p, a) => { p.style.cssText = a[0]; p.classList.toggle('flusso', a[1]); }",
+                        [f"--fs:{fs}pt;--fv:{fv}pt;--lh:{1.35 if fs >= 10 else 1.25};{spazi}", flusso])
+            alto, disp = el.evaluate("p => [p.scrollHeight, p.clientHeight]")
+            if alto <= disp + 1:
+                esito.append((n, nome, fv))
+                break
+        else:
+            return (None, n, alto, disp)
+    return esito
+
+
+def adatta(costruisci, html_p, pdf_p, n_giorni):
+    """costruisci(pagine, giorni_p1) -> html. Due pagine se entrano al minimo; altrimenti
+    tre, dividendo la settimana dove la scrittura resta piu' grande. Prima del PDF ogni
+    pagina e' misurata; se non entra nulla si ferma."""
     from playwright.sync_api import sync_playwright
-    sborda = ("[...document.querySelectorAll('.pag')].some("
-              "p => p.scrollHeight > p.clientHeight + 1)")
     with sync_playwright() as p:
         b = p.chromium.launch()
         pag = b.new_page(viewport={"width": 695, "height": 1028})
-        pag.goto("file://" + os.path.abspath(html_p))
         pag.emulate_media(media="print")
-        troppo = pag.evaluate(sborda)
-        if troppo:
-            pag.evaluate("document.body.classList.add('densa')")
-            troppo = pag.evaluate(sborda)
-        if not troppo:
-            pag.pdf(path=pdf_p, prefer_css_page_size=True, print_background=True)
+
+        def prova(pagine, k):
+            with open(html_p, "w", encoding="utf-8") as f:
+                f.write(costruisci(pagine, k))
+            pag.goto("file://" + os.path.abspath(html_p))
+            return _adatta_pagine(pag)
+        esito, scelta = prova(2, 0), (2, 0)
+        if isinstance(esito, tuple):
+            ultimo, migliore = esito, None
+            for k in range(n_giorni + 1):
+                e = prova(3, k)
+                if isinstance(e, tuple):
+                    ultimo = e
+                    continue
+                voto = (min(x[2] for x in e), k)
+                if migliore is None or voto > migliore[0]:
+                    migliore = (voto, e, k)
+            if migliore is None:
+                b.close()
+                _, n, alto, disp = ultimo
+                raise Fermo(f"scheda: il contenuto non sta in tre pagine alla scrittura minima "
+                            f"(pagina {n}: {alto} px su {disp}, {100 * (alto - disp) // disp + 1}% "
+                            f"di troppo). PDF non generato: serve una decisione del nutrizionista")
+            esito, scelta = migliore[1], (3, migliore[2])
+            prova(*scelta)
+        pag.pdf(path=pdf_p, prefer_css_page_size=True, print_background=True)
+        with open(html_p, "w", encoding="utf-8") as f:
+            f.write(pag.content())
         b.close()
-    if troppo:
-        raise Fermo("scheda: il contenuto non sta nelle due pagine, PDF non generato")
+    return esito
 
 
 def riepilogo(tabelle):
@@ -352,6 +417,10 @@ def autotest():
     tp = tc.tabella_pesce(prova, db)
     if tp["righe"][0]["celle"][tp["colonne"].index("Spigola")]["grammi"] != 185:
         problemi.append("merluzzo 180 g in spigola non vale 185 g")
+    tv = tc.tabella_pesce([{"pasto": "cena", "food_id": "1313", "grammi": "150", "giorno": "1", "opzione": ""}], db,
+                          filtro=tc.Filtro([], db, 1))
+    if tv["colonne"] or _tabella_html(tv).count("<tr>") != 1:
+        problemi.append("tabella senza scambi: colonne rimaste")
     if tc.tabella_verdure(prova, db)["segnalate"] == []:
         problemi.append("nessuna verdura segnalata")
     problemi += _autotest_filtro(db)
@@ -467,20 +536,27 @@ def main():
         print("\n".join(p) or "Autotest della scheda superato.")
         return 1 if p else 0
     try:
-        pagina, tabelle = _prepara(o.piano, o.target, o.metadati, o.orari, verdetto_p=o.verdetto,
-                                   eccezione_p=o.eccezione, nomi_eccezione_p=o.nomi_eccezione)
+        dati = _dati(o.piano, o.target, o.metadati, o.orari, verdetto_p=o.verdetto,
+                     eccezione_p=o.eccezione, nomi_eccezione_p=o.nomi_eccezione)
+        pagina, tabelle = componi(*dati)
     except Fermo as e:
         print(f"FERMO: {e}")
         return 1
     with open(o.out_html, "w", encoding="utf-8") as f:
         f.write(pagina)
     print("\n".join(riepilogo(tabelle)))
-    if o.out_pdf:
-        try:
-            in_pdf(o.out_html, o.out_pdf)
-        except Fermo as e:
-            print(f"FERMO: {e}")
-            return 1
+    if not o.out_pdf:
+        print("HTML non misurato: l'adattamento alle pagine avviene solo con --out-pdf")
+        return 0
+    try:
+        n_giorni = len({r["giorno"] for r in dati[0]}) + 1
+        esito = adatta(lambda p, k: componi(*dati, pagine=p, giorni_p1=k)[0], o.out_html, o.out_pdf, n_giorni)
+    except Fermo as e:
+        print(f"FERMO: {e}")
+        return 1
+    print(f"pagine: {len(esito)}")
+    for n, nome, fv in esito:
+        print(f"pagina {n}: livello «{nome}», ingredienti a {fv:g} punti")
     return 0
 
 

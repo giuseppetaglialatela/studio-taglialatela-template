@@ -629,7 +629,7 @@ un alimento mancante. Un nome generico trova più voci: si sceglie in composizio
 `autotest()` (45 prove) gira nel collaudo.
 
 ### genera_scheda_cucina.py — scheda per chi cucina (04/11/2026)
-Due pagine, settimana e tabelle di conversione, tutte calcolate da piano, metadati e
+Settimana e tabelle di conversione, in due o tre pagine, tutte calcolate da piano, metadati e
 `alimenti.csv` (M3, sezione 3). Richiede lo stesso verdetto e la stessa impronta del PDF.
 `python3 genera_scheda_cucina.py --piano ... --target ... --metadati ... --verdetto ...
 [--orari ...] [--eccezione-etichetta voci.csv --nomi-eccezione nomi.csv] --out-html
@@ -638,8 +638,11 @@ scheda.html [--out-pdf scheda.pdf]`. Le voci da etichetta passano con gli stessi
 scambio; non dichiarate, la scheda si ferma. Stampa righe, scarti in kcal e
 verdure del piano fuori elenco. Filtro di sicurezza (`tabelle_conversione.Filtro`, 04/11/2026):
 uno scambio compare solo con scarto entro il 2,5% delle kcal del target e se, nei giorni reali
-della voce, con un secondo scambio al limite nessuno scenario supera il ±10%. Il PDF richiede Chromium con Playwright; è `in_pdf` a
-misurare se il contenuto sta nelle pagine (versione compatta, poi fermo), l'HTML no.
+della voce, con un secondo scambio al limite nessuno scenario supera il ±10%. Il PDF richiede Chromium con Playwright. `adatta` prova su ogni
+pagina i `LIVELLI` (spazi, colonne a riempimento, scrittura fino a 8 punti per gli ingredienti);
+se due pagine non bastano prova tre, dividendo la settimana dove la scrittura resta più
+grande; se non basta si ferma. Riporta pagine, livello e punti. L'HTML senza `--out-pdf` non
+è misurato.
 
 ### genera_spiegazione.py — documento di spiegazione (30/10/2026)
 Genera il PDF del documento di spiegazione solo dopo i controlli: impronta approvata (come
