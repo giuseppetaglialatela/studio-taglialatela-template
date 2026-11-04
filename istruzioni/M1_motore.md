@@ -632,7 +632,10 @@ un alimento mancante. Un nome generico trova più voci: si sceglie in composizio
 Due pagine, settimana e tabelle di conversione, tutte calcolate da piano, metadati e
 `alimenti.csv` (M3, sezione 3). Richiede lo stesso verdetto e la stessa impronta del PDF.
 `python3 genera_scheda_cucina.py --piano ... --target ... --metadati ... --verdetto ...
-[--orari ...] --out-html scheda.html [--out-pdf scheda.pdf]`. Stampa righe, scarti in kcal e
+[--orari ...] [--eccezione-etichetta voci.csv --nomi-eccezione nomi.csv] --out-html
+scheda.html [--out-pdf scheda.pdf]`. Le voci da etichetta passano con gli stessi controlli di
+`genera_zona_piano.py`: compaiono nella settimana con nome e nota di peso, mai nelle tabelle di
+scambio; non dichiarate, la scheda si ferma. Stampa righe, scarti in kcal e
 verdure del piano fuori elenco. Il PDF richiede Chromium con Playwright; è `in_pdf` a
 misurare se il contenuto sta nelle pagine (versione compatta, poi fermo), l'HTML no.
 

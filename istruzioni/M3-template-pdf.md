@@ -312,7 +312,8 @@ Pagina 2: le tabelle di conversione, personalizzate sulle voci del piano:
   quelle che si discostano.
 
 Si genera con `genera_scheda_cucina.py` (M1) dopo il PDF: si ferma senza verdetto e
-impronta approvata. Le tabelle non si scrivono a mano. Si genera sempre con `--out-pdf`:
+impronta approvata. Un piano con eccezione etichetta richiede gli stessi due file del PDF
+(`--eccezione-etichetta`, `--nomi-eccezione`): la voce sta nella settimana, non negli scambi. Le tabelle non si scrivono a mano. Si genera sempre con `--out-pdf`:
 se il contenuto non sta passa da solo alla versione compatta, e se non basta si ferma. Il suo riepilogo (scarti, verdure fuori elenco) si riporta in chat.
 
 ## 4. ANTEPRIMA OBBLIGATORIA

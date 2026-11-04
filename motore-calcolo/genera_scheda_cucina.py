@@ -13,7 +13,8 @@ l'anteprima: scheda_cucina = {"note_carboidrati": "...", "note_piede": "..."}.
 USO
   python3 genera_scheda_cucina.py --piano piano_vN.csv --target target_vN.csv
       --metadati metadati_piano_vN.json --verdetto verdetto_vN.json
-      [--orari orari_pasti.csv] --out-html scheda.html [--out-pdf scheda.pdf]
+      [--orari orari_pasti.csv] [--eccezione-etichetta voci.csv --nomi-eccezione nomi.csv]
+      --out-html scheda.html [--out-pdf scheda.pdf]
   python3 genera_scheda_cucina.py --autotest
 """
 import argparse
@@ -62,13 +63,17 @@ def _g(v):
     return f"{float(v):g} g"
 
 
-def voce(r, nomi, uovo_g):
+def voce(r, nomi, uovo_g, etichetta=frozenset()):
+    """Le voci da etichetta portano anche la nota di peso del file --nomi-eccezione."""
     fid, g = r["food_id"], float(r["grammi"])
     if fid == FOOD_UOVO:
         n = round(g / uovo_g)
         return f"{n} uov{'o' if n == 1 else 'a'}"
     nome = nomi.get(fid, (fid,))
+    nota = nome[1] if isinstance(nome, tuple) and len(nome) > 1 else ""
     nome = nome[0] if isinstance(nome, tuple) else nome
+    if fid in etichetta and nota:
+        nome = f"{nome} ({nota})"
     return f"{NOMI_BREVI.get(fid) or nome} {_g(g)}"
 
 
@@ -118,10 +123,10 @@ def _nota_scarto(t):
     return f"<div class=n>Scarto di energia degli scambi: da {s[0]:+d} a {s[1]:+d} kcal.</div>" if s else ""
 
 
-def _voci(rr, nomi, uovo_g):
+def _voci(rr, nomi, uovo_g, etichetta=frozenset()):
     out = ""
     for r in rr:
-        v = voce(r, nomi, uovo_g)
+        v = voce(r, nomi, uovo_g, etichetta)
         if r["food_id"] == FOOD_UOVO:
             out += f"<span><b>{E(v)}</b></span>"
         else:
@@ -130,7 +135,9 @@ def _voci(rr, nomi, uovo_g):
     return f"<div class=voci>{out}</div>"
 
 
-def componi(piano, db, nomi, meta, orari):
+def componi(piano, db, nomi, meta, orari, etichetta=frozenset()):
+    """etichetta: i food_id delle voci da etichetta dichiarate. Stanno nella settimana;
+    le tabelle leggono solo i loro elenchi, quindi non le propongono mai come scambio."""
     titoli = meta["titoli_piatti"]
     giorni = sorted({r["giorno"] for r in piano}, key=int)
     primo = giorni[0]
@@ -141,7 +148,7 @@ def componi(piano, db, nomi, meta, orari):
 
     def piatto(giorno, pasto, opzione):
         return (f"<div class=t>{E(gzp._titolo(titoli, giorno, pasto, opzione))}</div>"
-                + _voci(_sel(piano, giorno, pasto, opzione), nomi, uovo_g))
+                + _voci(_sel(piano, giorno, pasto, opzione), nomi, uovo_g, etichetta))
 
     def carte(pasto):
         out = ""
@@ -152,7 +159,7 @@ def componi(piano, db, nomi, meta, orari):
             let = f"<span class=l>{E(o)}</span>" if o else ""
             t = E(gzp._titolo(titoli, primo, pasto, o))
             out += (f"<div class=card>{let}<span class=t>{t}</span>{fr}"
-                    + _voci(_sel(piano, primo, pasto, o), nomi, uovo_g) + "</div>")
+                    + _voci(_sel(piano, primo, pasto, o), nomi, uovo_g, etichetta) + "</div>")
         return out
 
     def ora(pasto):
@@ -232,7 +239,8 @@ def componi(piano, db, nomi, meta, orari):
 def _prepara(piano_p, target_p, meta_p, orari_p=None, **kw):
     gzp.verifica(piano_p, target_p, meta_p, orari_p, **kw)     # verdetto e impronta
     db, nomi, piano, _t, meta, _v = gzp._prepara(piano_p, target_p, meta_p, **kw)
-    return componi(piano, db, nomi, meta, gzp.carica_orari(orari_p))
+    etichetta = frozenset(db) - frozenset(tc.carica_db())
+    return componi(piano, db, nomi, meta, gzp.carica_orari(orari_p), etichetta)
 
 
 def in_pdf(html_p, pdf_p):
@@ -340,6 +348,66 @@ def autotest():
         problemi.append("merluzzo 180 g in spigola non vale 185 g")
     if tc.tabella_verdure(prova, db)["segnalate"] == []:
         problemi.append("nessuna verdura segnalata")
+    problemi += _autotest_etichetta(tmp, meta)
+    return problemi
+
+
+def _autotest_etichetta(tmp, meta):
+    """Voce da etichetta FITTIZIA in un piano approvato: con i due file la scheda si
+    genera, con il nome e la nota di peso e senza proporla come scambio; senza un
+    file si ferma. Con la voce arrivata al calcolo, le tabelle non si fermano."""
+    import io
+    import json as _j
+    import shutil
+    from contextlib import redirect_stdout
+    import metadati_piano as mod_meta
+    import pipeline as mod_pipeline
+    d = os.path.join(tmp, "etichetta")
+    os.mkdir(d)
+    _c, piano_c, target_c = gzp._piano_di_collaudo(d)
+    with open(piano_c, "a", encoding="utf-8") as f:
+        f.write("1,pranzo,ETI_TEST,30,,\n")
+    voci = os.path.join(d, "voci.csv")
+    shutil.copy(os.path.join(QUI, "golden", "caso_18_eccezione_etichetta_dichiarata",
+                             "voci_etichetta.csv"), voci)
+    nomi_p = os.path.join(d, "nomi.csv")
+    with open(nomi_p, "w", encoding="utf-8") as f:
+        f.write("food_id,nome_paziente,nota_peso\nETI_TEST,Vellutata di prova,peso da confezione\n")
+    m = {k: v for k, v in meta.items() if k != "impronta_approvata"}
+    mp, vp = os.path.join(d, "m.json"), os.path.join(d, "v.json")
+
+    def scrivi(x):
+        with open(mp, "w", encoding="utf-8") as f:
+            _j.dump(x, f)
+        with redirect_stdout(io.StringIO()):
+            ril, letti = mod_pipeline.esegui(piano_c, target_c, metadati_p=mp, salta_collaudo=True,
+                                             nessuna_terapia=True, eccezione_etichetta=voci)
+        mod_meta.scrivi_verdetto(vp, ril, piano_c, target_c, letti)
+    base = dict(verdetto_p=vp, _collaudo_saltato_ok=True)
+    con = dict(base, eccezione_p=voci, nomi_eccezione_p=nomi_p)
+    scrivi(m)
+    m["impronta_approvata"] = gzp.anteprima(piano_c, target_c, mp, **con)[1]
+    scrivi(m)
+    problemi = []
+    try:
+        pagina, tab = _prepara(piano_c, target_c, mp, **con)
+    except Fermo as e:
+        return [f"scheda con voce da etichetta fermata: {e}"]
+    if "Vellutata di prova (peso da confezione)" not in pagina:
+        problemi.append("voce da etichetta senza nome o nota di peso")
+    if any("ETI" in c or "Vellutata" in c for t in (tab["carboidrati"], tab["pesce"])
+           for c in t["colonne"]) or "Vellutata" in str(tab["verdure"]["gruppi"]):
+        problemi.append("voce da etichetta proposta come scambio")
+    for nome, kw in (("senza i file", base), ("senza i nomi", dict(base, eccezione_p=voci)),
+                     ("nomi senza voci", dict(base, nomi_eccezione_p=nomi_p))):
+        try:
+            _prepara(piano_c, target_c, mp, **kw)
+            problemi.append(f"voce da etichetta accettata {nome}")
+        except Fermo:
+            pass
+    with open(os.path.join(QUI, "alimenti.csv"), encoding="utf-8") as f:
+        if "ETI_TEST" in f.read():
+            problemi.append("voce da etichetta in alimenti.csv")
     return problemi
 
 
@@ -348,13 +416,16 @@ def main():
     a.add_argument("--piano"); a.add_argument("--target"); a.add_argument("--metadati")
     a.add_argument("--verdetto"); a.add_argument("--orari"); a.add_argument("--out-html")
     a.add_argument("--out-pdf"); a.add_argument("--autotest", action="store_true")
+    a.add_argument("--eccezione-etichetta", dest="eccezione")
+    a.add_argument("--nomi-eccezione", dest="nomi_eccezione")
     o = a.parse_args()
     if o.autotest:
         p = autotest()
         print("\n".join(p) or "Autotest della scheda superato.")
         return 1 if p else 0
     try:
-        pagina, tabelle = _prepara(o.piano, o.target, o.metadati, o.orari, verdetto_p=o.verdetto)
+        pagina, tabelle = _prepara(o.piano, o.target, o.metadati, o.orari, verdetto_p=o.verdetto,
+                                   eccezione_p=o.eccezione, nomi_eccezione_p=o.nomi_eccezione)
     except Fermo as e:
         print(f"FERMO: {e}")
         return 1

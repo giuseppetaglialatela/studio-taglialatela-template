@@ -496,6 +496,12 @@ def modo_verifica():
     if not ok_cat:
         falliti += 1
         ok_cli = False
+    # Scheda per chi cucina con voce da etichetta FITTIZIA (04/11/2026), riga di comando
+    ok_sch, msg_sch = verifica_scheda_etichetta()
+    print(f"\n  [{'OK ' if ok_sch else 'XX '}] scheda con eccezione etichetta: {msg_sch}")
+    if not ok_sch:
+        falliti += 1
+        ok_cli = False
     # Calcolo esatto dei pasti a scelta (tappa 1, 29/10/2026): giorno e
     # settimana confrontati con la forza bruta su casi casuali a seme fisso
     import combinazioni
@@ -627,6 +633,71 @@ def verifica_catena_anteprima():
         shutil.rmtree(tmp, ignore_errors=True)
     return True, ("pipeline con collaudo -> verdetto -> anteprima su file (non in chat) -> "
                   "impronta verificata")
+
+
+def verifica_scheda_etichetta():
+    """Dalla riga di comando, come in chat B: con --eccezione-etichetta e --nomi-eccezione
+    la scheda si genera; senza, si ferma (fermo del 04/11/2026 su un piano reale)."""
+    import subprocess, tempfile, json as _json, shutil
+    import genera_zona_piano as gzp
+    tmp = tempfile.mkdtemp()
+    try:
+        _, piano, target = gzp._piano_di_collaudo(tmp)
+        with open(piano, "a", encoding="utf-8") as f:
+            f.write("1,pranzo,ETI_TEST,30,,\n")
+        voci = os.path.join(tmp, "voci.csv")
+        shutil.copy(os.path.join(GOLDEN_DIR, "caso_18_eccezione_etichetta_dichiarata",
+                                 "voci_etichetta.csv"), voci)
+        nomi = os.path.join(tmp, "nomi.csv")
+        with open(nomi, "w", encoding="utf-8") as f:
+            f.write("food_id,nome_paziente,nota_peso\nETI_TEST,Vellutata di prova,peso da confezione\n")
+        meta_p = os.path.join(tmp, "metadati_piano_v1.json")
+        meta = {"versione_piano": "v1",
+                "giorni": {"lavorativi": ["lun"], "libero": "dom", "range_kcal_libero": [1600, 1900]},
+                "livello_colazione": "standard", "tdee_confermato_kcal": 2040,
+                "intestazione": {"nome": "Paziente Fittizio", "eta": "40 anni",
+                                 "condizione": "Caso di collaudo"},
+                "avvertenze_box": "Nessuna allergia dichiarata.",
+                "abbinamento_spuntino": {"A": "B", "B": "A"},
+                "indicazioni_giorno_libero": {"pranzo": "a piacere", "cena": "a piacere"},
+                "titoli_piatti": {"*|colazione|A": "Colazione A", "*|colazione|B": "Colazione B",
+                                  "*|spuntino|A": "Spuntino A", "*|spuntino|B": "Spuntino B",
+                                  "1|pranzo|": "Pranzo", "1|cena|": "Cena"},
+                "obiettivo_intestazione": "collaudo", "criterio_rivalutazione": "collaudo",
+                "terapia": "nessuna terapia, confermato dal nutrizionista il 23/10/2026 "
+                           "(fonte: colloquio)",
+                "assunzioni": [], "alimenti_desiderati": [], "profili": []}
+        ver = os.path.join(tmp, "verdetto_v1.json")
+
+        def pipe():
+            with open(meta_p, "w", encoding="utf-8") as f:
+                _json.dump(meta, f)
+            return subprocess.run([sys.executable, os.path.join(BASE, "pipeline.py"), "--piano", piano,
+                                   "--target", target, "--nessuna-terapia", "--metadati", meta_p,
+                                   "--eccezione-etichetta", voci, "--out-verdetto", ver], capture_output=True, text=True,
+                                  timeout=180, cwd=tmp)
+        if pipe().returncode != 0:
+            return False, "la pipeline non da' un verdetto presentabile"
+        kw = dict(verdetto_p=ver, eccezione_p=voci, nomi_eccezione_p=nomi)
+        meta["impronta_approvata"] = gzp.anteprima(piano, target, meta_p, **kw)[1]
+        if pipe().returncode != 0:
+            return False, "la pipeline non regge l'impronta nei metadati"
+        html_p = os.path.join(tmp, "scheda.html")
+        base_s = [sys.executable, os.path.join(BASE, "genera_scheda_cucina.py"), "--piano", piano,
+                  "--target", target, "--metadati", meta_p, "--verdetto", ver,
+                  "--out-html", html_p]
+        senza = subprocess.run(base_s, capture_output=True, text=True, timeout=60, cwd=tmp)
+        if senza.returncode == 0 or "ETI_TEST" not in senza.stdout or os.path.exists(html_p):
+            return False, "senza i file la voce da etichetta non ferma la scheda"
+        con = subprocess.run(base_s + ["--eccezione-etichetta", voci, "--nomi-eccezione", nomi],
+                             capture_output=True, text=True, timeout=60, cwd=tmp)
+        if con.returncode != 0 or not os.path.exists(html_p):
+            return False, f"con i file la scheda non si genera ({con.stdout.strip()[-120:]})"
+        if "Vellutata di prova (peso da confezione)" not in open(html_p, encoding="utf-8").read():
+            return False, "voce da etichetta senza nome e nota di peso"
+        return True, "con i due file si genera, con nome e nota di peso; senza, si ferma"
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
 
 
 def verifica_riga_di_comando_metadati():
