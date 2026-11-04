@@ -157,3 +157,5 @@ food_id,saturi_g,monoinsaturi_g,polinsaturi_g,epa_g,dha_g,colesterolo_mg,fonte,c
 005140,0.01,0.02,0.04,0,0,0,BDA-IEO,311_1,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.1 g); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
 005690,0.03,0.02,0.05,0,0,0,BDA-IEO,344_1,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.1 g); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
 006800,0.05,0.12,0.51,0,0,0,BDA-IEO,8001_1,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.8 g); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
+9090,3.2,5.73,1.25,0,0,7,BDA-IEO,9090_2,calcolato da ricetta,scheda BDA dichiarata in codice_fonte; grassi coincidenti (10.5 g); ricetta IGP con strutto: sovrastima i saturi per piadine all'olio,2026-11-03
+999057,0.32,0.23,0.78,0,0,0,BDA-IEO,999057_2,calcolato da BDA su alimento simile,scheda BDA dichiarata in codice_fonte; grassi coincidenti (1.9 g),2026-11-03
