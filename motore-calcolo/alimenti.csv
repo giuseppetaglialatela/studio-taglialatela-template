@@ -160,3 +160,4 @@ food_id,nome,categoria,fonte,codice_fonte,data_verifica,kcal_100g,proteine_g,car
 006800,Basilico fresco,verdura,CREA+BDA-IEO+USDA,006800+8001_1+172232,2026-10-28,42,3.1,5.2,0.8,1.6,250,5.5,0,55,0,0.7,64,26
 9090,Piadina,cereali,BDA-IEO,9090_2,2026-11-03,315,7.2,49.9,10.5,2.2,12,0.6,0,7,0,0.05,82,0
 999057,Cereali integrali in formelle (tipo Weetabix),cereali,BDA-IEO,999057_2,2026-11-03,351,10.5,72.7,1.9,9.7,30,12,0,170,0,1.7,83,0
+905010,Minestrone cotto,verdura,CREA(proteine/carboidrati/grassi imputati)+USDA(proxy micronutrienti),905010+171550,2026-11-10,45,2.0,7.8,0.4,2.1,25,0.74,0,13,0,0.6,6,2

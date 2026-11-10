@@ -1,7 +1,7 @@
 # M1 — MOTORE DI CALCOLO
 
 Modulo operativo (principio 6). Dipendenze: nessuna. Ne dipendono M2 e M6.
-Ultima modifica: 04/11/2026 (161 alimenti: piadina e cereali in formelle; scatolame a stato `familiare`; tabelle di conversione: `scambi_carboidrati.csv`, `scambi_pesce.csv`, `scambi_verdure.csv`, `tabelle_conversione.py`; `genera_scheda_cucina.py`; controllo 13 del collaudo). 31/10/2026 pomeriggio (file affiancato `lipidi.csv`: saturi, mono, poli,
+Ultima modifica: 10/11/2026 (162 alimenti: minestrone cotto, CREA 905010, micronutrienti USDA proxy, M6 sezione 10). 04/11/2026 (161 alimenti: piadina e cereali in formelle; scatolame a stato `familiare`; tabelle di conversione: `scambi_carboidrati.csv`, `scambi_pesce.csv`, `scambi_verdure.csv`, `tabelle_conversione.py`; `genera_scheda_cucina.py`; controllo 13 del collaudo). 31/10/2026 pomeriggio (file affiancato `lipidi.csv`: saturi, mono, poli,
 EPA, DHA, colesterolo; saturi e colesterolo calcolati nei riferimenti; sezione LIPIDI del
 report; controllo 12 del collaudo; casi 63-65). 31/10/2026 (riferimenti: si controllano solo
 i parametri dei profili scelti).
@@ -823,7 +823,7 @@ diventa un nuovo caso golden.
 
 ## 4. DATABASE ALIMENTI E GERARCHIA FONTI
 
-**Stato:** 161 alimenti verificati e tracciati alla fonte; il numero vincolante è
+**Stato:** 162 alimenti verificati e tracciati alla fonte; il numero vincolante è
 `EXPECTED_ALIMENTI_COUNT` in `collaudo.py`. Conformità kcal/macro/fibra a CREA:
 `python3 cerca_crea.py verifica`.
 
@@ -1022,10 +1022,10 @@ elenca le voci responsabili.
 Un valore sotto l'80% LARN con quel flag NON è una carenza accertata: prima di intervenire
 clinicamente, verifica se dipende dal gap.
 
-**Stato (verificato sul file il 04/11/2026):** 18 righe. Micronutrienti, 8 su 4 alimenti —
+**Stato (verificato sul file il 10/11/2026):** 21 righe. Micronutrienti, 8 su 4 alimenti —
 latte parzialmente scremato (vitamina D, B12), orata (vitamina D), salmone affumicato
-(vitamina D), trippa (vitamina D, B12, folati, zinco). Lipidi, 10 (vedi `lipidi.csv`,
-sezione 5).
+(vitamina D), trippa (vitamina D, B12, folati, zinco). Lipidi, 13 (vedi `lipidi.csv`,
+sezione 5; dal 10/11/2026 anche saturi, mono e poli del minestrone cotto).
 
 **Fave secche cotte — caso a parte:** minerali e folati presi dalla voce BDA delle fave
 CRUDE (proxy), quindi probabilmente SOVRASTIMATI. Non usarle come fonte portante di ferro o

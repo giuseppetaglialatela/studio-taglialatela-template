@@ -2,7 +2,7 @@
 
 Generata da `tabella_alimenti.py --genera-pagina` dai CSV del motore: non si modifica a mano. Valori per 100 g di parte edibile. «n.d.» = dato mancante, dichiarato in `gap.csv`: non è uno zero.
 
-**161 alimenti**, 18 valori mancanti su 8 alimenti.
+**162 alimenti**, 21 valori mancanti su 9 alimenti.
 
 ## Valori mancanti
 
@@ -26,6 +26,9 @@ Generata da `tabella_alimenti.py --genera-pagina` dai CSV del motore: non si mod
 | Sardine fresche | monoinsaturi_g | acidi grassi e colesterolo da INSA 882 (deroga INSA estesa agli acidi grassi, decisione del nutrizionista 31/10/2026): tabella non ancora acquisita |
 | Sardine fresche | polinsaturi_g | acidi grassi e colesterolo da INSA 882 (deroga INSA estesa agli acidi grassi, decisione del nutrizionista 31/10/2026): tabella non ancora acquisita |
 | Sardine fresche | saturi_g | acidi grassi e colesterolo da INSA 882 (deroga INSA estesa agli acidi grassi, decisione del nutrizionista 31/10/2026): tabella non ancora acquisita |
+| Minestrone cotto | monoinsaturi_g | acidi grassi assenti da CREA 905010 e da BDA-IEO (nessuna scheda di minestrone); USDA 171550 non rappresentativa (saturi 53% dei grassi, colesterolo 2 mg: ricetta con ingredienti animali); grassi totali 0.4 g/100 g |
+| Minestrone cotto | polinsaturi_g | acidi grassi assenti da CREA 905010 e da BDA-IEO (nessuna scheda di minestrone); USDA 171550 non rappresentativa (saturi 53% dei grassi, colesterolo 2 mg: ricetta con ingredienti animali); grassi totali 0.4 g/100 g |
+| Minestrone cotto | saturi_g | acidi grassi assenti da CREA 905010 e da BDA-IEO (nessuna scheda di minestrone); USDA 171550 non rappresentativa (saturi 53% dei grassi, colesterolo 2 mg: ricetta con ingredienti animali); grassi totali 0.4 g/100 g |
 
 ## Altro
 
@@ -768,6 +771,7 @@ Generata da `tabella_alimenti.py --genera-pagina` dai CSV del motore: non si mod
 | Lattuga | 22 | 1,8 | 2,2 | 0,4 | 1,5 |
 | Mais dolce in scatola sgocciolato | 105 | 3,4 | 20,5 | 1,3 | 1,4 |
 | Melanzane | 20 | 1,1 | 2,6 | 0,1 | 2,6 |
+| Minestrone cotto | 45 | 2 | 7,8 | 0,4 | 2,1 |
 | Patate | 80 | 2,1 | 18 | 0,1 | 1,6 |
 | Patate dolci | 92 | 1,2 | 21,3 | 0,3 | 2,3 |
 | Peperoni dolci | 26 | 0,9 | 4,2 | 0,3 | 1,9 |
@@ -818,6 +822,7 @@ Generata da `tabella_alimenti.py --genera-pagina` dai CSV del motore: non si mod
 | Lattuga | 45 | 0,8 | 0 | 64 | 0 | 0,2 | 11 | 6 |
 | Mais dolce in scatola sgocciolato | 4 | 0,5 | 0 | 45 | 0 | 0,45 | 16 | 7 |
 | Melanzane | 14 | 0,3 | 0 | 18 | 0 | 0,2 | 13,5 | 11 |
+| Minestrone cotto | 25 | 0,74 | 0 | 13 | 0 | 0,6 | 6 | 2 |
 | Patate | 10 | 0,6 | 0 | 35 | 0 | 0,27 | 23 | 15 |
 | Patate dolci | 24 | 0,7 | 0 | 17 | 0 | 0,3 | 19,1 | 23 |
 | Peperoni dolci | 17 | 0,7 | 0 | 24 | 0 | 0,2 | 12 | 151 |
@@ -868,6 +873,7 @@ Generata da `tabella_alimenti.py --genera-pagina` dai CSV del motore: non si mod
 | Lattuga | 0,05 | 0,01 | 0,21 | 0 | 0 | 0 |
 | Mais dolce in scatola sgocciolato | 0,2 | 0,3 | 0,57 | 0 | 0 | 0 |
 | Melanzane | 0,02 | 0,01 | 0,04 | 0 | 0 | 0 |
+| Minestrone cotto | n.d. | n.d. | n.d. | 0 | 0 | 0 |
 | Patate | 0,03 | 0,01 | 0,01 | 0 | 0 | 0 |
 | Patate dolci | 0,06 | 0,01 | 0,132 | 0 | 0 | 0 |
 | Peperoni dolci | 0,05 | 0,02 | 0,16 | 0 | 0 | 0 |
@@ -918,6 +924,7 @@ Generata da `tabella_alimenti.py --genera-pagina` dai CSV del motore: non si mod
 | Lattuga | 331 | BDA-IEO+USDA(proxy) | 331 | 2026-07-28 | BDA-IEO 331_1 |
 | Mais dolce in scatola sgocciolato | 000070 | CREA+BDA-IEO | 000070+9039 | 2026-10-01 | BDA-IEO 9039_2 |
 | Melanzane | 334 | BDA-IEO+USDA | 334 | 2026-07-28 | BDA-IEO 334_1 |
+| Minestrone cotto | 905010 | CREA(proteine/carboidrati/grassi imputati)+USDA(proxy micronutrienti) | 905010+171550 | 2026-11-10 | CREA 905010 |
 | Patate | 381 | BDA-IEO+USDA | 381 | 2026-07-28 | BDA-IEO 381_1 |
 | Patate dolci | 50399 | BDA-IEO+USDA | 50399 | 2026-07-28 | BDA-IEO 50399_1 |
 | Peperoni dolci | 336 | BDA-IEO+USDA(proxy) | 336 | 2026-07-28 | BDA-IEO 336_1 |

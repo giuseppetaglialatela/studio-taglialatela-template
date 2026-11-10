@@ -17,3 +17,6 @@ food_id,nome,nutriente,motivo
 11796,Mozzarella di bufala,epa_g,"EPA/DHA non riportati dalla scheda BDA 11796_2: dato mancante, alimento di origine animale"
 11796,Mozzarella di bufala,dha_g,"EPA/DHA non riportati dalla scheda BDA 11796_2: dato mancante, alimento di origine animale"
 106856,Tacchino fesa cotta al forno (proxy fesa affettata),epa_g,"EPA/DHA non riportati dalla scheda BDA 8698_2: dato mancante, alimento di origine animale"
+905010,Minestrone cotto,saturi_g,"acidi grassi assenti da CREA 905010 e da BDA-IEO (nessuna scheda di minestrone); USDA 171550 non rappresentativa (saturi 53% dei grassi, colesterolo 2 mg: ricetta con ingredienti animali); grassi totali 0.4 g/100 g"
+905010,Minestrone cotto,monoinsaturi_g,"acidi grassi assenti da CREA 905010 e da BDA-IEO (nessuna scheda di minestrone); USDA 171550 non rappresentativa (saturi 53% dei grassi, colesterolo 2 mg: ricetta con ingredienti animali); grassi totali 0.4 g/100 g"
+905010,Minestrone cotto,polinsaturi_g,"acidi grassi assenti da CREA 905010 e da BDA-IEO (nessuna scheda di minestrone); USDA 171550 non rappresentativa (saturi 53% dei grassi, colesterolo 2 mg: ricetta con ingredienti animali); grassi totali 0.4 g/100 g"

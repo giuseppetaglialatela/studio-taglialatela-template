@@ -373,3 +373,28 @@ Dati deboli: magnesio di cicorie, catalogna e cardi da un solo campione USDA (le
 usano la stessa voce 169992); magnesio del songino senza campioni. Zinco delle cime di rapa
 0,2 mg da BDA per gerarchia, contro 0,77 misurato da USDA 170381. Nuovo falso positivo
 Atwater: cavoli di Bruxelles (M1 sez. 8).
+
+## 10. MINESTRONE COTTO — 10/11/2026
+
+Su richiesta del nutrizionista. **Minestrone cotto (905010):** kcal e fibra da CREA 905010
+(kcal calcolate, fibra analitica); proteine, carboidrati e grassi da CREA ma IMPUTATI (origine
+S, metodo non noto), dichiarato nella `fonte`. Ricetta CREA solo vegetale: patate, carote,
+pomodori, zucchine, sedano, bieta, fagioli, verza, piselli, zucca, fagiolini, porro, cipolla.
+- **Micronutrienti:** CREA non ne pubblica nessuno; BDA-IEO non ha minestrone (né in cache né
+  in `BDA_alimenti.xlsx`). Calcio, ferro, folati, zinco, magnesio e vitamina C da USDA SR
+  Legacy 171550 «Soup, minestrone, canned, chunky, ready-to-serve» (proxy: ricetta americana
+  in scatola, con pasta arricchita e qualche ingrediente animale). Scelta tra le sei voci
+  USDA perché è la sola con dati analitici (calcio, ferro, vitamina C, 11 campioni) e macro
+  vicini a CREA. Dati deboli: magnesio 6 e zinco 0,6 (0 campioni); folati 13 µg = «Folate,
+  food», senza l'acido folico della pasta arricchita USA (9 µg, non trasferibile); il ferro
+  può contenere una piccola quota da arricchimento. Scartate: FNDDS 2710114 (nessuna
+  derivazione verificabile), SMART SOUP 171578 (marca, dati del produttore), 171153 e
+  172913 (condensata e diluita).
+- **Vitamina D e B12 = 0:** zero biologico (ricetta CREA solo vegetale), non lo zero USDA,
+  che per la vitamina D è «Assumed zero».
+- **Lipidi:** colesterolo 0 da CREA (imputato) ed EPA/DHA 0 (vegetale); saturi, mono e poli
+  in `gap.csv`: nessuna scheda BDA, CREA non li pubblica, USDA 171550 non rappresentativa
+  (saturi al 53% dei grassi, colesterolo 2 mg). Effetto trascurabile: grassi 0,4 g/100 g.
+- **Peso:** il minestrone si pesa COTTO (`nomi_paziente.csv`: «cotto»). Non rientra nelle
+  due eccezioni della regola pesi (M0 sezione 5): usarlo in un piano richiede la decisione
+  del nutrizionista.
