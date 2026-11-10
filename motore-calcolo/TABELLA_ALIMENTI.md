@@ -165,7 +165,7 @@ Generata da `tabella_alimenti.py --genera-pagina` dai CSV del motore: non si mod
 | Pasta di semola cruda | 341 | 13,5 | 72,7 | 1,2 | 1,7 |
 | Pasta di semola integrale cruda | 330 | 13,3 | 64,8 | 2,2 | 7,1 |
 | Piadina | 315 | 7,2 | 49,9 | 10,5 | 2,2 |
-| Pop corn | 408 | 12 | 77,9 | 4,2 | 15,1 |
+| Pop corn al naturale | 408 | 12 | 77,9 | 4,2 | 15,1 |
 | Quinoa cruda | 376 | 15,4 | 57,8 | 8,1 | 12,2 |
 | Riso basmati crudo | 367 | 9 | 82,9 | 1,9 | 1,3 |
 | Riso bianco crudo | 334 | 6,7 | 80,4 | 0,4 | 1 |
@@ -192,7 +192,7 @@ Generata da `tabella_alimenti.py --genera-pagina` dai CSV del motore: non si mod
 | Pasta di semola cruda | 22 | 1,4 | 0 | 19 | 0 | 1,15 | 51 | 0 |
 | Pasta di semola integrale cruda | 39 | 2,7 | 0 | 29 | 0 | 2 | 100 | 0 |
 | Piadina | 12 | 0,6 | 0 | 7 | 0 | 0,05 | 82 | 0 |
-| Pop corn | 10 | 2,7 | 0 | 31 | 0 | 3,44 | 144 | 0 |
+| Pop corn al naturale | 10 | 2,7 | 0 | 31 | 0 | 3,44 | 144 | 0 |
 | Quinoa cruda | 46 | 3,6 | 0 | 20 | 0 | 2,74 | 189 | 0 |
 | Riso basmati crudo | 5 | 0,8 | 0 | 12 | 0 | 1,48 | 32 | 0 |
 | Riso bianco crudo | 24 | 0,8 | 0 | 13 | 0 | 1,3 | 20 | 0 |
@@ -219,7 +219,7 @@ Generata da `tabella_alimenti.py --genera-pagina` dai CSV del motore: non si mod
 | Pasta di semola cruda | 0,19 | 0,14 | 0,61 | 0 | 0 | 0 |
 | Pasta di semola integrale cruda | 0,32 | 0,27 | 0,85 | 0 | 0 | 0 |
 | Piadina | 3,2 | 5,73 | 1,25 | 0 | 0 | 7 |
-| Pop corn | 0,59 | 0,88 | 2,14 | 0 | 0 | 0 |
+| Pop corn al naturale | 0,57 | 1,1 | 1,9 | 0 | 0 | 0 |
 | Quinoa cruda | 0,93 | 2,14 | 4,37 | 0 | 0,07 | 0 |
 | Riso basmati crudo | 0,13 | 0,16 | 0,23 | 0 | 0 | 0 |
 | Riso bianco crudo | 0,1 | 0,13 | 0,18 | 0 | 0 | 0 |
@@ -246,7 +246,7 @@ Generata da `tabella_alimenti.py --genera-pagina` dai CSV del motore: non si mod
 | Pasta di semola cruda | 000800 | CREA+BDA-IEO | 000800 | 2026-07-26 | BDA-IEO 50_2 |
 | Pasta di semola integrale cruda | 60091 | BDA-IEO | 60091 | 2026-07-26 | BDA-IEO 60091_2 |
 | Piadina | 9090 | BDA-IEO | 9090_2 | 2026-11-03 | BDA-IEO 9090_2 |
-| Pop corn | 3009 | BDA-IEO | 3009 | 2026-07-26 | BDA-IEO 3009_2 |
+| Pop corn al naturale | 3009 | CREA+USDA | 501200+167959 | 2026-11-10 | USDA USDA170246 |
 | Quinoa cruda | 889001 | BDA-IEO | 889001 | 2026-07-26 | BDA-IEO 889001_2 |
 | Riso basmati crudo | 000130 | CREA+BDA-IEO(proxy folati) | 000130 | 2026-07-27 | BDA-IEO 8075_2 |
 | Riso bianco crudo | 000100 | CREA+BDA-IEO(proxy zinco/magnesio/folati) | 000100 | 2026-10-01 | BDA-IEO 5_2 |

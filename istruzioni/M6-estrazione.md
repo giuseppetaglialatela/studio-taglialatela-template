@@ -398,3 +398,19 @@ pomodori, zucchine, sedano, bieta, fagioli, verza, piselli, zucca, fagiolini, po
 - **Peso:** il minestrone si pesa COTTO (`nomi_paziente.csv`: «cotto»). Non rientra nelle
   due eccezioni della regola pesi (M0 sezione 5): usarlo in un piano richiede la decisione
   del nutrizionista.
+
+## 11. POP CORN AL NATURALE — 10/11/2026
+
+Richiesto per uno spuntino (piano P04) come voce nuova da USDA; non serviva: CREA 501200
+«Pop corn» («senza sale», grassi 4,2 g misurati) è il mais scoppiato ad aria, e proteine,
+grassi, carboidrati, fibra, calcio e zinco coincidono con USDA 170246 «air-popped
+(Unsalted)». La voce c'era già come `3009` con i valori CREA, ma con fonte dichiarata
+BDA-IEO 3009_2 (prodotto Esselunga con olio di cocco, 28,5 g di grassi: non corrisponde).
+Corretta la riga, stesso `food_id` (usato da C56 e dai piani salvati), su decisione del
+nutrizionista; nessun valore nutrizionale cambiato.
+- **Fonte:** CREA 501200 per kcal, macro, fibra, calcio, ferro, zinco, vitamina C;
+  magnesio 144 e folati 31 da USDA 167959 «air-popped» (analitici, 4 campioni; sodio 8 mg:
+  non salato). Vitamina D e B12 = 0, zero biologico (cereale).
+- **Lipidi:** da USDA 170246 (grassi 4,2 g come CREA, nessuna proporzione): saturi 0,57,
+  mono 1,1, poli 1,9 g (prima 0,59 / 0,88 / 2,14 da BDA 3009_2); colesterolo, EPA, DHA 0.
+- **Nome paziente:** «Popcorn al naturale (senza olio né sale)». Formato: porzione libera.

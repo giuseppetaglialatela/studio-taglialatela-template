@@ -66,7 +66,7 @@ food_id,saturi_g,monoinsaturi_g,polinsaturi_g,epa_g,dha_g,colesterolo_mg,fonte,c
 100061,0.75,1.08,0.39,0.1,0.01,67,BDA-IEO,100061_2,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (2.6 g),2026-10-31
 805080,14.187,4.388,0.561,0,0,70,BDA-IEO,805080_2,calcolato da BDA su alimento simile,scheda BDA dichiarata in codice_fonte; grassi coincidenti (20.2 g),2026-10-31
 329,0.1,0.01,0.22,0,0,0,BDA-IEO,329_1,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.4 g); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
-3009,0.59,0.88,2.14,0,0,0,BDA-IEO,3009_2,calcolato da BDA su alimento simile,scheda BDA dichiarata in codice_fonte; grassi coincidenti (4.2 g),2026-10-31
+3009,0.57,1.1,1.9,0,0,0,USDA,USDA170246,USDA (campioni non dichiarati),"USDA 170246 Snacks, popcorn, air-popped (Unsalted): grassi 4.2 g coincidenti con CREA 501200, nessuna proporzione; colesterolo 0 (USDA 1 campione, CREA imputato); EPA e DHA 0: zero biologico (cereale); sostituisce BDA 3009_2 (prodotto confezionato con olio di cocco, non corrispondente)",2026-11-10
 50399,0.06,0.01,0.132,0,0,0,BDA-IEO,50399_1,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.3 g); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31
 888013,0.22,0.11,0.44,0,0,0,BDA-IEO,888013_2,calcolato da BDA su alimento simile,scheda BDA dichiarata in codice_fonte; grassi coincidenti (1.1 g),2026-10-31
 309,0.06,0.03,0.19,0,0,0,BDA-IEO,309_1,analitico,scheda BDA dichiarata in codice_fonte; grassi coincidenti (0.4 g); EPA/DHA assenti dalla scheda: zero biologico (alimento vegetale).,2026-10-31

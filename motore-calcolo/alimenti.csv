@@ -67,7 +67,7 @@ food_id,nome,categoria,fonte,codice_fonte,data_verifica,kcal_100g,proteine_g,car
 100061,Bresaola,carne,BDA-IEO,100061,2026-07-26,151,32,0,2.6,0,7,2.4,0.5,19,2,3.9,34,0
 805080,Feta,latticini,BDA-IEO,805080,2026-07-26,250,15.6,1.5,20.2,0,360,0.2,0.5,23,1.1,0.9,20,0
 329,Funghi prataioli coltivati,verdura,BDA-IEO+USDA,329,2026-07-28,23,2.3,1.9,0.4,1.7,10,1.2,0,44,0,0.4,9.0,4
-3009,Pop corn,cereali,BDA-IEO,3009,2026-07-26,408,12,77.9,4.2,15.1,10,2.7,0,31,0,3.44,144,0
+3009,Pop corn al naturale,cereali,CREA+USDA,501200+167959,2026-11-10,408,12,77.9,4.2,15.1,10,2.7,0,31,0,3.44,144,0
 50399,Patate dolci,verdura,BDA-IEO+USDA,50399,2026-07-28,92,1.2,21.3,0.3,2.3,24,0.7,0,17,0,0.3,19.1,23
 888013,Couscous secco,cereali,BDA-IEO,888013,2026-07-26,361,13.7,76.5,1.1,4.5,24,1.9,0,28,0,1.4,52,0
 309,Broccolo a testa,verdura,BDA-IEO+USDA,309,2026-07-28,33,3,3.1,0.4,3.1,28,0.8,0,132,0,0.6,21.0,54
