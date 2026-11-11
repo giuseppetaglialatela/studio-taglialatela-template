@@ -49,6 +49,7 @@ body{margin:0;width:180mm;font-family:'Liberation Sans',Arial,sans-serif;color:#
 .pag{page-break-after:always;height:275mm;display:flex;flex-direction:column;font-size:var(--fs,10pt);line-height:var(--lh,1.32)}.pag:last-child{page-break-after:auto}
 .top{font-size:9pt;color:var(--gr);border-bottom:.7pt solid var(--teal);padding-bottom:3px}.top b{color:var(--teal)}.top i{font-style:italic}
 h1{font-size:var(--h1,19pt);color:var(--navy);text-align:center;margin:var(--mh1,10px 0 1px)}.sub{color:var(--gr);font-style:italic;font-size:9pt;text-align:center;margin-bottom:var(--msub,6px)}
+.coda{margin-top:var(--mh,10px 0 4px);border-top:.7pt solid var(--teal);padding-top:4px}.coda .sub{margin-bottom:0}
 h2{font-size:10.5pt;color:var(--ara);margin:var(--mh,10px 0 4px);text-transform:uppercase;letter-spacing:.4px}h2 span{color:var(--gr);font-weight:normal;font-size:9pt;text-transform:none;letter-spacing:0;font-style:italic}
 .griglia{display:grid;gap:var(--gap,6px 10px)}
 .t{font-weight:bold;color:var(--navy);font-size:calc(var(--fs,10pt) + .5pt)}.l{color:var(--ara);font-weight:bold;margin-right:4px}.sc{color:var(--gr);font-size:8.5pt;font-style:italic}
@@ -172,10 +173,17 @@ def _voci(rr, nomi, formati_pz, etichetta=frozenset()):
     return f"<div class=voci>{out}</div>"
 
 
+# Blocchi delle tabelle che, con tre pagine, possono passare in coda alla pagina 2, dall'ultimo
+# (11/11/2026): prima Verdure, poi Carni e affettati. Mai una tabella divisa a meta'.
+SPOSTABILI = ("verdure", "carni")
+
+
 def componi(piano, db, nomi, meta, orari, target_kcal, etichetta=frozenset(), pagine=2, giorni_p1=0,
-            esclusioni=None):
+            esclusioni=None, in_coda=0):
     """etichetta: i food_id delle voci da etichetta dichiarate. Stanno nella settimana;
-    le tabelle leggono solo i loro elenchi, quindi non le propongono mai come scambio."""
+    le tabelle leggono solo i loro elenchi, quindi non le propongono mai come scambio.
+    in_coda (solo con tre pagine): quanti blocchi finali delle tabelle, nell'ordine di
+    SPOSTABILI, stanno in coda alla pagina 2 invece che sulla pagina 3."""
     titoli = meta["titoli_piatti"]
     giorni = sorted({r["giorno"] for r in piano}, key=int)
     primo = giorni[0]
@@ -302,6 +310,21 @@ def componi(piano, db, nomi, meta, orari, target_kcal, etichetta=frozenset(), pa
     foot = lambda n: (f"<div class=foot><span>{piede}</span><span>Studio Nutrizionale "
                       f"Taglialatela · {n}/{pagine}</span></div>")
     griglia = lambda c: f'<div class="griglia giorni">{"".join(c)}</div>'
+    blocchi = [("carboidrati", sez_c), ("pesce", sez_p), ("carni", sez_k), ("verdure", sez_v)]
+    blocchi = [(n, s) for n, s in blocchi if s]
+    spostati = []
+    if in_coda:
+        if pagine != 3:
+            raise ValueError("in_coda vale solo con tre pagine")
+        for nome in SPOSTABILI[:in_coda]:
+            if len(blocchi) > 1 and blocchi[-1][0] == nome:
+                spostati.insert(0, blocchi.pop())
+    coda = ""
+    if spostati:
+        nomi_sp = " e ".join({"verdure": "Verdure", "carni": "Carni e affettati"}[n] for n, _ in spostati)
+        coda = (f"<div class=coda><div class=sub>Come scambiare gli alimenti · Lo scambio vale nello "
+                f"stesso pasto</div>{''.join(s for _, s in spostati)}</div>")
+        blocchi.append(("rinvio", f"<div class=n>{E(nomi_sp)}: a pagina 2, sotto la settimana.</div>"))
     salto = ""
     if pagine == 3:
         salto = ((f"<h2>Pranzo e cena</h2>{griglia(primi)}" if primi else "")
@@ -309,9 +332,9 @@ def componi(piano, db, nomi, meta, orari, target_kcal, etichetta=frozenset(), pa
     pagina = f"""<!doctype html><html lang=it><head><meta charset=utf-8><title>Scheda per chi cucina</title><style>{CSS}</style></head><body>
 <div class=pag>{top}<h1>La settimana</h1><div class=sub>{nome_paz} · scheda per chi cucina</div>
 {sez('Colazione', 'colazione')}{griglia_carte('colazione')}{spuntini}
-{salto}{"" if pagine == 3 else "<h2>Pranzo e cena</h2>"}{griglia(resto)}{foot(pagine - 1)}</div>
+{salto}{"" if pagine == 3 else "<h2>Pranzo e cena</h2>"}{griglia(resto)}{coda}{foot(pagine - 1)}</div>
 <div class=pag>{top}<h1>Come scambiare gli alimenti</h1><div class=sub>{nome_paz} · Lo scambio vale nello stesso pasto</div>
-{sez_c}{sez_p}{sez_k}{sez_v}{foot(pagine)}</div></body></html>"""
+{"".join(s for _, s in blocchi)}{foot(pagine)}</div></body></html>"""
     return pagina, {"carboidrati": carbo, "pesce": pesce, "carni": carni, "verdure": verd}
 
 
@@ -398,31 +421,38 @@ def adatta(costruisci, html_p, pdf_p, n_giorni):
         pag = b.new_page(viewport={"width": 680, "height": 1040})
         pag.emulate_media(media="print")
 
-        def prova(pagine, k):
+        def prova(pagine, k, coda=0):
             with open(html_p, "w", encoding="utf-8") as f:
-                f.write(costruisci(pagine, k))
+                f.write(costruisci(pagine, k, coda) if coda else costruisci(pagine, k))
             pag.goto("file://" + os.path.abspath(html_p))
             return _adatta_pagine(pag)
         def tre_pagine():
-            ultimo, migliore = None, None
-            for k in range(0, n_giorni + 1, 2):         # righe intere di riquadri
-                e = prova(3, k)
-                if isinstance(e, tuple):
-                    ultimo = e
-                    continue
-                v = pag.evaluate(_VUOTI)                # pagine piene in modo simile
-                voto = (-abs(v[0] - v[1]), min(x[2] for x in e))
-                if migliore is None or voto > migliore[0]:
-                    migliore = (voto, e, k)
-            if migliore is None:
-                b.close()
-                _, n, alto, disp = ultimo
-                raise Fermo(f"scheda: il contenuto non sta in tre pagine con ingredienti a 9 punti, "
-                            f"la scrittura minima (pagina {n}: {alto} px su {disp}, "
-                            f"{100 * (alto - disp) // disp + 1}% di troppo). PDF non generato: "
-                            f"serve una decisione del nutrizionista")
-            prova(3, migliore[2])
-            return migliore[1]
+            """Prima con tutte le tabelle a pagina 3; se non entrano, con i blocchi finali
+            (Verdure, poi Carni e affettati) in coda alla pagina 2 (11/11/2026). Vince il
+            primo livello di spostamento che entra: si sposta il meno possibile."""
+            ultimo = None
+            for coda in range(len(SPOSTABILI) + 1):
+                migliore = None
+                for k in range(0, n_giorni + 1, 2):     # righe intere di riquadri
+                    e = prova(3, k, coda)
+                    if isinstance(e, tuple):
+                        if ultimo is None or (e[2] - e[3]) / e[3] < (ultimo[2] - ultimo[3]) / ultimo[3]:
+                            ultimo = e                  # nel fermo: il tentativo piu' vicino
+                        continue
+                    v = pag.evaluate(_VUOTI)            # pagine piene in modo simile
+                    voto = (-abs(v[0] - v[1]), min(x[2] for x in e))
+                    if migliore is None or voto > migliore[0]:
+                        migliore = (voto, e, k)
+                if migliore is not None:
+                    prova(3, migliore[2], coda)
+                    return migliore[1]
+            b.close()
+            _, n, alto, disp = ultimo
+            raise Fermo(f"scheda: il contenuto non sta in tre pagine con ingredienti a 9 punti, "
+                        f"la scrittura minima, nemmeno spostando Verdure e Carni e affettati "
+                        f"sotto la settimana (pagina {n}: {alto} px su {disp}, "
+                        f"{100 * (alto - disp) // disp + 1}% di troppo). PDF non generato: "
+                        f"serve una decisione del nutrizionista")
 
         def stampa():
             """Scrive il PDF e controlla sul PDF che ogni pagina porti il proprio piede."""
@@ -794,7 +824,8 @@ def main():
     html_p = o.out_html or os.path.join(tmp_html, "scheda.html")
     try:
         n_giorni = len({r["giorno"] for r in dati[0]}) + 1
-        esito = adatta(lambda p, k: componi(*dati, pagine=p, giorni_p1=k, esclusioni=esc)[0], html_p, o.out_pdf, n_giorni)
+        esito = adatta(lambda p, k, c=0: componi(*dati, pagine=p, giorni_p1=k, esclusioni=esc, in_coda=c)[0],
+                       html_p, o.out_pdf, n_giorni)
     except Fermo as e:
         print(f"FERMO: {e}")
         return 1

@@ -2,7 +2,7 @@
 
 Modulo operativo. Si carica **dopo l'approvazione dei calcoli**, per generare i due
 deliverable che il paziente riceve.
-Ultimo aggiornamento: 11/11/2026 (uova a pezzi in anteprima, PDF e scheda; tabella carni e affettati nella scheda; `--out-html` facoltativo; fermo su «Obiettivo» ripetuto). 04/11/2026 (scheda per chi cucina in due pagine, con le tabelle di conversione, in ogni dieta). 30/10/2026 (verdetto della pipeline allegato e richiesto da PDF e verifica;
+Ultimo aggiornamento: 11/11/2026 sera (tre pagine: le tabelle che non entrano nella pagina 3 passano sotto la settimana, a pagina 2). 11/11/2026 (uova a pezzi in anteprima, PDF e scheda; tabella carni e affettati nella scheda; `--out-html` facoltativo; fermo su «Obiettivo» ripetuto). 04/11/2026 (scheda per chi cucina in due pagine, con le tabelle di conversione, in ogni dieta). 30/10/2026 (verdetto della pipeline allegato e richiesto da PDF e verifica;
 documento di spiegazione generato con `genera_spiegazione.py`, che si ferma su segnaposto,
 parentesi quadre, struttura e nome del paziente). 23/10/2026: testo del documento di spiegazione approvato prima della consegna; template di spiegazione: elenchi puntati «•» al posto di «●», che il font non ha e stampava «NO GLYPH», unica modifica al motore grafico autorizzata dal nutrizionista; impronta dell'approvazione: il PDF si ferma se piano o testi sono cambiati, `--verifica-impronta` prima del documento di spiegazione, orari tra gli allegati; 22/10: fermo sui segnaposto nei testi del paziente; prima: 30/09/2026, secondo spuntino, fino a 5 pasti nel PDF). Presuppone **M2 già eseguito** (in chat A):
 copre i suoi PASSO 7 e PASSO 8 e non si esegue prima. **In chat B M2 e M1 non si
@@ -363,8 +363,12 @@ scheda. Senza il file, la scheda di un piano con esclusioni non si consegna.
 entrare la scheda. Il motore prova due pagine, riducendo spazi e poi scrittura fino al minimo
 di 9 punti per gli ingredienti; sotto non si scende. Griglie regolari in ogni livello: nessun
 riquadro orfano, stessa altezza per riga, stile del piano. Se non basta passa da solo a tre
-pagine: due per la settimana, una per le tabelle. Se non bastano nemmeno
-tre, o se una quantità esce dal riquadro, si ferma e decide il nutrizionista. Pagine, livello e punti si riportano in chat. Il suo riepilogo (scarti, verdure fuori elenco) si riporta in chat.
+pagine: due per la settimana, una per le tabelle. Se le tabelle non entrano nella pagina 3
+(11/11/2026), i blocchi finali passano in coda alla pagina 2, sotto la settimana, dall'ultimo:
+prima Verdure, poi se serve Carni e affettati; mai una tabella divisa a metà, si sposta il meno
+possibile, e la pagina 3 lo dice («… a pagina 2, sotto la settimana»). Se non bastano nemmeno
+così, o se una quantità esce dal riquadro, si ferma e decide il nutrizionista. Nessun contenuto
+si toglie e il filtro non cambia. Pagine, livello e punti si riportano in chat. Il suo riepilogo (scarti, verdure fuori elenco) si riporta in chat.
 
 ## 4. ANTEPRIMA OBBLIGATORIA
 

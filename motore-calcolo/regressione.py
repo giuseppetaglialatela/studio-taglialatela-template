@@ -41,6 +41,7 @@ scopo della suite.
 import csv
 import json
 import os
+import re
 import sys
 
 BASE = os.path.dirname(os.path.abspath(__file__))
@@ -781,6 +782,46 @@ def _piano_scheda(alternative, n_col, n_spu):
     return righe, meta
 
 
+def _piano_scheda_pieno():
+    """Piano realistico (11/11/2026): sei giorni di energia simile, due pranzi e una cena a
+    scelta con carni, pesci e carboidrati diversi, target sulla media. Le tabelle si riempiono
+    come nel caso reale (colonna del lombo di maiale) e non entrano nella pagina 3: senza lo
+    spostamento in coda alla pagina 2 la scheda si fermava."""
+    import tabelle_conversione as tc
+    col = [[("135020", 200), ("600009", 40), ("406", 100)], [("8053", 170), ("000550", 50), ("8807", 150)]]
+    spu = [[("1631", 125), ("406", 100)], [("8053", 150)]]
+    carbo = [("000800", 80), ("000100", 75), ("8603", 80), ("60091", 80), ("500010", 75), ("888013", 75)]
+    carni = [("105210", 110), ("106500", 140), ("8520", 130), ("101170", 120), ("106410", 150), ("8697", 135),
+             ("101120", 100), ("107030", 120), ("9007", 120)]
+    pesci = [("1313", 200), ("123200", 180), ("8734", 120), ("1322", 180), ("122900", 180), ("1304", 220),
+             ("1309", 200), ("127150", 250)]
+    verd = ["349", "345", "334", "101", "309", "336"]
+    righe = []
+
+    def agg(g, p, voci, o):
+        righe.extend({"giorno": g, "pasto": p, "food_id": f, "grammi": str(q), "opzione": o} for f, q in voci)
+    for d in range(6):
+        g = str(d + 1)
+        for i, v in enumerate(col):
+            agg(g, "colazione", v, "AB"[i])
+        for i, v in enumerate(spu):
+            agg(g, "spuntino", v, "AB"[i])
+        for i in range(2):
+            agg(g, "pranzo", [carbo[(d + i) % 6], carni[(d + 2 * i) % 9], (verd[(d + i) % 6], 200),
+                              ("702901", 10)], "AB"[i])
+        agg(g, "cena", [("000550", 60), pesci[d % 8], (verd[(d + 2) % 6], 200), ("702901", 10)], "A")
+    titoli = {(f"{r['giorno']}|{r['pasto']}|{r['opzione']}" if r["pasto"] in ("pranzo", "cena")
+               else f"*|{r['pasto']}|{r['opzione']}"): "Titolo di piatto di media lunghezza come nei piani"
+              for r in righe}
+    meta = {"titoli_piatti": titoli, "giorni": {"lavorativi": ["lun", "mar", "mer", "gio", "ven", "sab"],
+                                                "libero": "dom"},
+            "intestazione": {"nome": "Paziente Fittizio"}, "abbinamento_spuntino": "non concordato",
+            "indicazioni_giorno_libero": {"pranzo": "a piacere", "cena": "a piacere"}}
+    f = tc.Filtro(righe, tc.carica_db(), 1)
+    target = sum((lo + hi) / 2 for lo, hi in f.giorni.values()) / len(f.giorni)
+    return righe, meta, target
+
+
 def _pdf_senza_piede(p, tmp):
     """Prova al contrario: lo stesso PDF con una pagina sola in meno ha i piedi sbagliati."""
     from pypdf import PdfReader, PdfWriter
@@ -811,8 +852,8 @@ def verifica_adattamento_scheda():
 
     def fai(alt, n_col, n_spu):
         righe, meta = _piano_scheda(alt, n_col, n_spu)
-        return gsc.adatta(lambda n, k: gsc.componi(righe, db, nomi, meta, {}, 1800, pagine=n,
-                                                   giorni_p1=k)[0], h, p, len(alt) + 1)
+        return gsc.adatta(lambda n, k, c=0: gsc.componi(righe, db, nomi, meta, {}, 1800, pagine=n,
+                                                        giorni_p1=k, in_coda=c)[0], h, p, len(alt) + 1)
     try:
         e = fai((1, 1, 1), 2, 2)
         if len(e) != 2 or any(x[1] != "normale" for x in e):
@@ -820,6 +861,30 @@ def verifica_adattamento_scheda():
         e = fai((3, 4, 3, 4, 3, 1), 4, 6)
         if len(e) != 3 or min(x[2] for x in e) < 9:
             return False, f"piano grande non adattato: {e}"
+        # 11/11/2026: tabelle oltre la pagina 3 -> blocchi finali in coda alla pagina 2
+        righe_p, meta_p, target_p = _piano_scheda_pieno()
+        e = gsc.adatta(lambda n, k, c=0: gsc.componi(righe_p, db, nomi, meta_p, {}, target_p, pagine=n,
+                                                     giorni_p1=k, in_coda=c)[0], h, p, 7)
+        testo = open(h, encoding="utf-8").read().replace('"', "")   # Chromium mette le virgolette
+        if len(e) != 3 or min(x[2] for x in e) < 9 or "class=coda" not in testo:
+            return False, f"tabelle oltre la pagina 3 non spostate sotto la settimana: {e}"
+        sez = re.split(r"<div class=pag[ >]", testo)
+        if (len(sez) != 4 or "<h2>Verdure" not in sez[2] or "<h2>Verdure" in sez[3]
+                or "Lombo di maiale" not in testo or "a pagina 2, sotto la settimana" not in sez[3]):
+            return False, "blocchi spostati nel posto sbagliato o rinvio mancante"
+        if not gsc.piedi_a_posto(p):
+            return False, "tabelle spostate: piede di pagina fuori posto nel PDF"
+        senza = gsc.SPOSTABILI
+        try:                                            # prova al contrario: senza spostamento si ferma
+            gsc.SPOSTABILI = ()
+            gsc.adatta(lambda n, k, c=0: gsc.componi(righe_p, db, nomi, meta_p, {}, target_p, pagine=n,
+                                                     giorni_p1=k, in_coda=c)[0], h, p, 7)
+            return False, "piano pieno: entrava anche senza spostamento, il caso non prova nulla"
+        except gsc.Fermo:
+            pass
+        finally:
+            gsc.SPOSTABILI = senza
+        sposta = f"tabelle oltre la pagina 3 in coda alla pagina 2 ({', '.join(f'{x[0]}: {x[1]} {x[2]:g} pt' for x in e)})"
         testo = open(h, encoding="utf-8").read()
         if testo.count("<div class=\"gg\">") + testo.count("<div class=gg>") != 6:
             return False, "piano grande: giorni persi nell'adattamento"
@@ -832,8 +897,8 @@ def verifica_adattamento_scheda():
         righe.append({"giorno": "4", "pasto": "cena", "food_id": "ETI_L", "grammi": "250", "opzione": ""})
         for g, f in (("1", "312"), ("2", "349"), ("3", "345"), ("4", "309"), ("5", "336")):
             righe.append({"giorno": g, "pasto": "cena", "food_id": f, "grammi": "200", "opzione": ""})
-        costruisci = lambda n, k: gsc.componi(righe, db2, nomi2, meta, {}, 1500, frozenset({"ETI_L"}),
-                                              pagine=n, giorni_p1=k)[0]
+        costruisci = lambda n, k, c=0: gsc.componi(righe, db2, nomi2, meta, {}, 1500, frozenset({"ETI_L"}),
+                                                   pagine=n, giorni_p1=k, in_coda=c)[0]
         gsc.adatta(costruisci, h, p, 6)
         testo = open(h, encoding="utf-8").read()
         if "Sabato o domenica" not in testo:
@@ -844,7 +909,7 @@ def verifica_adattamento_scheda():
                                     filtro=gsc.tc.Filtro([], db, 1500))
         if not tv["gruppi"]["cotte"]:
             return False, "verdure cotte del piano sparite dal gruppo"
-        forzata = lambda n, k: costruisci(n, k).replace(".voci>span{", ".voci>span{white-space:nowrap;")
+        forzata = lambda n, k, c=0: costruisci(n, k, c).replace(".voci>span{", ".voci>span{white-space:nowrap;")
         try:
             gsc.adatta(forzata, h, p, 6)
             return False, "grammatura fuori dal riquadro non fermata"
@@ -868,7 +933,7 @@ def verifica_adattamento_scheda():
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
     return True, ("piccolo normale; grande in 3 pagine a 9 punti o piu'; estremo fermato; voce lunga, "
-                  "griglie, verdure cotte e giorno libero a posto; grammatura tagliata fermata")
+                  "griglie, verdure cotte e giorno libero a posto; grammatura tagliata fermata; " + sposta)
 
 
 def verifica_riga_di_comando_metadati():
