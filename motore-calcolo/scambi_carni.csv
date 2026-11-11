@@ -6,8 +6,10 @@ food_id,nome_riferimento,grammi_porzione,stato
 106856,Fesa di tacchino affettata,80,confermato
 100061,Bresaola,75,confermato
 9007,Prosciutto cotto sgrassato,105,confermato
-8520,Vitellone magro,110,da_confermare
-101170,Filetto di manzo,115,da_confermare
+8520,Vitellone magro,110,confermato
+101170,Filetto di manzo,115,confermato
+101120,Macinato magro di manzo,115,confermato
+107030,Coniglio (coscia),110,confermato
+101160_vitello,Fesa di vitello,105,confermato
 101520,Filetto di vitello,115,da_confermare
-101120,Macinato magro di manzo,115,da_confermare
 8711,Prosciutto crudo sgrassato,80,da_confermare

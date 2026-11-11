@@ -486,8 +486,6 @@ def _autotest_carni(db):
         c = pollo["celle"][t["colonne"].index(nome)] if nome in t["colonne"] else None
         if not c or c["grammi"] != g:
             problemi.append(f"carni: petto di pollo 100 g in {nome} non vale {g} g ({c})")
-    if "Filetto di manzo" in t["colonne"]:
-        problemi.append("carni: voce da_confermare proposta come alternativa")
     manzo = t["righe"][1]
     if manzo["celle"][t["colonne"].index("Petto di pollo")]["grammi"] != 105:
         problemi.append("carni: filetto di manzo 120 g in petto di pollo non vale 105 g")
@@ -501,6 +499,21 @@ def _autotest_carni(db):
         problemi.append("carni: bresaola vietata dal file delle esclusioni rimasta")
     if "Bresaola" not in salumi() or "Petto di pollo" in salumi():
         problemi.append("carni: affettati non riconosciuti per la nota sul sale")
+    # voci confermate e aggiunte l'11/11/2026 (sera): stato e grammature a parita' di proteine
+    for nome, g in (("Vitellone magro", 110), ("Filetto di manzo", 115),
+                    ("Macinato magro di manzo", 115), ("Coniglio (coscia)", 110),
+                    ("Fesa di vitello", 105)):
+        c = pollo["celle"][t["colonne"].index(nome)] if nome in t["colonne"] else None
+        if not c or c["grammi"] != g:
+            problemi.append(f"carni: {nome} non confermata o petto di pollo 100 g non vale {g} g ({c})")
+    for nome in ("Filetto di vitello", "Prosciutto crudo sgrassato"):
+        if nome in t["colonne"]:
+            problemi.append(f"carni: {nome} da_confermare proposta come alternativa")
+    tp = tc.tabella_pesce([riga("cena", "1313", "100")], db)
+    for nome, g in (("Orata", 85), ("Salmone", 90)):
+        c = tp["righe"][0]["celle"][tp["colonne"].index(nome)] if nome in tp["colonne"] else None
+        if not c or c["grammi"] != g:
+            problemi.append(f"pesce: merluzzo 100 g in {nome} non vale {g} g ({c})")
     return problemi
 
 

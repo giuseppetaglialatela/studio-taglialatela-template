@@ -427,16 +427,25 @@ più bassi di energia e grassi: è una stima per eccesso. Nome per il paziente �
 ruolo formaggio, a peso al banco (assente da `formati_confezione.csv`: qualsiasi grammatura).
 Il controllo 14 del collaudo lo verifica contro la scheda BDA 1718.
 
-## 13. TABELLA CARNI E AFFETTATI — VOCI MANCANTI, 11/11/2026
+## 13. TABELLA CARNI E AFFETTATI — CONIGLIO E FESA DI VITELLO, 11/11/2026
 
-Per la tabella di scambio delle carni (M3 sezione 3 bis) servivano anche **coniglio** e
-**fesa di vitello**, assenti da `alimenti.csv`. Non aggiunti (decisione del nutrizionista:
-mai valori a mano) e non scritti in `gap.csv`, che dichiara solo nutrienti mancanti di voci
-GIÀ presenti (il collaudo rifiuta un `food_id` che non è in `alimenti.csv`). Fonti
-disponibili per quando un piano li richiede (criterio Key Foods):
-- coniglio: CREA 107010 «Coniglio intero, crudo» e 107030 «Coniglio, coscio, crudo»;
-  BDA-IEO 1081 «Coniglio, carne magra», 8668 «coscio», 8666 «intero».
-- fesa di vitello: nessuna voce specifica né in CREA né in BDA-IEO. CREA ha solo il filetto di
-  vitello (101520, già in database) e la fesa di bovino adulto (101160); BDA-IEO ha «vitello
-  4 mesi, carne magra» generico (1006). Servirebbe un proxy dichiarato, su decisione del
-  nutrizionista.
+Richiesti per la tabella di scambio delle carni (M3 sezione 3 bis), su decisione del
+nutrizionista. Non scritti in `gap.csv` finché mancavano: quel file dichiara solo nutrienti
+mancanti di voci GIÀ presenti (il collaudo rifiuta un `food_id` che non è in `alimenti.csv`).
+- **Coniglio coscia cruda (107030):** kcal, proteine e grassi da CREA 107030 «Coniglio,
+  coscio, crudo»; carboidrati, fibra e vitamina C a 0 imputati da CREA (zero biologico nella
+  carne). Micronutrienti da BDA-IEO 8668 «CONIGLIO, COSCIO»: calcio, ferro, zinco, magnesio da
+  Carnovale 2000; folati 5 e B12 10 µg da McCance (Chan 1995); vitamina D 0 dalla tabella
+  finlandese (Rastas 1993), una sola fonte: dato debole. Parte edibile 83%: il peso si scrive
+  senza osso (nome per il paziente «Coscia di coniglio», «crudo, senza osso»), come il fuso di
+  pollo. Lipidi da BDA 8668 (grassi coincidenti, 5,9 g): acidi grassi e colesterolo del
+  coniglio intero CREA 107010 riportati da BDA ai grassi del coscio.
+- **Fesa di vitello (`101160_vitello`), proxy dichiarato:** CREA e BDA-IEO non hanno la fesa
+  di vitello, e kcal e macro non si prendono da USDA (sezione 6, cavolo nero). Decisione del
+  nutrizionista dell'11/11/2026: proxy sulla fesa di vitellone, stesso taglio, CREA 101160
+  (103 kcal, proteine 21,8, grassi 1,8) con i micronutrienti e i lipidi di BDA-IEO 8654
+  «VITELLONE, fesa» (grassi coincidenti, 1,8 g). Riscontro: USDA 175269 «Veal, leg (top
+  round), separable lean only, raw» ha 107 kcal, proteine 21,3, grassi 1,76: con il proxy
+  100 g di petto di pollo valgono 105 g di fesa, con il dato USDA 110 g. Scartato il filetto
+  di vitello CREA 101520 come proxy (grassi 2,7 g, 115 g). Nome per il paziente «Fesa di
+  vitello».

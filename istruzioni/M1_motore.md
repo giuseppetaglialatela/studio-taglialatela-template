@@ -1,7 +1,7 @@
 # M1 — MOTORE DI CALCOLO
 
 Modulo operativo (principio 6). Dipendenze: nessuna. Ne dipendono M2 e M6.
-Ultima modifica: 11/11/2026 sera (tabella carni e affettati: `scambi_carni.csv`, `tabelle_conversione.tabella_carni`, nota sul sale degli affettati nella scheda; `--out-html` facoltativo in `genera_scheda_cucina.py`; `genera_zona_piano.py` si ferma se `obiettivo_intestazione` comincia con «Obiettivo»). 11/11/2026 (163 alimenti: primo sale, proxy dichiarato della mozzarella di vacca, M6 sezione 12; uova a pezzi in anteprima, PDF e scheda, M3). 10/11/2026 (pop corn 3009 corretto su CREA 501200 + USDA, M6 sezione 11; 162 alimenti: minestrone cotto, CREA 905010, micronutrienti USDA proxy, M6 sezione 10). 04/11/2026 (161 alimenti: piadina e cereali in formelle; scatolame a stato `familiare`; tabelle di conversione: `scambi_carboidrati.csv`, `scambi_pesce.csv`, `scambi_verdure.csv`, `tabelle_conversione.py`; `genera_scheda_cucina.py`; controllo 13 del collaudo). 31/10/2026 pomeriggio (file affiancato `lipidi.csv`: saturi, mono, poli,
+Ultima modifica: 11/11/2026 notte (165 alimenti: coniglio coscia CREA 107030 + BDA 8668, fesa di vitello proxy fesa di vitellone CREA 101160 + BDA 8654, M6 sezione 13; `scambi_carni.csv` con vitellone magro, filetto e macinato di manzo, coniglio e fesa di vitello confermati; orata e salmone in `scambi_pesce.csv`). 11/11/2026 sera (tabella carni e affettati: `scambi_carni.csv`, `tabelle_conversione.tabella_carni`, nota sul sale degli affettati nella scheda; `--out-html` facoltativo in `genera_scheda_cucina.py`; `genera_zona_piano.py` si ferma se `obiettivo_intestazione` comincia con «Obiettivo»). 11/11/2026 (163 alimenti: primo sale, proxy dichiarato della mozzarella di vacca, M6 sezione 12; uova a pezzi in anteprima, PDF e scheda, M3). 10/11/2026 (pop corn 3009 corretto su CREA 501200 + USDA, M6 sezione 11; 162 alimenti: minestrone cotto, CREA 905010, micronutrienti USDA proxy, M6 sezione 10). 04/11/2026 (161 alimenti: piadina e cereali in formelle; scatolame a stato `familiare`; tabelle di conversione: `scambi_carboidrati.csv`, `scambi_pesce.csv`, `scambi_verdure.csv`, `tabelle_conversione.py`; `genera_scheda_cucina.py`; controllo 13 del collaudo). 31/10/2026 pomeriggio (file affiancato `lipidi.csv`: saturi, mono, poli,
 EPA, DHA, colesterolo; saturi e colesterolo calcolati nei riferimenti; sezione LIPIDI del
 report; controllo 12 del collaudo; casi 63-65). 31/10/2026 (riferimenti: si controllano solo
 i parametri dei profili scelti).
@@ -826,7 +826,7 @@ diventa un nuovo caso golden.
 
 ## 4. DATABASE ALIMENTI E GERARCHIA FONTI
 
-**Stato:** 163 alimenti verificati e tracciati alla fonte; il numero vincolante è
+**Stato:** 165 alimenti verificati e tracciati alla fonte; il numero vincolante è
 `EXPECTED_ALIMENTI_COUNT` in `collaudo.py`. Conformità kcal/macro/fibra a CREA:
 `python3 cerca_crea.py verifica`.
 

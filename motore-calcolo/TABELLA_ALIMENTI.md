@@ -2,7 +2,7 @@
 
 Generata da `tabella_alimenti.py --genera-pagina` dai CSV del motore: non si modifica a mano. Valori per 100 g di parte edibile. «n.d.» = dato mancante, dichiarato in `gap.csv`: non è uno zero.
 
-**163 alimenti**, 21 valori mancanti su 9 alimenti.
+**165 alimenti**, 21 valori mancanti su 9 alimenti.
 
 ## Valori mancanti
 
@@ -77,6 +77,7 @@ Generata da `tabella_alimenti.py --genera-pagina` dai CSV del motore: non si mod
 | Bovino adulto o vitellone filetto crudo | 127 | 20,5 | 0 | 5 | 0 |
 | Bovino magro vitellone senza grasso visibile | 108 | 21,58 | 0 | 2,38 | 0 |
 | Bresaola | 151 | 32 | 0 | 2,6 | 0 |
+| Coniglio coscia cruda | 137 | 21 | 0 | 5,9 | 0 |
 | Macinato di manzo magro (proxy: bovino adulto o vitellone tagli anteriori crudo) | 145 | 20,5 | 0 | 7 | 0 |
 | Maiale lombo crudo | 146 | 20,7 | 0 | 7 | 0 |
 | Pollo fuso (coscia) senza pelle crudo | 107 | 18,5 | 0 | 3,7 | 0 |
@@ -86,6 +87,7 @@ Generata da `tabella_alimenti.py --genera-pagina` dai CSV del motore: non si mod
 | Tacchino fesa cotta al forno (proxy fesa affettata) | 131 | 29,6 | 0 | 1,4 | 0 |
 | Tacchino petto senza pelle | 107 | 24 | 0 | 1,2 | 0 |
 | Trippa di bovini | 108 | 15,8 | 0 | 5 | 0 |
+| Vitello fesa cruda (proxy fesa di vitellone) | 103 | 21,8 | 0 | 1,8 | 0 |
 | Vitello filetto crudo | 107 | 20,7 | 0 | 2,7 | 0 |
 
 ### Micronutrienti
@@ -95,6 +97,7 @@ Generata da `tabella_alimenti.py --genera-pagina` dai CSV del motore: non si mod
 | Bovino adulto o vitellone filetto crudo | 4 | 1,9 | 0,5 | 10 | 2 | 2,8 | 20 | 0 |
 | Bovino magro vitellone senza grasso visibile | 4,4 | 1,56 | 0,5 | 27,6 | 2 | 3,76 | 17,4 | 0 |
 | Bresaola | 7 | 2,4 | 0,5 | 19 | 2 | 3,9 | 34 | 0 |
+| Coniglio coscia cruda | 22 | 1 | 0 | 5 | 10 | 3,9 | 22 | 0 |
 | Macinato di manzo magro (proxy: bovino adulto o vitellone tagli anteriori crudo) | 10 | 1,3 | 0,56 | 19,4 | 2 | 4,5 | 17 | 0 |
 | Maiale lombo crudo | 7 | 1,3 | 0,5 | 3 | 1 | 1,8 | 22 | 0 |
 | Pollo fuso (coscia) senza pelle crudo | 13 | 1 | 0,1 | 9 | 1 | 1,9 | 23 | 0 |
@@ -104,6 +107,7 @@ Generata da `tabella_alimenti.py --genera-pagina` dai CSV del motore: non si mod
 | Tacchino fesa cotta al forno (proxy fesa affettata) | 11 | 1,5 | 0,4 | 7 | 1 | 1,3 | 39 | 0 |
 | Tacchino petto senza pelle | 6 | 0,8 | 0,3 | 17 | 2 | 1,1 | 32 | 0 |
 | Trippa di bovini | 8 | 4 | n.d. | n.d. | n.d. | n.d. | 13 | 3 |
+| Vitello fesa cruda (proxy fesa di vitellone) | 4 | 1,8 | 0,5 | 16 | 2 | 3,9 | 18 | 0 |
 | Vitello filetto crudo | 14 | 2,3 | 1,2 | 23 | 2 | 2,8 | 25 | 0 |
 
 ### Lipidi
@@ -113,6 +117,7 @@ Generata da `tabella_alimenti.py --genera-pagina` dai CSV del motore: non si mod
 | Bovino adulto o vitellone filetto crudo | 1,67 | 1,63 | 0,99 | 0,11 | 0,05 | 60 |
 | Bovino magro vitellone senza grasso visibile | 0,786 | 0,776 | 0,486 | 0,048 | 0,028 | 61,2 |
 | Bresaola | 0,75 | 1,08 | 0,39 | 0,1 | 0,01 | 67 |
+| Coniglio coscia cruda | 2,333 | 1,166 | 1,811 | 0 | 0 | 52 |
 | Macinato di manzo magro (proxy: bovino adulto o vitellone tagli anteriori crudo) | 2,3026 | 2,275 | 1,4338 | 0,1382 | 0,0768 | 61,8 |
 | Maiale lombo crudo | 2,23 | 2,38 | 1,82 | 0 | 0 | 61 |
 | Pollo fuso (coscia) senza pelle crudo | 1,08 | 1,06 | 0,98 | 0,02 | 0,05 | 88 |
@@ -122,6 +127,7 @@ Generata da `tabella_alimenti.py --genera-pagina` dai CSV del motore: non si mod
 | Tacchino fesa cotta al forno (proxy fesa affettata) | 0,43 | 0,37 | 0,38 | n.d. | 0,04 | 62 |
 | Tacchino petto senza pelle | 0,38 | 0,31 | 0,34 | n.d. | 0,03 | 50 |
 | Trippa di bovini | 1,749 | 2,077 | 0,244 | 0 | 0 | 95 |
+| Vitello fesa cruda (proxy fesa di vitellone) | 0,6 | 0,59 | 0,36 | 0,04 | 0,02 | 60 |
 | Vitello filetto crudo | 1,0437 | 1,2597 | 0,1797 | 0,0009 | 0 | 55 |
 
 ### Fonti
@@ -131,6 +137,7 @@ Generata da `tabella_alimenti.py --genera-pagina` dai CSV del motore: non si mod
 | Bovino adulto o vitellone filetto crudo | 101170 | CREA+BDA-IEO(proxy scottona) | 101170+8655 | 2026-10-01 | BDA-IEO 8655_2 |
 | Bovino magro vitellone senza grasso visibile | 8520 | BDA-IEO | 8520 | 2026-07-26 | BDA-IEO 8520_2 |
 | Bresaola | 100061 | BDA-IEO | 100061 | 2026-07-26 | BDA-IEO 100061_2 |
+| Coniglio coscia cruda | 107030 | CREA+BDA-IEO | 107030+8668 | 2026-11-11 | BDA-IEO 8668_2 |
 | Macinato di manzo magro (proxy: bovino adulto o vitellone tagli anteriori crudo) | 101120 | CREA(proxy macinato)+BDA-IEO(proxy semigrassa) | 101120+8522 | 2026-10-23 | BDA-IEO 8522_2 |
 | Maiale lombo crudo | 105210 | CREA+BDA-IEO+USDA | 105210 | 2026-07-28 | BDA-IEO 8670_2 |
 | Pollo fuso (coscia) senza pelle crudo | 106410 | CREA+BDA-IEO | 106410+8686 | 2026-10-01 | BDA-IEO 8686_2 |
@@ -140,6 +147,7 @@ Generata da `tabella_alimenti.py --genera-pagina` dai CSV del motore: non si mod
 | Tacchino fesa cotta al forno (proxy fesa affettata) | 106856 | CREA+BDA-IEO(proxy fesa affettata) | 106856+8698_2 | 2026-10-17 | BDA-IEO 8698_2 |
 | Tacchino petto senza pelle | 8697 | BDA-IEO | 8697 | 2026-07-26 | BDA-IEO 8697_2 |
 | Trippa di bovini | 115800 | CREA+USDA | 115800 | 2026-07-28 | BDA-IEO 1209_2 |
+| Vitello fesa cruda (proxy fesa di vitellone) | 101160_vitello | CREA+BDA-IEO(proxy fesa di vitellone 101160) | 101160+8654 | 2026-11-11 | BDA-IEO 8654_2 |
 | Vitello filetto crudo | 101520 | CREA+BDA-IEO(proxy)+USDA | 101520 | 2026-07-28 | USDA USDA173826 |
 
 ## Cereali

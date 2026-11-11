@@ -316,14 +316,17 @@ di conversione, personalizzate sulle voci del piano:
 - **Carboidrati:** a parità di carboidrati, arrotondati a 5 g, con la colonna della pasta
   e lo scarto in kcal dichiarato. Quinoa e piadina compaiono solo se sono nel piano,
   mai come alternative (`solo_piano`): a parità di carboidrati superano le 100 kcal in più.
-- **Pesce:** a parità di proteine, stesso arrotondamento.
+- **Pesce:** a parità di proteine, stesso arrotondamento. Dall'11/11/2026 anche orata e
+  salmone: a parità di proteine con 100 g di merluzzo portano +64 e +96 kcal, quindi il
+  filtro del 2,5% li toglie spesso come scambio del pesce magro; restano tra loro e con le
+  voci vicine.
 - **Carni e affettati (11/11/2026):** a parità di proteine, riferimento 100 g di petto di
   pollo, stesso arrotondamento, stesso filtro, stesse esclusioni (`scambi_carni.csv`).
-  Alternative: petto di pollo, petto di tacchino, coscia di pollo senza pelle, lombo di
-  maiale, fesa di tacchino affettata, bresaola, prosciutto cotto sgrassato. Vitellone magro,
-  filetto di manzo, filetto di vitello, macinato magro e prosciutto crudo sono
-  `da_confermare`: compaiono come riga se sono nel piano, mai come alternativa. Coniglio e
-  fesa di vitello non sono nel database (M6, sezione 13). Gli affettati (ruolo salume)
+  Alternative (11/11/2026 sera): petto di pollo, petto di tacchino, coscia di pollo senza
+  pelle, lombo di maiale, fesa di tacchino affettata, bresaola, prosciutto cotto sgrassato,
+  vitellone magro, filetto di manzo, macinato magro di manzo, coniglio (coscia), fesa di
+  vitello (proxy, M6 sezione 13). Filetto di vitello e prosciutto crudo restano
+  `da_confermare`: compaiono come riga se sono nel piano, mai come alternativa. Gli affettati (ruolo salume)
   portano «*» e la nota «Affettato: contiene più sale della carne fresca.»: il motore non
   calcola il sodio. Per un paziente che deve limitare il sale, gli affettati si tolgono
   con `--esclusioni`. Come il pesce, la tabella guarda solo pranzo e cena: un affettato a
