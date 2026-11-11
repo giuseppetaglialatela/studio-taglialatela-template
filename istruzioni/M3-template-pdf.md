@@ -2,7 +2,7 @@
 
 Modulo operativo. Si carica **dopo l'approvazione dei calcoli**, per generare i due
 deliverable che il paziente riceve.
-Ultimo aggiornamento: 04/11/2026 (scheda per chi cucina in due pagine, con le tabelle di conversione, in ogni dieta). 30/10/2026 (verdetto della pipeline allegato e richiesto da PDF e verifica;
+Ultimo aggiornamento: 11/11/2026 (uova a pezzi in anteprima, PDF e scheda). 04/11/2026 (scheda per chi cucina in due pagine, con le tabelle di conversione, in ogni dieta). 30/10/2026 (verdetto della pipeline allegato e richiesto da PDF e verifica;
 documento di spiegazione generato con `genera_spiegazione.py`, che si ferma su segnaposto,
 parentesi quadre, struttura e nome del paziente). 23/10/2026: testo del documento di spiegazione approvato prima della consegna; template di spiegazione: elenchi puntati «•» al posto di «●», che il font non ha e stampava «NO GLYPH», unica modifica al motore grafico autorizzata dal nutrizionista; impronta dell'approvazione: il PDF si ferma se piano o testi sono cambiati, `--verifica-impronta` prima del documento di spiegazione, orari tra gli allegati; 22/10: fermo sui segnaposto nei testi del paziente; prima: 30/09/2026, secondo spuntino, fino a 5 pasti nel PDF). Presuppone **M2 già eseguito** (in chat A):
 copre i suoi PASSO 7 e PASSO 8 e non si esegue prima. **In chat B M2 e M1 non si
@@ -120,6 +120,15 @@ Copia di riserva: Drive > Template.
 
 Questo file **sostituisce e annulla** la v4 e le precedenti v1.0 e v3.0. Se ne
 trovi altre copie in giro, non usarle e segnalalo.
+
+**Alimenti a pezzi (11/11/2026, decisione del nutrizionista).** Le uova (`1800`) escono
+come numero di pezzi con i grammi tra parentesi, «Uova 2 (104 g)», «Uovo 1 (52 g)», in
+anteprima, PDF e scheda per chi cucina, dalla stessa funzione (`formati.testo_pezzi`; elenco
+in `formati.A_PEZZI`, peso del pezzo e tolleranza da `formati_confezione.csv`). Una quantità
+che non è un multiplo del pezzo (es. 80 g) resta in grammi con il nome per il paziente e
+non si arrotonda: la pipeline la segnala al PASSO 6 come fuori formato. Il testo
+dell'anteprima è cambiato: un piano con uova approvato prima dell'11/11/2026 ha
+un'impronta che non coincide più e va riapprovato sulla nuova anteprima (M2).
 
 Novità della v5 (19/09/2026): icone dei pasti non più tagliate; emoji ⭐ e 🚫
 dei box info rese come immagine; blocco alternative nativo per colazione e

@@ -66,6 +66,7 @@ from calcolatore import (entro_tolleranza, carica_alimenti, carica_eccezioni_eti
                          PASTI_AMMESSI, ordine_pasti, pasti_non_ammessi)
 from scelte_multiple import carica_piano_esteso
 import combinazioni as mod_comb
+import formati
 import metadati_piano as mod_meta
 
 KCAL_PER_KG = 7700          # convenzione clinica decisa il 19/09/2026
@@ -226,11 +227,25 @@ def _campo_paziente(meta, chiave):
 
 
 # ─── costruzione dei pasti ────────────────────────────────────────
+_FORMATI = None
+
+
+def _formati():
+    global _FORMATI
+    if _FORMATI is None:
+        _FORMATI = formati.carica_formati()
+    return _FORMATI
+
+
 def _dettaglio(righe, nomi):
     parti = []
     for r in righe:
         if r["food_id"] not in nomi:
             raise Fermo(f"food_id {r['food_id']} senza nome in nomi_paziente.csv")
+        a_pezzi = formati.testo_pezzi(r["food_id"], r["grammi"], _formati(), _grammi)
+        if a_pezzi:                      # «Uova 2 (104 g)», decisione dell'11/11/2026
+            parti.append(a_pezzi)
+            continue
         nome, nota = nomi[r["food_id"]]
         parti.append(f"{nome} {_grammi(r['grammi'])} g" + (f" ({nota})" if nota else ""))
     return " · ".join(parti)

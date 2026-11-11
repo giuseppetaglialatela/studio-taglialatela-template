@@ -2,7 +2,7 @@
 
 Generata da `tabella_alimenti.py --genera-pagina` dai CSV del motore: non si modifica a mano. Valori per 100 g di parte edibile. «n.d.» = dato mancante, dichiarato in `gap.csv`: non è uno zero.
 
-**162 alimenti**, 21 valori mancanti su 9 alimenti.
+**163 alimenti**, 21 valori mancanti su 9 alimenti.
 
 ## Valori mancanti
 
@@ -446,6 +446,7 @@ Generata da `tabella_alimenti.py --genera-pagina` dai CSV del motore: non si mod
 | Mozzarella di vacca | 253 | 18,7 | 0,7 | 19,5 | 0 |
 | Parmigiano | 387 | 33,5 | 0 | 28,1 | 0 |
 | Pecorino | 392 | 25,8 | 0,2 | 32 | 0 |
+| Primo sale (proxy mozzarella di vacca) | 253 | 18,7 | 0,7 | 19,5 | 0 |
 | Ricotta di pecora | 157 | 9,5 | 4,2 | 11,5 | 0 |
 | Ricotta di vacca | 146 | 8,8 | 3,5 | 10,9 | 0 |
 | Robiola | 338 | 20 | 2,3 | 27,7 | 0 |
@@ -469,6 +470,7 @@ Generata da `tabella_alimenti.py --genera-pagina` dai CSV del motore: non si mod
 | Mozzarella di vacca | 160 | 0,4 | 0,12 | 16 | 1,7 | 2,6 | 10 | 0 |
 | Parmigiano | 1159 | 0,7 | 0,5 | 5 | 4,2 | 4 | 43 | 0 |
 | Pecorino | 607 | 0,6 | 0,5 | 7 | 1,1 | 3,4 | 40 | 0 |
+| Primo sale (proxy mozzarella di vacca) | 160 | 0,4 | 0,12 | 16 | 1,7 | 2,6 | 10 | 0 |
 | Ricotta di pecora | 166 | 0,3 | 0,18 | 12 | 0,3 | 0,2 | 15 | 0 |
 | Ricotta di vacca | 295 | 0,4 | 0,03 | 12 | 0,3 | 0,5 | 17 | 0 |
 | Robiola | 704 | 0,7 | 0,17 | 19 | 0,6 | 4,1 | 20 | 0 |
@@ -492,6 +494,7 @@ Generata da `tabella_alimenti.py --genera-pagina` dai CSV del motore: non si mod
 | Mozzarella di vacca | 11,429 | 5,958 | 0,65 | 0 | 0 | 46 |
 | Parmigiano | 18,54 | 8,81 | 0,79 | 0 | 0 | 91 |
 | Pecorino | 17,344 | 7,943 | 0,601 | 0 | 0 | 104 |
+| Primo sale (proxy mozzarella di vacca) | 11,429 | 5,958 | 0,65 | 0 | 0 | 46 |
 | Ricotta di pecora | 7,36 | 2,5 | 0,68 | 0 | 0 | 56 |
 | Ricotta di vacca | 6,82 | 2,76 | 0,39 | 0 | 0 | 50 |
 | Robiola | 16,235 | 8,464 | 0,923 | 0 | 0 | 90 |
@@ -515,6 +518,7 @@ Generata da `tabella_alimenti.py --genera-pagina` dai CSV del motore: non si mod
 | Mozzarella di vacca | 1718 | BDA-IEO | 1718 | 2026-07-26 | BDA-IEO 1718_2 |
 | Parmigiano | 1726 | BDA-IEO | 1726 | 2026-07-26 | BDA-IEO 1726_2 |
 | Pecorino | 1721 | BDA-IEO | 1721 | 2026-07-26 | BDA-IEO 1721_2 |
+| Primo sale (proxy mozzarella di vacca) | 1718_primosale | BDA-IEO(proxy mozzarella di vacca 1718) | 1718 | 2026-11-11 | BDA-IEO 1718_2 |
 | Ricotta di pecora | 166810 | CREA | 166810 | 2026-07-26 | BDA-IEO 1723_2 |
 | Ricotta di vacca | 11793 | BDA-IEO | 11793 | 2026-07-26 | BDA-IEO 11793_2 |
 | Robiola | 100030 | BDA-IEO | 100030 | 2026-07-26 | BDA-IEO 100030_2 |

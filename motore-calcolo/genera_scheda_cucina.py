@@ -35,7 +35,6 @@ from genera_zona_piano import Fermo
 import tabelle_conversione as tc
 
 E = html.escape
-FOOD_UOVO = "1800"
 NOMI_BREVI = {"702901": "Olio EVO", "391": "Pomodori", "392": "Pomodori pelati",
               "1515": "Tonno al naturale", "8520": "Vitellone magro", "123200": "Spigola",
               "150030": "Yogurt greco 0%", "1631": "Yogurt parz. scremato",
@@ -83,12 +82,12 @@ def _g(v):
     return f"{float(v):g} g"
 
 
-def voce(r, nomi, uovo_g, etichetta=frozenset()):
+def voce(r, nomi, formati_pz, etichetta=frozenset()):
     """Le voci da etichetta portano anche la nota di peso del file --nomi-eccezione."""
     fid, g = r["food_id"], float(r["grammi"])
-    if fid == FOOD_UOVO:
-        n = round(g / uovo_g)
-        return f"{n} uov{'o' if n == 1 else 'a'}"
+    a_pezzi = formati.testo_pezzi(fid, g, formati_pz, lambda x: f"{x:g}", "\u00a0")
+    if a_pezzi:                          # «Uova 2 (104 g)», come nel PDF (11/11/2026)
+        return a_pezzi
     nome = nomi.get(fid, (fid,))
     nota = nome[1] if isinstance(nome, tuple) and len(nome) > 1 else ""
     nome = nome[0] if isinstance(nome, tuple) else nome
@@ -157,15 +156,12 @@ def _nota_scarto(t):
     return f"<div class=n>Scarto di energia degli scambi: da {s[0]:+d} a {s[1]:+d} kcal.</div>" if s else ""
 
 
-def _voci(rr, nomi, uovo_g, etichetta=frozenset()):
+def _voci(rr, nomi, formati_pz, etichetta=frozenset()):
     out = ""
     for r in rr:
-        v = voce(r, nomi, uovo_g, etichetta)
-        if r["food_id"] == FOOD_UOVO:
-            out += f"<span class=x><b class=q>{E(v)}</b></span>"
-        else:
-            nome, peso = v.rsplit(" ", 1)
-            out += f"<span class=x>{E(nome)} <b class=q>{E(peso)}</b></span>"
+        v = voce(r, nomi, formati_pz, etichetta)
+        nome, peso = v.rsplit(" ", 1)    # la quantita' usa spazi non divisibili
+        out += f"<span class=x>{E(nome)} <b class=q>{E(peso)}</b></span>"
     return f"<div class=voci>{out}</div>"
 
 
@@ -176,14 +172,14 @@ def componi(piano, db, nomi, meta, orari, target_kcal, etichetta=frozenset(), pa
     titoli = meta["titoli_piatti"]
     giorni = sorted({r["giorno"] for r in piano}, key=int)
     primo = giorni[0]
-    uovo_g = formati.carica_formati().get(FOOD_UOVO, {"unita": [52.0]})["unita"][0]
+    formati_pz = formati.carica_formati()      # pezzi: peso e tolleranza da formati_confezione.csv
     for p in ("colazione", "spuntino", "spuntino2"):
         _fisso(piano, p)
     ab = gzp._abbinamenti(meta) or {}
 
     def piatto(giorno, pasto, opzione):
         return (f"<div class=t>{E(gzp._titolo(titoli, giorno, pasto, opzione))}</div>"
-                + _voci(_sel(piano, giorno, pasto, opzione), nomi, uovo_g, etichetta))
+                + _voci(_sel(piano, giorno, pasto, opzione), nomi, formati_pz, etichetta))
 
     def carte(pasto):
         out = ""
@@ -194,7 +190,7 @@ def componi(piano, db, nomi, meta, orari, target_kcal, etichetta=frozenset(), pa
             let = f"<span class=l>{E(o)}</span>" if o else ""
             t = E(gzp._titolo(titoli, primo, pasto, o))
             out += (f"<div class=card>{let}<span class=t>{t}</span>{fr}"
-                    + _voci(_sel(piano, primo, pasto, o), nomi, uovo_g, etichetta) + "</div>")
+                    + _voci(_sel(piano, primo, pasto, o), nomi, formati_pz, etichetta) + "</div>")
         return out
 
     def griglia_carte(pasto):
@@ -484,7 +480,17 @@ def autotest():
             ril, letti = mod_pipeline.esegui(piano_c, target_c, metadati_p=mp,
                                              salta_collaudo=True, nessuna_terapia=True)
         mod_meta.scrivi_verdetto(vp, ril, piano_c, target_c, letti)
-    problemi = []
+    # Uova a pezzi (11/11/2026), uguali in scheda e PDF; un non multiplo resta in grammi
+    problemi_pz = []
+    fmt, nomi_t = formati.carica_formati(), gzp.carica_nomi(os.path.join(QUI, "nomi_paziente.csv"))
+    for g, atteso in ((52, "Uovo 1 (52 g)"), (104, "Uova 2 (104 g)"), (106, "Uova 2 (106 g)"),
+                      (80, "Uovo intero 80 g")):
+        r = {"food_id": "1800", "grammi": float(g)}
+        sch = voce(r, nomi_t, fmt).replace("\u00a0", " ")
+        pdf = gzp._dettaglio([r], nomi_t)
+        if sch != atteso or pdf != atteso:
+            problemi_pz.append(f"uova {g} g: scheda «{sch}», PDF «{pdf}», atteso «{atteso}»")
+    problemi = list(problemi_pz)
     scrivi(meta)
     testo, imp = gzp.anteprima(piano_c, target_c, mp, **kw)
     if "Nota di collaudo." not in testo:

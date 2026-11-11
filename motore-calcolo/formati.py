@@ -61,6 +61,35 @@ def quantita_valida(grammi, fmt):
     return False
 
 
+# Alimenti contati a pezzi (decisione del nutrizionista, 11/11/2026): nel piano restano in
+# grammi, ma anteprima, PDF e scheda per chi cucina li scrivono come numero di pezzi con i
+# grammi tra parentesi, es. «Uova 2 (104 g)». Il peso del pezzo e la tolleranza vengono da
+# formati_confezione.csv; qui solo il nome al singolare e al plurale.
+A_PEZZI = {"1800": ("Uovo", "Uova")}
+
+
+def pezzi(fid, grammi, formati):
+    """Numero di pezzi se i grammi sono un multiplo del pezzo entro la tolleranza,
+    altrimenti None (la voce si scrive in grammi, come le altre: un 80 g di uovo non
+    si arrotonda a 2 uova)."""
+    if fid not in A_PEZZI or fid not in formati or len(formati[fid]["unita"]) != 1:
+        return None
+    u, tol = formati[fid]["unita"][0], formati[fid]["tolleranza"]
+    n = round(float(grammi) / u)
+    return n if n >= 1 and abs(float(grammi) - n * u) <= tol else None
+
+
+def testo_pezzi(fid, grammi, formati, fmt_grammi, spazio=" "):
+    """«Uova 2 (104 g)» oppure None. fmt_grammi formatta il numero dei grammi
+    (virgola decimale nel PDF); spazio separa le parti della quantita'."""
+    n = pezzi(fid, grammi, formati)
+    if n is None:
+        return None
+    singolare, plurale = A_PEZZI[fid]
+    return (f"{singolare if n == 1 else plurale} {n}{spazio}"
+            f"({fmt_grammi(float(grammi))}{spazio}g)")
+
+
 def formati_suggeriti(fmt):
     """Quantita' ammesse, per il messaggio di segnalazione."""
     valori = sorted({int(u * k) if (u * k) == int(u * k) else u * k

@@ -234,7 +234,7 @@ scremato; insalata generica = lattuga; aromi senza grammatura omessi.
 
 ## 5. CERCATI E NON TROVATI — non riprovare
 
-primo sale · muesli · misto cereali e legumi precotti in busta · condimento
+primo sale (dal 11/11/2026 proxy dichiarato, sezione 12) · muesli · misto cereali e legumi precotti in busta · condimento
 verdure Saclà · hamburger di tacchino confezionato.
 
 **Kefir** — cercato su tutte e tre le fonti il 28/07/2026, anche come "latte
@@ -414,3 +414,15 @@ nutrizionista; nessun valore nutrizionale cambiato.
 - **Lipidi:** da USDA 170246 (grassi 4,2 g come CREA, nessuna proporzione): saturi 0,57,
   mono 1,1, poli 1,9 g (prima 0,59 / 0,88 / 2,14 da BDA 3009_2); colesterolo, EPA, DHA 0.
 - **Nome paziente:** «Popcorn al naturale (senza olio né sale)». Formato: porzione libera.
+
+## 12. PRIMO SALE — PROXY DICHIARATO, 11/11/2026
+
+Per il piano P04. Assente da CREA e da BDA-IEO (sezione 5). Proxy approvato dal nutrizionista
+il 10/11/2026: **`1718_primosale`** «Primo sale (proxy mozzarella di vacca)», stessi valori
+della mozzarella di vacca BDA-IEO 1718 in `alimenti.csv` e in `lipidi.csv`, fonte
+`BDA-IEO(proxy mozzarella di vacca 1718)`, codice `1718`. Motivo: il primo sale commerciale
+sta tra 195 e 272 kcal e tra 13,5 e 21,5 g di grassi per 100 g, e la mozzarella (253 kcal,
+19,5 g) è la voce del database più vicina. I valori del primo sale reale possono essere
+più bassi di energia e grassi: è una stima per eccesso. Nome per il paziente «Primo sale»,
+ruolo formaggio, a peso al banco (assente da `formati_confezione.csv`: qualsiasi grammatura).
+Il controllo 14 del collaudo lo verifica contro la scheda BDA 1718.
