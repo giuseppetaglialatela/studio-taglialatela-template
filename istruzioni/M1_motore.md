@@ -1,7 +1,7 @@
 # M1 — MOTORE DI CALCOLO
 
 Modulo operativo (principio 6). Dipendenze: nessuna. Ne dipendono M2 e M6.
-Ultima modifica: 11/11/2026 (163 alimenti: primo sale, proxy dichiarato della mozzarella di vacca, M6 sezione 12; uova a pezzi in anteprima, PDF e scheda, M3). 10/11/2026 (pop corn 3009 corretto su CREA 501200 + USDA, M6 sezione 11; 162 alimenti: minestrone cotto, CREA 905010, micronutrienti USDA proxy, M6 sezione 10). 04/11/2026 (161 alimenti: piadina e cereali in formelle; scatolame a stato `familiare`; tabelle di conversione: `scambi_carboidrati.csv`, `scambi_pesce.csv`, `scambi_verdure.csv`, `tabelle_conversione.py`; `genera_scheda_cucina.py`; controllo 13 del collaudo). 31/10/2026 pomeriggio (file affiancato `lipidi.csv`: saturi, mono, poli,
+Ultima modifica: 11/11/2026 sera (tabella carni e affettati: `scambi_carni.csv`, `tabelle_conversione.tabella_carni`, nota sul sale degli affettati nella scheda; `--out-html` facoltativo in `genera_scheda_cucina.py`; `genera_zona_piano.py` si ferma se `obiettivo_intestazione` comincia con «Obiettivo»). 11/11/2026 (163 alimenti: primo sale, proxy dichiarato della mozzarella di vacca, M6 sezione 12; uova a pezzi in anteprima, PDF e scheda, M3). 10/11/2026 (pop corn 3009 corretto su CREA 501200 + USDA, M6 sezione 11; 162 alimenti: minestrone cotto, CREA 905010, micronutrienti USDA proxy, M6 sezione 10). 04/11/2026 (161 alimenti: piadina e cereali in formelle; scatolame a stato `familiare`; tabelle di conversione: `scambi_carboidrati.csv`, `scambi_pesce.csv`, `scambi_verdure.csv`, `tabelle_conversione.py`; `genera_scheda_cucina.py`; controllo 13 del collaudo). 31/10/2026 pomeriggio (file affiancato `lipidi.csv`: saturi, mono, poli,
 EPA, DHA, colesterolo; saturi e colesterolo calcolati nei riferimenti; sezione LIPIDI del
 report; controllo 12 del collaudo; casi 63-65). 31/10/2026 (riferimenti: si controllano solo
 i parametri dei profili scelti).
@@ -647,7 +647,10 @@ Settimana e tabelle di conversione, in due o tre pagine, tutte calcolate da pian
 `alimenti.csv` (M3, sezione 3). Richiede lo stesso verdetto e la stessa impronta del PDF.
 `python3 genera_scheda_cucina.py --piano ... --target ... --metadati ... --verdetto ...
 [--orari ...] [--eccezione-etichetta voci.csv --nomi-eccezione nomi.csv] [--esclusioni
-esclusioni.json] --out-html scheda.html [--out-pdf scheda.pdf]`. `--esclusioni` (04/11/2026,
+esclusioni.json] --out-pdf scheda.pdf [--out-html scheda.html]`. Senza `--out-html` la pagina
+misurata sta in una cartella temporanea (11/11/2026: prima TypeError); senza nessuna delle due
+uscite si ferma. Tabelle: carboidrati, pesce, carni e affettati (11/11/2026; gli affettati, ruolo
+salume, con «*» e la nota sul sale), verdure. `--esclusioni` (04/11/2026,
 facoltativa): file fuori dal repository e dai metadati, con `escludi_food_id`,
 `massimo_g_a_pasto`, `verdure_crude_ammesse`; campo non previsto, `food_id` sconosciuto o voce
 vietata presente nel piano fermano la scheda. Le voci da etichetta passano con gli stessi controlli di
@@ -939,9 +942,10 @@ grammi ma non vincola né segnala, perché una scatola si divide in famiglia).
 frutta equivalenti in energia (riferimento banana 100 g), per la tabella di scambio del
 documento di spiegazione.
 
-**scambi_carboidrati.csv, scambi_pesce.csv** — stesso schema. `grammi_porzione` = grammi
-equivalenti a 80 g di pasta cruda (parità di carboidrati) o a 100 g di merluzzo (parità di
-proteine), arrotondati a 5 g. Non si scrivono a mano: `python3 tabelle_conversione.py
+**scambi_carboidrati.csv, scambi_pesce.csv, scambi_carni.csv** — stesso schema. `grammi_porzione` = grammi
+equivalenti a 80 g di pasta cruda (parità di carboidrati), a 100 g di merluzzo o a 100 g di
+petto di pollo (parità di proteine; carni dall'11/11/2026, ruoli ammessi carne e salume),
+arrotondati a 5 g. Riferimenti e nutriente in `tabelle_conversione.TABELLE_GRAMMI`. Non si scrivono a mano: `python3 tabelle_conversione.py
 --rigenera` li ricalcola da `alimenti.csv`; se il database cambia, il controllo 13 si ferma
 finché non lo si esegue. `da_confermare` = compare come riga se è nel piano, non come
 alternativa; `solo_piano` = lo stesso, per decisione del nutrizionista (quinoa e piadina).

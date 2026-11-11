@@ -222,8 +222,20 @@ def _oggetto(meta, chiave):
     return valore
 
 
+# Il template stampa gia' «Obiettivo: » davanti al campo: un valore che comincia con
+# «Obiettivo» usciva «Obiettivo: Obiettivo: 65 kg» nel PDF (chat B, 11/11/2026).
+_PREFISSO_OBIETTIVO = re.compile(r"obiettiv[oi]\b", re.IGNORECASE)
+
+
 def _campo_paziente(meta, chiave):
-    return _testo_paziente(_campo(meta, chiave), chiave)
+    valore = _testo_paziente(_campo(meta, chiave), chiave)
+    if chiave == "obiettivo_intestazione":
+        pulito = unicodedata.normalize("NFKC", valore).translate(_INVISIBILI).strip(_BORDI + " ")
+        if _PREFISSO_OBIETTIVO.match(pulito):
+            raise Fermo(f"metadati: 'obiettivo_intestazione' vale «{valore}», ma il PDF "
+                        f"scrive gia' «Obiettivo: » davanti (uscirebbe «Obiettivo: {valore}»): "
+                        f"scrivere solo il contenuto, es. «65 kg», e riapprovare l'anteprima (M2)")
+    return valore
 
 
 # ─── costruzione dei pasti ────────────────────────────────────────
@@ -1099,6 +1111,16 @@ def autotest(template_p=None):
                            ("criterio_rivalutazione", "Da rivalutare dopo N sett."),
                            ("avvertenze_box", "Indicare qui allergie")):
         deve_fermarsi(f"'{campo}' = {scritto!r}", dict(base_meta, **{campo: scritto}), campo)
+    # 11/11/2026: «Obiettivo: Obiettivo: 65 kg» nel PDF
+    for scritto in ("Obiettivo: 65 kg", "obiettivo 65 kg", " «Obiettivo» - 65 kg", "OBIETTIVI: -5 kg"):
+        deve_fermarsi(f"obiettivo_intestazione = {scritto!r} (prefisso doppio)",
+                      dict(base_meta, obiettivo_intestazione=scritto), "obiettivo_intestazione")
+    for scritto in ("65 kg", "Mantenimento obiettivo 65 kg", "-5 kg in 3 mesi"):
+        try:
+            _campo_paziente(dict(base_meta, obiettivo_intestazione=scritto), "obiettivo_intestazione")
+            esiti.append((f"obiettivo_intestazione = {scritto!r} passa", True))
+        except Fermo as e:
+            esiti.append((f"obiettivo_intestazione = {scritto!r}: fermo inatteso ({e})", False))
     deve_fermarsi("intestazione.condizione = 'Descrizione della condizione clinica'",
                   con("intestazione", "condizione", "Descrizione della condizione clinica"),
                   "intestazione.condizione")
@@ -1112,7 +1134,7 @@ def autotest(template_p=None):
                   dict(base_meta, titoli_piatti="*|colazione|A"), "titoli_piatti")
     # nomi, sigle e frasi legittime: passano
     legittimi = ["Nan", "Na", "N.D.", "ND", "NAFLD", "Nadia Xu", "9 anni",
-                 "Obiettivo non concordato con il cardiologo", "Da definire con il cardiologo",
+                 "Peso non concordato con il cardiologo", "Da definire con il cardiologo",
                  "Nessuna allergia dichiarata.", "Nefropatia diabetica (ND)",
                  "Gravidanza alla XX settimana", "Cariotipo 46,XX", "Non note",
                  "Allergie non pervenute", "Via XX Settembre",
@@ -1127,7 +1149,7 @@ def autotest(template_p=None):
                   + (f": respinti {respinti}" if respinti else ""), not respinti))
     # 7) una frase vera che contiene le stesse parole NON si ferma
     try:
-        prova_meta(dict(base_meta, obiettivo_intestazione="Obiettivo non concordato con il cardiologo",
+        prova_meta(dict(base_meta, obiettivo_intestazione="Peso non concordato con il cardiologo",
                         abbinamento_spuntino="non concordato"), approvato=True)
         esiti.append(("frase vera con 'non concordato' e abbinamento non concordato: PDF generato", True))
     except Fermo as e:

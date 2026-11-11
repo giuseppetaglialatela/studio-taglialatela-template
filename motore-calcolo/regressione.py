@@ -703,6 +703,19 @@ def verifica_scheda_etichetta():
             return False, f"con i file la scheda non si genera ({con.stdout.strip()[-120:]})"
         if "Vellutata di prova (peso da confezione)" not in open(html_p, encoding="utf-8").read():
             return False, "voce da etichetta senza nome e nota di peso"
+        # 11/11/2026: --out-html facoltativo (prima TypeError su open(None)); senza
+        # nessuna uscita, fermo esplicito e nessun traceback
+        senza_html = [x for x in base_s if x not in ("--out-html", html_p)]
+        solo_pdf = os.path.join(tmp, "solo.pdf")
+        r = subprocess.run(senza_html + ["--eccezione-etichetta", voci, "--nomi-eccezione", nomi,
+                                         "--out-pdf", solo_pdf], capture_output=True, text=True,
+                           timeout=120, cwd=tmp)
+        if r.returncode != 0 or not os.path.exists(solo_pdf) or "Traceback" in r.stderr:
+            return False, f"solo --out-pdf non genera la scheda ({(r.stdout + r.stderr).strip()[-160:]})"
+        r = subprocess.run(senza_html + ["--eccezione-etichetta", voci, "--nomi-eccezione", nomi],
+                           capture_output=True, text=True, timeout=60, cwd=tmp)
+        if r.returncode == 0 or "Traceback" in r.stderr or "--out-pdf" not in r.stdout:
+            return False, "senza --out-pdf ne' --out-html nessun fermo esplicito"
         # --esclusioni dalla riga di comando (04/11/2026): file valido, voce vietata nel
         # piano, campo non previsto
         esc_p = os.path.join(tmp, "esclusioni.json")
@@ -722,6 +735,7 @@ def verifica_scheda_etichetta():
         if con_esclusioni({"campo_ignoto": 1}).returncode == 0:
             return False, "campo non previsto in --esclusioni non fermato"
         return True, ("con i due file si genera, con nome e nota di peso; senza, si ferma; "
+                      "solo --out-pdf genera, nessuna uscita si ferma; "
                       "--esclusioni e i suoi fermi provati")
     finally:
         shutil.rmtree(tmp, ignore_errors=True)

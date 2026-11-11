@@ -2,7 +2,7 @@
 
 Modulo operativo: si carica quando si compone, si modifica o si valuta un piano.
 Dipende da **M1**: nessun passo è eseguibile senza il motore collaudato.
-Ultima modifica: 04/11/2026 (scatolame ammesso in consumo familiare; `scheda_cucina` nei metadati; file delle esclusioni al PASSO 6). 31/10/2026 pomeriggio (deroga INSA estesa ad acidi grassi e colesterolo; saturi e colesterolo nel report, sezione LIPIDI). 31/10/2026 (avvisi dei riferimenti solo per i profili scelti). 30/10/2026 sera (profili clinici e registro dei riferimenti all'apertura). 30/10/2026 (tappa 2: apertura con gli alimenti desiderati contro il database e
+Ultima modifica: 11/11/2026 (`obiettivo_intestazione` senza «Obiettivo» davanti: l'anteprima si ferma). 04/11/2026 (scatolame ammesso in consumo familiare; `scheda_cucina` nei metadati; file delle esclusioni al PASSO 6). 31/10/2026 pomeriggio (deroga INSA estesa ad acidi grassi e colesterolo; saturi e colesterolo nel report, sezione LIPIDI). 31/10/2026 (avvisi dei riferimenti solo per i profili scelti). 30/10/2026 sera (profili clinici e registro dei riferimenti all'apertura). 30/10/2026 (tappa 2: apertura con gli alimenti desiderati contro il database e
 le assunzioni da confermare; conferma dell'assenza di terapia nei metadati; PASSO 6 su un
 verdetto della pipeline senza bloccanti, anteprima consegnata come file; campi nuovi dei
 metadati). 23/10/2026: PASSO 6 con anteprima completa e impronta, metadati in bozza prima dell'approvazione, un giorno chiuso = una riga in chat; condimenti a porzione libera; `--nessuna-terapia`; 22/10:
@@ -488,7 +488,10 @@ accanto al CSV. È ciò che legge la chat B
   «Indicare qui allergie…», «titolo approvato». Elenco chiuso: i titoli d'esempio della
   zona dati del template («Nome piatto pranzo», «Colazione dolce 1», «Spuntino 1»,
   «Pasto libero o indicazioni»…) NON sono intercettati e si controllano a vista. Passano le
-  frasi vere che contengono le stesse parole e sigle o nomi brevi («NA», «N.D.»). Si
+  frasi vere che contengono le stesse parole e sigle o nomi brevi («NA», «N.D.»).
+  `obiettivo_intestazione` si scrive senza «Obiettivo» davanti: il PDF lo stampa già e
+  l'anteprima si ferma se il campo comincia con «Obiettivo»/«Obiettivi» (11/11/2026,
+  «Obiettivo: Obiettivo: 65 kg» in un PDF reale). Si
   ferma se `giorni`, `intestazione`, `indicazioni_giorno_libero` o `titoli_piatti` non
   sono oggetti, e se `versione_piano` non è un numero, con o senza «v» o «versione»
   davanti, anche con lettera finale (`"v3"`, `"2b"`); se manca, la nota del PDF esce

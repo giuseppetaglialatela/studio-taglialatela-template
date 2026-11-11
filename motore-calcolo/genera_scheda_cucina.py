@@ -123,6 +123,13 @@ def _orario(orari, primo, pasto):
 MIN_SCAMBI_COLONNA = 3
 
 
+def salumi():
+    """Nomi di scambi_carni.csv con ruolo salume: nella scheda portano la nota sul sale."""
+    ruoli = {r["food_id"]: r["ruolo"] for r in tc._righe("ruoli_alimenti.csv")}
+    return {s["nome_riferimento"] for s in tc.carica_scambi("scambi_carni.csv")
+            if ruoli.get(s["food_id"]) == "salume"}
+
+
 def _tabella_html(t):
     """Una riga per alternativa, una colonna per ogni voce del piano. Le voci con meno di
     tre scambi non occupano una colonna quasi vuota: vanno in una riga sotto la tabella."""
@@ -255,6 +262,7 @@ def componi(piano, db, nomi, meta, orari, target_kcal, etichetta=frozenset(), pa
     carbo, pesce, verd = (tc.tabella_carboidrati(piano, db, filtro=filtro, esc=esclusioni),
                           tc.tabella_pesce(piano, db, filtro=filtro, esc=esclusioni),
                           tc.tabella_verdure(piano, db, filtro=filtro, esc=esclusioni))
+    carni = tc.tabella_carni(piano, db, filtro=filtro, esc=esclusioni)
     note = meta.get("scheda_cucina") or {}
     seg = "".join(f" {E(s)}." for s in verd["segnalate"])
     gruppi_v = "".join(f"<b>{n}</b><div>{''.join(f'<span class=chip>{E(x)}</span>' for x in f)}</div>"
@@ -273,6 +281,18 @@ def componi(piano, db, nomi, meta, orari, target_kcal, etichetta=frozenset(), pa
         sez_c += f"<div class=n>{E(note['note_carboidrati'])}</div>"
     sez_p = (f"<h2>Pesce <span>stessa quantità di proteine</span></h2>{corpo(pesce)}"
              if pesce["righe"] else "")
+    # carni e affettati (11/11/2026): gli affettati portano «*» e la nota sul sale, perche'
+    # il motore non calcola il sodio; il dato resta a parita' di proteine
+    sal = salumi()
+    carni_v = dict(carni, colonne=[c + "*" if c in sal else c for c in carni["colonne"]],
+                   righe=[dict(r, nome=r["nome"] + "*" if r["nome"] in sal else r["nome"])
+                          for r in carni["righe"]])
+    nota_sale = ("<div class=n>* Affettato: contiene più sale della carne fresca.</div>"
+                 if carni["colonne"] and any(n.endswith("*") for n in
+                                             carni_v["colonne"] + [r["nome"] for r in carni_v["righe"]])
+                 else "")
+    sez_k = (f"<h2>Carni e affettati <span>stessa quantità di proteine</span></h2>"
+             f"{corpo(carni_v)}{nota_sale}" if carni["righe"] else "")
     sez_v = (f"<h2>Verdure <span>stesso peso, stesso gruppo</span></h2><div class=v>{gruppi_v}</div>"
              f"<div class=n>Patate e legumi non si scambiano con le verdure.{seg}</div>")
     top = "<div class=top><b>Dott. Giuseppe Taglialatela</b> <i>— Consulente in Nutrizione</i></div>"
@@ -291,8 +311,8 @@ def componi(piano, db, nomi, meta, orari, target_kcal, etichetta=frozenset(), pa
 {sez('Colazione', 'colazione')}{griglia_carte('colazione')}{spuntini}
 {salto}{"" if pagine == 3 else "<h2>Pranzo e cena</h2>"}{griglia(resto)}{foot(pagine - 1)}</div>
 <div class=pag>{top}<h1>Come scambiare gli alimenti</h1><div class=sub>{nome_paz} · Lo scambio vale nello stesso pasto</div>
-{sez_c}{sez_p}{sez_v}{foot(pagine)}</div></body></html>"""
-    return pagina, {"carboidrati": carbo, "pesce": pesce, "verdure": verd}
+{sez_c}{sez_p}{sez_k}{sez_v}{foot(pagine)}</div></body></html>"""
+    return pagina, {"carboidrati": carbo, "pesce": pesce, "carni": carni, "verdure": verd}
 
 
 def _prepara(piano_p, target_p, meta_p, orari_p=None, **kw):
@@ -435,7 +455,7 @@ def riepilogo(tabelle):
     celle = sum(tabelle[k]["da_file"]["celle"] for k in tabelle)
     if voci or celle:
         L.append(f"esclusioni del piano: tolte {voci} voci e {celle} caselle")
-    for nome in ("carboidrati", "pesce"):
+    for nome in ("carboidrati", "pesce", "carni"):
         s = scarto_massimo(tabelle[nome])
         L.append(f"{nome}: {len(tabelle[nome]['righe'])} righe, {tabelle[nome]['esclusi']} scambi "
                  f"esclusi dal filtro" + (f", scarto da {s[0]:+d} a {s[1]:+d} kcal" if s else ""))
@@ -446,6 +466,42 @@ def riepilogo(tabelle):
     if tabelle["verdure"]["fuori_elenco"]:
         L.append("verdure del piano fuori elenco: " + ", ".join(tabelle["verdure"]["fuori_elenco"]))
     return L
+
+
+def _autotest_carni(db):
+    """Caso golden della tabella carni e affettati (11/11/2026): grammature a parita' di
+    proteine ricalcolate a mano una volta e fissate qui; filtro, esclusioni, pasti e sale."""
+    problemi = []
+    riga = lambda p, f, q: {"giorno": "1", "pasto": p, "food_id": f, "grammi": q, "opzione": ""}
+    piano = [riga("pranzo", "106500", "100"), riga("cena", "101170", "120"),
+             riga("colazione", "100061", "40")]
+    t = tc.tabella_carni(piano, db)
+    if [r["food_id"] for r in t["righe"]] != ["106500", "101170"]:
+        problemi.append(f"carni: righe {[r['food_id'] for r in t['righe']]}, attese pollo e manzo "
+                        f"(solo pranzo e cena, la bresaola a colazione no)")
+    attese = {"Petto di tacchino": 95, "Coscia di pollo senza pelle": 125, "Lombo di maiale": 115,
+              "Fesa di tacchino affettata": 80, "Bresaola": 75, "Prosciutto cotto sgrassato": 105}
+    pollo = t["righe"][0]
+    for nome, g in attese.items():
+        c = pollo["celle"][t["colonne"].index(nome)] if nome in t["colonne"] else None
+        if not c or c["grammi"] != g:
+            problemi.append(f"carni: petto di pollo 100 g in {nome} non vale {g} g ({c})")
+    if "Filetto di manzo" in t["colonne"]:
+        problemi.append("carni: voce da_confermare proposta come alternativa")
+    manzo = t["righe"][1]
+    if manzo["celle"][t["colonne"].index("Petto di pollo")]["grammi"] != 105:
+        problemi.append("carni: filetto di manzo 120 g in petto di pollo non vale 105 g")
+    tf = tc.tabella_carni(piano, db, filtro=tc.Filtro(piano, db, 320))  # giorno ~312 kcal
+    if "Lombo di maiale" in tf["colonne"] and tf["righe"][0]["celle"][tf["colonne"].index("Lombo di maiale")]:
+        problemi.append("carni: scambio oltre il 2,5% del target (maiale +68 kcal su 320) rimasto")
+    if "Petto di tacchino" not in tf["colonne"]:
+        problemi.append("carni: scambio entro il 2,5% (tacchino) tolto")
+    te = tc.tabella_carni(piano, db, esc={"vieti": {"100061": "prova"}, "massimi": {}})
+    if "Bresaola" in te["colonne"] or te["da_file"]["voci"] != 1:
+        problemi.append("carni: bresaola vietata dal file delle esclusioni rimasta")
+    if "Bresaola" not in salumi() or "Petto di pollo" in salumi():
+        problemi.append("carni: affettati non riconosciuti per la nota sul sale")
+    return problemi
 
 
 def autotest():
@@ -528,6 +584,7 @@ def autotest():
     tp = tc.tabella_pesce(prova, db)
     if tp["righe"][0]["celle"][tp["colonne"].index("Spigola")]["grammi"] != 185:
         problemi.append("merluzzo 180 g in spigola non vale 185 g")
+    problemi += _autotest_carni(db)
     tv = tc.tabella_pesce([{"pasto": "cena", "food_id": "1313", "grammi": "150", "giorno": "1", "opzione": ""}], db,
                           filtro=tc.Filtro([], db, 1))
     if tv["colonne"] or "nessuno scambio previsto" not in _tabella_html(tv):
@@ -666,7 +723,7 @@ def _autotest_etichetta(tmp, meta):
         return [f"scheda con voce da etichetta fermata: {e}"]
     if "Vellutata di prova (peso da confezione)" not in pagina:
         problemi.append("voce da etichetta senza nome o nota di peso")
-    if any("ETI" in c or "Vellutata" in c for t in (tab["carboidrati"], tab["pesce"])
+    if any("ETI" in c or "Vellutata" in c for t in (tab["carboidrati"], tab["pesce"], tab["carni"])
            for c in t["colonne"]) or "Vellutata" in str(tab["verdure"]["gruppi"]):
         problemi.append("voce da etichetta proposta come scambio")
     for nome, kw in (("senza i file", base), ("senza i nomi", dict(base, eccezione_p=voci)),
@@ -695,6 +752,9 @@ def main():
         p = autotest()
         print("\n".join(p) or "Autotest della scheda superato.")
         return 1 if p else 0
+    if not o.out_html and not o.out_pdf:
+        print("FERMO: indicare --out-pdf (la scheda da consegnare) e, se serve, --out-html")
+        return 1
     try:
         dati = _dati(o.piano, o.target, o.metadati, o.orari, verdetto_p=o.verdetto,
                      eccezione_p=o.eccezione, nomi_eccezione_p=o.nomi_eccezione)
@@ -708,18 +768,27 @@ def main():
     except Fermo as e:
         print(f"FERMO: {e}")
         return 1
-    with open(o.out_html, "w", encoding="utf-8") as f:
-        f.write(pagina)
+    if o.out_html:
+        with open(o.out_html, "w", encoding="utf-8") as f:
+            f.write(pagina)
     print("\n".join(riepilogo(tabelle)))
     if not o.out_pdf:
         print("HTML non misurato: l'adattamento alle pagine avviene solo con --out-pdf")
         return 0
+    # --out-html e' facoltativo (11/11/2026): senza, la pagina misurata sta in una
+    # cartella temporanea, cancellata alla fine (prima: TypeError su open(None))
+    tmp_html = None if o.out_html else tempfile.mkdtemp()
+    html_p = o.out_html or os.path.join(tmp_html, "scheda.html")
     try:
         n_giorni = len({r["giorno"] for r in dati[0]}) + 1
-        esito = adatta(lambda p, k: componi(*dati, pagine=p, giorni_p1=k, esclusioni=esc)[0], o.out_html, o.out_pdf, n_giorni)
+        esito = adatta(lambda p, k: componi(*dati, pagine=p, giorni_p1=k, esclusioni=esc)[0], html_p, o.out_pdf, n_giorni)
     except Fermo as e:
         print(f"FERMO: {e}")
         return 1
+    finally:
+        if tmp_html:
+            import shutil
+            shutil.rmtree(tmp_html, ignore_errors=True)
     print(f"pagine: {len(esito)}")
     for n, nome, fv in esito:
         print(f"pagina {n}: livello «{nome}», ingredienti a {fv:g} punti")

@@ -88,6 +88,7 @@ FILE_DA_VERIFICARE = [
     "scambi_frutta.csv",
     "scambi_carboidrati.csv",
     "scambi_pesce.csv",
+    "scambi_carni.csv",
     "scambi_verdure.csv",
     "ruoli_alimenti.csv",
     "accoppiamenti_vietati.csv",

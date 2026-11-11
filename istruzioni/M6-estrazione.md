@@ -426,3 +426,17 @@ sta tra 195 e 272 kcal e tra 13,5 e 21,5 g di grassi per 100 g, e la mozzarella 
 più bassi di energia e grassi: è una stima per eccesso. Nome per il paziente «Primo sale»,
 ruolo formaggio, a peso al banco (assente da `formati_confezione.csv`: qualsiasi grammatura).
 Il controllo 14 del collaudo lo verifica contro la scheda BDA 1718.
+
+## 13. TABELLA CARNI E AFFETTATI — VOCI MANCANTI, 11/11/2026
+
+Per la tabella di scambio delle carni (M3 sezione 3 bis) servivano anche **coniglio** e
+**fesa di vitello**, assenti da `alimenti.csv`. Non aggiunti (decisione del nutrizionista:
+mai valori a mano) e non scritti in `gap.csv`, che dichiara solo nutrienti mancanti di voci
+GIÀ presenti (il collaudo rifiuta un `food_id` che non è in `alimenti.csv`). Fonti
+disponibili per quando un piano li richiede (criterio Key Foods):
+- coniglio: CREA 107010 «Coniglio intero, crudo» e 107030 «Coniglio, coscio, crudo»;
+  BDA-IEO 1081 «Coniglio, carne magra», 8668 «coscio», 8666 «intero».
+- fesa di vitello: nessuna voce specifica né in CREA né in BDA-IEO. CREA ha solo il filetto di
+  vitello (101520, già in database) e la fesa di bovino adulto (101160); BDA-IEO ha «vitello
+  4 mesi, carne magra» generico (1006). Servirebbe un proxy dichiarato, su decisione del
+  nutrizionista.

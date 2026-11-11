@@ -10,6 +10,11 @@ DATI
                           a parita' di carboidrati, arrotondati a 5 g.
   scambi_pesce.csv        stesso schema: grammi equivalenti a 100 g di merluzzo, a
                           parita' di proteine, arrotondati a 5 g.
+  scambi_carni.csv        stesso schema (decisione del nutrizionista, 11/11/2026): carni e
+                          affettati, grammi equivalenti a 100 g di petto di pollo, a parita'
+                          di proteine, arrotondati a 5 g. Gli affettati (ruolo salume) sono
+                          segnati nella scheda con la nota sul sale: il motore non calcola
+                          il sodio.
   scambi_verdure.csv      food_id, nome_riferimento, uso (crude|cotte|entrambe), stato.
                           A parita' di peso; patate e legumi esclusi.
   Stato: 'confermato' = compare come alternativa; 'da_confermare' = compare solo come
@@ -43,10 +48,15 @@ BASE = os.path.dirname(os.path.abspath(__file__))
 PASSO_G = 5
 RIF_CARBOIDRATI = ("000800", 80.0)     # pasta cruda
 RIF_PESCE = ("1313", 100.0)            # merluzzo
+RIF_CARNI = ("106500", 100.0)          # petto di pollo
 SOGLIA_CARBOIDRATI_VERDURA = 5.0       # g/100 g: oltre, la verdura si segnala
 SOGLIA_FIBRA_VERDURA = 5.0             # g/100 g: oltre, la verdura si segnala
 RUOLI_AMMESSI = {"carboidrati": {"cereale", "patate"}, "pesce": {"pesce", "molluschi_crostacei"},
-                 "verdure": {"verdura"}}
+                 "carni": {"carne", "salume"}, "verdure": {"verdura"}}
+# tabelle a grammature ricalcolate: file, riferimento (food_id, grammi), nutriente
+TABELLE_GRAMMI = {"scambi_carboidrati.csv": (RIF_CARBOIDRATI, "carboidrati_g"),
+                  "scambi_pesce.csv": (RIF_PESCE, "proteine_g"),
+                  "scambi_carni.csv": (RIF_CARNI, "proteine_g")}
 USI_VERDURE = {"crude", "cotte", "entrambe"}
 STATI = {"confermato", "da_confermare", "solo_piano"}
 PASTI_PRINCIPALI = ("pranzo", "cena")
@@ -197,6 +207,10 @@ def tabella_pesce(piano, db, base=None, filtro=None, esc=None):
     return _tabella(piano, db, carica_scambi("scambi_pesce.csv", base), "proteine_g", filtro, esc)
 
 
+def tabella_carni(piano, db, base=None, filtro=None, esc=None):
+    return _tabella(piano, db, carica_scambi("scambi_carni.csv", base), "proteine_g", filtro, esc)
+
+
 def _fasce(voci, grammi, limite):
     """voci: [(kcal/100 g, nome, food_id)] in ordine. Fasce in cui due voci qualsiasi, a
     quel peso, differiscono al massimo di 'limite' kcal."""
@@ -272,8 +286,7 @@ def tabella_verdure(piano, db, base=None, filtro=None, esc=None):
 def attese(nome, base=None, db=None):
     """grammi_porzione ricalcolati da alimenti.csv."""
     db = db or carica_db(base)
-    rif, g, campo = ((*RIF_CARBOIDRATI, "carboidrati_g") if nome == "scambi_carboidrati.csv"
-                     else (*RIF_PESCE, "proteine_g"))
+    (rif, g), campo = TABELLE_GRAMMI[nome]
     return {s["food_id"]: equivalente(g, rif, s["food_id"], campo, db)
             for s in carica_scambi(nome, base)}
 
@@ -284,7 +297,7 @@ def controlla(base=None):
     db = carica_db(base)
     ruoli = {r["food_id"]: r["ruolo"] for r in _righe("ruoli_alimenti.csv", base)}
     for nome, tipo in (("scambi_carboidrati.csv", "carboidrati"), ("scambi_pesce.csv", "pesce"),
-                       ("scambi_verdure.csv", "verdure")):
+                       ("scambi_carni.csv", "carni"), ("scambi_verdure.csv", "verdure")):
         righe = carica_scambi(nome, base)
         visti = set()
         for s in righe:
@@ -312,7 +325,7 @@ def controlla(base=None):
 
 def rigenera(base=None):
     """Riscrive grammi_porzione dai dati di alimenti.csv."""
-    for nome in ("scambi_carboidrati.csv", "scambi_pesce.csv"):
+    for nome in TABELLE_GRAMMI:
         att = attese(nome, base)
         righe = carica_scambi(nome, base)
         with open(os.path.join(base or BASE, nome), "w", newline="", encoding="utf-8") as f:

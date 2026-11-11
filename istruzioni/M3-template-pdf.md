@@ -2,7 +2,7 @@
 
 Modulo operativo. Si carica **dopo l'approvazione dei calcoli**, per generare i due
 deliverable che il paziente riceve.
-Ultimo aggiornamento: 11/11/2026 (uova a pezzi in anteprima, PDF e scheda). 04/11/2026 (scheda per chi cucina in due pagine, con le tabelle di conversione, in ogni dieta). 30/10/2026 (verdetto della pipeline allegato e richiesto da PDF e verifica;
+Ultimo aggiornamento: 11/11/2026 (uova a pezzi in anteprima, PDF e scheda; tabella carni e affettati nella scheda; `--out-html` facoltativo; fermo su «Obiettivo» ripetuto). 04/11/2026 (scheda per chi cucina in due pagine, con le tabelle di conversione, in ogni dieta). 30/10/2026 (verdetto della pipeline allegato e richiesto da PDF e verifica;
 documento di spiegazione generato con `genera_spiegazione.py`, che si ferma su segnaposto,
 parentesi quadre, struttura e nome del paziente). 23/10/2026: testo del documento di spiegazione approvato prima della consegna; template di spiegazione: elenchi puntati «•» al posto di «●», che il font non ha e stampava «NO GLYPH», unica modifica al motore grafico autorizzata dal nutrizionista; impronta dell'approvazione: il PDF si ferma se piano o testi sono cambiati, `--verifica-impronta` prima del documento di spiegazione, orari tra gli allegati; 22/10: fermo sui segnaposto nei testi del paziente; prima: 30/09/2026, secondo spuntino, fino a 5 pasti nel PDF). Presuppone **M2 già eseguito** (in chat A):
 copre i suoi PASSO 7 e PASSO 8 e non si esegue prima. **In chat B M2 e M1 non si
@@ -317,6 +317,17 @@ di conversione, personalizzate sulle voci del piano:
   e lo scarto in kcal dichiarato. Quinoa e piadina compaiono solo se sono nel piano,
   mai come alternative (`solo_piano`): a parità di carboidrati superano le 100 kcal in più.
 - **Pesce:** a parità di proteine, stesso arrotondamento.
+- **Carni e affettati (11/11/2026):** a parità di proteine, riferimento 100 g di petto di
+  pollo, stesso arrotondamento, stesso filtro, stesse esclusioni (`scambi_carni.csv`).
+  Alternative: petto di pollo, petto di tacchino, coscia di pollo senza pelle, lombo di
+  maiale, fesa di tacchino affettata, bresaola, prosciutto cotto sgrassato. Vitellone magro,
+  filetto di manzo, filetto di vitello, macinato magro e prosciutto crudo sono
+  `da_confermare`: compaiono come riga se sono nel piano, mai come alternativa. Coniglio e
+  fesa di vitello non sono nel database (M6, sezione 13). Gli affettati (ruolo salume)
+  portano «*» e la nota «Affettato: contiene più sale della carne fresca.»: il motore non
+  calcola il sodio. Per un paziente che deve limitare il sale, gli affettati si tolgono
+  con `--esclusioni`. Come il pesce, la tabella guarda solo pranzo e cena: un affettato a
+  colazione o a spuntino non diventa una riga.
 - **Voci con meno di 3 scambi:** non occupano una colonna, vanno in una riga sotto la tabella.
 - **Verdure:** a parità di peso, gruppi crude e cotte, patate e legumi esclusi, segnalate
   quelle che si discostano.
@@ -329,7 +340,7 @@ stanno nel documento di spiegazione.
 
 Si genera con `genera_scheda_cucina.py` (M1) dopo il PDF: si ferma senza verdetto e
 impronta approvata. Un piano con eccezione etichetta richiede gli stessi due file del PDF
-(`--eccezione-etichetta`, `--nomi-eccezione`): la voce sta nella settimana, non negli scambi. Le tabelle non si scrivono a mano. Si genera sempre con `--out-pdf`.
+(`--eccezione-etichetta`, `--nomi-eccezione`): la voce sta nella settimana, non negli scambi. Le tabelle non si scrivono a mano. Si genera sempre con `--out-pdf`; `--out-html` è facoltativo (11/11/2026: prima, senza, lo script andava in errore), senza nessuno dei due si ferma.
 
 **Esclusioni del piano (04/11/2026).** La scheda genera gli scambi dagli elenchi generali e non
 sa cosa una dieta vieta. Per un piano con alimenti vietati o limiti di porzione si passa
