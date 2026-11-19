@@ -1,6 +1,7 @@
 # MB — REGISTRO BIBLIOGRAFICO
 Modulo operativo del progetto editoriale e formativo — Studio Taglialatela
-Ultima modifica: 17/08/2026 · Dipendenze: nessuna · Rilievo R34
+Ultima modifica: 19/11/2026 (tema T7 e deroga sulle fonti di settore, sezioni 4 e 5.2;
+nome del file allineato al router: `MB_bibliografia.md`) · Dipendenze: nessuna · Rilievo R34
 
 ---
 
@@ -125,8 +126,8 @@ mai in una citazione biomedica.
 | Campo | Contenuto | Note |
 |---|---|---|
 | `id` | `F001`, `F002`, … | Progressivo, mai riutilizzato anche se una riga viene rimossa |
-| `livello` | `1`-`4` | Gerarchia delle fonti (sezione 5) |
-| `tipo` | `RCP`, `normativa`, `linea_guida`, `review`, `studio`, `dato_istituzionale` | Vocabolario chiuso |
+| `livello` | `1`-`4`, oppure `S` | Gerarchia delle fonti (sezione 5); `S` solo per la deroga T7 (sezione 5.2) |
+| `tipo` | `RCP`, `normativa`, `linea_guida`, `review`, `studio`, `dato_istituzionale`, `fonte_di_settore` | Vocabolario chiuso; `fonte_di_settore` solo con la deroga T7 |
 | `citazione` | Riferimento completo in stile Vancouver | Punto e virgola ammessi: il separatore è `\|` |
 | `identificatore` | PMID, DOI o URL | Uno solo, il più stabile disponibile |
 | `data_documento` | `AAAA-MM-GG` o `AAAA-MM` o `AAAA` | La data DELLA FONTE, non della consultazione |
@@ -184,6 +185,7 @@ titolo riformulato: «nessuna differenza significativa vs placebo a 12 settimane
 | `T4` | Deprescribing e paziente anziano polifarmaco |
 | `T5` | Counseling nelle affezioni minori |
 | `T6` | Categorie di integratori al banco: interazioni per prodotto |
+| `T7` | Acquisto e valutazione della farmacia (requisiti, cessione, valore, finanziamento, procedura) |
 | `T0` | Trasversale (dati di settore, contesto normativo generale) |
 
 Una fonte può servire più temi. È il caso normale, non l'eccezione: gli RCP
@@ -223,6 +225,34 @@ Conseguenza accettata: talvolta l'unico dato utilizzabile sarà straniero. Si us
 di provenienza interessata. Nessuna classifica di vendita si afferma su questa
 base; ciò che si può dire è cosa arriva più spesso al banco, dichiarato
 esplicitamente come esperienza professionale.
+
+**Deroga per il tema T7 — fonti di settore sui dati di mercato.**
+*Regola approvata dal titolare il 18/11/2026.* Sull'acquisto e la valutazione di
+una farmacia molti numeri (multipli di prezzo, quota finanziata dalle banche,
+tempi delle pratiche, margini, peso del magazzino) esistono quasi solo sulla
+stampa di settore. Con la regola generale le unità sul valore e sul
+finanziamento direbbero quasi sempre «dato non disponibile». Per il solo tema
+`T7` valgono queste condizioni, tutte insieme:
+1. **Solo dati economici e di mercato.** Mai norme, giurisprudenza o
+   procedure amministrative: quelle solo dal testo ufficiale.
+2. **Prima la risalita.** Si tenta sempre di risalire alla fonte originale; la
+   deroga vale solo se la risalita fallisce, e il fallimento si scrive
+   nell'`esito_sintetico` (cosa si è cercato, dove).
+3. **Dichiarazione nel testo:** «riportato da [testata], non verificato su fonte
+   primaria».
+4. **Due testate indipendenti** concordi per ogni numero che regge una
+   conclusione; con una sola testata il numero si cita come indicativo e non
+   regge conclusioni.
+5. **Intermediari di compravendita esclusi** (agenzie e portali che vendono
+   farmacie): hanno interesse economico sul prezzo, lo stesso conflitto della
+   sezione 5.4 senza possibilità di ancoraggio.
+6. **Gli studi professionali che pubblicano analisi proprie** (per esempio
+   elaborazioni su bilanci depositati) non sono riviste: sono fonti primarie non
+   istituzionali, ammesse con metodo dichiarato nell'`esito_sintetico`.
+Registrazione: `livello` = `S` (fonte di settore, fuori dalla gerarchia 1-4),
+`tipo` = `fonte_di_settore`. La regola delle indagini commissionate resta
+valida: un'indagine commissionata da un'associazione di categoria non rientra
+nella deroga.
 
 ### 5.3 Modalità di lettura ammesse per il livello 1
 
