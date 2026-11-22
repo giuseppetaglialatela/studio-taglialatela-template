@@ -331,7 +331,11 @@ def componi(piano, db, nomi, meta, orari, target_kcal, etichetta=frozenset(), pa
                       f"Taglialatela · {n}/{pagine}</span></div>")
     griglia = lambda c: f'<div class="griglia giorni">{"".join(c)}</div>'
     blocchi = [("carboidrati", sez_c), ("pesce", sez_p), ("carni", sez_k), ("verdure", sez_v)]
-    blocchi = [(n, s) for n, s in blocchi if s]
+    scelte = tc.tabelle_scelte(esclusioni)          # campo «tabelle» (22/11/2026)
+    blocchi = [(n, s) for n, s in blocchi if s and n in scelte]
+    if not blocchi:
+        raise Fermo(f"scheda: nessuna delle tabelle scelte ({', '.join(scelte)}) ha voci in "
+                    f"questo piano: rivedere il campo «tabelle» del file delle esclusioni")
     spostati = []
     if in_coda:
         if pagine != 3:
@@ -355,7 +359,8 @@ def componi(piano, db, nomi, meta, orari, target_kcal, etichetta=frozenset(), pa
 {salto}{"" if pagine == 3 else "<h2>Pranzo e cena</h2>"}{griglia(resto)}{coda}{foot(pagine - 1)}</div>
 <div class=pag>{top}<h1>Come scambiare gli alimenti</h1><div class=sub>{nome_paz} · Lo scambio vale nello stesso pasto</div>
 {"".join(s for _, s in blocchi)}{foot(pagine)}</div></body></html>"""
-    return pagina, {"carboidrati": carbo, "pesce": pesce, "carni": carni, "verdure": verd}
+    tutte = {"carboidrati": carbo, "pesce": pesce, "carni": carni, "verdure": verd}
+    return pagina, {n: tutte[n] for n in scelte}
 
 
 def _prepara(piano_p, target_p, meta_p, orari_p=None, **kw):
@@ -500,15 +505,17 @@ def adatta(costruisci, html_p, pdf_p, n_giorni):
 
 def riepilogo(tabelle):
     """Righe per il nutrizionista, in chat: gli scarti e cio' che resta fuori."""
-    L = []
+    L = ["tabelle incluse: " + ", ".join(tabelle)]
     voci = sum(tabelle[k]["da_file"]["voci"] for k in tabelle)
     celle = sum(tabelle[k]["da_file"]["celle"] for k in tabelle)
     if voci or celle:
         L.append(f"esclusioni del piano: tolte {voci} voci e {celle} caselle")
-    for nome in ("carboidrati", "pesce", "carni"):
+    for nome in [n for n in ("carboidrati", "pesce", "carni") if n in tabelle]:
         s = scarto_massimo(tabelle[nome])
         L.append(f"{nome}: {len(tabelle[nome]['righe'])} righe, {tabelle[nome]['esclusi']} scambi "
                  f"esclusi dal filtro" + (f", scarto da {s[0]:+d} a {s[1]:+d} kcal" if s else ""))
+    if "verdure" not in tabelle:
+        return L
     v = tabelle["verdure"]
     L.append(f"verdure: {sum(len(f) for g in v['gruppi'].values() for f in g)} in tabella, "
              f"{v['esclusi']} escluse dal filtro" +
@@ -743,6 +750,19 @@ def _autotest_esclusioni(tmp, db):
         problemi.append("esclusioni: gruppo Crude con voci non ammesse")
     if tc.controlla_esclusioni(piano, esc({"escludi_food_id": {"1313": "merluzzo"}})) != ["1313"]:
         problemi.append("esclusioni: voce vietata nel piano non rilevata")
+    # campo «tabelle» (22/11/2026): valori ammessi, elenco vuoto, ripetizioni, default
+    for nome, cont in (("tabella non prevista", {"tabelle": ["pesce", "dolci"]}),
+                       ("elenco vuoto", {"tabelle": []}), ("non un elenco", {"tabelle": "pesce"}),
+                       ("ripetizione", {"tabelle": ["pesce", "pesce"]})):
+        try:
+            esc(cont)
+            problemi.append(f"esclusioni: tabelle con {nome} accettate")
+        except ValueError:
+            pass
+    if tc.tabelle_scelte(None) != tc.TABELLE_SCHEDA or tc.tabelle_scelte(esc({})) != tc.TABELLE_SCHEDA:
+        problemi.append("esclusioni: senza il campo «tabelle» non ci sono tutte e quattro")
+    if tc.tabelle_scelte(esc({"tabelle": ["verdure", "pesce"]})) != ("pesce", "verdure"):
+        problemi.append("esclusioni: tabelle scelte non nell'ordine della scheda")
     return problemi
 
 

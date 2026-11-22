@@ -366,6 +366,23 @@ riga vuota sparisce; se `verdure_crude_ammesse` c'è, il gruppo Crude contiene s
 Una voce vietata presente nel piano, un `food_id` sconosciuto o un campo non previsto fermano la
 scheda. Senza il file, la scheda di un piano con esclusioni non si consegna.
 
+**Tabelle scelte per piano (decisione del nutrizionista, 22/11/2026).** Di default la scheda
+ha tutte e quattro le tabelle: carboidrati, pesce, carni, verdure. Per un piano che ne vuole
+meno, la scelta si decide al PASSO 6 e si scrive nello stesso file delle esclusioni, campo
+`tabelle` (un piano senza altre esclusioni ha un file con il solo campo `tabelle`):
+```
+{"tabelle": ["pesce", "verdure"]}
+```
+Valori ammessi `carboidrati`, `pesce`, `carni`, `verdure`, in qualsiasi ordine (in scheda
+restano nell'ordine fisso). Un valore non previsto, un elenco vuoto, un valore ripetuto o un
+campo che non è un elenco fermano la scheda; la ferma anche una scelta in cui nessuna tabella
+ha voci in quel piano. Senza il campo o senza il file: quattro tabelle, scheda identica a
+prima, quindi le diete già consegnate non cambiano. Con meno tabelle l'impaginazione si rifà
+da sola (anche in due pagine) e il rimando «a pagina 2, sotto la settimana» compare solo se un
+blocco viene davvero spostato. La prima riga del riepilogo in chat dice le tabelle incluse.
+Il file non entra nell'impronta: la scelta va riportata nella tabella del PASSO 6 e nelle
+istruzioni di passaggio, con il file tra quelli da allegare in chat B.
+
 **Adattamento al contenuto (04/11/2026).** Il contenuto del piano non si cambia per far
 entrare la scheda. Il motore prova due pagine, riducendo spazi e poi scrittura fino al minimo
 di 9 punti per gli ingredienti; sotto non si scende. Griglie regolari in ogni livello: nessun

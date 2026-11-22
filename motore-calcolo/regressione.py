@@ -515,6 +515,12 @@ def modo_verifica():
     if not ok_mp:
         falliti += 1
         ok_cli = False
+    # Tabelle scelte per piano (22/11/2026): solo pesce e verdure; senza il campo
+    ok_ts, msg_ts = verifica_scheda_tabelle_scelte()
+    print(f"\n  [{'OK ' if ok_ts else 'XX '}] scheda con tabelle scelte: {msg_ts}")
+    if not ok_ts:
+        falliti += 1
+        ok_cli = False
     # Calcolo esatto dei pasti a scelta (tappa 1, 29/10/2026): giorno e
     # settimana confrontati con la forza bruta su casi casuali a seme fisso
     import combinazioni
@@ -915,6 +921,67 @@ def verifica_scheda_molte_porzioni():
         gsc._tabella_righe_html = vecchia
     return True, (f"14 porzioni (9 di pane), 4 colonne, {len(e)} pagine, minimo {min(x[2] for x in e):g} pt; "
                   f"a colonne per porzione si ferma")
+
+
+def verifica_scheda_tabelle_scelte():
+    """Tabelle scelte per piano (22/11/2026), sul piano pieno che con quattro tabelle va in tre
+    pagine con Verdure e Carni in coda alla pagina 2. 1) Campo «tabelle» = pesce e verdure: solo
+    quelle due, impaginazione rifatta, nessun rimando a pagina 2 se non serve, riepilogo con le
+    tabelle incluse. 2) File senza il campo: pagina identica a quella senza file (le diete gia'
+    consegnate non cambiano) e quattro tabelle."""
+    import json as _j
+    import tempfile
+    import genera_zona_piano as gzp
+    import genera_scheda_cucina as gsc
+    import tabelle_conversione as tc
+    try:
+        import playwright  # noqa: F401
+    except ImportError:
+        return True, "NON ESEGUITO: Chromium assente in questa sessione"
+    db = gzp.carica_alimenti(os.path.join(BASE, "alimenti.csv"))
+    nomi = gzp.carica_nomi(os.path.join(BASE, "nomi_paziente.csv"))
+    righe, meta, target = _piano_scheda_pieno()
+    tmp = tempfile.mkdtemp()
+    h, p = os.path.join(tmp, "s.html"), os.path.join(tmp, "s.pdf")
+
+    def esc(contenuto):
+        f = os.path.join(tmp, "esc.json")
+        with open(f, "w", encoding="utf-8") as fh:
+            _j.dump(contenuto, fh)
+        return tc.carica_esclusioni(f, tc.carica_db())
+
+    def fai(e):
+        pag = gsc.adatta(lambda n, k, c=0: gsc.componi(righe, db, nomi, meta, {}, target, pagine=n,
+                                                       giorni_p1=k, esclusioni=e, in_coda=c)[0], h, p, 7)
+        return pag, open(h, encoding="utf-8").read().replace('"', "")
+    titoli = {"carboidrati": "<h2>Carboidrati", "pesce": "<h2>Pesce", "carni": "<h2>Carni e affettati",
+              "verdure": "<h2>Verdure"}
+    try:
+        due = esc({"tabelle": ["pesce", "verdure"]})
+        pag_d, html_d = fai(due)
+        presenti = [n for n, t in titoli.items() if t in html_d]
+        if presenti != ["pesce", "verdure"]:
+            return False, f"con pesce e verdure la scheda ha: {presenti}"
+        if "sotto la settimana" in html_d or "class=coda" in html_d:
+            return False, "rimando a pagina 2 presente senza spostamenti"
+        rie = gsc.riepilogo(gsc.componi(righe, db, nomi, meta, {}, target, esclusioni=due)[1])
+        if rie[0] != "tabelle incluse: pesce, verdure":
+            return False, f"riepilogo senza le tabelle incluse: {rie[0]}"
+        pag_n, html_n = fai(None)
+        pag_v, html_v = fai(esc({}))
+        if html_v != html_n or pag_v != pag_n:
+            return False, "file senza il campo «tabelle»: scheda diversa da quella senza file"
+        if [n for n, t in titoli.items() if t in html_n] != list(titoli):
+            return False, "senza il campo non ci sono tutte e quattro le tabelle"
+        try:
+            gsc.componi(righe, db, nomi, meta, {}, target, esclusioni=dict(due, tabelle=("dolci",)))
+            return False, "tabella non prevista non fermata in componi"
+        except Exception:
+            pass
+    except gsc.Fermo as x:
+        return False, f"scheda fermata: {str(x)[:160]}"
+    return True, (f"pesce e verdure: {len(pag_d)} pagine, nessun rimando; senza il campo: quattro "
+                  f"tabelle, {len(pag_n)} pagine, scheda identica a quella senza file")
 
 
 def _pdf_senza_piede(p, tmp):

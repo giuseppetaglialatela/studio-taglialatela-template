@@ -31,7 +31,9 @@ verdura del piano non resta mai vuota in silenzio.
 
 Esclusioni del singolo piano (04/11/2026): file JSON facoltativo, fuori dal repository e
 dai metadati, con le chiavi escludi_food_id, massimo_g_a_pasto e verdure_crude_ammesse
-(carica_esclusioni). Toglie dalle tabelle cio' che quella dieta vieta.
+(carica_esclusioni). Toglie dalle tabelle cio' che quella dieta vieta. Dal 22/11/2026 anche
+«tabelle»: quali tabelle includere nella scheda (carboidrati, pesce, carni, verdure); senza
+il campo tutte e quattro; un valore non previsto, un elenco vuoto o ripetizioni fermano.
 
 La colonna grammi_porzione e' controllata dal collaudo (controllo 13): se alimenti.csv
 cambia, il collaudo si ferma finche' non si esegue --rigenera.
@@ -64,7 +66,11 @@ QUOTA_SCAMBIO = 0.025                  # dello scarto ammesso sul target giornal
 LIMITE_GIORNO = 0.10                   # limite di sicurezza del nucleo, principio 8
 
 
-CHIAVI_ESCLUSIONI = ("escludi_food_id", "massimo_g_a_pasto", "verdure_crude_ammesse")
+CHIAVI_ESCLUSIONI = ("escludi_food_id", "massimo_g_a_pasto", "verdure_crude_ammesse", "tabelle")
+# Tabelle della scheda, nell'ordine in cui compaiono. Il campo «tabelle» del file delle
+# esclusioni (decisione del nutrizionista, 22/11/2026) sceglie quali includere per quel
+# piano; senza il campo (o senza il file) ci sono tutte e quattro.
+TABELLE_SCHEDA = ("carboidrati", "pesce", "carni", "verdure")
 
 
 def carica_esclusioni(path, db):
@@ -90,8 +96,25 @@ def carica_esclusioni(path, db):
     for f, g in massimi.items():
         if isinstance(g, bool) or not isinstance(g, (int, float)) or g <= 0:
             raise ValueError(f"{path}: massimo non valido per {f}: {g}")
+    tabelle = dati.get("tabelle")
+    if tabelle is not None:
+        if not isinstance(tabelle, list) or not tabelle:
+            raise ValueError(f"{path}: «tabelle» deve essere un elenco non vuoto tra "
+                             f"{', '.join(TABELLE_SCHEDA)}")
+        ignote = [t for t in tabelle if t not in TABELLE_SCHEDA]
+        if ignote:
+            raise ValueError(f"{path}: tabelle non previste: {', '.join(map(str, ignote))} "
+                             f"(ammesse: {', '.join(TABELLE_SCHEDA)})")
+        if len(set(tabelle)) != len(tabelle):
+            raise ValueError(f"{path}: «tabelle» contiene ripetizioni")
     return {"vieti": set(vieti), "massimi": {f: float(g) for f, g in massimi.items()},
-            "crude": None if crude is None else set(crude)}
+            "crude": None if crude is None else set(crude),
+            "tabelle": None if tabelle is None else tuple(t for t in TABELLE_SCHEDA if t in tabelle)}
+
+
+def tabelle_scelte(esc):
+    """Tabelle da includere: quelle del campo «tabelle», altrimenti tutte e quattro."""
+    return (esc or {}).get("tabelle") or TABELLE_SCHEDA
 
 
 def controlla_esclusioni(piano, esc):
