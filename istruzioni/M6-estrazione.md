@@ -234,7 +234,7 @@ scremato; insalata generica = lattuga; aromi senza grammatura omessi.
 
 ## 5. CERCATI E NON TROVATI — non riprovare
 
-primo sale (dal 11/11/2026 proxy dichiarato, sezione 12) · muesli · misto cereali e legumi precotti in busta · condimento
+primo sale (dal 11/11/2026 proxy dichiarato, sezione 12) · pomodori piccadilly (22/11/2026, sezione 15) · muesli · misto cereali e legumi precotti in busta · condimento
 verdure Saclà · hamburger di tacchino confezionato.
 
 **Kefir** — cercato su tutte e tre le fonti il 28/07/2026, anche come "latte
@@ -475,3 +475,19 @@ Lacune emerse componendo il piano di un paziente nuovo (codice su Drive). Nessun
   scritti alla soglia BDA 0,005 g. Peso: bevanda pronta, 1 tazzina = 30 g (porzione BDA).
   Ruolo nuovo `bevanda` in `accoppiamenti.RUOLI_AMMESSI`, categoria `altro`. Lo zucchero
   nel caffè si scrive a parte (201500).
+
+## 15. POMODORI CILIEGINI — 22/11/2026
+
+Dalla chat B di un piano in corso. **Pomodori ciliegini crudi (006650):** tutto da CREA 006650
+«Pomodorini ciliegino, freschi» (kcal, macro, fibra, calcio, ferro, folati, zinco, magnesio,
+vitamina C, analitici; kcal calcolate). Non c'è in BDA-IEO; vitamina D e B12 a 0, zero
+biologico (vegetale, come i pomodori da insalata 391). Lipidi: colesterolo 0 da CREA (zero
+logico), EPA/DHA 0 (vegetale); saturi, mono e poli in `gap.csv`: CREA non pubblica gli acidi
+grassi, BDA-IEO non ha la voce, USDA 321360 «Tomatoes, grape, raw» non li riporta. Effetto
+trascurabile: grassi 0,4 g/100 g. Nome per il paziente «Pomodorini ciliegini», crudi; ruolo
+verdura; gruppo crude in `scambi_verdure.csv`; porzione libera. Nota: 37 kcal/100 g, il doppio
+del pomodoro da insalata (19), per gli zuccheri (carboidrati 7,2 g contro 2,8).
+
+**Pomodori piccadilly:** cercati in CREA (cache e sito), BDA-IEO (cache e `BDA_alimenti.xlsx`)
+e USDA (solo «grape» e «cherry» generici): nessuna voce propria. Il nutrizionista ha deciso di
+rinunciare (22/11/2026): niente proxy. Non riprovare senza una fonte nuova.

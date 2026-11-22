@@ -313,9 +313,15 @@ piano, con la stessa veste professionale.
 Decisione del nutrizionista, 04/11/2026: ogni dieta ha una scheda per chi cucina, separata
 dal PDF del piano, che resta congelato: la settimana, a riquadri per giorno, e le tabelle
 di conversione, personalizzate sulle voci del piano:
-- **Carboidrati:** a parità di carboidrati, arrotondati a 5 g, con la colonna della pasta
-  e lo scarto in kcal dichiarato. Quinoa e piadina compaiono solo se sono nel piano,
-  mai come alternative (`solo_piano`): a parità di carboidrati superano le 100 kcal in più.
+- **Carboidrati:** a parità di carboidrati, arrotondati a 5 g, scarto in kcal dichiarato.
+  Dal 22/11/2026 (decisione del nutrizionista) le alternative sono solo pasta, riso, pane
+  comune e patate; couscous, pane integrale, pasta e riso integrali, riso basmati, farro,
+  orzo, quinoa e piadina sono `solo_piano`: compaiono come righe se sono nel piano, mai come
+  alternative. Tabella GIRATA: una riga per porzione del piano, raggruppate per alimento, e
+  una colonna per alternativa (al massimo 4), così la larghezza non dipende dal numero di
+  porzioni (un piano con 9 porzioni di pane, 2 di pasta, 2 di patate e 1 di riso faceva 14
+  colonne e la scheda si fermava con «testo tagliato dal bordo»). Le porzioni con meno di 3
+  scambi restano righe, con «—».
 - **Pesce:** a parità di proteine, stesso arrotondamento. Dall'11/11/2026 anche orata e
   salmone: a parità di proteine con 100 g di merluzzo portano +64 e +96 kcal, quindi il
   filtro del 2,5% li toglie spesso come scambio del pesce magro; restano tra loro e con le
@@ -331,7 +337,8 @@ di conversione, personalizzate sulle voci del piano:
   calcola il sodio. Per un paziente che deve limitare il sale, gli affettati si tolgono
   con `--esclusioni`. Come il pesce, la tabella guarda solo pranzo e cena: un affettato a
   colazione o a spuntino non diventa una riga.
-- **Voci con meno di 3 scambi:** non occupano una colonna, vanno in una riga sotto la tabella.
+- **Voci con meno di 3 scambi (pesce, carni):** non occupano una colonna, vanno in una riga
+  sotto la tabella.
 - **Verdure:** a parità di peso, gruppi crude e cotte, patate e legumi esclusi, segnalate
   quelle che si discostano.
 

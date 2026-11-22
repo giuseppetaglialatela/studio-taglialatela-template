@@ -1,7 +1,7 @@
 # M1 — MOTORE DI CALCOLO
 
 Modulo operativo (principio 6). Dipendenze: nessuna. Ne dipendono M2 e M6.
-Ultima modifica: 22/11/2026 (167 alimenti: zucchero CREA 201500 e caffè espresso BDA 9031, ruolo `bevanda`, M6 sezione 14; `tdee.py --piano surplus_moderato` (+15%); dichiarazione «nessuna interazione nota» in `interazioni.csv` e principio attivo a due orari citato una volta; profilo `sportivo_forza` con R070 approvato; autotest di `tdee.py` e `interazioni.py` nel controllo 10; casi 66-67). 11/11/2026 notte, impaginazione (`genera_scheda_cucina.py`: con tre pagine, Verdure e poi Carni e affettati passano in coda alla pagina 2 se le tabelle non entrano nella pagina 3; `componi(..., in_coda=)`, `SPOSTABILI`). 11/11/2026 notte (165 alimenti: coniglio coscia CREA 107030 + BDA 8668, fesa di vitello proxy fesa di vitellone CREA 101160 + BDA 8654, M6 sezione 13; `scambi_carni.csv` con vitellone magro, filetto e macinato di manzo, coniglio e fesa di vitello confermati; orata e salmone in `scambi_pesce.csv`). 11/11/2026 sera (tabella carni e affettati: `scambi_carni.csv`, `tabelle_conversione.tabella_carni`, nota sul sale degli affettati nella scheda; `--out-html` facoltativo in `genera_scheda_cucina.py`; `genera_zona_piano.py` si ferma se `obiettivo_intestazione` comincia con «Obiettivo»). 11/11/2026 (163 alimenti: primo sale, proxy dichiarato della mozzarella di vacca, M6 sezione 12; uova a pezzi in anteprima, PDF e scheda, M3). 10/11/2026 (pop corn 3009 corretto su CREA 501200 + USDA, M6 sezione 11; 162 alimenti: minestrone cotto, CREA 905010, micronutrienti USDA proxy, M6 sezione 10). 04/11/2026 (161 alimenti: piadina e cereali in formelle; scatolame a stato `familiare`; tabelle di conversione: `scambi_carboidrati.csv`, `scambi_pesce.csv`, `scambi_verdure.csv`, `tabelle_conversione.py`; `genera_scheda_cucina.py`; controllo 13 del collaudo). 31/10/2026 pomeriggio (file affiancato `lipidi.csv`: saturi, mono, poli,
+Ultima modifica: 22/11/2026 sera (168 alimenti: pomodori ciliegini CREA 006650, M6 sezione 15; scheda per chi cucina: alternative dei carboidrati solo pasta, riso, pane comune e patate, tabella girata con una riga per porzione, `_tabella_righe_html`, controllo «scheda con molte porzioni di pane» della regressione; cime di rapa tra le verdure cotte). 22/11/2026 (167 alimenti: zucchero CREA 201500 e caffè espresso BDA 9031, ruolo `bevanda`, M6 sezione 14; `tdee.py --piano surplus_moderato` (+15%); dichiarazione «nessuna interazione nota» in `interazioni.csv` e principio attivo a due orari citato una volta; profilo `sportivo_forza` con R070 approvato; autotest di `tdee.py` e `interazioni.py` nel controllo 10; casi 66-67). 11/11/2026 notte, impaginazione (`genera_scheda_cucina.py`: con tre pagine, Verdure e poi Carni e affettati passano in coda alla pagina 2 se le tabelle non entrano nella pagina 3; `componi(..., in_coda=)`, `SPOSTABILI`). 11/11/2026 notte (165 alimenti: coniglio coscia CREA 107030 + BDA 8668, fesa di vitello proxy fesa di vitellone CREA 101160 + BDA 8654, M6 sezione 13; `scambi_carni.csv` con vitellone magro, filetto e macinato di manzo, coniglio e fesa di vitello confermati; orata e salmone in `scambi_pesce.csv`). 11/11/2026 sera (tabella carni e affettati: `scambi_carni.csv`, `tabelle_conversione.tabella_carni`, nota sul sale degli affettati nella scheda; `--out-html` facoltativo in `genera_scheda_cucina.py`; `genera_zona_piano.py` si ferma se `obiettivo_intestazione` comincia con «Obiettivo»). 11/11/2026 (163 alimenti: primo sale, proxy dichiarato della mozzarella di vacca, M6 sezione 12; uova a pezzi in anteprima, PDF e scheda, M3). 10/11/2026 (pop corn 3009 corretto su CREA 501200 + USDA, M6 sezione 11; 162 alimenti: minestrone cotto, CREA 905010, micronutrienti USDA proxy, M6 sezione 10). 04/11/2026 (161 alimenti: piadina e cereali in formelle; scatolame a stato `familiare`; tabelle di conversione: `scambi_carboidrati.csv`, `scambi_pesce.csv`, `scambi_verdure.csv`, `tabelle_conversione.py`; `genera_scheda_cucina.py`; controllo 13 del collaudo). 31/10/2026 pomeriggio (file affiancato `lipidi.csv`: saturi, mono, poli,
 EPA, DHA, colesterolo; saturi e colesterolo calcolati nei riferimenti; sezione LIPIDI del
 report; controllo 12 del collaudo; casi 63-65). 31/10/2026 (riferimenti: si controllano solo
 i parametri dei profili scelti).
@@ -672,7 +672,8 @@ Settimana e tabelle di conversione, in due o tre pagine, tutte calcolate da pian
 [--orari ...] [--eccezione-etichetta voci.csv --nomi-eccezione nomi.csv] [--esclusioni
 esclusioni.json] --out-pdf scheda.pdf [--out-html scheda.html]`. Senza `--out-html` la pagina
 misurata sta in una cartella temporanea (11/11/2026: prima TypeError); senza nessuna delle due
-uscite si ferma. Tabelle: carboidrati, pesce, carni e affettati (11/11/2026; gli affettati, ruolo
+uscite si ferma. Tabelle: carboidrati (girata dal 22/11/2026: una riga per porzione del
+piano, una colonna per alternativa, M3), pesce, carni e affettati (11/11/2026; gli affettati, ruolo
 salume, con «*» e la nota sul sale), verdure. `--esclusioni` (04/11/2026,
 facoltativa): file fuori dal repository e dai metadati, con `escludi_food_id`,
 `massimo_g_a_pasto`, `verdure_crude_ammesse`; campo non previsto, `food_id` sconosciuto o voce
@@ -857,7 +858,7 @@ diventa un nuovo caso golden.
 
 ## 4. DATABASE ALIMENTI E GERARCHIA FONTI
 
-**Stato:** 167 alimenti verificati e tracciati alla fonte; il numero vincolante è
+**Stato:** 168 alimenti verificati e tracciati alla fonte; il numero vincolante è
 `EXPECTED_ALIMENTI_COUNT` in `collaudo.py`. Conformità kcal/macro/fibra a CREA:
 `python3 cerca_crea.py verifica`.
 
@@ -979,7 +980,8 @@ petto di pollo (parità di proteine; carni dall'11/11/2026, ruoli ammessi carne 
 arrotondati a 5 g. Riferimenti e nutriente in `tabelle_conversione.TABELLE_GRAMMI`. Non si scrivono a mano: `python3 tabelle_conversione.py
 --rigenera` li ricalcola da `alimenti.csv`; se il database cambia, il controllo 13 si ferma
 finché non lo si esegue. `da_confermare` = compare come riga se è nel piano, non come
-alternativa; `solo_piano` = lo stesso, per decisione del nutrizionista (quinoa e piadina).
+alternativa; `solo_piano` = lo stesso, per decisione del nutrizionista (quinoa e piadina;
+dal 22/11/2026 tutti i carboidrati tranne pasta, riso, pane comune e patate).
 
 **scambi_verdure.csv** — `food_id, nome_riferimento, uso, stato`. `uso`: `crude`, `cotte`,
 `entrambe`. Scambio a parità di peso. Si segnalano da sole le voci da almeno 5 g/100 g di

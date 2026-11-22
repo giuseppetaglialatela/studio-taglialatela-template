@@ -1,14 +1,14 @@
 food_id,nome_riferimento,grammi_porzione,stato
 000800,Pasta,80,confermato
 000100,Riso,70,confermato
-888013,Couscous,75,confermato
-000550,Pane integrale,130,confermato
+888013,Couscous,75,solo_piano
+000550,Pane integrale,130,solo_piano
 100154_2,Pane comune,95,confermato
 381,Patate,325,confermato
-60091,Pasta integrale,90,confermato
-500010,Riso integrale,75,confermato
-000130,Riso basmati,70,confermato
-8603,Farro,85,confermato
-000090,Orzo perlato,80,confermato
+60091,Pasta integrale,90,solo_piano
+500010,Riso integrale,75,solo_piano
+000130,Riso basmati,70,solo_piano
+8603,Farro,85,solo_piano
+000090,Orzo perlato,80,solo_piano
 889001,Quinoa,100,solo_piano
 9090,Piadina,115,solo_piano

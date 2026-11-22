@@ -166,3 +166,4 @@ food_id,nome,categoria,fonte,codice_fonte,data_verifica,kcal_100g,proteine_g,car
 101160_vitello,Vitello fesa cruda (proxy fesa di vitellone),carne,CREA+BDA-IEO(proxy fesa di vitellone 101160),101160+8654,2026-11-11,103,21.8,0,1.8,0,4,1.8,0.5,16,2,3.9,18,0
 201500,Zucchero (saccarosio),altro,CREA+BDA-IEO,201500+2021_2,2026-11-22,392,0,104.5,0,0,1,0.3,0,0,0,0.1,2,0
 9031,Caffè espresso (senza zucchero),altro,BDA-IEO(dati USDA 171891),9031_2+171891,2026-11-22,2,0.12,0,0.18,0,2,0.13,0,1,0,0.05,80,0
+006650,Pomodori ciliegini,verdura,CREA,006650,2026-11-22,37,1.1,7.2,0.4,1.0,9,0.4,0,40,0,0.18,13,35

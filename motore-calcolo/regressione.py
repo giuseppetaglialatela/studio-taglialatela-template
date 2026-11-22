@@ -509,6 +509,12 @@ def modo_verifica():
     if not ok_ad:
         falliti += 1
         ok_cli = False
+    # Tabella dei carboidrati con molte porzioni (22/11/2026): piano fittizio a 14 porzioni
+    ok_mp, msg_mp = verifica_scheda_molte_porzioni()
+    print(f"\n  [{'OK ' if ok_mp else 'XX '}] scheda con molte porzioni di pane: {msg_mp}")
+    if not ok_mp:
+        falliti += 1
+        ok_cli = False
     # Calcolo esatto dei pasti a scelta (tappa 1, 29/10/2026): giorno e
     # settimana confrontati con la forza bruta su casi casuali a seme fisso
     import combinazioni
@@ -820,6 +826,95 @@ def _piano_scheda_pieno():
     f = tc.Filtro(righe, tc.carica_db(), 1)
     target = sum((lo + hi) / 2 for lo, hi in f.giorni.values()) / len(f.giorni)
     return righe, meta, target
+
+
+def _piano_molte_porzioni():
+    """Piano fittizio (22/11/2026): 9 porzioni di pane comune (30-130 g), 2 di pasta, 2 di
+    patate, 1 di riso basmati, come il piano reale che fermava la scheda con «testo tagliato
+    dal bordo». Ogni opzione e' bilanciata con la quota di proteine, cosi' il filtro di
+    sicurezza lascia passare gli scambi come in un piano reale."""
+    import tabelle_conversione as tc
+    db = tc.carica_db()
+    k = lambda f: float(db[f]["kcal_100g"]) / 100
+    col = [[("135020", 200), ("600009", 40), ("406", 100)], [("8053", 170), ("000550", 50), ("8807", 150)]]
+    spu = [[("1631", 125), ("406", 100)], [("8053", 150)]]
+    pane = [30, 40, 50, 60, 70, 80, 90, 110, 130]
+    primi = [("000800", 70), ("000800", 90), ("381", 200), ("381", 300), ("000130", 70)]
+    PASTO = 620.0                                    # kcal di ogni opzione di pranzo e di cena
+
+    def opzione(carbo, proteina, verdura):
+        fid, g = carbo
+        resto = PASTO - g * k(fid) - 200 * k(verdura) - 10 * k("702901")
+        gp = max(40, round(resto / k(proteina) / 5) * 5)
+        return [carbo, (proteina, gp), (verdura, 200), ("702901", 10)]
+    porzioni = primi + [("100154_2", p) for p in pane]
+    porzioni += porzioni[:18 - len(porzioni)]
+    righe = []
+
+    def agg(g, p, voci, o):
+        righe.extend({"giorno": g, "pasto": p, "food_id": f, "grammi": str(q), "opzione": o} for f, q in voci)
+    for d in range(6):
+        g = str(d + 1)
+        for i, v in enumerate(col):
+            agg(g, "colazione", v, "AB"[i])
+        for i, v in enumerate(spu):
+            agg(g, "spuntino", v, "AB"[i])
+        # 18 posti (pranzo A e B, cena) per 14 porzioni: ogni porzione almeno una volta
+        agg(g, "pranzo", opzione(porzioni[3 * d], "106500", "349"), "A")
+        agg(g, "pranzo", opzione(porzioni[3 * d + 1], "1515", "101"), "B")
+        agg(g, "cena", opzione(porzioni[3 * d + 2], "1313", "345"), "")
+    titoli = {(f"{r['giorno']}|{r['pasto']}|{r['opzione']}" if r["pasto"] in ("pranzo", "cena")
+               else f"*|{r['pasto']}|{r['opzione']}"): "Titolo di piatto di media lunghezza come nei piani"
+              for r in righe}
+    meta = {"titoli_piatti": titoli, "giorni": {"lavorativi": ["lun", "mar", "mer", "gio", "ven", "sab"],
+                                                "libero": "dom"},
+            "intestazione": {"nome": "Paziente Fittizio"}, "abbinamento_spuntino": "non concordato",
+            "indicazioni_giorno_libero": {"pranzo": "a piacere", "cena": "a piacere"}}
+    f = tc.Filtro(righe, db, 1)
+    target = sum((lo + hi) / 2 for lo, hi in f.giorni.values()) / len(f.giorni)
+    return righe, meta, target
+
+
+def verifica_scheda_molte_porzioni():
+    """Tabella dei carboidrati girata (22/11/2026): con 14 porzioni la scheda si genera, la
+    tabella ha una riga per porzione e solo le 4 alternative (pasta, riso, pane comune,
+    patate), scrittura non sotto 9 punti. Prova al contrario: con la tabella a una colonna
+    per porzione lo stesso piano si ferma."""
+    import tempfile
+    import genera_zona_piano as gzp
+    import genera_scheda_cucina as gsc
+    try:
+        import playwright  # noqa: F401
+    except ImportError:
+        return True, "NON ESEGUITO: Chromium assente in questa sessione"
+    db = gzp.carica_alimenti(os.path.join(BASE, "alimenti.csv"))
+    nomi = gzp.carica_nomi(os.path.join(BASE, "nomi_paziente.csv"))
+    righe, meta, target = _piano_molte_porzioni()
+    tmp = tempfile.mkdtemp()
+    h, p = os.path.join(tmp, "s.html"), os.path.join(tmp, "s.pdf")
+    fai = lambda: gsc.adatta(lambda n, k, c=0: gsc.componi(righe, db, nomi, meta, {}, target, pagine=n,
+                                                           giorni_p1=k, in_coda=c)[0], h, p, 7)
+    try:
+        e = fai()
+    except gsc.Fermo as x:
+        return False, f"la scheda si ferma con 14 porzioni: {str(x)[:160]}"
+    _, tab = gsc.componi(righe, db, nomi, meta, {}, target)
+    carbo = tab["carboidrati"]
+    if len(carbo["righe"]) != 14 or carbo["colonne"] != ["Pasta", "Riso", "Pane comune", "Patate"]:
+        return False, f"tabella inattesa: {len(carbo['righe'])} righe, colonne {carbo['colonne']}"
+    if min(x[2] for x in e) < 9 or "girata" not in open(h, encoding="utf-8").read():
+        return False, f"scrittura sotto 9 punti o tabella non girata: {e}"
+    vecchia = gsc._tabella_righe_html
+    try:
+        gsc._tabella_righe_html = gsc._tabella_html
+        fai()
+        return False, "anche la tabella a colonne entrava: il caso non prova nulla"
+    except gsc.Fermo:
+        pass
+    finally:
+        gsc._tabella_righe_html = vecchia
+    return True, (f"14 porzioni (9 di pane), 4 colonne, {len(e)} pagine, minimo {min(x[2] for x in e):g} pt; "
+                  f"a colonne per porzione si ferma")
 
 
 def _pdf_senza_piede(p, tmp):

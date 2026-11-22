@@ -59,7 +59,7 @@ h2{font-size:10.5pt;color:var(--ara);margin:var(--mh,10px 0 4px);text-transform:
 .gg{display:grid;grid-row:span 3;grid-template-rows:subgrid;row-gap:0;border:.7pt solid var(--teal);border-radius:3px;overflow:hidden;min-width:0;break-inside:avoid}.gg .d{background:var(--teal);color:#fff;font-weight:bold;padding:2px 8px}.gg .m{padding:var(--pm,4px 8px);border-top:.5pt solid var(--lin)}.pr .m:first-child{border-top:0}.ce{border-top:.5pt solid var(--lin)}.ce .m{border-top:0}
 .e{font-size:8pt;color:var(--teal);font-weight:bold;letter-spacing:.5px}.cena .e{color:var(--navy)}
 .libero .m{grid-row:span 2;border-top:0}.fascia{grid-column:1/3;grid-row:span 2}.fascia .m{grid-row:auto}.fascia .m{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.conv{width:100%;border-collapse:collapse;font-size:var(--fv,9.5pt)}.conv th,.conv td{padding:var(--pt,3.5px 6px);text-align:center;border-bottom:.5pt solid var(--lin)}.conv thead th{background:var(--teal);color:#fff;font-weight:normal;font-size:8.5pt;vertical-align:bottom;border:0}.conv th.cap{text-align:left;font-style:italic}.conv tbody th{text-align:left;color:var(--navy);font-weight:bold}.conv td.sel{color:#B6C1C5}.conv tbody tr:nth-child(even){background:var(--ten)}
+.conv{width:100%;border-collapse:collapse;font-size:var(--fv,9.5pt)}.conv th,.conv td{padding:var(--pt,3.5px 6px);text-align:center;border-bottom:.5pt solid var(--lin)}.conv thead th{background:var(--teal);color:#fff;font-weight:normal;font-size:8.5pt;vertical-align:bottom;border:0}.conv th.cap{text-align:left;font-style:italic}.conv tbody th{text-align:left;color:var(--navy);font-weight:bold}.conv td.sel{color:#B6C1C5}.conv tbody tr:nth-child(even){background:var(--ten)}.girata tbody th{font-weight:normal;color:var(--testo)}.girata tbody th b{color:var(--navy)}.girata tr.gr>*{border-top:1pt solid var(--teal)}
 .n{color:var(--gr);font-size:9pt;margin-top:3px;font-style:italic}.chip{display:inline-block;background:var(--ten);border-radius:10px;padding:1px 8px;margin:0 3px 3px 0;font-size:9.5pt}.v{display:grid;grid-template-columns:60px 1fr;gap:3px 6px;align-items:baseline}.v>b{color:var(--teal)}
 .foot{margin-top:auto;border-top:.5pt solid var(--lin);padding-top:3px;color:var(--gr);font-size:7.5pt;display:flex;justify-content:space-between;gap:12px}"""
 
@@ -152,6 +152,24 @@ def _tabella_html(t):
         sc = ", ".join(f"{col} {c['grammi']}\u00a0g" for col, c in zip(t["colonne"], r["celle"]) if c)
         out += f"<div class=n><b>{E(r['nome'])} {r['grammi']:g} g:</b> {E(sc) if sc else 'nessuno scambio previsto'}.</div>"
     return out
+
+
+def _tabella_righe_html(t):
+    """Tabella girata (22/11/2026): una riga per porzione del piano, raggruppate per alimento,
+    una colonna per alternativa. La larghezza dipende solo dal numero di alternative, non
+    dalle porzioni del piano: con 9 porzioni di pane la tabella a colonne usciva dal bordo."""
+    testa = "".join(f"<th>{E(c)}</th>" for c in t["colonne"])
+    corpo, prec = "", None
+    for r in t["righe"]:
+        nuovo = r["nome"] != prec
+        nome = f"{E(r['nome'])} " if nuovo else ""
+        classe = " class=gr" if nuovo and prec is not None else ""
+        prec = r["nome"]
+        celle = "".join("<td class=sel>—</td>" if c is None else f"<td>{c['grammi']}\u00a0g</td>"
+                        for c in r["celle"])
+        corpo += f"<tr{classe}><th>{nome}<b>{r['grammi']:g}\u00a0g</b></th>{celle}</tr>"
+    return (f"<table class='conv girata'><thead><tr><th class=cap>Al posto di ↓</th>{testa}</tr></thead>"
+            f"<tbody>{corpo}</tbody></table>")
 
 
 def scarto_massimo(t):
@@ -283,7 +301,9 @@ def componi(piano, db, nomi, meta, orari, target_kcal, etichetta=frozenset(), pa
     trattino = "<div class=n>— = scambio non previsto per questo piano.</div>"
     vuoto = "<div class=n>Nessuno scambio previsto per questo piano.</div>"
     corpo = lambda t: f"{_tabella_html(t)}{trattino}{_nota_scarto(t)}" if t["colonne"] else vuoto
-    sez_c = (f"<h2>Carboidrati <span>stessa quantità di carboidrati</span></h2>{corpo(carbo)}"
+    corpo_c = (f"{_tabella_righe_html(carbo)}{trattino}{_nota_scarto(carbo)}" if carbo["colonne"]
+               else vuoto)
+    sez_c = (f"<h2>Carboidrati <span>stessa quantità di carboidrati</span></h2>{corpo_c}"
              if carbo["righe"] else "")
     if note.get("note_carboidrati"):
         sez_c += f"<div class=n>{E(note['note_carboidrati'])}</div>"
@@ -618,10 +638,13 @@ def autotest():
              {"pasto": "cena", "food_id": "1313", "grammi": "180"},
              {"pasto": "cena", "food_id": "381", "grammi": "250"}]
     t = tc.tabella_carboidrati(prova, db)
-    i = t["colonne"].index("Couscous")
+    # dal 22/11/2026 le alternative sono solo pasta, riso, pane comune e patate
+    if t["colonne"] != ["Pasta", "Riso", "Pane comune", "Patate"]:
+        problemi.append(f"alternative dei carboidrati inattese: {t['colonne']}")
+    i = t["colonne"].index("Pasta")
     pane = [r for r in t["righe"] if r["food_id"] == "000550"][0]
     if pane["celle"][i]["grammi"] != 60:
-        problemi.append("pane integrale 100 g in couscous non vale 60 g")
+        problemi.append("pane integrale 100 g in pasta non vale 60 g")
     if [r["food_id"] for r in t["righe"]] != ["000550", "381"]:
         problemi.append("righe dei carboidrati non legate al piano")
     tp = tc.tabella_pesce(prova, db)
@@ -703,11 +726,11 @@ def _autotest_esclusioni(tmp, db):
     if not all(uguali):
         problemi.append("esclusioni: file vuoto cambia le tabelle")
     e = esc({"escludi_food_id": {"000100": "riso", "005120": "carciofi", "101": "fagiolini"},
-             "massimo_g_a_pasto": {"000550": 70}, "verdure_crude_ammesse": ["391"]})
+             "massimo_g_a_pasto": {"381": 300}, "verdure_crude_ammesse": ["391"]})
     t = tc.tabella_carboidrati(piano, db, filtro=fl, esc=e)
     if "Riso" in t["colonne"] or t["da_file"]["voci"] != 1:
         problemi.append("esclusioni: voce vietata rimasta tra gli scambi")
-    if "Pane integrale" in t["colonne"] or t["da_file"]["celle"] != 1:
+    if "Patate" in t["colonne"] or t["da_file"]["celle"] != 1:     # 80 g di pasta = 325 g
         problemi.append("esclusioni: casella oltre il massimo rimasta")
     if not t["righe"] or t["righe"][0]["food_id"] != "000800":
         problemi.append("esclusioni: voce del piano in colonna persa")

@@ -2,7 +2,7 @@
 
 Generata da `tabella_alimenti.py --genera-pagina` dai CSV del motore: non si modifica a mano. Valori per 100 g di parte edibile. «n.d.» = dato mancante, dichiarato in `gap.csv`: non è uno zero.
 
-**167 alimenti**, 21 valori mancanti su 9 alimenti.
+**168 alimenti**, 24 valori mancanti su 10 alimenti.
 
 ## Valori mancanti
 
@@ -29,6 +29,9 @@ Generata da `tabella_alimenti.py --genera-pagina` dai CSV del motore: non si mod
 | Minestrone cotto | monoinsaturi_g | acidi grassi assenti da CREA 905010 e da BDA-IEO (nessuna scheda di minestrone); USDA 171550 non rappresentativa (saturi 53% dei grassi, colesterolo 2 mg: ricetta con ingredienti animali); grassi totali 0.4 g/100 g |
 | Minestrone cotto | polinsaturi_g | acidi grassi assenti da CREA 905010 e da BDA-IEO (nessuna scheda di minestrone); USDA 171550 non rappresentativa (saturi 53% dei grassi, colesterolo 2 mg: ricetta con ingredienti animali); grassi totali 0.4 g/100 g |
 | Minestrone cotto | saturi_g | acidi grassi assenti da CREA 905010 e da BDA-IEO (nessuna scheda di minestrone); USDA 171550 non rappresentativa (saturi 53% dei grassi, colesterolo 2 mg: ricetta con ingredienti animali); grassi totali 0.4 g/100 g |
+| Pomodori ciliegini | monoinsaturi_g | acidi grassi non pubblicati: CREA 006650 senza acidi grassi, assente da BDA-IEO, USDA 321360 (grape) senza acidi grassi; effetto trascurabile (grassi 0,4 g/100 g) |
+| Pomodori ciliegini | polinsaturi_g | acidi grassi non pubblicati: CREA 006650 senza acidi grassi, assente da BDA-IEO, USDA 321360 (grape) senza acidi grassi; effetto trascurabile (grassi 0,4 g/100 g) |
+| Pomodori ciliegini | saturi_g | acidi grassi non pubblicati: CREA 006650 senza acidi grassi, assente da BDA-IEO, USDA 321360 (grape) senza acidi grassi; effetto trascurabile (grassi 0,4 g/100 g) |
 
 ## Altro
 
@@ -796,6 +799,7 @@ Generata da `tabella_alimenti.py --genera-pagina` dai CSV del motore: non si mod
 | Patate dolci | 92 | 1,2 | 21,3 | 0,3 | 2,3 |
 | Peperoni dolci | 26 | 0,9 | 4,2 | 0,3 | 1,9 |
 | Piselli | 87 | 7 | 12,4 | 0,2 | 5,2 |
+| Pomodori ciliegini | 37 | 1,1 | 7,2 | 0,4 | 1 |
 | Pomodori da insalata | 19 | 1,2 | 2,8 | 0,2 | 1,1 |
 | Pomodori pelati in scatola | 22 | 1,2 | 3 | 0,5 | 0,9 |
 | Porri | 35 | 2,1 | 5,2 | 0,1 | 2,9 |
@@ -847,6 +851,7 @@ Generata da `tabella_alimenti.py --genera-pagina` dai CSV del motore: non si mod
 | Patate dolci | 24 | 0,7 | 0 | 17 | 0 | 0,3 | 19,1 | 23 |
 | Peperoni dolci | 17 | 0,7 | 0 | 24 | 0 | 0,2 | 12 | 151 |
 | Piselli | 47 | 1,8 | 0 | 62 | 0 | 0,7 | 33 | 28 |
+| Pomodori ciliegini | 9 | 0,4 | 0 | 40 | 0 | 0,18 | 13 | 35 |
 | Pomodori da insalata | 11 | 0,4 | 0 | 14 | 0 | 0,2 | 11 | 21 |
 | Pomodori pelati in scatola | 9 | 0,2 | 0 | 10 | 0 | 0,27 | 18,6 | 18 |
 | Porri | 54 | 0,8 | 0 | 74 | 0 | 0,2 | 15,7 | 9 |
@@ -898,6 +903,7 @@ Generata da `tabella_alimenti.py --genera-pagina` dai CSV del motore: non si mod
 | Patate dolci | 0,06 | 0,01 | 0,132 | 0 | 0 | 0 |
 | Peperoni dolci | 0,05 | 0,02 | 0,16 | 0 | 0 | 0 |
 | Piselli | 0,08 | 0,06 | 0,02 | 0 | 0 | 0 |
+| Pomodori ciliegini | n.d. | n.d. | n.d. | 0 | 0 | 0 |
 | Pomodori da insalata | 0,03 | 0,03 | 0,08 | 0 | 0 | 0 |
 | Pomodori pelati in scatola | 0,07 | 0,08 | 0,21 | 0 | 0 | 0 |
 | Porri | 0,01 | 0 | 0,05 | 0 | 0 | 0 |
@@ -949,6 +955,7 @@ Generata da `tabella_alimenti.py --genera-pagina` dai CSV del motore: non si mod
 | Patate dolci | 50399 | BDA-IEO+USDA | 50399 | 2026-07-28 | BDA-IEO 50399_1 |
 | Peperoni dolci | 336 | BDA-IEO+USDA(proxy) | 336 | 2026-07-28 | BDA-IEO 336_1 |
 | Piselli | 103 | BDA-IEO+USDA | 103 | 2026-07-28 | BDA-IEO 103_1 |
+| Pomodori ciliegini | 006650 | CREA | 006650 | 2026-11-22 | CREA 006650 |
 | Pomodori da insalata | 391 | BDA-IEO+USDA | 391 | 2026-07-28 | BDA-IEO 391_1 |
 | Pomodori pelati in scatola | 392 | BDA-IEO+USDA(proxy) | 392 | 2026-07-28 | BDA-IEO 392_1 |
 | Porri | 005650 | CREA+BDA-IEO(proxy zinco/folati)+USDA | 005650 | 2026-10-01 | BDA-IEO 337_1 |
