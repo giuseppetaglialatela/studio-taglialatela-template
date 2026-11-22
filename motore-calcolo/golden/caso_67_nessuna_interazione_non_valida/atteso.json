@@ -1,0 +1,54 @@
+{
+  "tipo": "pipeline",
+  "bloccanti": [
+    [
+      5,
+      "INTERAZIONE_GRAVITA_ALTA"
+    ],
+    [
+      5,
+      "INTERAZIONE_GRAVITA_ALTA"
+    ],
+    [
+      5,
+      "INTERAZIONE_NESSUNA_CONTRADDITTORIA"
+    ],
+    [
+      5,
+      "INTERAZIONE_NESSUNA_NON_VALIDA"
+    ],
+    [
+      5,
+      "INTERAZIONE_NESSUNA_SENZA_FONTE"
+    ]
+  ],
+  "attenzioni": [
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      4,
+      "FORMATO_CONFEZIONE_NON_RISPETTATO"
+    ],
+    [
+      6,
+      "LIVELLO_FUORI_CATALOGO"
+    ],
+    [
+      6,
+      "LIVELLO_FUORI_CATALOGO"
+    ],
+    [
+      6,
+      "VALUTARE_LIVELLO_RINFORZATO"
+    ]
+  ],
+  "exit_code": 1,
+  "descrizione": "Dichiarazione senza fonte, con target/separazione/gravita' non coerenti, o insieme a interazioni vere dello stesso principio: si blocca.",
+  "riferimento": "22/11/2026"
+}

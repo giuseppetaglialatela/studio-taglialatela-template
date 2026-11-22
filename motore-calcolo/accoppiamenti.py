@@ -46,7 +46,7 @@ BASE = os.path.dirname(os.path.abspath(__file__))
 RUOLI_AMMESSI = {
     "carne", "salume", "pesce", "molluschi_crostacei", "uova", "legumi",
     "latte", "yogurt", "formaggio", "cereale", "patate", "verdura", "frutta",
-    "frutta_secca", "condimento", "dolce",
+    "frutta_secca", "condimento", "dolce", "bevanda",
 }
 
 FILE_LIBRERIA = ("moduli_pasto.csv", "moduli_colazione.csv")

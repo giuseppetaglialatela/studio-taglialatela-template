@@ -1,0 +1,41 @@
+{
+  "tipo": "pipeline",
+  "bloccanti": [],
+  "attenzioni": [
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      3,
+      "MEDIA_SOTTO_LARN"
+    ],
+    [
+      4,
+      "FORMATO_CONFEZIONE_NON_RISPETTATO"
+    ],
+    [
+      5,
+      "PRINCIPIO_ATTIVO_NON_COPERTO"
+    ],
+    [
+      5,
+      "PRINCIPIO_ATTIVO_SENZA_INTERAZIONI_NOTE"
+    ],
+    [
+      6,
+      "LIVELLO_FUORI_CATALOGO"
+    ],
+    [
+      6,
+      "LIVELLO_FUORI_CATALOGO"
+    ],
+    [
+      6,
+      "VALUTARE_LIVELLO_RINFORZATO"
+    ]
+  ],
+  "exit_code": 0,
+  "descrizione": "Un principio attivo senza interazioni alimentari si dichiara con una riga nessuna_interazione_nota con fonte: niente PRINCIPIO_ATTIVO_NON_COPERTO, ma una attenzione che porta la fonte. Il principio non coperto preso a due orari compare una volta sola.",
+  "riferimento": "22/11/2026, lacuna emersa da un piano reale (P-nuovo)"
+}

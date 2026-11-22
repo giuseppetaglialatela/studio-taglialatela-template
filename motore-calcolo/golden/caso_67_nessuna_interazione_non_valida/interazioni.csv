@@ -1,0 +1,5 @@
+principio_attivo,tipo_target,target,meccanismo,separazione_ore,gravita
+levetiracetam,nessuna_interazione_nota,,nessuna interazione,0,nessuna
+principio_test_y,nessuna_interazione_nota,calcio_mg,"Fonte: documento di prova, par. 4.5, frase di prova",2,bassa
+principio_test_z,nessuna_interazione_nota,,"Fonte: documento di prova, par. 4.5, frase di prova",0,nessuna
+principio_test_z,nutriente,calcio_mg,test: contraddice la riga precedente,4,alta

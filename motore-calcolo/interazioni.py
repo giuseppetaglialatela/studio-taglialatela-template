@@ -20,12 +20,22 @@ SCHEMI:
 farmaci_paziente.csv: principio_attivo, nome_commerciale, orario_assunzione, note
 interazioni.csv:      principio_attivo, tipo_target, target, meccanismo,
                       separazione_ore, gravita
-                      tipo_target: "nutriente" | "food_id"
+                      tipo_target: "nutriente" | "food_id" | "nessuna_interazione_nota"
 orari_pasti.csv:      giorno, pasto, orario   (formato HH:MM)
 """
 
 import csv
 from datetime import datetime
+
+# Convenzione del 22/11/2026, dentro lo schema congelato: un principio attivo
+# senza interazioni alimentari rilevanti si dichiara con UNA riga
+#   principio_attivo, nessuna_interazione_nota, , Fonte: <documento, paragrafo,
+#   frase>, 0, nessuna
+# Copre il principio attivo (niente PRINCIPIO_ATTIVO_NON_COPERTO) ma la pipeline
+# la mostra con la sua fonte; senza fonte, con target, separazione o gravita'
+# diversi, o insieme a interazioni vere dello stesso principio, si ferma.
+TIPO_NESSUNA = "nessuna_interazione_nota"
+GRAVITA_NESSUNA = "nessuna"
 
 
 def _ora(hhmm):
@@ -129,6 +139,8 @@ def verifica_interazioni(piano_righe, db_alimenti, farmaci, interazioni, orari,
             for inter in interazioni:
                 if inter["principio_attivo"] != farmaco["principio_attivo"]:
                     continue
+                if inter["tipo_target"] == TIPO_NESSUNA:
+                    continue  # dichiarazione, non un'interazione
                 if distanza >= inter["separazione_ore"]:
                     continue  # separazione gia' rispettata
 
@@ -162,12 +174,58 @@ def verifica_interazioni(piano_righe, db_alimenti, farmaci, interazioni, orari,
                     })
 
     # principi attivi senza copertura in tabella
+    # (una riga nessuna_interazione_nota copre). Un principio attivo preso a due
+    # orari compare due volte in farmaci: qui una volta sola (22/11/2026; prima
+    # il rilievo diceva «levetiracetam, levetiracetam»)
     coperti = {i["principio_attivo"] for i in interazioni}
-    coperture_mancanti = [
-        f for f in farmaci if f["principio_attivo"] not in coperti
-    ]
+    coperture_mancanti, visti = [], set()
+    for f in farmaci:
+        if f["principio_attivo"] in coperti or f["principio_attivo"] in visti:
+            continue
+        visti.add(f["principio_attivo"])
+        coperture_mancanti.append(f)
 
     return allerte, coperture_mancanti
+
+
+def autotest():
+    """Copertura e doppioni (22/11/2026): la suite di regressione confronta solo i
+    codici dei rilievi, non il testo, quindi il doppione «levetiracetam,
+    levetiracetam» si verifica qui. Restituisce (prove, elenco dei fallimenti)."""
+    farmaci = [
+        {"principio_attivo": "lev", "nome_commerciale": "A", "orario_assunzione": "08:00", "note": ""},
+        {"principio_attivo": "lev", "nome_commerciale": "A", "orario_assunzione": "20:00", "note": ""},
+        {"principio_attivo": "x", "nome_commerciale": "B", "orario_assunzione": "08:00", "note": ""},
+        {"principio_attivo": "x", "nome_commerciale": "B", "orario_assunzione": "20:00", "note": ""},
+    ]
+    db = {"F1": {"nome": "alimento di prova", "calcio_mg": 200.0}}
+    piano = [{"giorno": "1", "pasto": "colazione", "food_id": "F1", "grammi": 100.0}]
+    orari = {("1", "colazione"): "08:00"}
+    dich = {"principio_attivo": "lev", "tipo_target": TIPO_NESSUNA, "target": "",
+            "meccanismo": "Fonte: prova", "separazione_ore": 0.0,
+            "gravita": GRAVITA_NESSUNA}
+    ko, prove = [], 0
+
+    def atteso(nome, ottenuto, valore):
+        nonlocal prove
+        prove += 1
+        if ottenuto != valore:
+            ko.append(f"interazioni: {nome}: {ottenuto!r} invece di {valore!r}")
+
+    allerte, mancanti = verifica_interazioni(piano, db, farmaci, [], orari)
+    atteso("principio non coperto a due orari, una volta sola",
+           [f["principio_attivo"] for f in mancanti], ["lev", "x"])
+    allerte, mancanti = verifica_interazioni(piano, db, farmaci, [dich], orari)
+    atteso("la dichiarazione copre il principio",
+           [f["principio_attivo"] for f in mancanti], ["x"])
+    atteso("la dichiarazione non genera allerte", allerte, [])
+    vera = {"principio_attivo": "x", "tipo_target": "nutriente", "target": "calcio_mg",
+            "meccanismo": "prova", "separazione_ore": 4.0, "gravita": "alta"}
+    allerte, mancanti = verifica_interazioni(piano, db, farmaci, [dich, vera], orari)
+    atteso("interazione vera: una allerta per l'orario vicino",
+           [(a["principio_attivo"], a["orario_farmaco"]) for a in allerte],
+           [("x", "08:00")])
+    return prove, ko
 
 
 def stampa_report_interazioni(allerte, coperture_mancanti):

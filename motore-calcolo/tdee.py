@@ -55,12 +55,24 @@ def proponi_tdee(peso_kg, altezza_cm, eta_anni, sesso, livello_attivita):
     }
 
 
+# Fattori sul TDEE per tipo di piano. surplus_moderato (+15%) aggiunto il
+# 22/11/2026 su decisione del nutrizionista.
+FATTORI_PIANO = {
+    "mantenimento": 1.0,
+    "deficit_lieve": 0.85,
+    "deficit_moderato": 0.75,
+    "surplus_lieve": 1.10,
+    "surplus_moderato": 1.15,
+}
+
+
 def proponi_target_csv(tdee_kcal, tipo_piano, proteine_pct, carboidrati_pct,
                        grassi_pct, fibra_g_target, sesso=None, eta_anni=None,
                        condizione="nessuna", larn=None):
     """
     tipo_piano: 'mantenimento' | 'deficit_lieve' (-15%) | 'deficit_moderato' (-25%)
-                | 'surplus_lieve' (+10%)
+                | 'surplus_lieve' (+10%) | 'surplus_moderato' (+15%, deciso dal
+                nutrizionista il 22/11/2026)
     I LARN si leggono da larn.csv per sesso, eta' e condizione (nessuna |
     menopausa | gravidanza | allattamento). Non esistono valori di default:
     senza sesso ed eta' il modulo si ferma. Con larn={...} si possono forzare
@@ -68,12 +80,7 @@ def proponi_target_csv(tdee_kcal, tipo_piano, proteine_pct, carboidrati_pct,
     Restituisce le righe pronte per target.csv (il nutrizionista conferma
     prima di salvare).
     """
-    fattori = {
-        "mantenimento": 1.0,
-        "deficit_lieve": 0.85,
-        "deficit_moderato": 0.75,
-        "surplus_lieve": 1.10,
-    }
+    fattori = FATTORI_PIANO
     if tipo_piano not in fattori:
         raise ValueError(f"tipo_piano deve essere uno tra: {list(fattori)}")
     kcal_piano = round(tdee_kcal * fattori[tipo_piano])
@@ -103,6 +110,24 @@ def autotest():
                            sesso="M", eta_anni=36)
     print("Target proposto:", t)
     assert t["larn_vitamina_b12_ug"] == 4.0, "LARN non letti dalla tabella V revisione"
+    # Fattori per tipo di piano sul TDEE di P00 (2040): una modifica non voluta
+    # di un fattore o la scomparsa di un tipo fermano l'autotest.
+    attesi = {"mantenimento": 2040, "deficit_lieve": 1734, "deficit_moderato": 1530,
+              "surplus_lieve": 2244, "surplus_moderato": 2346}
+    assert set(attesi) == set(FATTORI_PIANO) == set(TIPI_PIANO), \
+        "tipi di piano non allineati tra FATTORI_PIANO, TIPI_PIANO e autotest"
+    for tipo, kcal in attesi.items():
+        k = proponi_target_csv(2040, tipo, 22, 48, 30, 30, sesso="M",
+                               eta_anni=36)["kcal_target"]
+        assert k == kcal, f"{tipo}: {k} kcal invece di {kcal}"
+    print("OK: fattori per tipo di piano su 2040 kcal:", attesi)
+    try:
+        proponi_target_csv(2000, "surplus_forte", 22, 48, 30, 30, sesso="M",
+                           eta_anni=36)
+    except ValueError:
+        print("OK: un tipo di piano sconosciuto si ferma.")
+    else:
+        raise AssertionError("avrebbe dovuto fermarsi su un tipo sconosciuto")
     try:
         proponi_target_csv(2000, "mantenimento", 22, 48, 30, 30)
     except ValueError:
@@ -113,7 +138,7 @@ def autotest():
     return 0
 
 
-TIPI_PIANO = ("mantenimento", "deficit_lieve", "deficit_moderato", "surplus_lieve")
+TIPI_PIANO = tuple(FATTORI_PIANO)
 
 
 def main(argv=None):

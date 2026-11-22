@@ -449,3 +449,29 @@ mancanti di voci GIÀ presenti (il collaudo rifiuta un `food_id` che non è in `
   100 g di petto di pollo valgono 105 g di fesa, con il dato USDA 110 g. Scartato il filetto
   di vitello CREA 101520 come proxy (grassi 2,7 g, 115 g). Nome per il paziente «Fesa di
   vitello».
+
+## 14. ZUCCHERO E CAFFÈ ESPRESSO — 22/11/2026
+
+Lacune emerse componendo il piano di un paziente nuovo (codice su Drive). Nessuna riga in
+`gap.csv`: tutti i nutrienti dello schema sono coperti.
+- **Zucchero, saccarosio (201500):** kcal, carboidrati, calcio, ferro e folati da CREA 201500
+  (proteine, grassi, fibra e vitamina C imputati a 0 da CREA: zero biologico nel saccarosio);
+  vitamina D, B12, zinco e magnesio da BDA-IEO 2021_2. La B12 della scheda BDA è segnata
+  traccia ma con fonte «Zero Logici» e valore 0: scritto 0 (zero logico, non la soglia 0,05).
+  Lipidi da BDA 2021_2, tutti 0 (zero logico). Ruolo `dolce`, categoria `altro`, porzione
+  libera (non deperibile, assente da `formati_confezione.csv`). Atwater: 392 kcal contro 418
+  con 4 kcal/g, scarto 6,2%, sotto la soglia (CREA usa 3,75 kcal/g per i monosaccaridi).
+- **Caffè espresso senza zucchero (9031), valutato e aggiunto invece di dichiararlo
+  trascurabile:** l'energia lo è (2 kcal/100 g), il magnesio no: 80 mg/100 g, circa 24 mg a
+  tazzina, 70 mg con tre caffè al giorno (20% del LARN). Serve anche come `food_id` per le
+  interazioni con la caffeina (es. levotiroxina). CREA non ha l'espresso (solo il caffè
+  tostato in polvere): tutto da BDA-IEO 9031_2 «CAFFE' BAR, in tazza», che riporta i dati USDA
+  171891 «Coffee, brewed, espresso, restaurant-prepared». Derivazione USDA controllata:
+  calcio, ferro, zinco, magnesio e folati analitici (2 campioni, dato debole); vitamina D e B12
+  0 zero biologico (vegetale; USDA «Assumed zero», BDA 0 da McCance). Energia 2 kcal ricalcolata
+  da BDA (USDA 9 kcal per i carboidrati «by difference», che BDA non riconosce come
+  disponibili: scarto di 2 kcal a tazzina). Lipidi da BDA (grassi 0,18 g coincidenti);
+  saturi e polinsaturi USDA derivazione BFFN (da forma simile), monoinsaturi in traccia
+  scritti alla soglia BDA 0,005 g. Peso: bevanda pronta, 1 tazzina = 30 g (porzione BDA).
+  Ruolo nuovo `bevanda` in `accoppiamenti.RUOLI_AMMESSI`, categoria `altro`. Lo zucchero
+  nel caffè si scrive a parte (201500).

@@ -1,7 +1,7 @@
 # M1 — MOTORE DI CALCOLO
 
 Modulo operativo (principio 6). Dipendenze: nessuna. Ne dipendono M2 e M6.
-Ultima modifica: 11/11/2026 notte, impaginazione (`genera_scheda_cucina.py`: con tre pagine, Verdure e poi Carni e affettati passano in coda alla pagina 2 se le tabelle non entrano nella pagina 3; `componi(..., in_coda=)`, `SPOSTABILI`). 11/11/2026 notte (165 alimenti: coniglio coscia CREA 107030 + BDA 8668, fesa di vitello proxy fesa di vitellone CREA 101160 + BDA 8654, M6 sezione 13; `scambi_carni.csv` con vitellone magro, filetto e macinato di manzo, coniglio e fesa di vitello confermati; orata e salmone in `scambi_pesce.csv`). 11/11/2026 sera (tabella carni e affettati: `scambi_carni.csv`, `tabelle_conversione.tabella_carni`, nota sul sale degli affettati nella scheda; `--out-html` facoltativo in `genera_scheda_cucina.py`; `genera_zona_piano.py` si ferma se `obiettivo_intestazione` comincia con «Obiettivo»). 11/11/2026 (163 alimenti: primo sale, proxy dichiarato della mozzarella di vacca, M6 sezione 12; uova a pezzi in anteprima, PDF e scheda, M3). 10/11/2026 (pop corn 3009 corretto su CREA 501200 + USDA, M6 sezione 11; 162 alimenti: minestrone cotto, CREA 905010, micronutrienti USDA proxy, M6 sezione 10). 04/11/2026 (161 alimenti: piadina e cereali in formelle; scatolame a stato `familiare`; tabelle di conversione: `scambi_carboidrati.csv`, `scambi_pesce.csv`, `scambi_verdure.csv`, `tabelle_conversione.py`; `genera_scheda_cucina.py`; controllo 13 del collaudo). 31/10/2026 pomeriggio (file affiancato `lipidi.csv`: saturi, mono, poli,
+Ultima modifica: 22/11/2026 (167 alimenti: zucchero CREA 201500 e caffè espresso BDA 9031, ruolo `bevanda`, M6 sezione 14; `tdee.py --piano surplus_moderato` (+15%); dichiarazione «nessuna interazione nota» in `interazioni.csv` e principio attivo a due orari citato una volta; profilo `sportivo_forza` con R070 da approvare; autotest di `tdee.py` e `interazioni.py` nel controllo 10; casi 66-67). 11/11/2026 notte, impaginazione (`genera_scheda_cucina.py`: con tre pagine, Verdure e poi Carni e affettati passano in coda alla pagina 2 se le tabelle non entrano nella pagina 3; `componi(..., in_coda=)`, `SPOSTABILI`). 11/11/2026 notte (165 alimenti: coniglio coscia CREA 107030 + BDA 8668, fesa di vitello proxy fesa di vitellone CREA 101160 + BDA 8654, M6 sezione 13; `scambi_carni.csv` con vitellone magro, filetto e macinato di manzo, coniglio e fesa di vitello confermati; orata e salmone in `scambi_pesce.csv`). 11/11/2026 sera (tabella carni e affettati: `scambi_carni.csv`, `tabelle_conversione.tabella_carni`, nota sul sale degli affettati nella scheda; `--out-html` facoltativo in `genera_scheda_cucina.py`; `genera_zona_piano.py` si ferma se `obiettivo_intestazione` comincia con «Obiettivo»). 11/11/2026 (163 alimenti: primo sale, proxy dichiarato della mozzarella di vacca, M6 sezione 12; uova a pezzi in anteprima, PDF e scheda, M3). 10/11/2026 (pop corn 3009 corretto su CREA 501200 + USDA, M6 sezione 11; 162 alimenti: minestrone cotto, CREA 905010, micronutrienti USDA proxy, M6 sezione 10). 04/11/2026 (161 alimenti: piadina e cereali in formelle; scatolame a stato `familiare`; tabelle di conversione: `scambi_carboidrati.csv`, `scambi_pesce.csv`, `scambi_verdure.csv`, `tabelle_conversione.py`; `genera_scheda_cucina.py`; controllo 13 del collaudo). 31/10/2026 pomeriggio (file affiancato `lipidi.csv`: saturi, mono, poli,
 EPA, DHA, colesterolo; saturi e colesterolo calcolati nei riferimenti; sezione LIPIDI del
 report; controllo 12 del collaudo; casi 63-65). 31/10/2026 (riferimenti: si controllano solo
 i parametri dei profili scelti).
@@ -146,7 +146,8 @@ Dodici controlli:
    alimenti del piano (sezione 8)
 10. controlli di disciplina: autotest di `metadati_piano.py` e di `genera_zona_piano.py`
    (verdetto, anteprima, impronta, segnaposto) e, se c'è il suo template, di
-   `genera_spiegazione.py`. Con i template accanto alla cartella del motore (repository
+   `genera_spiegazione.py`; dal 22/11/2026 anche `tdee.py` (TDEE di P00 e fattori di ogni
+   tipo di piano) e `interazioni.py` (copertura, dichiarazione, doppioni). Con i template accanto alla cartella del motore (repository
    clonato) gira intero, PDF compreso; con il solo motore del comando d'avvio gira senza
    `.py` e PDF, che si verificano con `--template` (chat B). Dura meno di un secondo
    senza template, circa 2 secondi con
@@ -335,7 +336,23 @@ pasti e farmaci. La tabella si legge senza distinzione tra maiuscole e minuscole
 - un `food_id` assente dal database si dichiara: quell'interazione non può scattare.
 Nessuna conoscenza farmacologica propria, nessuna interazione inventata:
 segnala esplicitamente i principi attivi assenti dalla tabella, perché l'assenza di
-allarme non sia scambiata per assenza di rischio.
+allarme non sia scambiata per assenza di rischio (`PRINCIPIO_ATTIVO_NON_COPERTO`, un
+principio attivo una volta sola anche se preso a più orari, 22/11/2026).
+
+**Nessuna interazione nota (22/11/2026).** Un principio attivo senza interazioni
+alimentari rilevanti si dichiara, dentro lo schema congelato, con UNA riga:
+```
+levetiracetam,nessuna_interazione_nota,,"Fonte: RCP Keppra (EMA), par. 4.5 e 5.2: «The extent of absorption of levetiracetam was not altered by food, but the rate of absorption was slightly reduced.»",0,nessuna
+```
+`tipo_target = nessuna_interazione_nota`, target vuoto, `separazione_ore = 0`, `gravita =
+nessuna`, e la colonna `meccanismo` che inizia con «Fonte:» e cita documento, paragrafo e
+frase (di solito il paragrafo 4.5 del RCP). Copre il principio attivo e la pipeline al
+PASSO 5 la mostra con la fonte (`PRINCIPIO_ATTIVO_SENZA_INTERAZIONI_NOTE`, attenzione da
+riportare nella tabella del PASSO 6). Blocca: senza fonte
+(`INTERAZIONE_NESSUNA_SENZA_FONTE`), con target, separazione o gravità diversi
+(`INTERAZIONE_NESSUNA_NON_VALIDA`), insieme a interazioni vere dello stesso principio
+(`INTERAZIONE_NESSUNA_CONTRADDITTORIA`). La riga, come ogni riga della tabella, la valida
+il nutrizionista.
 
 ### formati.py
 Regola anti-spreco (nucleo, sezione 5). Legge `formati_confezione.csv` e
@@ -452,6 +469,9 @@ python3 tdee.py ... --piano deficit_lieve --proteine 25 --carboidrati 45 --grass
     --fibra 30 [--condizione menopausa] [--tdee-confermato 2300] [--out target_proposto.csv]
 ```
 `--attivita` usa le chiavi di `PAL`, le stesse di `livello_attivita_dichiarato` del Form A.
+`--piano`: `mantenimento`, `deficit_lieve` (-15%), `deficit_moderato` (-25%), `surplus_lieve`
+(+10%), `surplus_moderato` (+15%, deciso dal nutrizionista il 22/11/2026); i fattori stanno in
+`FATTORI_PIANO` e l'autotest (controllo 10 del collaudo) li verifica tutti sul TDEE di P00.
 Senza uno dei cinque dati si ferma e li elenca (mai default); senza argomenti non esegue
 più la demo (fino al 23/10/2026 `--help` stampava il caso del paziente fittizio P00). Con `--piano` servono
 le tre percentuali (somma 100) e la fibra; `--tdee-confermato` calcola il target sul TDEE
@@ -589,7 +609,10 @@ indicazione` per le raccomandazioni senza numero, che si mostrano e non si contr
 Le righe vengono dalla scheda «Estrazione linee guida» del documento di progetto, mai da
 memoria.
 - Profili: `generale` (LARN: termine di confronto, da solo non dà avvisi), `over65`, `ipercolesterolemia`,
-  `ipertrigliceridemia`, `ipertensione`, `masld`, `diabete_t2`, `obesita` (vuoto: linea
+  `ipertrigliceridemia`, `ipertensione`, `masld`, `diabete_t2`, `sportivo_forza` (R070,
+  proteine ≥ 1,6 g/kg/die da Morton 2018, proposta del 22/11/2026 in stato `da_verificare`
+  finché il nutrizionista non la approva; il parametro `proteine_g_kg` si mostra e non si
+  controlla: il motore non conosce il peso), `obesita` (vuoto: linea
   guida SIO/ISS da leggere). Li sceglie il nutrizionista, nei metadati.
 - Si controllano SOLO i parametri dei profili scelti (nutrizionista, 31/10/2026: «i
   controlli devono scattare solo nelle apposite diete»): un piano con `"profili": []` non ha
@@ -810,6 +833,11 @@ validato).
   avviso), valori ricalcolati a parte sui CSV.
 - **65_saturi_alti_senza_profilo** — il piano del 63 con `"profili": []`: nessun avviso del
   PASSO 7 (regola del 31/10/2026).
+- **66_nessuna_interazione_nota** — levetiracetam a due orari dichiarato senza interazioni
+  con la fonte (attenzione con la fonte, nessun «non coperto») e un principio non coperto a
+  due orari (un solo rilievo).
+- **67_nessuna_interazione_non_valida** — dichiarazione senza fonte, con target, separazione
+  e gravità sbagliati, o insieme a un'interazione vera: blocca.
 
 **Tipi di caso.** `fisso` e `scelta_multipla` si deducono dal piano (presenza di
 `gruppo_scelta`). `pipeline` è l'unico DICHIARATO, da un `pipeline.json` nella cartella del
@@ -829,7 +857,7 @@ diventa un nuovo caso golden.
 
 ## 4. DATABASE ALIMENTI E GERARCHIA FONTI
 
-**Stato:** 165 alimenti verificati e tracciati alla fonte; il numero vincolante è
+**Stato:** 167 alimenti verificati e tracciati alla fonte; il numero vincolante è
 `EXPECTED_ALIMENTI_COUNT` in `collaudo.py`. Conformità kcal/macro/fibra a CREA:
 `python3 cerca_crea.py verifica`.
 
@@ -998,7 +1026,7 @@ Si legge con `python3 moduli_pasto.py`.
 
 **ruoli_alimenti.csv** — `food_id, ruolo`. Un ruolo per voce: carne, salume, pesce,
 molluschi_crostacei, uova, legumi, latte, yogurt, formaggio, cereale, patate, verdura,
-frutta, frutta_secca, condimento, dolce. Più fine della `categoria` di `alimenti.csv`.
+frutta, frutta_secca, condimento, dolce, bevanda (22/11/2026, caffè espresso). Più fine della `categoria` di `alimenti.csv`.
 Patate e patata dolce hanno un ruolo proprio (portano carboidrato, non contorno); i piselli
 sono legumi; il mais dolce è cereale. Ogni voce nuova del database richiede la sua riga
 qui (controllo 8).

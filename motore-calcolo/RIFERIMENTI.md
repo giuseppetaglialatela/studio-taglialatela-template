@@ -2,7 +2,7 @@
 
 Generato da `riferimenti.py --genera-pagina` da `riferimenti.csv`: non si modifica a mano (il collaudo controlla che coincida). Ogni valore con documento, posizione e frase originale. Si controllano solo i parametri dei profili scelti nel piano: il profilo «generale» (LARN) da solo non dà avvisi, è il termine di confronto, e un profilo lo sostituisce solo se più restrittivo (salvo le righe «sostituisce»). Avvisi, mai blocchi.
 
-Impronta del registro: `7f5db1f99598`
+Impronta del registro: `c8833968811b`
 
 ## generale — popolazione adulta sana (LARN): termine di confronto, da solo non da' avvisi
 
@@ -145,3 +145,12 @@ Impronta del registro: `7f5db1f99598`
 linea guida SIO/ISS 2026 (Eat Weight Disord 2026;31:9) non ancora letta: nessun riferimento caricato
 
 Nessuna riga.
+
+## sportivo_forza — allenamento di forza o ipertrofia
+
+riferimento sulle proteine proposto il 22/11/2026 (R070), da approvare: finche' resta «da_verificare» non si usa
+
+- `R070` **proteine per kg di peso corporeo** ≥ 1,6 g/kg/die — **DA_VERIFICARE**
+  - Morton RW et al., Br J Sports Med 2018;52:376-384, doi 10.1136/bjsports-2017-097608, Risultati, «Break point analysis», p. 6 di 10; Abstract, «Summary/conclusion», p. 1 di 10; evidenza: meta-analisi e meta-regressione di RCT (49 studi, 1.863 partecipanti); break point non significativo (p=0,079); popolazione: adulti sani in allenamento di forza di almeno 6 settimane; verificato: 2026-11-22
+  - «break point=1.62 (1.03, 2.20) g/kg/day» · «With protein supplementation, protein intakes at amounts greater than ~1.6 g/kg/day do not further contribute RET-induced gains in FFM»
+  - nota: PROPOSTA del 22/11/2026, da approvare. Limite superiore lasciato vuoto: 2,2 g/kg/die e' il limite superiore dell'intervallo di confidenza, non un tetto di sicurezza. Concordanti: ISSN 2017 (J Int Soc Sports Nutr 14:20, 1,4-2,0 g/kg/die); Nunes 2022 (J Cachexia Sarcopenia Muscle 13:795, forza maggiore da 1,6 g/kg/die). In deficit energetico la relazione resta lineare (Refalo 2025, Strength Cond J): 1,6 e' un minimo, non un tetto. Il motore non conosce il peso: si mostra, non si controlla

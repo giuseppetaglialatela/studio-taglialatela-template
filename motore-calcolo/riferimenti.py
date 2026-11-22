@@ -65,10 +65,13 @@ PROFILI = {
     "masld": "steatosi epatica metabolica (MASLD)",
     "diabete_t2": "diabete tipo 2",
     "obesita": "obesità",
+    "sportivo_forza": "allenamento di forza o ipertrofia",
 }
 NOTE_PROFILO = {
     "obesita": "linea guida SIO/ISS 2026 (Eat Weight Disord 2026;31:9) non ancora letta: "
                "nessun riferimento caricato",
+    "sportivo_forza": "riferimento sulle proteine proposto il 22/11/2026 (R070), da "
+                      "approvare: finche' resta «da_verificare» non si usa",
 }
 
 # parametro -> (unita, descrizione, come si calcola dal motore o None)
@@ -91,9 +94,12 @@ PARAMETRI = {
     "potassio_mg": ("mg_die", "potassio", None),
     "alcol_g_die": ("g_die", "alcol", None),
     "alcol_g_settimana": ("g_settimana", "alcol", None),
+    # per kg di peso corporeo: il motore non conosce il peso del paziente, quindi
+    # si mostra e non si controlla (22/11/2026)
+    "proteine_g_kg": ("g_kg_die", "proteine per kg di peso corporeo", None),
 }
 UNITA_LEGGIBILE = {"g_die": "g/die", "mg_die": "mg/die", "pct_energia": "% dell'energia",
-                   "g_settimana": "g/settimana"}
+                   "g_settimana": "g/settimana", "g_kg_die": "g/kg/die"}
 STATI = ("attivo", "superato", "da_verificare")
 REGOLE = ("", "piu_restrittivo", "sostituisce")
 

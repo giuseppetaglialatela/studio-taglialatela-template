@@ -2,7 +2,7 @@
 
 Generata da `tabella_alimenti.py --genera-pagina` dai CSV del motore: non si modifica a mano. Valori per 100 g di parte edibile. «n.d.» = dato mancante, dichiarato in `gap.csv`: non è uno zero.
 
-**165 alimenti**, 21 valori mancanti su 9 alimenti.
+**167 alimenti**, 21 valori mancanti su 9 alimenti.
 
 ## Valori mancanti
 
@@ -36,37 +36,45 @@ Generata da `tabella_alimenti.py --genera-pagina` dai CSV del motore: non si mod
 
 | Alimento | kcal | Prot g | Carb g | Grassi g | Fibra g |
 |---|---:|---:|---:|---:|---:|
+| Caffè espresso (senza zucchero) | 2 | 0,12 | 0 | 0,18 | 0 |
 | Cioccolato fondente | 531 | 6,6 | 49,7 | 33,6 | 8 |
 | Crema di nocciole e cacao | 537 | 6,9 | 58,1 | 32,4 | 3 |
 | Miele | 304 | 0,6 | 80,3 | 0 | 0 |
 | Olive verdi | 148 | 0,8 | 1 | 15 | 3 |
+| Zucchero (saccarosio) | 392 | 0 | 104,5 | 0 | 0 |
 
 ### Micronutrienti
 
 | Alimento | Ca mg | Fe mg | Vit D µg | Folati µg | B12 µg | Zn mg | Mg mg | Vit C mg |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Caffè espresso (senza zucchero) | 2 | 0,13 | 0 | 1 | 0 | 0,05 | 80 | 0 |
 | Cioccolato fondente | 51 | 5 | 0 | 12 | 0 | 1,3 | 89 | 0 |
 | Crema di nocciole e cacao | 143 | 3,6 | 0,005 | 14 | 0,05 | 1 | 65 | 0 |
 | Miele | 5 | 0,5 | 0 | 2 | 0 | 0,8 | 3 | 1 |
 | Olive verdi | 64 | 1,6 | 0 | 0,5 | 0 | 0,4 | 11 | 0 |
+| Zucchero (saccarosio) | 1 | 0,3 | 0 | 0 | 0 | 0,1 | 2 | 0 |
 
 ### Lipidi
 
 | Alimento | Saturi g | Mono g | Poli g | EPA g | DHA g | Col mg |
 |---|---:|---:|---:|---:|---:|---:|
+| Caffè espresso (senza zucchero) | 0,092 | 0,005 | 0,092 | 0 | 0 | 0 |
 | Cioccolato fondente | 20,59 | 11,08 | 1,41 | 0 | 0 | 0 |
 | Crema di nocciole e cacao | 9,17 | 16,51 | 5,3 | 0 | 0 | 2 |
 | Miele | 0 | 0 | 0 | 0 | 0 | 0 |
 | Olive verdi | 2,1 | 10,47 | 1,68 | 0 | 0 | 0 |
+| Zucchero (saccarosio) | 0 | 0 | 0 | 0 | 0 | 0 |
 
 ### Fonti
 
 | Alimento | food_id | Fonte | Codice | Verifica | Fonte lipidi |
 |---|---|---|---|---|---|
+| Caffè espresso (senza zucchero) | 9031 | BDA-IEO(dati USDA 171891) | 9031_2+171891 | 2026-11-22 | BDA-IEO 9031_2 |
 | Cioccolato fondente | 203020 | CREA+BDA-IEO | 203020 | 2026-08-08 | BDA-IEO 2005_2 |
 | Crema di nocciole e cacao | 203500 | CREA+BDA-IEO | 203500+2008_2 | 2026-10-21 | BDA-IEO 2008_2 |
 | Miele | 210010 | CREA+BDA-IEO(proxy zinco/folati) | 210010 | 2026-07-26 | BDA-IEO 2017_2 |
 | Olive verdi | 008820 | CREA+BDA-IEO(proxy zinco/folati)+USDA | 008820 | 2026-10-01 | BDA-IEO 590_1 |
+| Zucchero (saccarosio) | 201500 | CREA+BDA-IEO | 201500+2021_2 | 2026-11-22 | BDA-IEO 2021_2 |
 
 ## Carne
 

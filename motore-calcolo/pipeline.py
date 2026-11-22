@@ -929,8 +929,11 @@ def passo_5_interazioni(rilievi, piano, db, farmaci_path, interazioni_path,
     # una gravita' scritta male non si declassa in silenzio: prima del
     # 21/10/2026 tutto cio' che non era esattamente "alta" diventava "media",
     # e un "Alta" maiuscolo perdeva il blocco
+    nessuna = mod_interazioni.TIPO_NESSUNA
+    nessuna_non_valide = set()
     ignote = sorted({(i["principio_attivo"], i["target"], i["gravita"])
-                     for i in tabella if i["gravita"] not in GRAVITA_AMMESSE})
+                     for i in tabella if i["gravita"] not in GRAVITA_AMMESSE
+                     and i["tipo_target"] != nessuna})
     for principio, target_i, grav in ignote:
         rilievi.blocca(5, "INTERAZIONE_GRAVITA_NON_RICONOSCIUTA",
                        f"tabella interazioni: gravita' '{grav}' non riconosciuta per "
@@ -939,10 +942,39 @@ def passo_5_interazioni(rilievi, piano, db, farmaci_path, interazioni_path,
     # l'interazione senza alcun avviso
     for i in tabella:
         etichetta = f"{i['principio_attivo']} / {i['tipo_target']} / {i['target']}"
-        if i["tipo_target"] not in ("nutriente", "food_id"):
+        if i["tipo_target"] == nessuna:
+            # dichiarazione «nessuna interazione nota» (22/11/2026): vale solo
+            # completa e con la fonte, altrimenti sarebbe un silenzio travestito
+            difetti = []
+            if i["target"] not in ("", "-"):
+                difetti.append("target non vuoto")
+            if i["separazione_ore"] != 0:
+                difetti.append("separazione_ore diversa da 0")
+            if i["gravita"] != mod_interazioni.GRAVITA_NESSUNA:
+                difetti.append(f"gravita' '{i['gravita']}' invece di 'nessuna'")
+            if difetti:
+                nessuna_non_valide.add(i["principio_attivo"])
+                rilievi.blocca(5, "INTERAZIONE_NESSUNA_NON_VALIDA",
+                               f"tabella interazioni: riga {nessuna} di "
+                               f"{i['principio_attivo']} non valida: {', '.join(difetti)}")
+            m = i["meccanismo"]
+            if not m.lower().startswith("fonte:") or len(m[6:].strip()) < 15:
+                nessuna_non_valide.add(i["principio_attivo"])
+                rilievi.blocca(5, "INTERAZIONE_NESSUNA_SENZA_FONTE",
+                               f"tabella interazioni: {i['principio_attivo']} dichiarato "
+                               f"senza interazioni note senza fonte: la colonna meccanismo "
+                               f"deve iniziare con «Fonte:» e citare documento, paragrafo "
+                               f"e frase")
+            if any(j["principio_attivo"] == i["principio_attivo"]
+                   and j["tipo_target"] != nessuna for j in tabella):
+                nessuna_non_valide.add(i["principio_attivo"])
+                rilievi.blocca(5, "INTERAZIONE_NESSUNA_CONTRADDITTORIA",
+                               f"tabella interazioni: {i['principio_attivo']} ha sia una "
+                               f"riga {nessuna} sia interazioni: chiarire quale vale")
+        elif i["tipo_target"] not in ("nutriente", "food_id"):
             rilievi.blocca(5, "INTERAZIONE_TIPO_NON_RICONOSCIUTO",
                            f"tabella interazioni: tipo_target non riconosciuto in "
-                           f"{etichetta} (ammessi: nutriente, food_id)")
+                           f"{etichetta} (ammessi: nutriente, food_id, {nessuna})")
         elif i["tipo_target"] == "nutriente" and i["target"] not in NUTRIENTI_PER_100G:
             rilievi.blocca(5, "INTERAZIONE_NUTRIENTE_NON_RICONOSCIUTO",
                            f"tabella interazioni: nutriente non riconosciuto in "
@@ -955,6 +987,21 @@ def passo_5_interazioni(rilievi, piano, db, farmaci_path, interazioni_path,
 
     allerte, coperture_mancanti = mod_interazioni.verifica_interazioni(
         piano, db, farmaci, tabella, orari)
+
+    in_terapia = []
+    for f in farmaci:
+        if f["principio_attivo"] not in in_terapia:
+            in_terapia.append(f["principio_attivo"])
+    for pa in in_terapia:
+        dich = [i for i in tabella if i["principio_attivo"] == pa
+                and i["tipo_target"] == nessuna]
+        if dich and pa not in nessuna_non_valide:
+            print(f"\n  Principio attivo dichiarato senza interazioni alimentari note: "
+                  f"{pa}")
+            print(f"     {dich[0]['meccanismo']}")
+            rilievi.segnala(5, "PRINCIPIO_ATTIVO_SENZA_INTERAZIONI_NOTE",
+                            f"{pa}: nessuna interazione alimentare nota, dichiarata in "
+                            f"tabella con la fonte ({dich[0]['meccanismo']})")
 
     if coperture_mancanti:
         print("\n  ⚠️ Principi attivi in terapia SENZA righe in tabella:")

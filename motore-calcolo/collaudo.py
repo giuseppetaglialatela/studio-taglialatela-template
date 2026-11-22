@@ -24,7 +24,9 @@ CONTROLLI:
   9) Cross-check Atwater sull'intero database: solo falsi positivi verificati
      (23/10/2026; la pipeline lo esegue solo sugli alimenti del piano)
  10) Controlli di disciplina (30/10/2026): autotest di metadati_piano.py e di
-     genera_zona_piano.py (verdetto, anteprima, impronta, segnaposto)
+     genera_zona_piano.py (verdetto, anteprima, impronta, segnaposto); dal
+     22/11/2026 anche tdee.py (TDEE di P00 e fattori per tipo di piano) e
+     interazioni.py (copertura, dichiarazione «nessuna interazione nota», doppioni)
  11) Registro dei riferimenti clinici (30/10/2026): fonti complete, una riga
      attiva per profilo e parametro, RIFERIMENTI.md allineata, autotest
  13) Tabelle di conversione (04/11/2026): elenchi, ricalcolo, scheda solo su piano
@@ -58,7 +60,7 @@ import sys
 BASE = os.path.dirname(os.path.abspath(__file__))
 
 # --- valore da aggiornare manualmente quando il database cresce ---
-EXPECTED_ALIMENTI_COUNT = 165
+EXPECTED_ALIMENTI_COUNT = 167
 
 # File coperti dai checksum ma NON necessari a ogni sessione. Se presenti
 # vengono verificati come tutti gli altri; se assenti, il collaudo lo dice e
@@ -371,19 +373,27 @@ def controllo_10_disciplina():
             if os.path.isfile(TEMPLATE_SPIEGAZIONE):
                 import genera_spiegazione
                 esito = genera_spiegazione.autotest(TEMPLATE_SPIEGAZIONE) or esito
+        buf_tdee = io.StringIO()
+        with redirect_stdout(buf_tdee):
+            import tdee
+            tdee.autotest()
+        import interazioni
+        n_int, ko_int = interazioni.autotest()
+    except AssertionError as e:
+        return False, f"tdee.py --autotest fallito: {e}"
     except Exception as e:
         return False, f"autotest non eseguibile: {type(e).__name__}: {e}"
     righe = buf.getvalue().splitlines()
     ok_g = sum(1 for r in righe if r.startswith("  [OK"))
     ko_g = [r.strip()[6:] for r in righe if r.startswith("  [KO")]
-    problemi = ko_meta + ko_g
+    problemi = ko_meta + ko_g + ko_int
     if esito != 0 and not ko_g:
         problemi.append("genera_zona_piano.py --autotest fallito")
     if problemi:
         return False, "; ".join(problemi[:6]) + (f" (+{len(problemi) - 6})"
                                                  if len(problemi) > 6 else "")
     return True, (f"metadati {n_meta} prove, anteprima, impronta e spiegazione {ok_g} "
-                  f"prove, tutte superate" + ("" if template else
+                  f"prove, tdee, interazioni {n_int} prove, tutte superate" + ("" if template else
                                               " (senza PDF: template assenti)"))
 
 
