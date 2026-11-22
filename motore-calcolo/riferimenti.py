@@ -70,8 +70,6 @@ PROFILI = {
 NOTE_PROFILO = {
     "obesita": "linea guida SIO/ISS 2026 (Eat Weight Disord 2026;31:9) non ancora letta: "
                "nessun riferimento caricato",
-    "sportivo_forza": "riferimento sulle proteine proposto il 22/11/2026 (R070), da "
-                      "approvare: finche' resta «da_verificare» non si usa",
 }
 
 # parametro -> (unita, descrizione, come si calcola dal motore o None)
