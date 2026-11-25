@@ -73,13 +73,9 @@
     [
       6,
       "VALUTARE_LIVELLO_RINFORZATO"
-    ],
-    [
-      7,
-      "PROFILO_SENZA_RIFERIMENTI"
     ]
   ],
   "exit_code": 0,
-  "descrizione": "Il caso 51 con il profilo obesita, che nel registro non ha ancora righe (linea guida SIO/ISS non letta): compare solo PROFILO_SENZA_RIFERIMENTI, nessun avviso dai valori generali. Diventa rosso se un profilo vuoto passa come se fosse stato controllato.",
-  "riferimento": "Costruito il 30/10/2026 (registro dei riferimenti) da caso_51_macro_scelte_giornate_reali (stessi piano e target); attesi aggiunti a mano sui valori settimanali calcolati a parte. Aggiornato il 31/10/2026: i controlli scattano solo per i parametri dei profili scelti (decisione del nutrizionista). Il 04/11/2026 tolte le due segnalazioni dello scatolame (stato familiare, decisione del nutrizionista): resta quella degli altri alimenti."
+  "descrizione": "Il caso 51 con il profilo obesita. Fino al 24/11/2026 il profilo era vuoto e il caso verificava PROFILO_SENZA_RIFERIMENTI; dal 25/11/2026 il profilo ha le indicazioni senza numero della linea guida SIO/ISS 2026 (R080-R082), che si mostrano e non si verificano: nessun avviso del PASSO 7, ne' dai valori generali ne' dal profilo. Diventa rosso se un'indicazione senza numero produce un avviso o se i valori generali tornano a dare avvisi da soli. La garanzia sul profilo vuoto resta nell'autotest di riferimenti.py («profilo senza righe segnalato»), perche' nel registro non c'e' piu' un profilo vuoto.",
+  "riferimento": "Costruito il 30/10/2026 (registro dei riferimenti) da caso_51_macro_scelte_giornate_reali (stessi piano e target); attesi aggiunti a mano sui valori settimanali calcolati a parte. Aggiornato il 31/10/2026: i controlli scattano solo per i parametri dei profili scelti (decisione del nutrizionista). Il 04/11/2026 tolte le due segnalazioni dello scatolame (stato familiare, decisione del nutrizionista): resta quella degli altri alimenti. Il 25/11/2026 tolto PROFILO_SENZA_RIFERIMENTI: profilo obesita caricato dalla linea guida SIO/ISS 2026 (decisione del nutrizionista)."
 }

@@ -1,7 +1,7 @@
 # M1 — MOTORE DI CALCOLO
 
 Modulo operativo (principio 6). Dipendenze: nessuna. Ne dipendono M2 e M6.
-Ultima modifica: 22/11/2026 notte (scheda per chi cucina: campo `tabelle` del file delle esclusioni, tabelle scelte piano per piano, default tutte e quattro; controllo «scheda con tabelle scelte» della regressione). 22/11/2026 sera (168 alimenti: pomodori ciliegini CREA 006650, M6 sezione 15; scheda per chi cucina: alternative dei carboidrati solo pasta, riso, pane comune e patate, tabella girata con una riga per porzione, `_tabella_righe_html`, controllo «scheda con molte porzioni di pane» della regressione; cime di rapa tra le verdure cotte). 22/11/2026 (167 alimenti: zucchero CREA 201500 e caffè espresso BDA 9031, ruolo `bevanda`, M6 sezione 14; `tdee.py --piano surplus_moderato` (+15%); dichiarazione «nessuna interazione nota» in `interazioni.csv` e principio attivo a due orari citato una volta; profilo `sportivo_forza` con R070 approvato; autotest di `tdee.py` e `interazioni.py` nel controllo 10; casi 66-67). 11/11/2026 notte, impaginazione (`genera_scheda_cucina.py`: con tre pagine, Verdure e poi Carni e affettati passano in coda alla pagina 2 se le tabelle non entrano nella pagina 3; `componi(..., in_coda=)`, `SPOSTABILI`). 11/11/2026 notte (165 alimenti: coniglio coscia CREA 107030 + BDA 8668, fesa di vitello proxy fesa di vitellone CREA 101160 + BDA 8654, M6 sezione 13; `scambi_carni.csv` con vitellone magro, filetto e macinato di manzo, coniglio e fesa di vitello confermati; orata e salmone in `scambi_pesce.csv`). 11/11/2026 sera (tabella carni e affettati: `scambi_carni.csv`, `tabelle_conversione.tabella_carni`, nota sul sale degli affettati nella scheda; `--out-html` facoltativo in `genera_scheda_cucina.py`; `genera_zona_piano.py` si ferma se `obiettivo_intestazione` comincia con «Obiettivo»). 11/11/2026 (163 alimenti: primo sale, proxy dichiarato della mozzarella di vacca, M6 sezione 12; uova a pezzi in anteprima, PDF e scheda, M3). 10/11/2026 (pop corn 3009 corretto su CREA 501200 + USDA, M6 sezione 11; 162 alimenti: minestrone cotto, CREA 905010, micronutrienti USDA proxy, M6 sezione 10). 04/11/2026 (161 alimenti: piadina e cereali in formelle; scatolame a stato `familiare`; tabelle di conversione: `scambi_carboidrati.csv`, `scambi_pesce.csv`, `scambi_verdure.csv`, `tabelle_conversione.py`; `genera_scheda_cucina.py`; controllo 13 del collaudo). 31/10/2026 pomeriggio (file affiancato `lipidi.csv`: saturi, mono, poli,
+Ultima modifica: 25/11/2026 (avvio: se la sessione blocca l'esecuzione si chiede l'autorizzazione esplicita al nutrizionista, mai aggirare il blocco; righe del registro solo da fonte ufficiale letta sull'originale; profilo `over65` con R012 proteine ≥ 1 g/kg/die e R013-R014, profilo `obesita` con R080-R082 dalla SIO/ISS 2026; `peso_kg` e `altezza_cm` nei metadati: proteine per kg verificate, con BMI ≥ 30 sul peso aggiustato; controllo «proteine per kg (over65)» della regressione; caso 62 aggiornato). 22/11/2026 notte (scheda per chi cucina: campo `tabelle` del file delle esclusioni, tabelle scelte piano per piano, default tutte e quattro; controllo «scheda con tabelle scelte» della regressione). 22/11/2026 sera (168 alimenti: pomodori ciliegini CREA 006650, M6 sezione 15; scheda per chi cucina: alternative dei carboidrati solo pasta, riso, pane comune e patate, tabella girata con una riga per porzione, `_tabella_righe_html`, controllo «scheda con molte porzioni di pane» della regressione; cime di rapa tra le verdure cotte). 22/11/2026 (167 alimenti: zucchero CREA 201500 e caffè espresso BDA 9031, ruolo `bevanda`, M6 sezione 14; `tdee.py --piano surplus_moderato` (+15%); dichiarazione «nessuna interazione nota» in `interazioni.csv` e principio attivo a due orari citato una volta; profilo `sportivo_forza` con R070 approvato; autotest di `tdee.py` e `interazioni.py` nel controllo 10; casi 66-67). 11/11/2026 notte, impaginazione (`genera_scheda_cucina.py`: con tre pagine, Verdure e poi Carni e affettati passano in coda alla pagina 2 se le tabelle non entrano nella pagina 3; `componi(..., in_coda=)`, `SPOSTABILI`). 11/11/2026 notte (165 alimenti: coniglio coscia CREA 107030 + BDA 8668, fesa di vitello proxy fesa di vitellone CREA 101160 + BDA 8654, M6 sezione 13; `scambi_carni.csv` con vitellone magro, filetto e macinato di manzo, coniglio e fesa di vitello confermati; orata e salmone in `scambi_pesce.csv`). 11/11/2026 sera (tabella carni e affettati: `scambi_carni.csv`, `tabelle_conversione.tabella_carni`, nota sul sale degli affettati nella scheda; `--out-html` facoltativo in `genera_scheda_cucina.py`; `genera_zona_piano.py` si ferma se `obiettivo_intestazione` comincia con «Obiettivo»). 11/11/2026 (163 alimenti: primo sale, proxy dichiarato della mozzarella di vacca, M6 sezione 12; uova a pezzi in anteprima, PDF e scheda, M3). 10/11/2026 (pop corn 3009 corretto su CREA 501200 + USDA, M6 sezione 11; 162 alimenti: minestrone cotto, CREA 905010, micronutrienti USDA proxy, M6 sezione 10). 04/11/2026 (161 alimenti: piadina e cereali in formelle; scatolame a stato `familiare`; tabelle di conversione: `scambi_carboidrati.csv`, `scambi_pesce.csv`, `scambi_verdure.csv`, `tabelle_conversione.py`; `genera_scheda_cucina.py`; controllo 13 del collaudo). 31/10/2026 pomeriggio (file affiancato `lipidi.csv`: saturi, mono, poli,
 EPA, DHA, colesterolo; saturi e colesterolo calcolati nei riferimenti; sezione LIPIDI del
 report; controllo 12 del collaudo; casi 63-65). 31/10/2026 (riferimenti: si controllano solo
 i parametri dei profili scelti).
@@ -36,7 +36,11 @@ sessione (errore 403, che `curl -sf` nasconde: compare come «gzip: stdin: unexp
 of file»), scatta da solo e stampa «codeload non disponibile: ripiego con git clone». Stesso
 risultato; provato in entrambi i rami il 23/10/2026.
 Poi si lavora in `/tmp/motore`. Nessun calcolo su paziente prima dell'esito positivo
-(principio 7). Il download è pubblico: non serve il repository collegato. Il motore si
+(principio 7). **Se la sessione blocca l'esecuzione** del codice scaricato (blocco di
+sicurezza della piattaforma, non una regola di queste istruzioni: successo tre volte il
+25/11/2026), ci si ferma e si chiede l'autorizzazione esplicita al nutrizionista in chat;
+non si aggira il blocco (niente comandi alternativi, copie o esecuzioni indirette). Con
+l'autorizzazione si riprova lo stesso comando. Il download è pubblico: non serve il repository collegato. Il motore si
 esegue con `python3` normale dalla sua cartella, **mai con `python3 -I`** (modalità
 isolata): i moduli non si importano e il collaudo fallisce senza motivo.
 `cache.zip`, `BDA_alimenti.xlsx` e `crea_cache.zip` servono solo per ampliare il database
@@ -239,7 +243,8 @@ assunzione di composizione da confermare (`ASSUNZIONE_NON_CONFERMATA`); campo `a
 o `alimenti_desiderati` scritto male (`ASSUNZIONI_NON_VALIDE`,
 `ALIMENTI_DESIDERATI_NON_VALIDI`); testo libero in `drive` (`DRIVE_NON_VALIDO`); profili
 scritti male o sconosciuti (`PROFILI_NON_VALIDI`); registro dei riferimenti non valido
-(`REGISTRO_RIFERIMENTI_NON_VALIDO`).
+(`REGISTRO_RIFERIMENTI_NON_VALIDO`); `peso_kg` senza `altezza_cm` o viceversa, o valori non
+plausibili (`ANTROPOMETRIA_NON_VALIDA`).
 
 **Rilievi DA DICHIARARE** (non bloccano): eccezione etichetta dichiarata
 (`ALIMENTO_FUORI_DATABASE_SU_RICHIESTA`); giorno con kcal fuori ±5% (entro ±10%) o macro
@@ -260,8 +265,9 @@ principi attivi assenti dalla tabella; terapia non dichiarata (né file né
 desiderati assenti dal database (`ALIMENTI_DESIDERATI_MANCANTI`, avviso per decisione del
 30/10/2026: si aggiungono con M6 o si sostituiscono); riferimento di un profilo fuori
 nella settimana reale peggiore (`RIFERIMENTO_FUORI`, con fonte e scelte), riferimenti che il
-motore non calcola (`RIFERIMENTI_NON_VERIFICABILI`, da dichiarare come limite), profilo
-senza righe nel registro (`PROFILO_SENZA_RIFERIMENTI`); pasto assente su tutto il
+motore non calcola (`RIFERIMENTI_NON_VERIFICABILI`, da dichiarare come limite), soglie per
+kg non verificate per mancanza di peso e altezza nei metadati (`RIFERIMENTI_SENZA_PESO`),
+profilo senza righe nel registro (`PROFILO_SENZA_RIFERIMENTI`); pasto assente su tutto il
 piano; livello parziale o fuori catalogo; catalogo assente (livello verificato solo come
 uniforme); collaudo saltato; avviso del livello rinforzato (`VALUTARE_LIVELLO_RINFORZATO`,
 PASSO 6). I totali sottostimati per gap si stampano nel report.
@@ -606,14 +612,28 @@ memoria della chat: una riga per profilo e parametro con `valore_min` e/o `valor
 unità, documento, posizione, frase originale, evidenza, popolazione, data di verifica e
 stato (`attivo`, `superato` con `sostituito_da`, `da_verificare`); `parametro =
 indicazione` per le raccomandazioni senza numero, che si mostrano e non si controllano.
-Le righe vengono dalla scheda «Estrazione linee guida» del documento di progetto, mai da
-memoria.
+Le righe vengono dalla scheda «Estrazione linee guida» del documento di progetto o dal
+documento originale letto in sessione, mai da memoria. **Solo fonti ufficiali** (25/11/2026):
+il PDF dell'editore o della società scientifica, letto per intero sul file (non un riassunto
+dello strumento web, non una copia di terzi); ogni frase tra «» si controlla parola per
+parola sul PDF, e la pagina è quella stampata sul PDF. Se il sito non si apre dalla sessione,
+il PDF si chiede allegato al nutrizionista.
 - Profili: `generale` (LARN: termine di confronto, da solo non dà avvisi), `over65`, `ipercolesterolemia`,
   `ipertrigliceridemia`, `ipertensione`, `masld`, `diabete_t2`, `sportivo_forza` (R070,
   proteine ≥ 1,6 g/kg/die da Morton 2018, nessun massimo, approvato dal nutrizionista il
-  22/11/2026; il parametro `proteine_g_kg` si mostra e non si
-  controlla: il motore non conosce il peso), `obesita` (vuoto: linea
-  guida SIO/ISS da leggere). Li sceglie il nutrizionista, nei metadati.
+  22/11/2026), `obesita` (R080-R082, solo indicazioni senza numero: la linea guida SIO/ISS
+  2026, letta per intero il 25/11/2026, non ha valori sui nutrienti). `over65` ha anche
+  R012, proteine ≥ 1 g/kg/die (ESPEN 2022 R2, grado B; PROT-AGE concordante; approvato il
+  25/11/2026), e R013-R014 sul calo di peso nell'anziano (ESPEN 2022 R79-R82). Li sceglie
+  il nutrizionista, nei metadati.
+- Proteine per kg (`proteine_g_kg`, 25/11/2026): si verificano solo se i metadati hanno
+  `peso_kg` e `altezza_cm` (entrambi; uno solo, o valori non plausibili, bloccano con
+  `ANTROPOMETRIA_NON_VALIDA`). Peso di riferimento, decisione del nutrizionista: con BMI ≥ 30
+  il peso aggiustato = peso a BMI 25 + 25% dell'eccesso (SOGLI 2026, Clin Nutr
+  2026;61:106645, Statement 11: fonte senza grado, dichiarata nella nota di R012); sotto 30
+  il peso attuale. Il report del PASSO 7 scrive quale peso ha usato. Senza i due campi la
+  soglia si mostra e non si controlla, con l'attenzione `RIFERIMENTI_SENZA_PESO`. Over65 e
+  sportivo_forza insieme: vale la soglia più alta.
 - Si controllano SOLO i parametri dei profili scelti (nutrizionista, 31/10/2026: «i
   controlli devono scattare solo nelle apposite diete»): un piano con `"profili": []` non ha
   avvisi del PASSO 7, e un parametro che sta solo nel generale (es. sodio, EPA+DHA) non si

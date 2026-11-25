@@ -2,7 +2,7 @@
 
 Modulo operativo: si carica quando si compone, si modifica o si valuta un piano.
 Dipende da **M1**: nessun passo è eseguibile senza il motore collaudato.
-Ultima modifica: 22/11/2026 (tabelle della scheda scelte al PASSO 6, campo `tabelle` del file delle esclusioni). 11/11/2026 (`obiettivo_intestazione` senza «Obiettivo» davanti: l'anteprima si ferma). 04/11/2026 (scatolame ammesso in consumo familiare; `scheda_cucina` nei metadati; file delle esclusioni al PASSO 6). 31/10/2026 pomeriggio (deroga INSA estesa ad acidi grassi e colesterolo; saturi e colesterolo nel report, sezione LIPIDI). 31/10/2026 (avvisi dei riferimenti solo per i profili scelti). 30/10/2026 sera (profili clinici e registro dei riferimenti all'apertura). 30/10/2026 (tappa 2: apertura con gli alimenti desiderati contro il database e
+Ultima modifica: 25/11/2026 (`peso_kg` e `altezza_cm` nei metadati per le proteine per kg dei profili `over65` e `sportivo_forza`; attenzioni `RIFERIMENTI_SENZA_PESO` e blocco `ANTROPOMETRIA_NON_VALIDA`). 22/11/2026 (tabelle della scheda scelte al PASSO 6, campo `tabelle` del file delle esclusioni). 11/11/2026 (`obiettivo_intestazione` senza «Obiettivo» davanti: l'anteprima si ferma). 04/11/2026 (scatolame ammesso in consumo familiare; `scheda_cucina` nei metadati; file delle esclusioni al PASSO 6). 31/10/2026 pomeriggio (deroga INSA estesa ad acidi grassi e colesterolo; saturi e colesterolo nel report, sezione LIPIDI). 31/10/2026 (avvisi dei riferimenti solo per i profili scelti). 30/10/2026 sera (profili clinici e registro dei riferimenti all'apertura). 30/10/2026 (tappa 2: apertura con gli alimenti desiderati contro il database e
 le assunzioni da confermare; conferma dell'assenza di terapia nei metadati; PASSO 6 su un
 verdetto della pipeline senza bloccanti, anteprima consegnata come file; campi nuovi dei
 metadati). 23/10/2026: PASSO 6 con anteprima completa e impronta, metadati in bozza prima dell'approvazione, un giorno chiuso = una riga in chat; condimenti a porzione libera; `--nessuna-terapia`; 22/10:
@@ -144,6 +144,11 @@ confermate sono emersi a piano finito e hanno fatto rifare i pranzi):**
   ricerca fatta in chat: se manca nel registro, si dichiara e si porta al progetto di
   consolidamento. Nei metadati: `"profili": [...]`; `[]` = nessun profilo clinico, e
   allora il PASSO 7 non dà avvisi (si controllano solo i parametri dei profili scelti);
+- con un profilo che ha soglie per kg (`over65`, `sportivo_forza`), peso e altezza del
+  paziente vanno nei metadati (`"peso_kg"`, `"altezza_cm"`, valori del fascicolo o della
+  visita, entrambi): il PASSO 7 verifica le proteine in g/kg, con BMI ≥ 30 sul peso
+  aggiustato (M1, riferimenti.py). Senza i due campi la soglia non si controlla e la
+  pipeline lo dice (`RIFERIMENTI_SENZA_PESO`), da dichiarare al PASSO 6;
 - gli alimenti che paziente o nutrizionista vogliono nel piano (fascicolo, Form B, richieste
   dirette) si confrontano col database: `python3 metadati_piano.py --desiderati "nome 1"
   "nome 2" ...`. Gli assenti si dichiarano subito, nelle domande in blocco: si aggiungono
@@ -404,7 +409,8 @@ una regola di questo modulo.
 - gli alimenti desiderati assenti dal database (`ALIMENTI_DESIDERATI_MANCANTI`), con cosa
   si è deciso (aggiunti con M6 o sostituiti);
 - i riferimenti dei profili fuori (`RIFERIMENTO_FUORI`), con il motivo se restano, e quelli
-  non verificabili (`RIFERIMENTI_NON_VERIFICABILI`), dichiarati come limite;
+  non verificabili (`RIFERIMENTI_NON_VERIFICABILI`, `RIFERIMENTI_SENZA_PESO`), dichiarati
+  come limite;
 - l'attenzione `LIVELLO_INCOERENTE_IN_DEROGA`, se presente, con la decisione del
   nutrizionista (sezione 2);
 - l'avviso `VALUTARE_LIVELLO_RINFORZATO`, se presente, con il motivo che lo ha fatto
@@ -431,6 +437,7 @@ accanto al CSV. È ciò che legge la chat B
   "assunzioni": [{"testo": "pranzo a casa nei giorni lavorativi", "stato": "confermata"}],
   "alimenti_desiderati": ["petto di pollo", "..."],
   "profili": ["ipercolesterolemia"],
+  "peso_kg": 0, "altezza_cm": 0,
   "intestazione": {"nome": "...", "eta": "XX anni", "condizione": "..."},
   "avvertenze_box": "allergie ed esclusioni obbligatorie, o \"Nessuna allergia dichiarata.\"",
   "abbinamento_spuntino": {"<opzione colazione>": "<opzione spuntino>"},
@@ -457,7 +464,8 @@ accanto al CSV. È ciò che legge la chat B
   `confermata` o `da_confermare`, nient'altro.
 - Nessuna kcal, nessun grammo, nessun valore nutrizionale: i numeri li ricalcola il motore
   in chat B da `piano.csv` (principio 2). Sole eccezioni, perché DATI DI INGRESSO
-  confermati dal nutrizionista: `tdee_confermato_kcal` e `range_kcal_libero`.
+  confermati dal nutrizionista: `tdee_confermato_kcal`, `range_kcal_libero`, `peso_kg` e
+  `altezza_cm` (questi due facoltativi: servono alle soglie per kg).
 - `terapia`: i principi attivi confermati al PASSO 4, oppure la formula fissa della conferma
   (PASSO 4), la stessa che la pipeline ha accettato in `TERAPIA_DICHIARATA_ASSENTE`. È l'unica fonte della chat B per la
   sezione 2 del documento di spiegazione quando manca il fascicolo: senza, la chat B non

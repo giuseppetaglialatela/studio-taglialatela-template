@@ -30,6 +30,9 @@ COME FUNZIONA
   nella settimana reale peggiore. Gli altri: dichiarati «non verificabili».
   Dal 31/10/2026 anche saturi (% dell'energia, 9 kcal/g) e colesterolo, dal file
   affiancato lipidi.csv; dato mancante = totale sottostimato (gap.csv).
+  Dal 25/11/2026 anche le proteine per kg, se i metadati hanno peso_kg e
+  altezza_cm: con BMI >= 30 sul peso aggiustato (peso_riferimento), sotto sul
+  peso attuale; senza i due campi si mostrano e non si controllano.
 - Avviso, mai blocco (decisione del 30/10/2026).
 - Evidenze nuove: si aggiunge la riga nuova «attivo» e la vecchia diventa
   «superato» con sostituito_da; niente si cancella. Una riga «da_verificare» non
@@ -68,8 +71,8 @@ PROFILI = {
     "sportivo_forza": "allenamento di forza o ipertrofia",
 }
 NOTE_PROFILO = {
-    "obesita": "linea guida SIO/ISS 2026 (Eat Weight Disord 2026;31:9) non ancora letta: "
-               "nessun riferimento caricato",
+    "obesita": "linea guida SIO/ISS 2026 (Eat Weight Disord 2026;31:9) letta per intero il "
+               "25/11/2026: nessun valore numerico sui nutrienti, solo indicazioni",
 }
 
 # parametro -> (unita, descrizione, come si calcola dal motore o None)
@@ -92,10 +95,61 @@ PARAMETRI = {
     "potassio_mg": ("mg_die", "potassio", None),
     "alcol_g_die": ("g_die", "alcol", None),
     "alcol_g_settimana": ("g_settimana", "alcol", None),
-    # per kg di peso corporeo: il motore non conosce il peso del paziente, quindi
-    # si mostra e non si controlla (22/11/2026)
-    "proteine_g_kg": ("g_kg_die", "proteine per kg di peso corporeo", None),
+    # per kg di peso corporeo (25/11/2026): si verifica solo se i metadati hanno
+    # peso_kg e altezza_cm (peso di riferimento: vedi peso_riferimento); senza, si
+    # mostra e non si controlla, come dal 22/11/2026
+    "proteine_g_kg": ("g_kg_die", "proteine per kg di peso corporeo", ("per_kg", "proteine_g")),
 }
+
+# Peso di riferimento per i parametri per kg (decisione del nutrizionista del
+# 25/11/2026): con BMI >= 30 il peso aggiustato (peso a BMI 25 + 25% dell'eccesso),
+# sotto 30 il peso attuale. Fonte del peso aggiustato: Barazzoni R et al., Clin Nutr
+# 2026;61:106645 (SOGLI), Statement 11, p. 5; nessun grado di evidenza (vedi la nota
+# di R012). ESPEN 2022 dice solo «BW».
+BMI_OBESITA = 30.0
+BMI_RIFERIMENTO = 25.0
+QUOTA_ECCESSO = 0.25
+FONTE_PESO_AGGIUSTATO = ("Barazzoni et al., Clin Nutr 2026;61:106645 (SOGLI), Statement 11, "
+                         "p. 5")
+LIMITI_PESO = (30.0, 300.0)       # kg: fuori da qui e' un errore di scrittura
+LIMITI_ALTEZZA = (120.0, 230.0)   # cm
+
+
+def peso_riferimento(meta):
+    """(info, errore). info = None se i metadati non hanno ne' peso_kg ne' altezza_cm
+    (parametri per kg mostrati e non verificati); altrimenti dict(peso, altezza, bmi,
+    peso_rif, tipo, descrizione). Errore se ne manca uno o se non sono numeri
+    plausibili: il controllo sarebbe impossibile, non si indovina."""
+    meta = meta or {}
+    ha_p, ha_a = "peso_kg" in meta, "altezza_cm" in meta
+    if not ha_p and not ha_a:
+        return None, None
+    if ha_p != ha_a:
+        return None, ("nei metadati c'e' " + ("peso_kg" if ha_p else "altezza_cm")
+                      + " senza " + ("altezza_cm" if ha_p else "peso_kg")
+                      + ": servono entrambi (il peso aggiustato richiede il BMI)")
+    p, a = meta["peso_kg"], meta["altezza_cm"]
+    for nome, v, (lo, hi) in (("peso_kg", p, LIMITI_PESO), ("altezza_cm", a, LIMITI_ALTEZZA)):
+        if isinstance(v, bool) or not isinstance(v, (int, float)):
+            return None, f"{nome} deve essere un numero (vale {v!r})"
+        if not lo <= v <= hi:
+            return None, f"{nome} = {v} fuori dall'intervallo plausibile {lo:g}-{hi:g}"
+    h2 = (a / 100) ** 2
+    bmi = round(p / h2, 6)          # 76,8 kg a 160 cm = BMI 30, non 29,999...
+    if bmi >= BMI_OBESITA:
+        ideale = BMI_RIFERIMENTO * h2
+        rif = ideale + QUOTA_ECCESSO * (p - ideale)
+        descr = (f"peso aggiustato {_fmt(round(rif, 1))} kg (peso {_fmt(p)} kg, altezza "
+                 f"{_fmt(a)} cm, BMI {_fmt(round(bmi, 1))} >= {_fmt(BMI_OBESITA)}: peso a BMI "
+                 f"{_fmt(BMI_RIFERIMENTO)} + {QUOTA_ECCESSO:.0%} dell'eccesso; "
+                 f"{FONTE_PESO_AGGIUSTATO})")
+        tipo = "aggiustato"
+    else:
+        rif = float(p)
+        descr = (f"peso attuale {_fmt(p)} kg (altezza {_fmt(a)} cm, BMI "
+                 f"{_fmt(round(bmi, 1))} < {_fmt(BMI_OBESITA)})")
+        tipo = "attuale"
+    return dict(peso=p, altezza=a, bmi=bmi, peso_rif=rif, tipo=tipo, descrizione=descr), None
 UNITA_LEGGIBILE = {"g_die": "g/die", "mg_die": "mg/die", "pct_energia": "% dell'energia",
                    "g_settimana": "g/settimana", "g_kg_die": "g/kg/die"}
 STATI = ("attivo", "superato", "da_verificare")
@@ -285,9 +339,11 @@ def _settimana_somma(combos_per_giorno, campo):
     return (lo, idx_min), (hi, idx_max)
 
 
-def valuta(limiti, combos_per_giorno):
+def valuta(limiti, combos_per_giorno, peso_rif=None):
     """Esiti per parametro: lista di dict(parametro, lato, riga, verificabile,
-    valore (media settimanale peggiore), indici (scelte per giorno), ok)."""
+    motivo (perche' non verificabile: «database» o «peso»), valore (media
+    settimanale peggiore), indici (scelte per giorno), ok). peso_rif: kg su cui si
+    calcolano i parametri per kg (None = non verificabili)."""
     import combinazioni as mod_comb
     esiti = []
     sett = None
@@ -298,11 +354,16 @@ def valuta(limiti, combos_per_giorno):
             if r is None:
                 continue
             soglia = r["min"] if s == "min" else r["max"]
-            if calcolo is None:
+            if calcolo is None or (calcolo[0] == "per_kg" and not peso_rif):
                 esiti.append(dict(parametro=par, lato=s, riga=r, soglia=soglia,
-                                  verificabile=False, valore=None, indici=None, ok=None))
+                                  verificabile=False,
+                                  motivo="database" if calcolo is None else "peso",
+                                  valore=None, indici=None, ok=None))
                 continue
-            if calcolo[0] == "somma":
+            if calcolo[0] == "per_kg":
+                (lo, ilo), (hi, ihi) = _settimana_somma(combos_per_giorno, calcolo[1])
+                lo, hi = lo / peso_rif, hi / peso_rif
+            elif calcolo[0] == "somma":
                 (lo, ilo), (hi, ihi) = _settimana_somma(combos_per_giorno, calcolo[1])
             else:
                 if sett is None:
@@ -319,7 +380,7 @@ def valuta(limiti, combos_per_giorno):
             valore, indici = (lo, ilo) if s == "min" else (hi, ihi)
             ok = valore >= soglia - 1e-9 if s == "min" else valore <= soglia + 1e-9
             esiti.append(dict(parametro=par, lato=s, riga=r, soglia=soglia, verificabile=True,
-                              valore=valore, indici=indici, ok=ok))
+                              motivo=None, valore=valore, indici=indici, ok=ok))
     return esiti
 
 
@@ -353,7 +414,9 @@ def testo_apertura(righe, profili):
             r = limiti[par][s]
             if r is None:
                 continue
-            calc = "sì" if PARAMETRI[par][2] else "NO: si dichiara come limite"
+            calcolo = PARAMETRI[par][2]
+            calc = ("solo con peso_kg e altezza_cm nei metadati" if calcolo and calcolo[0] == "per_kg"
+                    else "sì" if calcolo else "NO: si dichiara come limite")
             L.append(f"| {PARAMETRI[par][1]} | {descrivi_limite(r, s)} | {calc} | {r['profilo']} "
                      f"| {r['documento']}, {r['posizione']} ({r['id']}) | {r['frase']} "
                      f"| {r['evidenza']} |")
@@ -522,6 +585,40 @@ def autotest():
     atteso("proteine in % dell'energia della settimana", round(es[("proteine_pct", "max")]["valore"], 6),
            round(p_pct, 6))
     atteso("proteine 29% oltre 20%: fuori", es[("proteine_pct", "max")]["ok"], False)
+
+    # proteine per kg (25/11/2026): peso di riferimento e verifica settimanale
+    atteso("senza peso ne' altezza: nessuna verifica", peso_riferimento({}), (None, None))
+    for etichetta, m in (("solo peso", {"peso_kg": 80}), ("solo altezza", {"altezza_cm": 160}),
+                         ("peso testo", {"peso_kg": "80", "altezza_cm": 160}),
+                         ("peso booleano", {"peso_kg": True, "altezza_cm": 160}),
+                         ("altezza in metri", {"peso_kg": 80, "altezza_cm": 1.6}),
+                         ("peso in grammi", {"peso_kg": 80000, "altezza_cm": 160})):
+        atteso(f"antropometria respinta: {etichetta}", peso_riferimento(m)[1] is not None, True)
+    info, _ = peso_riferimento({"peso_kg": 64, "altezza_cm": 160})       # BMI 25,0
+    atteso("BMI 25: peso attuale", (info["tipo"], info["peso_rif"]), ("attuale", 64.0))
+    info, _ = peso_riferimento({"peso_kg": 76.79, "altezza_cm": 160})    # BMI 29,996
+    atteso("BMI appena sotto 30: peso attuale", info["tipo"], "attuale")
+    info, _ = peso_riferimento({"peso_kg": 76.8, "altezza_cm": 160})     # BMI 30,0
+    atteso("BMI 30: peso aggiustato", info["tipo"], "aggiustato")
+    info, _ = peso_riferimento({"peso_kg": 89.6, "altezza_cm": 160})     # BMI 35
+    # ideale = 25 x 1,6^2 = 64 kg; aggiustato = 64 + 0,25 x (89,6 - 64) = 70,4 kg
+    atteso("peso aggiustato = 64 + 25% di 25,6 = 70,4 kg", round(info["peso_rif"], 6), 70.4)
+    reg_k = reg + [riga("K1", "over65", "proteine_g_kg", mn="1"),
+                   riga("K2", "sportivo_forza", "proteine_g_kg", mn="1.6")]
+    lim, _, _ = applicabili(reg_k, ["over65"])
+    cp_k = [[c(30, 60, 50, 10)], [c(30, 70, 50, 10), c(30, 80, 50, 10)]]  # 60, 70-80 g
+    es = valuta(lim, cp_k)
+    atteso("senza peso: proteine per kg non verificabili (motivo peso)",
+           [(e["verificabile"], e["motivo"]) for e in es if e["parametro"] == "proteine_g_kg"],
+           [(False, "peso")])
+    es = {e["parametro"]: e for e in valuta(lim, cp_k, peso_rif=70.4)}
+    atteso("g/kg sulla settimana peggiore: (60+70)/2 / 70,4",
+           round(es["proteine_g_kg"]["valore"], 6), round(65 / 70.4, 6))
+    atteso("0,92 g/kg sotto 1: fuori", es["proteine_g_kg"]["ok"], False)
+    es = {e["parametro"]: e for e in valuta(lim, cp_k, peso_rif=64.0)}
+    atteso("prova al contrario: 65/64 = 1,02 g/kg dentro", es["proteine_g_kg"]["ok"], True)
+    lim, _, _ = applicabili(reg_k, ["over65", "sportivo_forza"])
+    atteso("over65 + forza: vale il piu' restrittivo (1,6)", lim["proteine_g_kg"]["min"]["id"], "K2")
 
     # validazione: ogni difetto noto si ferma
     def con(i, **kw):

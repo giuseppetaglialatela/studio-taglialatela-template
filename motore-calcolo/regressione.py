@@ -497,6 +497,12 @@ def modo_verifica():
     if not ok_cat:
         falliti += 1
         ok_cli = False
+    # Proteine per kg nel profilo over65 (25/11/2026): peso e altezza nei metadati
+    ok_pk, msg_pk = verifica_proteine_per_kg()
+    print(f"\n  [{'OK ' if ok_pk else 'XX '}] proteine per kg (over65): {msg_pk}")
+    if not ok_pk:
+        falliti += 1
+        ok_cli = False
     # Scheda per chi cucina con voce da etichetta FITTIZIA (04/11/2026), riga di comando
     ok_sch, msg_sch = verifica_scheda_etichetta()
     print(f"\n  [{'OK ' if ok_sch else 'XX '}] scheda con eccezione etichetta: {msg_sch}")
@@ -652,6 +658,63 @@ def verifica_catena_anteprima():
         shutil.rmtree(tmp, ignore_errors=True)
     return True, ("pipeline con collaudo -> verdetto -> anteprima su file (non in chat) -> "
                   "impronta verificata")
+
+
+def verifica_proteine_per_kg():
+    """Proteine per kg nel profilo over65 (25/11/2026), dalla riga di comando: senza
+    peso e altezza la soglia R012 non si verifica e lo dice; con un peso basso e'
+    dentro, con un BMI >= 30 si usa il peso aggiustato e la stessa settimana esce
+    sotto la soglia (prova al contrario); peso senza altezza blocca. Pesi fittizi."""
+    import subprocess, tempfile, json as _json, shutil
+    import genera_zona_piano as gzp
+    tmp = tempfile.mkdtemp()
+    try:
+        _, piano, target = gzp._piano_di_collaudo(tmp)
+        meta_p = os.path.join(tmp, "metadati_piano_v1.json")
+        ver = os.path.join(tmp, "verdetto_v1.json")
+        base = {"versione_piano": "v1",
+                "giorni": {"lavorativi": ["lun"], "libero": "dom",
+                           "range_kcal_libero": [1600, 1900]},
+                "abbinamento_spuntino": {"A": "B", "B": "A"},
+                "terapia": "nessuna terapia, confermato dal nutrizionista il 23/10/2026 "
+                           "(fonte: colloquio)",
+                "assunzioni": [], "alimenti_desiderati": [], "profili": ["over65"]}
+
+        def pipe(**extra):
+            with open(meta_p, "w", encoding="utf-8") as f:
+                _json.dump(dict(base, **extra), f)
+            if os.path.exists(ver):
+                os.remove(ver)
+            r = subprocess.run([sys.executable, os.path.join(BASE, "pipeline.py"), "--piano", piano,
+                                "--target", target, "--nessuna-terapia", "--metadati", meta_p,
+                                "--salta-collaudo", "--out-verdetto", ver],
+                               capture_output=True, text=True, timeout=180, cwd=tmp)
+            v = _json.load(open(ver, encoding="utf-8")) if os.path.exists(ver) else {}
+            codici = {c for _, c, *_ in v.get("attenzioni", [])}
+            bloc = {c for _, c, *_ in v.get("bloccanti", [])}
+            return r, codici, bloc
+
+        def proteine_fuori(r):
+            return any("RIFERIMENTO_FUORI" in l and "proteine per kg" in l
+                       for l in r.stdout.splitlines())
+
+        r, cod, bloc = pipe()
+        if "RIFERIMENTI_SENZA_PESO" not in cod or "R012" not in r.stdout:
+            return False, "senza peso la soglia R012 non e' dichiarata come non verificata"
+        r, cod, bloc = pipe(peso_kg=40, altezza_cm=160)            # BMI 15,6: peso attuale
+        if "peso attuale 40 kg" not in r.stdout or proteine_fuori(r) \
+                or "RIFERIMENTI_SENZA_PESO" in cod:
+            return False, "con 40 kg (proteine > 1 g/kg) il controllo non da' esito OK"
+        r, cod, bloc = pipe(peso_kg=300, altezza_cm=230)           # BMI 56,7: aggiustato
+        if "peso aggiustato" not in r.stdout or not proteine_fuori(r):
+            return False, "con BMI >= 30 il peso aggiustato non si usa o la soglia non scatta"
+        r, cod, bloc = pipe(peso_kg=80)
+        if "ANTROPOMETRIA_NON_VALIDA" not in bloc:
+            return False, "peso senza altezza non blocca"
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+    return True, ("R012 senza peso dichiarata non verificata; 40 kg dentro; BMI 56,7 sul peso "
+                  "aggiustato fuori; peso senza altezza blocca")
 
 
 def verifica_scheda_etichetta():

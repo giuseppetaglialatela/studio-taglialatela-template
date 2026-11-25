@@ -1434,32 +1434,52 @@ def controlla_riferimenti(rilievi, meta, combos, sottostime=None):
     except mod_rif.ErroreRiferimenti as e:
         rilievi.blocca(7, "REGISTRO_RIFERIMENTI_NON_VALIDO", str(e))
         return
+    # peso e altezza nei metadati (25/11/2026): servono solo ai parametri per kg
+    antropo, err = mod_rif.peso_riferimento(meta)
+    if err:
+        rilievi.blocca(7, "ANTROPOMETRIA_NON_VALIDA", err)
+        return
     print(f"\n  Profili: generale" + (" + " + ", ".join(profili) if profili else "")
           + f" (registro {mod_rif.impronta(righe)})")
+    per_kg = any(mod_rif.PARAMETRI[p][2] and mod_rif.PARAMETRI[p][2][0] == "per_kg"
+                 for p in limiti)
+    if per_kg:
+        print("  Peso di riferimento per i parametri per kg: "
+              + (antropo["descrizione"] if antropo
+                 else "assente (peso_kg e altezza_cm non sono nei metadati)"))
     giorni = sorted(combos, key=lambda g: (len(g), g))
-    esiti = mod_rif.valuta(limiti, [combos[g] for g in giorni])
+    esiti = mod_rif.valuta(limiti, [combos[g] for g in giorni],
+                           peso_rif=antropo["peso_rif"] if antropo else None)
     sotto = sottostime or {}
-    non_verificabili = []
+    non_verificabili, senza_peso = [], []
     for e in esiti:
         r = e["riga"]
         nome = mod_rif.PARAMETRI[e["parametro"]][1]
         limite = mod_rif.descrivi_limite(r, e["lato"])
         if not e["verificabile"]:
-            non_verificabili.append(f"{nome} {limite} ({r['id']})")
-            print(f"    {nome:24} {limite:22} NON VERIFICABILE (dato assente dal database)")
+            if e["motivo"] == "peso":
+                senza_peso.append(f"{nome} {limite} ({r['id']})")
+                print(f"    {nome:24} {limite:22} NON VERIFICATO (peso e altezza assenti "
+                      f"dai metadati)")
+            else:
+                non_verificabili.append(f"{nome} {limite} ({r['id']})")
+                print(f"    {nome:24} {limite:22} NON VERIFICABILE (dato assente dal database)")
             continue
         calcolo = mod_rif.PARAMETRI[e["parametro"]][2]
         campo = calcolo[1]
         unita = "%" if calcolo[0] == "pct" else " " + mod_rif.UNITA_LEGGIBILE[r["unita"]]
+        cifre = 2 if calcolo[0] == "per_kg" else 1
+        val = f"{e['valore']:.{cifre}f}"
+        base = (f", su {antropo['descrizione']}" if calcolo[0] == "per_kg" else "")
         nota = (f" [SOTTOSTIMATO: gap su {', '.join(f for f, _ in sotto[campo])}]"
                 if campo in sotto else "")
         print(f"    {nome:24} {limite:22} media settimanale peggiore "
-              f"{e['valore']:.1f}{unita} -> {'OK' if e['ok'] else 'FUORI'}{nota}")
+              f"{val}{unita} -> {'OK' if e['ok'] else 'FUORI'}{nota}")
         if not e["ok"]:
             scelte = _descrivi_settimana(giorni, combos, e["indici"])
             rilievi.segnala(7, "RIFERIMENTO_FUORI",
-                            f"{nome}: media settimanale {e['valore']:.1f}{unita} nella "
-                            f"settimana peggiore ({scelte}), riferimento {limite} "
+                            f"{nome}: media settimanale {val}{unita} nella "
+                            f"settimana peggiore ({scelte}){base}, riferimento {limite} "
                             f"[{r['profilo']}: {mod_rif.fonte(r)}]{nota}. Avviso: si dichiara "
                             f"e si motiva al PASSO 6")
     if non_verificabili:
@@ -1467,6 +1487,11 @@ def controlla_riferimenti(rilievi, meta, combos, sottostime=None):
                         "riferimenti dei profili che il motore non calcola (dato assente dal "
                         "database), da dichiarare come limite al PASSO 6: "
                         + "; ".join(non_verificabili))
+    if senza_peso:
+        rilievi.segnala(7, "RIFERIMENTI_SENZA_PESO",
+                        "riferimenti per kg non verificati perche' i metadati non hanno "
+                        "peso_kg e altezza_cm (aggiungerli per il controllo): "
+                        + "; ".join(senza_peso))
     for a in avvertenze:
         rilievi.segnala(7, "PROFILO_SENZA_RIFERIMENTI", a)
     if indicazioni:

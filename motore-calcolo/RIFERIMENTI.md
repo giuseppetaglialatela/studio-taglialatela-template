@@ -2,7 +2,7 @@
 
 Generato da `riferimenti.py --genera-pagina` da `riferimenti.csv`: non si modifica a mano (il collaudo controlla che coincida). Ogni valore con documento, posizione e frase originale. Si controllano solo i parametri dei profili scelti nel piano: il profilo «generale» (LARN) da solo non dà avvisi, è il termine di confronto, e un profilo lo sostituisce solo se più restrittivo (salvo le righe «sostituisce»). Avvisi, mai blocchi.
 
-Impronta del registro: `eb36eb3fe89d`
+Impronta del registro: `35d6a7487ab0`
 
 ## generale — popolazione adulta sana (LARN): termine di confronto, da solo non da' avvisi
 
@@ -40,6 +40,16 @@ Impronta del registro: `eb36eb3fe89d`
 - `R011` **potassio** ≥ 3900 mg/die — **DA_VERIFICARE**
   - SINU, LARN V revisione (2024), Appendici A-D, App. D p. 13, tab. 2; evidenza: SDT; popolazione: 65 anni e oltre; verificato: —
   - nota: valore nella tabella delle estrazioni, frase originale non trascritta: da leggere sulla fonte prima dell'uso
+- `R012` **proteine per kg di peso corporeo** ≥ 1 g/kg/die
+  - ESPEN practical guideline geriatria (Volkert D et al.), Clin Nutr 2022;41:958-989, Raccomandazione 2 (R2), p. 960; commento alla raccomandazione 81, p. 983; evidenza: R2: grado B, consenso forte 100%; popolazione: 65 anni e oltre, anche in calo di peso; verificato: 2026-11-25
+  - «Protein intake in older persons should be at least 1 g protein per kg BW and day. The amount should be individually adjusted with regard to nutritional status, physical activity level, disease status, and tolerance.» · in calo di peso: «assuring a protein intake of at least 1 g/kg BW/d and appropriate intake of micronutrients»
+  - nota: Approvato dal nutrizionista il 25/11/2026 (minimo 1,0, nessun massimo). Peso di riferimento (decisione del 25/11/2026): con BMI >= 30 il peso aggiustato = peso a BMI 25 + 25% dell'eccesso (Barazzoni R et al., Clin Nutr 2026;61:106645, SOGLI, Statement 11 p. 5; Statement 14 p. 7: «>1 g protein/kg ABW/day» durante la gestione dell'obesità; nessun grado né metodo di consenso formale; gli autori: apporto ottimale nell'obesità «incompletely defined, especially during weight loss», p. 4); sotto 30 il peso attuale. ESPEN dice solo «BW». Concordante: PROT-AGE (Bauer J et al., JAMDA 2013;14:542-559, riquadro p. 554): «at least in the range of 1.0 to 1.2 g/kg BW/d»; 1,2-1,5 g/kg con malattia acuta o cronica; con eGFR < 30 non in dialisi le proteine vanno limitate (consenso Delphi-like, p. 543-544). Si verifica solo con peso_kg e altezza_cm nei metadati.
+- `R013` **calo di peso nell'anziano: quando** (indicazione)
+  - ESPEN practical guideline geriatria (Volkert D et al.), Clin Nutr 2022;41:958-989, Raccomandazioni 79-80, pp. 982-983; evidenza: R79 (R54): GPP, consenso forte 95%; R80 (R55): GPP, consenso forte 100%; popolazione: 65 anni e oltre in sovrappeso o con obesità; verificato: 2026-11-25
+  - «In overweight older persons, weight-reducing diets shall be avoided in order to prevent loss of muscle mass and accompanying functional decline.» · «In obese older persons with weight-related health problems, weight-reducing diets shall only be considered after careful and individual weighing of benefits and risks.»
+- `R014` **calo di peso nell'anziano: come (deficit, apporto minimo, velocità, esercizio)** (indicazione)
+  - ESPEN practical guideline geriatria (Volkert D et al.), Clin Nutr 2022;41:958-989, Raccomandazioni 81-82 e commento, p. 983; evidenza: R81 (R56): GPP, consenso forte 95%; R82 (R57): grado A, consenso forte 100%; popolazione: 65 anni e oltre con obesità; verificato: 2026-11-25
+  - «If weight reduction is considered in obese older persons, energy restriction shall be only moderate in order to achieve a slow weight reduction and preserve muscle mass.» · «a maximally moderate caloric restriction (~500 kcal/d less than estimated needs and maintaining a minimum intake of 1000–1200 kcal/d) targeting a weight loss of 0.25–1 kg/ week» · «If weight reduction is considered in obese older persons, dietary interventions shall be combined with physical exercise whenever possible in order to preserve muscle mass.»
 
 ## ipercolesterolemia — ipercolesterolemia / LDL elevato
 
@@ -142,9 +152,17 @@ Impronta del registro: `eb36eb3fe89d`
 
 ## obesita — obesità
 
-linea guida SIO/ISS 2026 (Eat Weight Disord 2026;31:9) non ancora letta: nessun riferimento caricato
+linea guida SIO/ISS 2026 (Eat Weight Disord 2026;31:9) letta per intero il 25/11/2026: nessun valore numerico sui nutrienti, solo indicazioni
 
-Nessuna riga.
+- `R080` **intervento strutturato sullo stile di vita** (indicazione)
+  - Linea guida SIO/ISS obesità (Barazzoni R et al.), Eat Weight Disord 2026;31:9, doi 10.1007/s40519-026-01813-z, PICO 5, p. 5; Tabella 1, p. 3; evidenza: forte a favore, qualità delle evidenze moderata; popolazione: adulti con BMI ≥ 25 (la linea guida si applica da BMI 27); verificato: 2026-11-25
+  - «We recommend, in subjects with BMI≥25 kg/m2, structured lifestyle rather than non-structured lifestyle interventions in overweight and obesity management»
+- `R081` **dieta chetogenica (discordanza nella fonte: la Tabella 1 a p. 3 dice «We do not recommend», il testo a p. 6 «We do not suggest»; il grado è condizionato in entrambi)** (indicazione)
+  - Linea guida SIO/ISS obesità (Barazzoni R et al.), Eat Weight Disord 2026;31:9, doi 10.1007/s40519-026-01813-z, PICO 7, p. 6; Tabella 1, p. 3; evidenza: condizionata contro, qualità delle evidenze molto bassa; popolazione: adulti con BMI ≥ 25; verificato: 2026-11-25
+  - «We do not suggest in subjects with BMI≥25 kg/m2 to routinely adopt a ketogenic diet versus balanced macronutrient diets (e.g., Mediterranean diet) for overweight and obesity treatment»
+- `R082` **obiettivo di calo di peso (il quesito riguarda il calo con farmaci o chirurgia; esito: benessere psicologico)** (indicazione)
+  - Linea guida SIO/ISS obesità (Barazzoni R et al.), Eat Weight Disord 2026;31:9, doi 10.1007/s40519-026-01813-z, PICO 13, p. 8; Tabella 1, p. 4; evidenza: forte a favore, qualità delle evidenze moderata; popolazione: adulti con BMI ≥ 30; verificato: 2026-11-25
+  - «We recommend in subjects with BMI≥30 kg/m2 a weight loss of at least 5% to achieve (or maintain) a psychological well-being»
 
 ## sportivo_forza — allenamento di forza o ipertrofia
 
